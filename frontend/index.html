@@ -86,9 +86,13 @@
         <div class="flex items-center justify-between mt-2 px-1">
           <span class="text-xs text-slate-600">Enter to send • Shift+Enter new line</span>
           <select id="model-select" class="text-xs bg-transparent text-slate-500 border-none outline-none cursor-pointer">
-            <option value="qwen/qwen3-coder:free">Qwen Coder (Free)</option>
-            <option value="minimax/minimax-m2.5">MiniMax M2.5</option>
-            <option value="kwaipilot/kat-coder-pro">KAT-Coder Pro</option>
+            <option value="google/gemini-2.5-flash" selected>Gemini 2.5 Flash ($0.30) ⚡</option>
+            <option value="xiaomi/mimo-v2-omni">MiMo V2 Omni ($0.40)</option>
+            <option value="xiaomi/mimo-v2-pro">MiMo V2 Pro ($1.00)</option>
+            <option value="minimax/minimax-m2.5">MiniMax M2.5 ($0.30)</option>
+            <option value="google/gemini-2.5-pro">Gemini 2.5 Pro ($1.25)</option>
+            <option value="anthropic/claude-sonnet-4-6">Claude Sonnet ($3.00)</option>
+            <option value="anthropic/claude-opus-4-6">Claude Opus ($15.00)</option>
           </select>
         </div>
       </div>
@@ -154,7 +158,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
   <script>
-    const API = 'http://localhost:3500';
+    const API = '';
     let currentHtml = '';
     let currentBuildId = '';
     let monacoEditor = null;
@@ -206,8 +210,18 @@
       if (!html) return;
       empty.classList.add('hidden');
       frame.classList.remove('hidden');
-      const blob = new Blob([html], { type: 'text/html' });
-      frame.src = URL.createObjectURL(blob);
+      try {
+        // Use srcdoc for reliable cross-browser preview
+        frame.srcdoc = html;
+      } catch(e) {
+        // Fallback to blob URL
+        try {
+          const blob = new Blob([html], { type: 'text/html' });
+          frame.src = URL.createObjectURL(blob);
+        } catch(e2) {
+          console.error('Preview error:', e2);
+        }
+      }
     }
 
     async function generate() {
@@ -230,14 +244,38 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ prompt, model, existingCode: currentHtml || null })
         });
-        const data = await res.json();
+
+        const rawText = await res.text();
+        console.log('[DEBUG] raw response:', rawText.substring(0, 200));
+
+        let data;
+        try {
+          data = JSON.parse(rawText);
+        } catch(e) {
+          throw new Error(`Invalid JSON response: ${rawText.substring(0, 100)}`);
+        }
+
         if (data.error) throw new Error(data.error);
+        if (!data.html) throw new Error('No HTML in response');
 
         currentHtml = data.html;
         currentBuildId = data.buildId;
 
-        // Update editor
-        if (monacoEditor) monacoEditor.setValue(currentHtml);
+        // Update editor safely
+        try {
+          if (monacoEditor) {
+            const model = monacoEditor.getModel();
+            if (model) {
+              model.pushEditOperations([], [{
+                range: model.getFullModelRange(),
+                text: currentHtml
+              }], () => null);
+            }
+          }
+        } catch(e) {
+          console.warn('Monaco setValue error:', e.message);
+        }
+
         updatePreview(currentHtml);
 
         typingMsg.innerHTML = '✅ Done! You can ask me to refine it.';
@@ -245,6 +283,7 @@
         document.getElementById('deploy-btn').classList.remove('hidden');
 
       } catch (err) {
+        console.error('[ERROR]', err);
         typingMsg.innerHTML = `❌ Error: ${err.message}`;
         setStatus('Error', '#EF4444');
       } finally {
@@ -263,8 +302,9 @@
 
     function openNewTab() {
       if (!currentHtml) return;
-      const blob = new Blob([currentHtml], { type: 'text/html' });
-      window.open(URL.createObjectURL(blob), '_blank');
+      const w = window.open('', '_blank');
+      w.document.write(currentHtml);
+      w.document.close();
     }
 
     function copyCode() {

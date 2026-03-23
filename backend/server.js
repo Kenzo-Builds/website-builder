@@ -8,10 +8,12 @@ const crypto = require('crypto');
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // ── Config ─────────────────────────────────────────────────────────────────
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || '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';
+// Always use this key — ignore system env to avoid stale key conflicts
+const OPENROUTER_API_KEY = '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';
 const DEPLOY_API = 'http://172.18.0.1:5000';
 const BUILDS_DIR = path.join(__dirname, 'builds');
 const PORT = process.env.PORT || 3500;
@@ -19,7 +21,7 @@ const PORT = process.env.PORT || 3500;
 if (!fs.existsSync(BUILDS_DIR)) fs.mkdirSync(BUILDS_DIR, { recursive: true });
 
 // ── AI call via OpenRouter ──────────────────────────────────────────────────
-function callAI(messages, model = 'qwen/qwen3-coder:free', stream = false) {
+function callAI(messages, model = 'google/gemini-2.5-flash', stream = false) {
   return new Promise((resolve, reject) => {
     const body = JSON.stringify({ model, messages, stream });
     const options = {
@@ -39,10 +41,19 @@ function callAI(messages, model = 'qwen/qwen3-coder:free', stream = false) {
       res.on('end', () => {
         try {
           const parsed = JSON.parse(data);
-          if (parsed.error) return reject(new Error(parsed.error.message));
-          resolve(parsed.choices[0].message.content);
-        } catch (e) { reject(e); }
+          if (parsed.error) return reject(new Error(parsed.error.message || JSON.stringify(parsed.error)));
+          const content = parsed.choices?.[0]?.message?.content;
+          if (!content) return reject(new Error('Empty response from model'));
+          resolve(content);
+        } catch (e) {
+          console.error('[AI raw response]', data.substring(0, 300));
+          reject(new Error(`JSON parse error: ${data.substring(0, 100)}`));
+        }
       });
+    });
+    req.setTimeout(240000, () => {
+      req.destroy();
+      reject(new Error('AI request timed out after 4 minutes'));
     });
     req.on('error', reject);
     req.write(body);

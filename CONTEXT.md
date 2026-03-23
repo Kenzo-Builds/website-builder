@@ -1,59 +1,91 @@
 # CONTEXT.md — Website Builder
 
 ## Product
-AI-powered website, web app, and Telegram bot builder. Describe in plain language → AI builds it.
+AI-powered website, web app, and Telegram bot builder. Describe in plain language → AI builds it instantly.
 
 ## Target Audience
 - Small business owners who need a website fast
-- Freelancers/agencies building for clients
 - Entrepreneurs launching products
-- Non-technical founders (like Khumoyun himself)
+- Non-technical founders
+- Uzbek users who don't speak English or Russian (native language support)
 - Primary market: Uzbekistan, secondary: CIS region
 
 ## Core Problem
 Building websites is expensive ($500-3000 for a developer) and slow (2-4 weeks). No-code tools (Wix, Webflow) are complex and not localized for Uzbek market. No AI builder exists in Uzbek/Russian.
 
 ## Solution
-Type what you want → AI builds it in seconds. Export clean code or deploy directly. Works for:
-- Static websites (business cards, landing pages)
-- Web applications (dashboards, portals)
-- Telegram bots
-- E-commerce stores
+Type what you want in any language → AI builds it in seconds. Export clean code or deploy directly.
 
 ## Key Differentiators vs Bolt.new / v0 / Aura
-1. **Uzbek + Russian language** — describe in native language
+1. **Uzbek + Russian language** — describe in native language, AI understands
 2. **Agent mode** — AI autonomously builds multi-file projects, fixes errors, iterates
 3. **Telegram bot builder** — unique, no competitor has this
 4. **Payme/Click integration templates** — pre-built payment flows for Uzbek market
-5. **Deploy to kenzoagent.com** — one-click deploy (initially)
-6. **No prompt limits** — flat monthly fee, unlimited generations
+5. **One-click deploy** — live on kenzoagent.com subdomain instantly
+6. **Usage-based pricing** — same quality for all plans, only limits differ
 
-## Tech Stack
-- Frontend: Next.js + Tailwind CSS + Monaco Editor (code view)
-- AI: KAT-Coder-Pro V1 (free tier coding), MiniMax M2.5 (paid tier)
-- Agent: Custom multi-step agent (plan → code → fix → deploy loop)
-- Sandbox: WebContainer (browser-based) or Docker (server-side)
-- Deployment: Nginx + Certbot on kenzoagent.com
-- Payments: Payme, Click
-- Languages: Uzbek, Russian, English
+## AI Model Stack (FINAL — decided 2026-03-23)
 
-## Pricing
-- Free: 5 generations/day, basic sites only
-- Standard ($9/mo): Unlimited generations, web apps, custom domains
-- Premium ($19/mo): Agent mode, Telegram bot builder, priority deployment
+### Primary Model
+- **Claude Sonnet 4.6** (`anthropic/claude-sonnet-4-6`) — best design + code quality, used for all requests
 
-## Agent Mode (Core Differentiator)
+### Escalation Stack (silent, user never sees this)
+- **Gemini 2.5 Pro** (`google/gemini-2.5-pro`) — design-specific failures, complex CSS/layouts
+- **Claude Opus 4.6** (`anthropic/claude-opus-4-6`) — absolute last resort for complex failures, Expert plan only
+
+### Routing Logic
+```
+All requests → Sonnet (primary)
+  ↓ if output quality fails
+Gemini 2.5 Pro (design escalation)
+  ↓ if still fails + Expert plan user
+Claude Opus (nuclear option)
+```
+
+### Quality Validator
+Check output HTML has: <!DOCTYPE>, <body>, actual content, min 500 chars
+If validation fails → escalate silently
+
+## Pricing Tiers (FINAL — decided 2026-03-23)
+
+| Plan | Price | Requests | Escalation |
+|------|-------|----------|------------|
+| Free | $0 | 15 total (lifetime) | Sonnet only |
+| Starter | $5/mo | 50/mo | Sonnet only |
+| Pro | $15/mo | 200/mo | Sonnet + Gemini 2.5 Pro |
+| Expert | $30/mo | Unlimited | Full stack incl. Opus |
+
+- Same quality for all plans — only usage limits differ
+- Users never see which model is used
+- Expert plan gets silent Opus escalation to ensure nothing ever breaks
+
+## Cost Economics (1,000 subscribers)
+- API cost: ~$485/month (all Sonnet)
+- Revenue: $11,500/month
+- Profit margin: **96%**
+
+## Tech Stack (Current MVP)
+- Frontend: HTML + Tailwind CSS + Monaco Editor
+- Backend: Node.js Express (port 3500, PM2)
+- AI: OpenRouter API (Sonnet → Gemini 2.5 Pro → Opus)
+- Deployment: Nginx + Certbot, kenzoagent.com subdomains
+- Deploy API: http://172.18.0.1:5000/deploy
+- Builds stored: /root/.openclaw/workspace/projects/website-builder/backend/builds/
+- Live URL: https://builder.kenzoagent.com
+
+## Agent Mode (Core Differentiator — Phase 2)
 Unlike simple code generators, the agent:
 1. Plans the project structure
 2. Generates all files
-3. Runs in sandbox, detects errors
-4. Fixes errors automatically
-5. Iterates until working
-6. Deploys with one click
-
-Like Cursor's agent but for building full products, not just editing code.
+3. Validates output quality
+4. Escalates model if quality insufficient
+5. Deploys with one click
 
 ## Monetization
-- SaaS subscription (Payme/Click)
-- Template marketplace (sell/buy templates, 0% commission initially)
-- Agency plan (white-label, build for clients)
+- SaaS subscription (Payme, Click)
+- Template marketplace (Phase 2)
+- Agency/white-label plan (Phase 3)
+
+## Competitor
+- Aura.build: 65K users, charges per prompt (10-560/mo), no Uzbek support
+- Bolt.new, v0, Lovable: English only, no Uzbek/CIS market presence
