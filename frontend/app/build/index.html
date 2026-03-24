@@ -12,15 +12,15 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #09090B;
-      --bg-2: #0C0C0F;
-      --bg-card: #111114;
-      --bg-hover: #18181B;
-      --border: #27272A;
-      --border-2: #3F3F46;
-      --text: #FAFAFA;
+      --bg: #0D0D0D;
+      --bg-2: #111115;
+      --bg-card: #151518;
+      --bg-hover: #1C1C22;
+      --border: rgba(255,255,255,0.07);
+      --border-2: rgba(255,255,255,0.12);
+      --text: #F4F4F5;
       --text-2: #A1A1AA;
-      --text-3: #71717A;
+      --text-3: #52525B;
       --blue: #3B82F6;
       --purple: #8B5CF6;
       --green: #22C55E;
@@ -150,32 +150,54 @@
 
     /* Input area */
     #input-area {
-      padding: 12px 16px 16px; border-top: 1px solid var(--border);
+      padding: 10px 12px 14px; border-top: 1px solid var(--border);
       flex-shrink: 0; background: var(--bg-2);
     }
+    /* Attach preview */
+    .attach-preview { display:none; align-items:center; gap:8px; padding:6px 0 8px; }
+    .attach-preview.show { display:flex; }
+    .attach-thumb { width:40px; height:40px; border-radius:6px; object-fit:cover; border:1px solid var(--border-2); }
+    .attach-rm { background:none; border:none; color:var(--text-3); cursor:pointer; font-size:16px; line-height:1; padding:2px; }
+    .attach-rm:hover { color:var(--text); }
+
     .input-box {
-      background: var(--bg); border: 1px solid var(--border);
+      background: var(--bg-card); border: 1px solid var(--border);
       border-radius: 12px; padding: 10px 12px;
       display: flex; gap: 8px; align-items: flex-end;
       transition: border-color 0.2s;
     }
     .input-box:focus-within { border-color: var(--border-2); }
+
+    .input-icon-btn {
+      width:28px; height:28px; border-radius:7px; border:none;
+      background:transparent; color:var(--text-3); cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      transition:all .15s; flex-shrink:0;
+    }
+    .input-icon-btn:hover { background:var(--bg-hover); color:var(--text-2); }
+    .input-icon-btn svg { width:15px; height:15px; }
+    .input-icon-btn.recording { color:#EAB308; background:rgba(234,179,8,0.12); animation:mic-pulse 1s ease-in-out infinite; }
+    .input-icon-btn.transcribing { color:#3B82F6; background:rgba(59,130,246,0.1); }
+    @keyframes mic-pulse{0%,100%{box-shadow:0 0 0 0 rgba(234,179,8,0.3)}50%{box-shadow:0 0 0 6px rgba(234,179,8,0)}}
+
     #prompt-input {
       flex: 1; background: transparent; border: none; outline: none;
       color: var(--text); font-size: 13px; resize: none; min-height: 36px; max-height: 120px;
       font-family: inherit; line-height: 1.5;
     }
     #prompt-input::placeholder { color: var(--text-3); }
+
     #send-btn {
-      width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
-      background: var(--blue); border: none; cursor: pointer;
+      width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
+      background: #fff; border: none; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       transition: opacity 0.15s;
     }
     #send-btn:hover { opacity: 0.85; }
-    #send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    #send-btn.disabled { opacity: 0.25; cursor: not-allowed; pointer-events:none; }
+    #send-btn svg { color: #0D0D0D; }
 
-    .input-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+    .input-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; gap:8px; }
     .input-hint { font-size: 11px; color: var(--text-3); }
     #model-select {
       font-size: 11px; background: var(--bg); color: var(--text-2);
@@ -564,11 +586,22 @@
         </div>
       </div>
       <div id="input-area">
+        <div class="attach-preview" id="attach-preview">
+          <img class="attach-thumb" id="attach-thumb" src="" alt="">
+          <button class="attach-rm" onclick="removeAttach()">×</button>
+        </div>
         <div class="input-box">
-          <textarea id="prompt-input" placeholder="Describe your website..." rows="1"></textarea>
-          <button id="send-btn" type="button">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          </button>
+          <div class="input-icon-btn" id="attach-btn" onclick="triggerAttach()" title="Attach image">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+          </div>
+          <input type="file" id="attach-file" accept="image/jpeg,image/png,image/gif,image/webp,image/heic,image/heif" style="display:none" onchange="handleAttach(this)">
+          <textarea id="prompt-input" placeholder="Describe your website..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();generate()}" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+          <div class="input-icon-btn" id="mic-btn" onclick="toggleVoice()" title="Voice input">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          </div>
+          <div id="send-btn" onclick="generate()" title="Send">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </div>
         </div>
         <div class="input-footer">
           <div class="mode-toggle">
@@ -580,11 +613,12 @@
             </button>
           </div>
           <select id="model-select">
-            <option value="xiaomi/mimo-v2-pro">MiMo V2 Pro ⭐</option>
-            <option value="minimax/minimax-m2.5">MiniMax M2.5 ⚡</option>
-            <option value="google/gemini-2.5-pro">Gemini 2.5 Pro</option>
-            <option value="anthropic/claude-sonnet-4">Claude Sonnet 4 💎</option>
-            <option value="anthropic/claude-opus-4">Claude Opus 4 👑</option>
+            <option value="anthropic/claude-sonnet-4.6" selected>Sonnet 4.6</option>
+            <option value="anthropic/claude-opus-4.6">Opus 4.6</option>
+            <option value="google/gemini-3.1-pro-preview">Gemini 3.1 Pro</option>
+            <option value="google/gemini-3-flash-preview">Gemini 3 Flash</option>
+            <option value="openai/gpt-5.4">GPT-5.4</option>
+            <option value="openai/gpt-5.3-codex">GPT-5.3 Codex</option>
           </select>
         </div>
       </div>
@@ -945,6 +979,74 @@
       });
     });
 
+    // ===== IMAGE ATTACH =====
+    var _attachData = null; // { base64, mimeType, dataUrl }
+
+    function triggerAttach() {
+      document.getElementById('attach-file').click();
+    }
+    function handleAttach(input) {
+      var file = input.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var dataUrl = e.target.result;
+        var b64 = dataUrl.split(',')[1];
+        _attachData = { base64: b64, mimeType: file.type, dataUrl: dataUrl };
+        document.getElementById('attach-thumb').src = dataUrl;
+        document.getElementById('attach-preview').classList.add('show');
+      };
+      reader.readAsDataURL(file);
+      input.value = '';
+    }
+    function removeAttach() {
+      _attachData = null;
+      document.getElementById('attach-preview').classList.remove('show');
+      document.getElementById('attach-thumb').src = '';
+    }
+
+    // ===== VOICE INPUT =====
+    var _mediaRec = null, _voiceChunks = [], _voiceLang = 'en';
+    function toggleVoice() {
+      var btn = document.getElementById('mic-btn');
+      if (_mediaRec && _mediaRec.state === 'recording') {
+        _mediaRec.stop();
+        btn.classList.remove('recording');
+      } else {
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
+          _voiceChunks = [];
+          _mediaRec = new MediaRecorder(stream);
+          _mediaRec.ondataavailable = function(e) { if (e.data.size > 0) _voiceChunks.push(e.data); };
+          _mediaRec.onstop = function() {
+            stream.getTracks().forEach(function(t) { t.stop(); });
+            btn.classList.remove('recording');
+            btn.classList.add('transcribing');
+            var blob = new Blob(_voiceChunks, { type: 'audio/webm' });
+            var fr = new FileReader();
+            fr.onload = function(e) {
+              var b64 = e.target.result.split(',')[1];
+              fetch('/api/transcribe', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ audio: b64, mimeType: 'audio/webm', language: _voiceLang })
+              }).then(function(r) { return r.json(); }).then(function(d) {
+                btn.classList.remove('transcribing');
+                if (d.text) {
+                  var inp = document.getElementById('prompt-input');
+                  inp.value = (inp.value ? inp.value + ' ' : '') + d.text;
+                  inp.style.height = 'auto';
+                  inp.style.height = Math.min(inp.scrollHeight, 120) + 'px';
+                }
+              }).catch(function(e) { btn.classList.remove('transcribing'); console.error('transcribe error', e); });
+            };
+            fr.readAsDataURL(blob);
+          };
+          _mediaRec.start();
+          btn.classList.add('recording');
+        }).catch(function(e) { alert('Microphone access denied'); });
+      }
+    }
+
     // ===== MODE SWITCHING =====
     function setMode(mode) {
       appMode = mode;
@@ -959,8 +1061,16 @@
       }
     }
 
-    async function brainstorm(userMsg) {
-      brainstormHistory.push({ role: 'user', content: userMsg });
+    async function brainstorm(userMsg, imgData) {
+      // Build message content — multimodal if image attached
+      // Use image_url format (OpenRouter normalizes for Claude/GPT/Gemini)
+      const msgContent = imgData
+        ? [
+            { type: 'image_url', image_url: { url: `data:${imgData.mimeType};base64,${imgData.base64}` } },
+            { type: 'text', text: userMsg }
+          ]
+        : userMsg;
+      brainstormHistory.push({ role: 'user', content: msgContent });
 
       const typingEl = addMessage('<div class="typing-dots"><span></span><span></span><span></span></div>', 'ai');
       setStatus('generating');
@@ -1029,7 +1139,7 @@
       const model = document.getElementById('model-select').value;
       const typingEl = addMessage('<div class="typing-dots"><span></span><span></span><span></span></div>', 'ai');
       setStatus('generating');
-      document.getElementById('send-btn').disabled = true;
+      document.getElementById('send-btn').classList.add('disabled');
 
       if (window.innerWidth <= 768) switchMobileTab('preview');
 
@@ -1087,7 +1197,7 @@
         typingEl.innerHTML = `<span style="color:var(--red)">Error: ${err.message}</span>`;
         setStatus('error');
       } finally {
-        document.getElementById('send-btn').disabled = false;
+        document.getElementById('send-btn').classList.remove('disabled');
       }
     }
 
@@ -1217,11 +1327,21 @@
 
       input.value = ''; input.style.height = 'auto';
       lastPrompt = prompt;
-      addMessage(prompt, 'user');
+
+      // Show image in chat bubble if attached
+      const attachedImg = _attachData ? _attachData.dataUrl : null;
+      const userMsgHtml = attachedImg
+        ? `<img src="${attachedImg}" style="max-width:180px;max-height:120px;border-radius:8px;display:block;margin-bottom:6px">${prompt}`
+        : prompt;
+      addMessage(userMsgHtml, 'user');
+
+      // Capture & clear attachment before routing
+      const attachSnapshot = _attachData ? { ..._attachData } : null;
+      if (_attachData) removeAttach();
 
       // Route to brainstorm if in brainstorm mode
       if (appMode === 'brainstorm') {
-        return brainstorm(prompt);
+        return brainstorm(prompt, attachSnapshot);
       }
 
       const model = document.getElementById('model-select').value;
@@ -1231,7 +1351,7 @@
 
       const typingEl = addMessage('<div class="typing-dots"><span></span><span></span><span></span></div>', 'ai');
       setStatus('generating');
-      document.getElementById('send-btn').disabled = true;
+      document.getElementById('send-btn').classList.add('disabled');
 
       if (window.innerWidth <= 768) switchMobileTab('preview');
 
@@ -1243,10 +1363,15 @@
           if (token) genHeaders['Authorization'] = `Bearer ${token}`;
         }
 
+        const genBody = { prompt, model, existingCode: currentHtml || null };
+        if (attachSnapshot) {
+          genBody.image = attachSnapshot.base64;
+          genBody.imageMimeType = attachSnapshot.mimeType;
+        }
         const startRes = await fetch(`${API}/api/generate-stream`, {
           method: 'POST',
           headers: genHeaders,
-          body: JSON.stringify({ prompt, model, existingCode: currentHtml || null })
+          body: JSON.stringify(genBody)
         });
 
         if (startRes.status === 429) {
@@ -1256,7 +1381,7 @@
           showLimitModal();
           typingEl.innerHTML = `<span style="color:var(--yellow)">⚠️ ${errData.message}</span>`;
           setStatus('ready');
-          document.getElementById('send-btn').disabled = false;
+          document.getElementById('send-btn').classList.remove('disabled');
           return;
         }
         if (!startRes.ok) throw new Error(`Server error ${startRes.status}`);
@@ -1332,7 +1457,7 @@
         typingEl.innerHTML = `<span style="color:var(--red)">Error: ${err.message}</span>`;
         setStatus('error');
       } finally {
-        document.getElementById('send-btn').disabled = false;
+        document.getElementById('send-btn').classList.remove('disabled');
       }
     }
 

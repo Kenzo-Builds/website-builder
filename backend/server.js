@@ -287,7 +287,7 @@ function callAIStream(messages, model, onChunk, onDone, onError) {
 
 // ── Streaming generate endpoint (SSE) ───────────────────────────────────────
 app.post('/api/generate-stream', async (req, res) => {
-  const { prompt, model = 'google/gemini-2.5-flash', existingCode } = req.body;
+  const { prompt, model = 'anthropic/claude-sonnet-4.6', existingCode, image, imageMimeType } = req.body;
   if (!prompt) return res.status(400).json({ error: 'Prompt is required' });
 
   // Check usage limits
@@ -316,14 +316,27 @@ app.post('/api/generate-stream', async (req, res) => {
   });
 
   const messages = [{ role: 'system', content: SYSTEM_PROMPT }];
-  if (existingCode) {
-    messages.push({ role: 'user', content: `Current HTML:\n${existingCode}\n\nModify: ${prompt}` });
+
+  // Build user message — support image attachment
+  let userContent;
+  if (image) {
+    // Vision: multimodal content array
+    const textPart = existingCode
+      ? `Current HTML:\n${existingCode}\n\nModify based on the attached image and instruction: ${prompt}`
+      : `Create a website based on the attached image and instruction: ${prompt}`;
+    userContent = [
+      { type: 'text', text: textPart },
+      { type: 'image_url', image_url: { url: `data:${imageMimeType || 'image/jpeg'};base64,${image}` } }
+    ];
+  } else if (existingCode) {
+    userContent = `Current HTML:\n${existingCode}\n\nModify: ${prompt}`;
   } else {
-    messages.push({ role: 'user', content: `Create a website: ${prompt}` });
+    userContent = `Create a website: ${prompt}`;
   }
+  messages.push({ role: 'user', content: userContent });
 
   const startTime = Date.now();
-  console.log(`[stream] model=${model} user=${userId?.slice(0,8)||'guest'} prompt="${prompt.slice(0,60)}"`);
+  console.log(`[stream] model=${model} user=${userId?.slice(0,8)||'guest'} img=${!!image} prompt="${prompt.slice(0,60)}"`);
 
   callAIStream(messages, model,
     // onChunk
@@ -429,8 +442,13 @@ Recommend:
 
 // ── Brainstorm endpoint (conversational, no HTML generation) ───────────────
 app.post('/api/brainstorm', async (req, res) => {
-  const { messages: chatHistory = [], model = 'xiaomi/mimo-v2-pro' } = req.body;
+  const { messages: chatHistory = [], model = 'anthropic/claude-sonnet-4.6' } = req.body;
   if (!chatHistory.length) return res.status(400).json({ error: 'Messages required' });
+
+  // Debug: check if last message has image
+  const lastMsg = chatHistory[chatHistory.length - 1];
+  const hasImage = Array.isArray(lastMsg?.content) && lastMsg.content.some(c => c.type === 'image_url');
+  if (hasImage) console.log('[brainstorm] image attached, model=', model);
 
   try {
     const messages = [

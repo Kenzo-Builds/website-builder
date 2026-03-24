@@ -90,6 +90,9 @@
     .bar-icon{width:30px;height:30px;border-radius:8px;background:none;color:#6B7280;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;flex-shrink:0;border:none}
     .bar-icon:hover{background:rgba(255,255,255,0.06);color:#9CA3AF}
     .bar-icon svg{width:16px;height:16px}
+    .bar-icon.recording{color:#EAB308;background:rgba(234,179,8,0.12);animation:mic-pulse 1s ease-in-out infinite}
+    .bar-icon.transcribing{color:#3B82F6;background:rgba(59,130,246,0.1)}
+    @keyframes mic-pulse{0%,100%{box-shadow:0 0 0 0 rgba(234,179,8,0.3)}50%{box-shadow:0 0 0 6px rgba(234,179,8,0)}}
 
     /* DROPDOWN TRIGGERS — compact pill */
     .dd-trigger{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:8px;background:none;border:none;color:#D1D5DB;font-size:13px;font-weight:500;cursor:pointer;transition:all .12s;white-space:nowrap;flex-shrink:0;font-family:inherit;position:relative}
@@ -644,8 +647,7 @@ function startRecording(){
     isRecording=true;
     window._recStart=Date.now();
     var btn=document.getElementById('mic-btn');
-    btn.style.color='#EF4444';
-    btn.style.background='rgba(239,68,68,0.15)';
+    btn.classList.add('recording');
     btn.title='Recording... click to stop';
   }).catch(function(err){
     alert('Microphone access denied. Please allow microphone access.');
@@ -655,17 +657,17 @@ function stopRecording(){
   var elapsed=Date.now()-(window._recStart||0);
   if(elapsed<500){console.warn('Recording too short:',elapsed,'ms');
     if(mediaRecorder&&mediaRecorder.state!=='inactive'){mediaRecorder.stream.getTracks().forEach(function(t){t.stop();});try{mediaRecorder.stop();}catch(e){}}
-    isRecording=false;var btn=document.getElementById('mic-btn');btn.style.color='';btn.style.background='';btn.title='Voice input';return;}
+    isRecording=false;var btn=document.getElementById('mic-btn');btn.classList.remove('recording','transcribing');btn.title='Voice input';return;}
   if(mediaRecorder&&mediaRecorder.state!=='inactive')mediaRecorder.stop();
   isRecording=false;
   var btn=document.getElementById('mic-btn');
-  btn.style.color='';btn.style.background='';btn.title='Voice input';
+  btn.classList.remove('recording','transcribing');btn.title='Voice input';
 }
 function transcribeAudio(blob,mimeType){
   var btn=document.getElementById('mic-btn');
   console.log('Audio blob size:',blob.size,'type:',blob.type,'lang:',voiceLang);
-  if(blob.size<1000){console.warn('Audio too small, skipping');btn.style.color='';btn.title='Voice input';return;}
-  btn.style.color='#F59E0B';btn.title='Transcribing...';
+  if(blob.size<1000){console.warn('Audio too small, skipping');btn.classList.remove('recording','transcribing');btn.title='Voice input';return;}
+  btn.classList.remove('recording');btn.classList.add('transcribing');btn.title='Transcribing...';
   var reader=new FileReader();
   reader.onload=function(){
     var base64=reader.result.split(',')[1];
@@ -675,7 +677,7 @@ function transcribeAudio(blob,mimeType){
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({audio:base64,mimeType:mimeType||'audio/webm',language:voiceLangApi[voiceLang]||'en'})
     }).then(function(r){return r.json();}).then(function(d){
-      btn.style.color='';btn.title='Voice input';
+      btn.classList.remove('recording','transcribing');btn.title='Voice input';
       console.log('Transcribe result:',d);
       if(d.text){
         var prompt=document.getElementById('prompt');
@@ -687,7 +689,7 @@ function transcribeAudio(blob,mimeType){
         console.error('Transcribe error:',d.error,d.details);
       }
     }).catch(function(err){
-      btn.style.color='';btn.title='Voice input';
+      btn.classList.remove('recording','transcribing');btn.title='Voice input';
       console.error('Transcribe fetch error:',err);
     });
   };
