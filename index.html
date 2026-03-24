@@ -83,17 +83,15 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           </button>
         </div>
-        <div class="flex items-center justify-between mt-2 px-1">
-          <span class="text-xs text-slate-600">Enter to send • Shift+Enter new line</span>
-          <select id="model-select" class="text-xs bg-transparent text-slate-500 border-none outline-none cursor-pointer">
-            <option value="google/gemini-2.5-flash" selected>Gemini 2.5 Flash ($0.30) ⚡</option>
-            <option value="xiaomi/mimo-v2-omni">MiMo V2 Omni ($0.40)</option>
+        <div class="flex flex-col gap-2 mt-3 px-1">
+          <select id="model-select" style="font-size:13px;background:#1E2535;color:#CBD5E1;border:1px solid #2D3748;border-radius:8px;padding:8px 12px;outline:none;cursor:pointer;width:100%;appearance:auto">
             <option value="xiaomi/mimo-v2-pro">MiMo V2 Pro ($1.00)</option>
             <option value="minimax/minimax-m2.5">MiniMax M2.5 ($0.30)</option>
             <option value="google/gemini-2.5-pro">Gemini 2.5 Pro ($1.25)</option>
-            <option value="anthropic/claude-sonnet-4-6">Claude Sonnet ($3.00)</option>
-            <option value="anthropic/claude-opus-4-6">Claude Opus ($15.00)</option>
+            <option value="anthropic/claude-sonnet-4">Claude Sonnet 4 ($3.00)</option>
+            <option value="anthropic/claude-opus-4">Claude Opus 4 ($15.00)</option>
           </select>
+          <span class="text-xs text-slate-600 text-center">Enter to send • Shift+Enter new line</span>
         </div>
       </div>
     </div>
@@ -163,6 +161,7 @@
     let currentBuildId = '';
     let monacoEditor = null;
     let activeTab = 'preview';
+    let currentPrompt = ''; // Store current prompt for re-prompts
 
     // Init Monaco
     require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
@@ -211,76 +210,84 @@
       empty.classList.add('hidden');
       frame.classList.remove('hidden');
       try {
-        // Use srcdoc for reliable cross-browser preview
         frame.srcdoc = html;
       } catch(e) {
-        // Fallback to blob URL
-        try {
-          const blob = new Blob([html], { type: 'text/html' });
-          frame.src = URL.createObjectURL(blob);
-        } catch(e2) {
-          console.error('Preview error:', e2);
-        }
+        console.error('Preview error:', e);
       }
     }
 
     async function generate() {
       const input = document.getElementById('prompt-input');
-      const prompt = input.value.trim();
-      if (!prompt) return;
+      currentPrompt = input.value.trim(); // Store current prompt
+      if (!currentPrompt) return;
       const model = document.getElementById('model-select').value;
 
       input.value = '';
       input.style.height = 'auto';
-      addMessage(prompt, 'user');
+      addMessage(currentPrompt, 'user');
 
       const typingMsg = addMessage('<div class="typing"><span></span><span></span><span></span></div>', 'ai');
       setStatus('Generating...', '#3B82F6');
       document.getElementById('send-btn').disabled = true;
 
+      let currentJobId = ''; // To track job ID across polls
+
       try {
-        const res = await fetch(`${API}/api/generate`, {
+        const startRes = await fetch(`${API}/api/generate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt, model, existingCode: currentHtml || null })
+          body: JSON.stringify({ prompt: currentPrompt, model, existingCode: currentHtml || null })
         });
 
-        const rawText = await res.text();
-        console.log('[DEBUG] raw response:', rawText.substring(0, 200));
-
-        let data;
-        try {
-          data = JSON.parse(rawText);
-        } catch(e) {
-          throw new Error(`Invalid JSON response: ${rawText.substring(0, 100)}`);
+        if (!startRes.ok) {
+          const errorText = await startRes.text();
+          throw new Error(`Server error: ${startRes.status} - ${errorText.substring(0,100)}`);
         }
 
+        const data = await startRes.json();
         if (data.error) throw new Error(data.error);
-        if (!data.html) throw new Error('No HTML in response');
 
-        currentHtml = data.html;
-        currentBuildId = data.buildId;
+        currentJobId = data.jobId;
+        if (!currentJobId) throw new Error('Missing job ID in response');
 
-        // Update editor safely
-        try {
-          if (monacoEditor) {
-            const model = monacoEditor.getModel();
-            if (model) {
-              model.pushEditOperations([], [{
-                range: model.getFullModelRange(),
-                text: currentHtml
-              }], () => null);
+        // Step 2: Poll until done
+        let elapsed = 0;
+        let pollingInterval = setInterval(async () => {
+          try {
+            const pollRes = await fetch(`${API}/api/job/${currentJobId}`);
+            const job = await pollRes.json();
+
+            if (job.status === 'done') {
+              clearInterval(pollingInterval);
+              currentHtml = job.html;
+              currentBuildId = job.buildId;
+              updatePreview(currentHtml);
+              updateEditor(currentHtml);
+              typingMsg.innerHTML = `✅ Done in ${Math.round(job.duration/1000)}s! Ask me to refine it.`;
+              setStatus('Ready', '#10B981');
+              document.getElementById('deploy-btn').classList.remove('hidden');
+              return; // Exit loop
             }
+
+            if (job.status === 'error') {
+              throw new Error(job.error);
+            }
+
+            // Update typing indicator
+            typingMsg.innerHTML = `⚡ Generating... (${elapsed}s)`;
+            elapsed += 2;
+
+            if (elapsed > 240) {
+              throw new Error('Generation timed out. Try a shorter prompt or faster model.');
+            }
+
+          } catch (pollErr) {
+            console.error('[POLL ERROR]', pollErr);
+            clearInterval(pollingInterval);
+            typingMsg.innerHTML = `❌ Poll error: ${pollErr.message}`;
+            setStatus('Error', '#EF4444');
           }
-        } catch(e) {
-          console.warn('Monaco setValue error:', e.message);
-        }
-
-        updatePreview(currentHtml);
-
-        typingMsg.innerHTML = '✅ Done! You can ask me to refine it.';
-        setStatus('Ready', '#10B981');
-        document.getElementById('deploy-btn').classList.remove('hidden');
+        }, 2000);
 
       } catch (err) {
         console.error('[ERROR]', err);
@@ -289,6 +296,15 @@
       } finally {
         document.getElementById('send-btn').disabled = false;
       }
+    }
+
+    function updateEditor(html) {
+      try {
+        if (monacoEditor) {
+          const m = monacoEditor.getModel();
+          if (m) m.pushEditOperations([], [{ range: m.getFullModelRange(), text: html }], () => null);
+        }
+      } catch(e) { console.warn('Monaco error:', e.message); }
     }
 
     function switchTab(tab) {
@@ -346,6 +362,62 @@
         setStatus('Error', '#EF4444');
       }
     }
+
+
+
+    // Create floating particles
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      if (!particlesContainer) return; // Ensure container exists
+      const particleCount = window.innerWidth < 768 ? 20 : 40;
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+
+        const size = Math.random() * 4 + 2;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+
+        particle.style.left = `${Math.random() * 100}vw`;
+        particle.style.top = `${Math.random() * 100}vh`;
+
+        particle.style.opacity = Math.random() * 0.5 + 0.1;
+
+        const duration = Math.random() * 25 + 15;
+        particle.style.animation = `floating ${duration}s ease-in-out infinite`;
+        particle.style.animationDelay = `${Math.random() * 10}s`;
+        particlesContainer.appendChild(particle);
+      }
+    }
+
+
+    // Initialize particles on load
+    window.addEventListener('load', () => {
+      createParticles(); // This is called after the page loads, but if createParticles isn't defined globally, it fails.
+      // Set default model to Gemini 2.5 Flash
+      const modelSelect = document.getElementById('model-select');
+      if (modelSelect) modelSelect.value = 'google/gemini-2.5-flash';
+
+      // Initialize Monaco editor after dimensions are available
+      require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
+      require(['vs/editor/editor.main'], () => {
+        monacoEditor = monaco.editor.create(document.getElementById('monaco-editor'), {
+          value: '<!-- Your generated code will appear here -->',
+          language: 'html',
+          theme: 'vs-dark',
+          fontSize: 13,
+          minimap: { enabled: false },
+          scrollBeyondLastLine: false,
+          automaticLayout: true,
+          padding: { top: 16 }
+        });
+        monacoEditor.onDidChangeModelContent(() => {
+          currentHtml = monacoEditor.getValue();
+          updatePreview(currentHtml);
+        });
+      });
+    });
+
   </script>
 </body>
 </html>
