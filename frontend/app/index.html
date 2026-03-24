@@ -498,7 +498,7 @@ function switchPage(name){
 function setupProfile(){
   var btn=document.getElementById('prof-btn');
   var pp=document.getElementById('pp');
-  pp.innerHTML='<button class="pp-item">Account Settings</button><button class="pp-item" onclick="window.open(\'https://t.me/kenzobuilder\')">Help & Support</button><div class="pp-div"></div><button class="pp-item danger" onclick="doLogout()">Log out</button>';
+  pp.innerHTML='<button class="pp-item">Account Settings</button><button class="pp-item" onclick="window.open(\'https://t.me/kenzobuilder\')">Help & Support</button><div class="pp-div"></div><button class="pp-item danger" onclick="doLogout()">Sign out</button>';
   btn.addEventListener('click',function(e){e.stopPropagation();pp.classList.toggle('show');});
   document.addEventListener('click',function(e){if(!e.target.closest('.sb-footer'))pp.classList.remove('show');});
 }
@@ -529,7 +529,7 @@ function updateAuth(){
     else gr.textContent='Good evening, '+fn+' 🌙';
   }else{av.textContent='?';nm.textContent='Guest';pl.textContent='Sign in';}
 }
-function doLogout(){if(sb)sb.auth.signOut();user=null;localStorage.removeItem('builder_guest');localStorage.removeItem('guest_gen_count');updateAuth();location.href='/app/?auth=login';}
+function doLogout(){if(!confirm('Are you sure you want to sign out?'))return;if(sb)sb.auth.signOut();user=null;localStorage.removeItem('builder_guest');localStorage.removeItem('guest_gen_count');updateAuth();location.href='/';}
 
 // RECENT TABS
 function toggleSidebar(){

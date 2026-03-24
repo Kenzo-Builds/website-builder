@@ -878,11 +878,13 @@
     }
 
     async function logoutUser() {
+      if(!confirm('Are you sure you want to sign out?'))return;
       if(sb) await sb.auth.signOut();
       currentUser = null; isGuest = false;
       localStorage.removeItem('builder_guest');
       updateAuthUI();
       document.getElementById('user-dropdown').classList.remove('show');
+      location.href='/';
     }
 
     function updateAuthUI() {
