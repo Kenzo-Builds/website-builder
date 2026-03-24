@@ -21,7 +21,7 @@ try {
     OPENROUTER_API_KEY = cfg.OPENROUTER_API_KEY;
   }
   if (cfg.OPENAI_API_KEY) OPENAI_API_KEY = cfg.OPENAI_API_KEY;
-} catch(e) { /* config.json optional */ }
+} catch(e) { console.warn('⚠️  config.json not found — relying on environment variables only'); }
 try {
   const sbCfg = JSON.parse(fs.readFileSync(path.join(__dirname, 'supabase-config.json'), 'utf8'));
   SUPABASE_URL = sbCfg.SUPABASE_URL;
@@ -29,6 +29,12 @@ try {
 } catch(e) { console.warn('supabase-config.json not found'); }
 
 const DEPLOY_API = 'http://172.18.0.1:5000';
+
+// Startup key audit
+if (!OPENROUTER_API_KEY) console.error('❌ CRITICAL: OPENROUTER_API_KEY is missing — AI calls will fail!');
+else console.log('✅ OpenRouter key loaded:', OPENROUTER_API_KEY.slice(0,20) + '...');
+if (!OPENAI_API_KEY) console.warn('⚠️  OPENAI_API_KEY missing — voice transcription will fail');
+else console.log('✅ OpenAI key loaded:', OPENAI_API_KEY.slice(0,20) + '...');
 
 // ── Plan Limits (generations per month) ─────────────────────────────────────
 const PLAN_LIMITS = {
