@@ -1,0 +1,5 @@
+{
+  "OPENROUTER_API_KEY": "sk-or-v1-YOUR_KEY_HERE",
+  "OPENAI_API_KEY": "sk-proj-YOUR_KEY_HERE",
+  "defaultModel": "anthropic/claude-sonnet-4.6"
+}
