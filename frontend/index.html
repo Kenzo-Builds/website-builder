@@ -26,7 +26,7 @@
     .nav-right{display:flex;align-items:center;gap:10px}
     .lang-select{background:transparent;border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#9CA3AF;font-size:12px;padding:6px 10px;cursor:pointer;outline:none;font-family:inherit}
     .lang-select option{background:#1A1A1A}
-    .btn-ghost{font-size:13px;font-weight:500;padding:7px 14px;border-radius:8px;background:none;border:1px solid rgba(255,255,255,0.08);color:#9CA3AF;cursor:pointer;text-decoration:none;transition:all .2s}
+    .btn-ghost{font-size:13px;font-weight:600;padding:7px 18px;border-radius:8px;background:none;border:1px solid rgba(255,255,255,0.08);color:#9CA3AF;cursor:pointer;text-decoration:none;transition:all .2s}
     .btn-ghost:hover{border-color:rgba(255,255,255,0.15);color:#D1D5DB}
     .btn-primary{font-size:13px;font-weight:600;padding:7px 18px;border-radius:8px;background:#fff;color:#0D0D0D;border:none;cursor:pointer;text-decoration:none;transition:all .2s}
     .btn-primary:hover{opacity:.9}
@@ -140,7 +140,7 @@
       .nav-links{display:none}
       .hamburger{display:block}
       .lang-select{font-size:11px;padding:4px 7px;border-radius:6px}
-      .btn-ghost{font-size:11px;padding:5px 10px;border-radius:6px}
+      .btn-ghost{font-size:11px;padding:5px 12px;border-radius:6px}
       .btn-primary{font-size:11px;padding:5px 12px;border-radius:6px}
       .nav-right{gap:6px}
       /* Hero buttons smaller on mobile */
@@ -173,8 +173,8 @@
         <option value="ru">🇷🇺 RU</option>
         <option value="en">🇬🇧 EN</option>
       </select>
-      <a href="/app/?auth=login" class="btn-ghost" data-i18n="nav_signin">Kirish</a>
-      <a href="/app/?auth=signup" class="btn-primary" data-i18n="nav_start">Boshlash →</a>
+      <a href="/app/build/?auth=login" class="btn-ghost" data-i18n="nav_signin">Kirish</a>
+      <a href="/app/build/?auth=signup" class="btn-primary" data-i18n="nav_start">Boshlash →</a>
     </div>
     <button class="hamburger" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button>
   </nav>
@@ -182,7 +182,7 @@
     <a href="#features" onclick="toggleMobileMenu()" data-i18n="nav_features">Xususiyatlar</a>
     <a href="#models" onclick="toggleMobileMenu()" data-i18n="nav_models">Modellar</a>
     <a href="#pricing" onclick="toggleMobileMenu()" data-i18n="nav_pricing">Narxlar</a>
-    <a href="/app/?auth=login" data-i18n="nav_signin">Kirish</a>
+    <a href="/app/build/?auth=login" data-i18n="nav_signin">Kirish</a>
   </div>
 
   <section class="hero">
@@ -191,7 +191,7 @@
       <h1 data-i18n="hero_title">Veb-saytingizni <span class="grad">AI bilan</span> yarating</h1>
       <p data-i18n="hero_desc">Tasvirlang — AI yaratadi. Bir necha soniyada professional veb-saytlar. Kod yozish shart emas.</p>
       <div class="hero-cta">
-        <a href="/app/?auth=signup" class="btn-lg primary" data-i18n="hero_cta_start">Bepul boshlash →</a>
+        <a href="/app/build/?auth=signup" class="btn-lg primary" data-i18n="hero_cta_start">Bepul boshlash →</a>
         <a href="#features" class="btn-lg outline" data-i18n="hero_cta_learn">Batafsil →</a>
       </div>
       <div class="hero-preview reveal">
@@ -244,10 +244,10 @@
       <h2 class="sec-title reveal" data-i18n="pricing_title">Oddiy va shaffof narxlar</h2>
       <p class="sec-desc reveal" data-i18n="pricing_desc">Bepuldan boshlang, kerak bo'lganda oshiring</p>
       <div class="pricing-grid">
-        <div class="pr-card reveal"><h4 data-i18n="plan_free">Bepul</h4><div class="price">$0<span>/oy</span></div><p class="pr-desc" data-i18n="plan_free_desc">Sinab ko'rish uchun</p><ul><li data-i18n="plan_free_f1">5 ta generatsiya/oy</li><li data-i18n="plan_free_f2">1 ta deploy</li><li data-i18n="plan_free_f3">Asosiy modellar</li></ul><a href="/app/?auth=signup" class="pr-btn outline" data-i18n="plan_free_btn">Bepul boshlash</a></div>
-        <div class="pr-card reveal"><h4 data-i18n="plan_starter">Starter</h4><div class="price">$5<span>/oy</span></div><p class="pr-desc" data-i18n="plan_starter_desc">Kichik loyihalar uchun</p><ul><li data-i18n="plan_starter_f1">50 ta generatsiya/oy</li><li data-i18n="plan_starter_f2">5 ta deploy</li><li data-i18n="plan_starter_f3">Barcha modellar</li><li data-i18n="plan_starter_f4">Kodni yuklab olish</li></ul><a href="/app/?auth=signup" class="pr-btn outline" data-i18n="plan_starter_btn">Boshlash</a></div>
-        <div class="pr-card popular reveal"><h4 data-i18n="plan_pro">Pro</h4><div class="price">$15<span>/oy</span></div><p class="pr-desc" data-i18n="plan_pro_desc">Professional foydalanish</p><ul><li data-i18n="plan_pro_f1">200 ta generatsiya/oy</li><li data-i18n="plan_pro_f2">20 ta deploy</li><li data-i18n="plan_pro_f3">Barcha premium modellar</li><li data-i18n="plan_pro_f4">Custom domenlar</li><li data-i18n="plan_pro_f5">Ustuvor qo'llab-quvvatlash</li></ul><a href="/app/?auth=signup" class="pr-btn primary" data-i18n="plan_pro_btn">Pro'ga o'tish</a></div>
-        <div class="pr-card reveal"><h4 data-i18n="plan_expert">Expert</h4><div class="price">$30<span>/oy</span></div><p class="pr-desc" data-i18n="plan_expert_desc">Agentliklar va jamoalar</p><ul><li data-i18n="plan_expert_f1">Cheksiz generatsiya</li><li data-i18n="plan_expert_f2">Cheksiz deploy</li><li data-i18n="plan_expert_f3">API kirish</li><li data-i18n="plan_expert_f4">Oq label brending</li><li data-i18n="plan_expert_f5">24/7 qo'llab-quvvatlash</li></ul><a href="/app/?auth=signup" class="pr-btn outline" data-i18n="plan_expert_btn">Bog'lanish</a></div>
+        <div class="pr-card reveal"><h4 data-i18n="plan_free">Bepul</h4><div class="price">$0<span>/oy</span></div><p class="pr-desc" data-i18n="plan_free_desc">Sinab ko'rish uchun</p><ul><li data-i18n="plan_free_f1">5 ta generatsiya/oy</li><li data-i18n="plan_free_f2">1 ta deploy</li><li data-i18n="plan_free_f3">Asosiy modellar</li></ul><a href="/app/build/?auth=signup" class="pr-btn outline" data-i18n="plan_free_btn">Bepul boshlash</a></div>
+        <div class="pr-card reveal"><h4 data-i18n="plan_starter">Starter</h4><div class="price">$5<span>/oy</span></div><p class="pr-desc" data-i18n="plan_starter_desc">Kichik loyihalar uchun</p><ul><li data-i18n="plan_starter_f1">50 ta generatsiya/oy</li><li data-i18n="plan_starter_f2">5 ta deploy</li><li data-i18n="plan_starter_f3">Barcha modellar</li><li data-i18n="plan_starter_f4">Kodni yuklab olish</li></ul><a href="/app/build/?auth=signup" class="pr-btn outline" data-i18n="plan_starter_btn">Boshlash</a></div>
+        <div class="pr-card popular reveal"><h4 data-i18n="plan_pro">Pro</h4><div class="price">$15<span>/oy</span></div><p class="pr-desc" data-i18n="plan_pro_desc">Professional foydalanish</p><ul><li data-i18n="plan_pro_f1">200 ta generatsiya/oy</li><li data-i18n="plan_pro_f2">20 ta deploy</li><li data-i18n="plan_pro_f3">Barcha premium modellar</li><li data-i18n="plan_pro_f4">Custom domenlar</li><li data-i18n="plan_pro_f5">Ustuvor qo'llab-quvvatlash</li></ul><a href="/app/build/?auth=signup" class="pr-btn primary" data-i18n="plan_pro_btn">Pro'ga o'tish</a></div>
+        <div class="pr-card reveal"><h4 data-i18n="plan_expert">Expert</h4><div class="price">$30<span>/oy</span></div><p class="pr-desc" data-i18n="plan_expert_desc">Agentliklar va jamoalar</p><ul><li data-i18n="plan_expert_f1">Cheksiz generatsiya</li><li data-i18n="plan_expert_f2">Cheksiz deploy</li><li data-i18n="plan_expert_f3">API kirish</li><li data-i18n="plan_expert_f4">Oq label brending</li><li data-i18n="plan_expert_f5">24/7 qo'llab-quvvatlash</li></ul><a href="/app/build/?auth=signup" class="pr-btn outline" data-i18n="plan_expert_btn">Bog'lanish</a></div>
       </div>
     </div>
   </section>
