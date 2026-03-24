@@ -12,6 +12,7 @@ app.use(express.json({ limit: '10mb' }));
 
 // Load key from config.json (never hardcode or share in chat)
 let OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || '';
+let OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
 let SUPABASE_URL = '';
 let SUPABASE_SERVICE_KEY = '';
 try {
@@ -19,6 +20,7 @@ try {
   if (cfg.OPENROUTER_API_KEY && !cfg.OPENROUTER_API_KEY.includes('REPLACE')) {
     OPENROUTER_API_KEY = cfg.OPENROUTER_API_KEY;
   }
+  if (cfg.OPENAI_API_KEY) OPENAI_API_KEY = cfg.OPENAI_API_KEY;
 } catch(e) { /* config.json optional */ }
 try {
   const sbCfg = JSON.parse(fs.readFileSync(path.join(__dirname, 'supabase-config.json'), 'utf8'));
@@ -559,4 +561,75 @@ app.get('/api/build/:buildId', (req, res) => {
   res.json({ html: fs.readFileSync(htmlPath, 'utf8') });
 });
 
-app.listen(PORT, () => console.log(`🚀 Website Builder API v3.2.0-usage-tracking on port ${PORT}`));
+// === WHISPER TRANSCRIPTION ===
+app.post('/api/transcribe', async (req, res) => {
+  try {
+    const { audio, mimeType, language } = req.body;
+    if (!audio) return res.status(400).json({ error: 'No audio data' });
+    if (!OPENAI_API_KEY) return res.status(500).json({ error: 'OpenAI key not configured' });
+
+    const audioBuffer = Buffer.from(audio, 'base64');
+    const { execSync } = require('child_process');
+    const tmpId = Date.now() + '_' + Math.random().toString(36).slice(2);
+    const tmpWebm = `/tmp/voice_${tmpId}.webm`;
+    const tmpWav = `/tmp/voice_${tmpId}.wav`;
+
+    // Write webm to temp file
+    fs.writeFileSync(tmpWebm, audioBuffer);
+
+    // Convert webm → wav using ffmpeg
+    try {
+      execSync(`ffmpeg -i ${tmpWebm} -ar 16000 -ac 1 -f wav ${tmpWav} -y 2>/dev/null`);
+    } catch(e) {
+      console.error('ffmpeg error:', e.message);
+      try { fs.unlinkSync(tmpWebm); } catch(x){}
+      return res.status(500).json({ error: 'Audio conversion failed' });
+    }
+
+    // Read wav file as base64
+    const wavBuffer = fs.readFileSync(tmpWav);
+    const wavBase64 = wavBuffer.toString('base64');
+
+    // Clean up temp files
+    try { fs.unlinkSync(tmpWebm); fs.unlinkSync(tmpWav); } catch(x){}
+
+    // Use gpt-4o-transcribe (Whisper endpoint, but GPT-4o quality)
+    const boundary2 = '----WB2' + Date.now();
+    function field2(name, value) {
+      return `--${boundary2}\r\nContent-Disposition: form-data; name="${name}"\r\n\r\n${value}\r\n`;
+    }
+
+    let prefix2 = field2('model', 'gpt-4o-transcribe');
+    if (language && language !== 'uz') prefix2 += field2('language', language);
+    // For Uzbek: use prompt hint instead of language code
+    if (language === 'uz') prefix2 += field2('prompt', 'Bu odam o\'zbek tilida gapirmoqda. O\'zbek lotin alifbosida yozing.');
+    prefix2 += `--${boundary2}\r\nContent-Disposition: form-data; name="file"; filename="voice.wav"\r\nContent-Type: audio/wav\r\n\r\n`;
+    const suffix2 = `\r\n--${boundary2}--\r\n`;
+
+    const body2 = Buffer.concat([Buffer.from(prefix2), wavBuffer, Buffer.from(suffix2)]);
+
+    const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Content-Type': `multipart/form-data; boundary=${boundary2}`
+      },
+      body: body2
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      console.error('Transcribe error:', response.status, JSON.stringify(result));
+      return res.status(response.status).json({ error: 'Transcription failed', details: JSON.stringify(result) });
+    }
+
+    const finalText = result.text || '';
+    console.log(`gpt-4o-transcribe [${language||'auto'}]: "${finalText}"`);
+    res.json({ text: finalText.trim() });
+  } catch (err) {
+    console.error('Transcribe error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.listen(PORT, () => console.log(`🚀 Website Builder API v3.3.0-voice on port ${PORT}`));

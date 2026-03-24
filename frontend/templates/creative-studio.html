@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FORMA — Creative Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #080808;
+      --white: #ffffff;
+      --gray: #888888;
+      --gray-dim: #333333;
+      --border: #1a1a1a;
+      --pink: #F43F5E;
+      --orange: #F97316;
+      --gradient: linear-gradient(90deg, #F43F5E, #F97316);
+      --gradient-diag: linear-gradient(135deg, #F43F5E, #F97316);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 60px;
+      background: rgba(8, 8, 8, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 48px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gray);
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--white);
+    }
+
+    .nav-cta {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 10px 24px;
+      background: var(--gradient);
+      color: var(--white);
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .nav-cta:hover {
+      opacity: 0.85;
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 60px 80px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 1px;
+      background: var(--gray);
+    }
+
+    .hero-headline {
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 900;
+      line-height: 0.92;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+      margin-bottom: 48px;
+    }
+
+    .hero-headline .gradient-text {
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-bottom {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+
+    .hero-subtitle {
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--gray);
+      max-width: 420px;
+      line-height: 1.6;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+    }
+
+    .hero-est {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      font-variant: small-caps;
+      color: var(--gray);
+    }
+
+    .hero-scroll {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gray);
+    }
+
+    .hero-scroll-line {
+      width: 60px;
+      height: 1px;
+      background: var(--gray);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-scroll-line::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: var(--gradient);
+      animation: slide-line 2s ease-in-out infinite;
+    }
+
+    @keyframes slide-line {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    .hero-bg-number {
+      position: absolute;
+      right: -20px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: clamp(40px, 5vw, 64px);
+      font-weight: 900;
+      color: rgba(255,255,255,0.02);
+      letter-spacing: -0.05em;
+      pointer-events: none;
+      user-select: none;
+      line-height: 1;
+    }
+
+    /* ─── TICKER ─── */
+    .ticker {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .ticker-inner {
+      display: flex;
+      gap: 0;
+      white-space: nowrap;
+      animation: marquee 30s linear infinite;
+    }
+
+    .ticker-inner:hover {
+      animation-play-state: paused;
+    }
+
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .ticker-item {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gray);
+      padding: 0 32px;
+      flex-shrink: 0;
+    }
+
+    .ticker-item span {
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ─── ABOUT ─── */
+    .about {
+      padding: 120px 60px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 64px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .section-label::before {
+      content: '';
+      width: 32px;
+      height: 1px;
+      background: var(--gradient);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      margin-bottom: 80px;
+    }
+
+    .stat-item {
+      background: var(--bg);
+      padding: 60px 48px;
+    }
+
+    .stat-number {
+      font-size: clamp(28px, 3vw, 44px);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gray);
+    }
+
+    .about-quote-block {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .quote-author-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gray);
+      line-height: 2;
+    }
+
+    .quote-author-name {
+      font-size: 18px;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+
+    .quote-text {
+      font-size: clamp(22px, 3vw, 36px);
+      font-weight: 500;
+      line-height: 1.4;
+      letter-spacing: -0.01em;
+      color: var(--white);
+    }
+
+    .quote-text::before {
+      content: '"';
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 1.2em;
+      font-weight: 900;
+      line-height: 1;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    /* ─── PORTFOLIO ─── */
+    .portfolio {
+      padding: 120px 60px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .portfolio-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 64px;
+    }
+
+    .section-title {
+      font-size: clamp(22px, 2.5vw, 36px);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .portfolio-link {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gray);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: color 0.2s;
+    }
+
+    .portfolio-link:hover {
+      color: var(--white);
+    }
+
+    .portfolio-link::after {
+      content: '→';
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+
+    .portfolio-item {
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .portfolio-image {
+      width: 100%;
+      aspect-ratio: 4/3;
+      display: block;
+    }
+
+    .portfolio-image-1 { background: linear-gradient(135deg, #1a0533, #7c3aed, #db2777); }
+    .portfolio-image-2 { background: linear-gradient(135deg, #0f172a, #0284c7, #06b6d4); }
+    .portfolio-image-3 { background: linear-gradient(135deg, #1c1917, #ca8a04, #f97316); }
+    .portfolio-image-4 { background: linear-gradient(135deg, #022c22, #059669, #84cc16); }
+    .portfolio-image-5 { background: linear-gradient(135deg, #1e1b4b, #4338ca, #ec4899); }
+    .portfolio-image-6 { background: linear-gradient(135deg, #1c0505, #dc2626, #f97316); }
+
+    .portfolio-image-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .portfolio-image-inner::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: inherit;
+      opacity: 0.15;
+    }
+
+    .portfolio-noise {
+      position: absolute;
+      inset: 0;
+      opacity: 0.4;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.5'/%3E%3C/svg%3E");
+    }
+
+    .portfolio-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(8, 8, 8, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .portfolio-item:hover .portfolio-overlay {
+      opacity: 1;
+    }
+
+    .portfolio-overlay-text {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .portfolio-info {
+      padding: 20px 0 8px;
+    }
+
+    .portfolio-category {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 6px;
+    }
+
+    .portfolio-name {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    /* ─── SERVICES ─── */
+    .services {
+      padding: 120px 60px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .services-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: end;
+      margin-bottom: 80px;
+    }
+
+    .services-desc {
+      font-size: 17px;
+      color: var(--gray);
+      line-height: 1.7;
+      max-width: 400px;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2px;
+      background: var(--border);
+    }
+
+    .service-card {
+      background: var(--bg);
+      padding: 56px 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      transition: background 0.3s;
+      cursor: pointer;
+    }
+
+    .service-card:hover {
+      background: #0f0f0f;
+    }
+
+    .service-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .service-icon svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    .service-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    .service-desc {
+      font-size: 15px;
+      color: var(--gray);
+      line-height: 1.7;
+      flex: 1;
+    }
+
+    .service-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .service-price {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .service-arrow {
+      font-size: 20px;
+      color: var(--gray);
+      transition: color 0.2s, transform 0.2s;
+    }
+
+    .service-card:hover .service-arrow {
+      color: var(--white);
+      transform: translateX(4px);
+    }
+
+    /* ─── TEAM ─── */
+    .team {
+      padding: 120px 60px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .team-header {
+      margin-bottom: 80px;
+    }
+
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      background: var(--border);
+    }
+
+    .team-member {
+      background: var(--bg);
+      padding: 48px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .team-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--white);
+      flex-shrink: 0;
+    }
+
+    .avatar-1 { background: linear-gradient(135deg, #7c3aed, #db2777); }
+    .avatar-2 { background: linear-gradient(135deg, #0284c7, #06b6d4); }
+    .avatar-3 { background: linear-gradient(135deg, #ca8a04, #f97316); }
+    .avatar-4 { background: linear-gradient(135deg, #059669, #0284c7); }
+
+    .team-name {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .team-role {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gray);
+    }
+
+    .team-bio {
+      font-size: 14px;
+      color: var(--gray);
+      line-height: 1.6;
+    }
+
+    /* ─── CONTACT ─── */
+    .contact {
+      padding: 120px 60px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .contact-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 120px;
+      align-items: start;
+    }
+
+    .contact-left {
+      position: sticky;
+      top: 120px;
+    }
+
+    .contact-heading {
+      font-size: clamp(28px, 3.5vw, 44px);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 0.95;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+    }
+
+    .contact-heading .gradient-text {
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: block;
+    }
+
+    .contact-sub {
+      font-size: 16px;
+      color: var(--gray);
+      line-height: 1.7;
+      margin-bottom: 48px;
+    }
+
+    .contact-info-row {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .contact-info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .contact-info-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gray);
+    }
+
+    .contact-info-value {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    /* ─── FORM ─── */
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      background: #0f0f0f;
+    }
+
+    .form-group label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gray);
+      padding: 20px 24px 0;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      padding: 10px 24px 20px;
+      width: 100%;
+      appearance: none;
+    }
+
+    .form-group select option {
+      background: #0f0f0f;
+      color: var(--white);
+    }
+
+    .form-group textarea {
+      resize: none;
+      min-height: 160px;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: var(--gray-dim);
+    }
+
+    .form-submit {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 28px 32px;
+      background: var(--white);
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .form-submit:hover {
+      opacity: 0.9;
+    }
+
+    .form-submit-text {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--bg);
+    }
+
+    .form-submit-icon {
+      font-size: 20px;
+      color: var(--bg);
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      padding: 40px 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-logo {
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 40px;
+      list-style: none;
+    }
+
+    .footer-links a {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gray);
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--white);
+    }
+
+    .footer-copy {
+      font-size: 12px;
+      color: var(--gray);
+      letter-spacing: 0.05em;
+    }
+
+    /* ─── GRADIENT BAR ─── */
+    .gradient-bar {
+      height: 3px;
+      background: var(--gradient);
+      width: 100%;
+    }
+
+    /* ─── UTILITIES ─── */
+    .highlight-char {
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--gray-dim);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--gray);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- GRADIENT BAR -->
+  <div class="gradient-bar"></div>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">FORMA</div>
+    <ul class="nav-links">
+      <li><a href="#portfolio">Work</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <button class="nav-cta">Start a Project</button>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg-number">08</div>
+    <div class="hero-eyebrow">Creative Studio — Est. 2018</div>
+    <h1 class="hero-headline">
+      Beyond The<br />
+      <span class="gradient-text">Horizon</span>
+    </h1>
+    <div class="hero-bottom">
+      <p class="hero-subtitle">
+        We build brands that move people. From concept to launch, every pixel is a decision — and every decision shapes how the world sees you.
+      </p>
+      <div class="hero-meta">
+        <span class="hero-est">Est. 2018</span>
+        <div class="hero-scroll">
+          <div class="hero-scroll-line"></div>
+          Scroll to explore
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="ticker-inner">
+      <!-- First set -->
+      <span class="ticker-item">Brand Identity</span>
+      <span class="ticker-item"><span>·</span></span>
+      <span class="ticker-item">Web Design</span>
+      <span class="ticker-item"><span>·</span></span>
+      <span class="ticker-item">Motion Graphics</span>
+      <span class="ticker-item"><span>·</span></span>
+      <span class="ticker-item">Digital Strategy</span>
+      <span class="ticker-item"><span>·</span></span>
+      <span class="ticker-item">UI/UX</span>
+      <span class="ticker-item"><span>·</span></span>
+      <span class="ticker-item">Print Design</span>
+      <span class="ticker-item"><span>·</span></span>
+      <!-- Duplicate for seamless loop -->
+      <span class="ticker-item">Brand Identity</span>
+      <span class="ticker-item"><span>·</span></span>
+      <span class="ticker-item">Web Design</span>
+      <span class="ticker-item"><span>·</span></span>
+      <span class="ticker-item">Motion Graphics</span>
+      <span class="ticker-item"><span>·</span></span>
+      <span class="ticker-item">Digital Strategy</span>
+      <span class="ticker-item"><span>·</span></span>
+      <span class="ticker-item">UI/UX</span>
+      <span class="ticker-item"><span>·</span></span>
+      <span class="ticker-item">Print Design</span>
+      <span class="ticker-item"><span>·</span></span>
+      <!-- Third set for extra width -->
+      <span class="ticker-item">Brand Identity</span>
+      <span class="ticker-item"><span>·</span></span>
+      <span class="ticker-item">Web Design</span>
+      <span class="ticker-item"><span>·</span></span>
+      <span class="ticker-item">Motion Graphics</span>
+      <span class="ticker-item"><span>·</span></span>
+      <span class="ticker-item">Digital Strategy</span>
+      <span class="ticker-item"><span>·</span></span>
+      <span class="ticker-item">UI/UX</span>
+      <span class="ticker-item"><span>·</span></span>
+      <span class="ticker-item">Print Design</span>
+      <span class="ticker-item"><span>·</span></span>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section class="about" id="about">
+    <div class="section-label">About FORMA</div>
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-number">240</div>
+        <div class="stat-label">Projects Completed</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">18</div>
+        <div class="stat-label">Awards Won</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">12</div>
+        <div class="stat-label">Countries Served</div>
+      </div>
+    </div>
+    <div class="about-quote-block">
+      <div>
+        <div class="quote-author-label">Founder & Creative Director</div>
+        <div class="quote-author-name">Marcus Reid</div>
+      </div>
+      <blockquote class="quote-text">
+        Design isn't decoration. It's the difference between a business people forget and a brand people can't stop talking about. We don't do safe. Safe is forgettable. We build brands that make a dent — brands that earn attention, create loyalty, and drive real growth. That's been our obsession since day one.
+      </blockquote>
+    </div>
+  </section>
+
+  <!-- PORTFOLIO -->
+  <section class="portfolio" id="portfolio">
+    <div class="portfolio-header">
+      <div class="section-label" style="margin-bottom:0;">Selected Work</div>
+      <div class="section-title">Our Work</div>
+      <a href="#" class="portfolio-link">View All Projects</a>
+    </div>
+    <div class="portfolio-grid">
+
+      <div class="portfolio-item">
+        <div class="portfolio-image portfolio-image-1">
+          <div class="portfolio-image-inner"></div>
+          <div class="portfolio-noise"></div>
+        </div>
+        <div class="portfolio-overlay">
+          <span class="portfolio-overlay-text">View Project →</span>
+        </div>
+        <div class="portfolio-info">
+          <div class="portfolio-category">Brand Identity</div>
+          <div class="portfolio-name">Veilux Cosmetics</div>
+        </div>
+      </div>
+
+      <div class="portfolio-item">
+        <div class="portfolio-image portfolio-image-2">
+          <div class="portfolio-image-inner"></div>
+          <div class="portfolio-noise"></div>
+        </div>
+        <div class="portfolio-overlay">
+          <span class="portfolio-overlay-text">View Project →</span>
+        </div>
+        <div class="portfolio-info">
+          <div class="portfolio-category">Web Experiences</div>
+          <div class="portfolio-name">Drift Financial</div>
+        </div>
+      </div>
+
+      <div class="portfolio-item">
+        <div class="portfolio-image portfolio-image-3">
+          <div class="portfolio-image-inner"></div>
+          <div class="portfolio-noise"></div>
+        </div>
+        <div class="portfolio-overlay">
+          <span class="portfolio-overlay-text">View Project →</span>
+        </div>
+        <div class="portfolio-info">
+          <div class="portfolio-category">Motion & Video</div>
+          <div class="portfolio-name">Amber Coffee Co.</div>
+        </div>
+      </div>
+
+      <div class="portfolio-item">
+        <div class="portfolio-image portfolio-image-4">
+          <div class="portfolio-image-inner"></div>
+          <div class="portfolio-noise"></div>
+        </div>
+        <div class="portfolio-overlay">
+          <span class="portfolio-overlay-text">View Project →</span>
+        </div>
+        <div class="portfolio-info">
+          <div class="portfolio-category">Digital Strategy</div>
+          <div class="portfolio-name">Moss Architecture</div>
+        </div>
+      </div>
+
+      <div class="portfolio-item">
+        <div class="portfolio-image portfolio-image-5">
+          <div class="portfolio-image-inner"></div>
+          <div class="portfolio-noise"></div>
+        </div>
+        <div class="portfolio-overlay">
+          <span class="portfolio-overlay-text">View Project →</span>
+        </div>
+        <div class="portfolio-info">
+          <div class="portfolio-category">UI/UX Design</div>
+          <div class="portfolio-name">Prism Analytics</div>
+        </div>
+      </div>
+
+      <div class="portfolio-item">
+        <div class="portfolio-image portfolio-image-6">
+          <div class="portfolio-image-inner"></div>
+          <div class="portfolio-noise"></div>
+        </div>
+        <div class="portfolio-overlay">
+          <span class="portfolio-overlay-text">View Project →</span>
+        </div>
+        <div class="portfolio-info">
+          <div class="portfolio-category">Brand Identity</div>
+          <div class="portfolio-name">Flare Streetwear</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section class="services" id="services">
+    <div class="services-header">
+      <div>
+        <div class="section-label">What We Do</div>
+        <div class="section-title">Our<br />Services</div>
+      </div>
+      <p class="services-desc">
+        From first impression to lasting identity, we offer end-to-end creative services for companies that refuse to blend in. We partner with brands at every stage — from early-stage startups to global enterprises.
+      </p>
+    </div>
+    <div class="services-grid">
+
+      <div class="service-card">
+        <div class="service-icon">
+          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="16" cy="16" r="12" stroke="url(#g1)" stroke-width="2"/>
+            <path d="M16 8V24M8 16H24" stroke="url(#g1)" stroke-width="2" stroke-linecap="square"/>
+            <defs>
+              <linearGradient id="g1" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#F43F5E"/>
+                <stop offset="1" stop-color="#F97316"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="service-title">Brand Identity</div>
+        <div class="service-desc">
+          Logo systems, visual identity, brand guidelines, typography, color strategy, and everything that makes your brand unmistakable. We build from insight, not templates.
+        </div>
+        <div class="service-footer">
+          <span class="service-price">From $4,800</span>
+          <span class="service-arrow">→</span>
+        </div>
+      </div>
+
+      <div class="service-card">
+        <div class="service-icon">
+          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="6" width="26" height="18" stroke="url(#g2)" stroke-width="2"/>
+            <path d="M3 10H29" stroke="url(#g2)" stroke-width="2"/>
+            <circle cx="7" cy="8" r="1" fill="url(#g2)"/>
+            <circle cx="11" cy="8" r="1" fill="url(#g2)"/>
+            <defs>
+              <linearGradient id="g2" x1="3" y1="6" x2="29" y2="24" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#F43F5E"/>
+                <stop offset="1" stop-color="#F97316"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="service-title">Web Experiences</div>
+        <div class="service-desc">
+          Websites that load fast, convert well, and look like nothing else. We design and build in Webflow, React, or custom — whatever the project demands.
+        </div>
+        <div class="service-footer">
+          <span class="service-price">From $8,500</span>
+          <span class="service-arrow">→</span>
+        </div>
+      </div>
+
+      <div class="service-card">
+        <div class="service-icon">
+          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 6L26 16L6 26V6Z" stroke="url(#g3)" stroke-width="2" stroke-linejoin="round"/>
+            <defs>
+              <linearGradient id="g3" x1="6" y1="6" x2="26" y2="26" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#F43F5E"/>
+                <stop offset="1" stop-color="#F97316"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="service-title">Motion & Video</div>
+        <div class="service-desc">
+          Brand films, animated explainers, social content, and title sequences. We give your brand a voice, a tempo, and a presence that still images can't match.
+        </div>
+        <div class="service-footer">
+          <span class="service-price">From $3,200</span>
+          <span class="service-arrow">→</span>
+        </div>
+      </div>
+
+      <div class="service-card">
+        <div class="service-icon">
+          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 28L12 16L20 22L28 8" stroke="url(#g4)" stroke-width="2" stroke-linecap="square"/>
+            <defs>
+              <linearGradient id="g4" x1="4" y1="8" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#F43F5E"/>
+                <stop offset="1" stop-color="#F97316"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="service-title">Strategy & Consulting</div>
+        <div class="service-desc">
+          Brand audits, competitive positioning, naming, messaging architecture, and go-to-market strategy. Clarity before execution — always.
+        </div>
+        <div class="service-footer">
+          <span class="service-price">From $2,400</span>
+          <span class="service-arrow">→</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- TEAM -->
+  <section class="team">
+    <div class="team-header">
+      <div class="section-label">The People</div>
+      <div class="section-title">Our Team</div>
+    </div>
+    <div class="team-grid">
+
+      <div class="team-member">
+        <div class="team-avatar avatar-1">MR</div>
+        <div>
+          <div class="team-name">Marcus Reid</div>
+          <div class="team-role">Founder & Creative Director</div>
+        </div>
+        <div class="team-bio">10+ years building visual systems for brands from seed stage to public. Obsessed with the intersection of emotion and function.</div>
+      </div>
+
+      <div class="team-member">
+        <div class="team-avatar avatar-2">SK</div>
+        <div>
+          <div class="team-name">Sofia Kim</div>
+          <div class="team-role">Head of Digital</div>
+        </div>
+        <div class="team-bio">Former product designer at two YC startups. Leads all web and interactive projects with a conversion-first mindset.</div>
+      </div>
+
+      <div class="team-member">
+        <div class="team-avatar avatar-3">JO</div>
+        <div>
+          <div class="team-name">James Okafor</div>
+          <div class="team-role">Motion Director</div>
+        </div>
+        <div class="team-bio">Award-winning motion designer with credits across Nike, Spotify, and three independent film festivals.</div>
+      </div>
+
+      <div class="team-member">
+        <div class="team-avatar avatar-4">LM</div>
+        <div>
+          <div class="team-name">Lena Müller</div>
+          <div class="team-role">Brand Strategist</div>
+        </div>
+        <div class="team-bio">Translates market research into stories worth telling. Has helped reposition 30+ brands across Europe and North America.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact" id="contact">
+    <div class="contact-inner">
+      <div class="contact-left">
+        <div class="section-label">Get In Touch</div>
+        <h2 class="contact-heading">
+          Let's Build
+          <span class="gradient-text">Something</span>
+          Great.
+        </h2>
+        <p class="contact-sub">
+          Have a project in mind? Tell us about it. We typically respond within one business day. No pitch decks required — just a conversation.
+        </p>
+        <div class="contact-info-row">
+          <div class="contact-info-item">
+            <span class="contact-info-label">Email</span>
+            <span class="contact-info-value">hello@forma.studio</span>
+          </div>
+          <div class="contact-info-item">
+            <span class="contact-info-label">Phone</span>
+            <span class="contact-info-value">+1 (415) 880 2200</span>
+          </div>
+          <div class="contact-info-item">
+            <span class="contact-info-label">Office</span>
+            <span class="contact-info-value">San Francisco, CA</span>
+          </div>
+        </div>
+      </div>
+
+      <form class="contact-form" onsubmit="return false;">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Your Name</label>
+            <input type="text" id="name" placeholder="Marcus Reid" />
+          </div>
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" placeholder="hello@yourcompany.com" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="project-type">Project Type</label>
+          <select id="project-type">
+            <option value="" disabled selected>Select a service</option>
+            <option value="brand">Brand Identity</option>
+            <option value="web">Web Experiences</option>
+            <option value="motion">Motion & Video</option>
+            <option value="strategy">Strategy & Consulting</option>
+            <option value="other">Something Else</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="message">Tell Us About Your Project</label>
+          <textarea id="message" placeholder="Describe your project, timeline, and what success looks like for you..."></textarea>
+        </div>
+        <button type="submit" class="form-submit">
+          <span class="form-submit-text">Send Message</span>
+          <span class="form-submit-icon">→</span>
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">FORMA</div>
+    <ul class="footer-links">
+      <li><a href="#portfolio">Work</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#contact">Contact</a></li>
+      <li><a href="#">Privacy</a></li>
+    </ul>
+    <span class="footer-copy">© 2024 FORMA Studio. All rights reserved.</span>
+  </footer>
+
+  <div class="gradient-bar"></div>
+
+</body>
+</html>

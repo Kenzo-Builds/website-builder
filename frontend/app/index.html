@@ -14,28 +14,45 @@
     .app{display:flex;height:100vh;overflow:hidden}
 
     /* SIDEBAR */
-    .sidebar{width:230px;flex-shrink:0;background:#0D0D0D;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;height:100vh}
-    .sb-logo{display:flex;align-items:center;gap:10px;padding:18px 16px 20px;text-decoration:none;color:#fff}
-    .sb-logo-icon{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#3B82F6,#8B5CF6);display:flex;align-items:center;justify-content:center}
+    .sidebar{width:230px;flex-shrink:0;background:#0D0D0D;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;height:100vh;transition:width .2s ease;overflow:hidden}
+    .sidebar.collapsed{width:56px}
+    .sb-logo{display:flex;align-items:center;gap:10px;padding:14px 12px;text-decoration:none;color:#fff;position:relative;cursor:pointer;user-select:none;transition:all .2s}
+    .sidebar.collapsed .sb-logo{padding:14px 0;justify-content:center;gap:0}
+    .sb-logo-icon{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#3B82F6,#8B5CF6);display:flex;align-items:center;justify-content:center;flex-shrink:0}
     .sb-logo-icon svg{width:14px;height:14px}
-    .sb-logo span{font-weight:700;font-size:15px}
-    .sb-nav{flex:1;padding:0 8px;overflow-y:auto}
-    .sb-item{display:flex;align-items:center;gap:10px;width:100%;padding:8px 12px;border-radius:8px;border:none;background:none;color:#9CA3AF;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;text-align:left;transition:all .15s}
-    .sb-item:hover{background:rgba(255,255,255,0.04);color:#D1D5DB}
-    .sb-item.active{background:rgba(255,255,255,0.06);color:#fff}
-    .sb-item svg{width:16px;height:16px;opacity:.5;flex-shrink:0}
-    .sb-item.active svg{opacity:.8}
-    .sb-label{font-size:10px;font-weight:600;color:#4B5563;text-transform:uppercase;letter-spacing:.8px;padding:18px 12px 6px}
-    .sb-upgrade{margin:8px;padding:12px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);cursor:pointer}
+    .sb-logo-text{font-weight:700;font-size:15px;white-space:nowrap;opacity:1;transition:opacity .15s;flex:1}
+    .sidebar.collapsed .sb-logo-text{opacity:0;width:0;overflow:hidden;flex:0}
+    .sb-toggle{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:0;transition:opacity .15s,background .15s;background:none}
+    .sb-logo:hover .sb-toggle{opacity:1;background:rgba(255,255,255,0.08)}
+    .sidebar.collapsed .sb-toggle{display:none}
+    .sb-toggle svg{width:13px;height:13px;color:#9CA3AF}
+    .sb-nav{flex:1;padding:4px 0;overflow-y:auto;overflow-x:hidden}
+    .sb-item{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-radius:8px;border:none;background:none;color:#9CA3AF;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;text-align:left;transition:all .15s;white-space:nowrap;box-sizing:border-box}
+    .sidebar.collapsed .sb-item{justify-content:center;padding:10px;gap:0}
+    .sb-item:hover{background:rgba(255,255,255,0.05);color:#D1D5DB}
+    .sb-item.active{background:rgba(255,255,255,0.07);color:#fff}
+    .sb-item svg{width:18px;height:18px;opacity:.55;flex-shrink:0;transition:width .1s,height .1s}
+    .sb-item.active svg{opacity:.9}
+    .sidebar.collapsed .sb-item svg{width:20px;height:20px;opacity:.7}
+    .sidebar.collapsed .sb-item.active svg{opacity:1}
+    .sb-item-label{opacity:1;transition:opacity .1s;overflow:hidden}
+    .sidebar.collapsed .sb-item-label{opacity:0;max-width:0;overflow:hidden}
+    .sb-label{font-size:10px;font-weight:600;color:#4B5563;text-transform:uppercase;letter-spacing:.8px;padding:18px 12px 6px;white-space:nowrap;transition:opacity .15s}
+    .sidebar.collapsed .sb-label{opacity:0}
+    .sb-upgrade{margin:8px;padding:12px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);cursor:pointer;overflow:hidden;transition:all .15s}
+    .sidebar.collapsed .sb-upgrade{margin:8px 4px;padding:10px 6px}
     .sb-upgrade:hover{background:rgba(255,255,255,0.05)}
-    .sb-upgrade b{display:block;font-size:12px;color:#D1D5DB;margin-bottom:2px}
-    .sb-upgrade span{font-size:11px;color:#6B7280}
+    .sb-upgrade b{display:block;font-size:12px;color:#D1D5DB;margin-bottom:2px;white-space:nowrap}
+    .sb-upgrade span{font-size:11px;color:#6B7280;white-space:nowrap}
+    .sidebar.collapsed .sb-upgrade b,.sidebar.collapsed .sb-upgrade span{display:none}
+    .sidebar.collapsed .sb-upgrade::after{content:'↑';color:#D97757;font-size:14px;display:flex;justify-content:center}
     .sb-footer{padding:10px 8px;border-top:1px solid rgba(255,255,255,0.06);position:relative}
-    .sb-profile{display:flex;align-items:center;gap:10px;width:100%;padding:8px;border-radius:10px;border:none;background:none;cursor:pointer}
+    .sb-profile{display:flex;align-items:center;gap:10px;width:100%;padding:8px;border-radius:10px;border:none;background:none;cursor:pointer;overflow:hidden}
     .sb-profile:hover{background:rgba(255,255,255,0.04)}
     .sb-avatar{width:30px;height:30px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,#3B82F6,#8B5CF6);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
-    .sb-pname{font-size:13px;font-weight:600;color:#fff;text-align:left}
-    .sb-pplan{font-size:10px;color:#22C55E;font-weight:600;text-align:left}
+    .sb-pname{font-size:13px;font-weight:600;color:#fff;text-align:left;white-space:nowrap;transition:opacity .15s}
+    .sb-pplan{font-size:10px;color:#22C55E;font-weight:600;text-align:left;white-space:nowrap}
+    .sidebar.collapsed .sb-pname,.sidebar.collapsed .sb-pplan{opacity:0}
     .profile-popup{display:none;position:absolute;bottom:58px;left:8px;right:8px;background:#1A1A1A;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:4px;z-index:200;box-shadow:0 -4px 20px rgba(0,0,0,.5)}
     .profile-popup.show{display:block}
     .pp-item{display:block;width:100%;padding:8px 10px;border-radius:6px;border:none;background:none;color:#9CA3AF;font-size:12px;font-family:inherit;text-align:left;cursor:pointer}
@@ -56,7 +73,7 @@
     .hero p{font-size:14px;color:#9CA3AF;margin-bottom:28px}
 
     /* PROMPT CARD */
-    .prompt-wrap{max-width:640px;margin:0 auto}
+    .prompt-wrap{max-width:820px;margin:0 auto}
     .prompt-card{background:#151515;border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px;box-shadow:0 4px 20px rgba(0,0,0,.3)}
     .prompt-card:focus-within{border-color:rgba(99,102,241,0.18)}
     .attach-area{display:none;margin-bottom:8px;position:relative}
@@ -74,17 +91,33 @@
     .bar-icon:hover{background:rgba(255,255,255,0.06);color:#9CA3AF}
     .bar-icon svg{width:16px;height:16px}
 
-    /* DROPDOWN TRIGGERS */
-    .dd-trigger{display:flex;align-items:center;gap:4px;padding:4px 8px;border-radius:8px;background:none;color:#D1D5DB;font-size:12px;font-weight:500;cursor:pointer;transition:all .12s;white-space:nowrap;flex-shrink:0;border:none;font-family:inherit;position:relative}
+    /* DROPDOWN TRIGGERS — compact pill */
+    .dd-trigger{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:8px;background:none;border:none;color:#D1D5DB;font-size:13px;font-weight:500;cursor:pointer;transition:all .12s;white-space:nowrap;flex-shrink:0;font-family:inherit;position:relative}
     .dd-trigger:hover{background:rgba(255,255,255,0.06)}
-    .dd-trigger .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-    .dd-trigger .chev{font-size:9px;color:#6B7280;margin-left:1px}
+    .dd-trigger .t-ico{width:14px;height:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .dd-trigger .t-ico img{width:14px;height:14px;border-radius:2px}
+    .dd-trigger .chev{font-size:8px;color:#6B7280;margin-left:2px}
 
-    /* DROPDOWN MENUS */
-    .dd-menu{display:none;position:absolute;bottom:100%;left:0;margin-bottom:6px;background:#1A1A1A;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:4px;min-width:170px;z-index:300;box-shadow:0 8px 24px rgba(0,0,0,.6)}
+    /* DROPDOWN MENUS — compact dark panel */
+    .dd-menu{display:none;position:absolute;top:100%;left:0;margin-top:4px;background:#1C1C22;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:4px;min-width:180px;z-index:300;box-shadow:0 6px 20px rgba(0,0,0,.5)}
     .dd-menu.open{display:block}
-    .dd-opt{padding:8px 10px;border-radius:6px;color:#D1D5DB;font-size:12px;cursor:pointer;transition:background .1s}
+    .dd-opt{padding:7px 10px;border-radius:6px;color:#D1D5DB;font-size:12px;cursor:pointer;transition:background .1s;display:flex;align-items:center;gap:8px}
     .dd-opt:hover{background:rgba(255,255,255,0.06);color:#fff}
+
+    /* Model dropdown — Emergent style */
+    #menu-model{min-width:280px;padding:4px;text-align:left}
+    .md-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;transition:background .12s}
+    .md-item:hover{background:rgba(255,255,255,0.05)}
+    .md-item .md-ico{width:16px;height:16px;flex-shrink:0}
+    .md-item .md-ico img{width:16px;height:16px;border-radius:2px}
+    .md-item .md-info{flex:1;min-width:0}
+    .md-item .md-name{font-size:13px;font-weight:500;color:#E5E7EB}
+    .md-item .md-desc{font-size:11px;color:#6B7280;margin-top:1px}
+    .md-item .md-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+    .md-item .md-check{color:#4ECDC4;font-size:13px;display:none}
+    .md-item.active .md-name{color:#4ECDC4}
+    .md-item.active .md-check{display:block}
+    .md-item .md-badge{font-size:10px;font-weight:600;color:#D4A843;display:flex;align-items:center;gap:2px}
 
     /* SEND */
     .send-btn{width:32px;height:32px;border-radius:50%;background:#fff;color:#0D0D0D;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;flex-shrink:0}
@@ -92,7 +125,7 @@
     .send-btn svg{width:14px;height:14px}
 
     /* CHIPS ROW — outside prompt card */
-    .chips-row{display:flex;align-items:center;gap:8px;max-width:640px;margin:14px auto 0;overflow-x:auto;padding:0 2px;-webkit-overflow-scrolling:touch}
+    .chips-row{display:flex;align-items:center;gap:8px;max-width:820px;margin:14px auto 0;overflow-x:auto;padding:0 2px;-webkit-overflow-scrolling:touch}
     .chips-row::-webkit-scrollbar{display:none}
     .chip{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:20px;font-size:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);color:#D1D5DB;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
     .chip:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.1);color:#fff}
@@ -128,13 +161,34 @@
     .pcard-new .plus{width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:16px;color:#6B7280}
     .pcard-new span{font-size:11px;color:#6B7280}
 
-    /* TEMPLATES */
-    .tcard{background:#151515;border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .2s}
-    .tcard:hover{border-color:rgba(255,255,255,0.12);transform:translateY(-1px)}
-    .tcard-thumb{height:90px;display:flex;align-items:center;justify-content:center;font-size:32px}
-    .tcard-info{padding:10px 12px;border-top:1px solid rgba(255,255,255,0.06)}
-    .tcard-name{font-size:12px;font-weight:600}
-    .tcard-desc{font-size:10px;color:#6B7280;margin-top:2px}
+    /* TEMPLATES — premium cards */
+    .tpl-section{max-width:820px;margin:40px auto 0;padding:0 32px 40px;width:100%}
+    .tpl-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+    .tpl-header h3{font-size:15px;font-weight:600;color:#E5E7EB}
+    .tpl-header a{font-size:12px;color:#6B7280;text-decoration:none;transition:color .15s}
+    .tpl-header a:hover{color:#fff}
+    .tpl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .tcard{position:relative;border-radius:14px;overflow:hidden;cursor:pointer;transition:all .3s;border:1px solid rgba(255,255,255,0.06);aspect-ratio:16/10}
+    .tcard:hover{transform:translateY(-3px);border-color:rgba(255,255,255,0.15);box-shadow:0 12px 40px rgba(0,0,0,.4)}
+    .tcard-bg{position:absolute;inset:0;z-index:0}
+    .tcard-bg canvas{width:100%;height:100%}
+    .tcard-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,transparent 30%,rgba(0,0,0,0.75) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:16px}
+    .tcard-name{font-size:14px;font-weight:600;color:#fff}
+    .tcard-desc{font-size:11px;color:rgba(255,255,255,0.6);margin-top:3px}
+    .tcard-tag{position:absolute;top:10px;right:10px;font-size:9px;font-weight:600;padding:3px 8px;border-radius:6px;background:rgba(0,0,0,0.4);backdrop-filter:blur(8px);color:rgba(255,255,255,0.8);letter-spacing:0.5px;text-transform:uppercase}
+    @media(max-width:768px){.tpl-grid{grid-template-columns:1fr}.tpl-section{padding:0 16px 24px}}
+    /* PREVIEW MODAL */
+    .preview-modal{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px)}
+    .preview-modal.open{display:flex;flex-direction:column}
+    .preview-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.08)}
+    .preview-bar .pv-title{font-size:14px;font-weight:600;color:#E5E7EB}
+    .preview-bar .pv-actions{display:flex;gap:10px}
+    .preview-bar .pv-btn{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;border:none;font-family:inherit}
+    .preview-bar .pv-close{background:rgba(255,255,255,0.06);color:#D1D5DB;border:1px solid rgba(255,255,255,0.08)}
+    .preview-bar .pv-close:hover{background:rgba(255,255,255,0.1)}
+    .preview-bar .pv-use{background:#fff;color:#0D0D0D}
+    .preview-bar .pv-use:hover{opacity:0.9}
+    .preview-frame{flex:1;border:none;width:100%;background:#fff}
 
     .hidden{display:none!important}
 
@@ -152,17 +206,17 @@
 <div class="app">
 
   <!-- SIDEBAR -->
-  <div class="sidebar">
-    <a href="/app/" class="sb-logo">
+  <div class="sidebar" id="sidebar">
+    <div class="sb-logo" id="sb-logo-toggle" onclick="toggleSidebar()">
       <div class="sb-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
-      <span>AI Builder</span>
-    </a>
+      <span class="sb-logo-text">AI Builder</span>
+      <div class="sb-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="18"/><path d="M14 3h7M14 12h7M14 21h7"/></svg></div>
+    </div>
     <div class="sb-nav">
-      <button class="sb-item active" data-v="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</button>
-      <button class="sb-item" data-v="projects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>My Projects</button>
-      <button class="sb-item" data-v="templates"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Templates</button>
-      <div class="sb-label">Recent</div>
-      <div id="sb-recent"><div class="sb-item" style="color:#4B5563;font-size:11px;cursor:default">No recent projects</div></div>
+      <button class="sb-item active" data-v="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span class="sb-item-label">Home</span></button>
+      <button class="sb-item" data-v="projects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg><span class="sb-item-label">My Projects</span></button>
+      <button class="sb-item" data-v="templates"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span class="sb-item-label">Templates</span></button>
+
     </div>
     <div class="sb-upgrade" onclick="location.href='/#pricing'"><b>✨ Upgrade your plan</b><span>Get more builds & premium models</span></div>
     <div class="sb-footer">
@@ -200,28 +254,55 @@
                 <input type="file" id="file-in" class="hidden" accept="image/*" onchange="handleFile(this)">
 
                 <div class="dd-trigger" id="dd-model">
-                  <span class="dot" id="m-dot" style="background:#F97316"></span>
-                  <span id="m-lbl">Gemini Flash</span>
+                  <span class="t-ico" id="m-ico"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect width='28' height='28' rx='6' fill='%23D97757'/%3E%3Cpath d='M18.3 8L14 20h-2.4l4.3-12h2.4zM11.4 8L7 20H4.7L9 8h2.4z' fill='%23F5E6D3'/%3E%3C/svg%3E" alt=""></span>
+                  <span id="m-lbl">Claude Sonnet 4.6</span>
                   <span class="chev">▾</span>
                   <div class="dd-menu" id="menu-model">
-                    <div class="dd-opt" data-m="google/gemini-2.5-flash" data-l="Gemini Flash" data-c="#F97316">Gemini 2.5 Flash</div>
-                    <div class="dd-opt" data-m="google/gemini-2.5-pro" data-l="Gemini Pro" data-c="#8B5CF6">Gemini 2.5 Pro</div>
-                    <div class="dd-opt" data-m="anthropic/claude-sonnet-4" data-l="Sonnet 4" data-c="#F97316">Claude Sonnet 4</div>
-                    <div class="dd-opt" data-m="anthropic/claude-opus-4" data-l="Opus 4" data-c="#F59E0B">Claude Opus 4</div>
+                    <div class="md-item active" data-m="anthropic/claude-sonnet-4.6" data-l="Claude Sonnet 4.6">
+                      <div class="md-ico"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect width='28' height='28' rx='6' fill='%23D97757'/%3E%3Cpath d='M18.3 8L14 20h-2.4l4.3-12h2.4zM11.4 8L7 20H4.7L9 8h2.4z' fill='%23F5E6D3'/%3E%3C/svg%3E" alt=""></div>
+                      <div class="md-info"><div class="md-name">Claude Sonnet 4.6</div><div class="md-desc">Anthropic's latest model</div></div>
+                      <div class="md-right"><span class="md-check">✓</span></div>
+                    </div>
+                    <div class="md-item" data-m="anthropic/claude-opus-4.6" data-l="Claude Opus 4.6">
+                      <div class="md-ico"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect width='28' height='28' rx='6' fill='%23D97757'/%3E%3Cpath d='M18.3 8L14 20h-2.4l4.3-12h2.4zM11.4 8L7 20H4.7L9 8h2.4z' fill='%23F5E6D3'/%3E%3C/svg%3E" alt=""></div>
+                      <div class="md-info"><div class="md-name">Claude Opus 4.6</div><div class="md-desc">Most advanced reasoning</div></div>
+                      <div class="md-right"><span class="md-badge">✦ Pro</span><span class="md-check">✓</span></div>
+                    </div>
+                    <div class="md-item" data-m="google/gemini-3.1-pro-preview" data-l="Gemini 3.1 Pro">
+                      <div class="md-ico"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%234285F4'/%3E%3Cstop offset='50%25' stop-color='%239B72CB'/%3E%3Cstop offset='100%25' stop-color='%23D96570'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M14 0C14 0 28 14 14 28C14 28 0 14 14 0Z' fill='url(%23a)'/%3E%3Cpath d='M14 0C14 0 0 14 14 28C14 28 28 14 14 0Z' fill='url(%23a)' opacity='0.6'/%3E%3C/svg%3E" alt=""></div>
+                      <div class="md-info"><div class="md-name">Gemini 3.1 Pro</div><div class="md-desc">Google's latest model</div></div>
+                      <div class="md-right"><span class="md-check">✓</span></div>
+                    </div>
+                    <div class="md-item" data-m="google/gemini-3-flash-preview" data-l="Gemini 3 Flash">
+                      <div class="md-ico"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%234285F4'/%3E%3Cstop offset='50%25' stop-color='%239B72CB'/%3E%3Cstop offset='100%25' stop-color='%23D96570'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M14 0C14 0 28 14 14 28C14 28 0 14 14 0Z' fill='url(%23a)'/%3E%3Cpath d='M14 0C14 0 0 14 14 28C14 28 28 14 14 0Z' fill='url(%23a)' opacity='0.6'/%3E%3C/svg%3E" alt=""></div>
+                      <div class="md-info"><div class="md-name">Gemini 3 Flash</div><div class="md-desc">Fast & efficient</div></div>
+                      <div class="md-right"><span class="md-check">✓</span></div>
+                    </div>
+                    <div class="md-item" data-m="openai/gpt-5.4" data-l="GPT-5.4">
+                      <div class="md-ico"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Ccircle cx='14' cy='14' r='14' fill='%23202020'/%3E%3Ccircle cx='14' cy='8' r='2' fill='none' stroke='%2310A37F' stroke-width='1.5'/%3E%3Cpath d='M9 13.5h10M14 13.5V20M10 18l4 4 4-4' fill='none' stroke='%2310A37F' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" alt=""></div>
+                      <div class="md-info"><div class="md-name">GPT-5.4</div><div class="md-desc">OpenAI's latest flagship</div></div>
+                      <div class="md-right"><span class="md-badge">✦ Pro</span><span class="md-check">✓</span></div>
+                    </div>
+                    <div class="md-item" data-m="openai/gpt-5.3-codex" data-l="GPT-5.3 Codex">
+                      <div class="md-ico"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Ccircle cx='14' cy='14' r='14' fill='%23202020'/%3E%3Ccircle cx='14' cy='8' r='2' fill='none' stroke='%2310A37F' stroke-width='1.5'/%3E%3Cpath d='M9 13.5h10M14 13.5V20M10 18l4 4 4-4' fill='none' stroke='%2310A37F' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" alt=""></div>
+                      <div class="md-info"><div class="md-name">GPT-5.3 Codex</div><div class="md-desc">Best for coding</div></div>
+                      <div class="md-right"><span class="md-check">✓</span></div>
+                    </div>
                   </div>
                 </div>
 
                 <div class="dd-trigger" id="dd-mode">
-                  <span id="md-ico">⚡</span>
-                  <span id="md-lbl">Build</span>
+                  <span id="md-ico">◎</span>
+                  <span id="md-lbl">Brainstorm</span>
                   <span class="chev">▾</span>
                   <div class="dd-menu" id="menu-mode">
-                    <div class="dd-opt" data-mode="build" data-ico="⚡" data-l="Build">⚡ Build directly</div>
-                    <div class="dd-opt" data-mode="brainstorm" data-ico="💬" data-l="Brainstorm">💬 Brainstorm first</div>
+                    <div class="dd-opt" data-mode="brainstorm" data-ico="◎" data-l="Brainstorm">◎ Brainstorm</div>
+                    <div class="dd-opt" data-mode="build" data-ico="→" data-l="Build">→ Build directly</div>
                   </div>
                 </div>
               </div>
               <div class="bar-right">
+                <div class="bar-icon" id="voice-lang" title="Switch voice language" style="font-size:10px;font-weight:700;color:#6B7280;width:24px;cursor:pointer">EN</div>
                 <div class="bar-icon" id="mic-btn" title="Voice input">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
                 </div>
@@ -237,13 +318,14 @@
         </div>
       </div>
 
-      <div class="recent-section" id="recent-sec" style="display:none">
+      <!-- TABS: Recent Projects + Templates -->
+      <div class="recent-section" id="recent-sec">
         <div class="rs-tabs">
-          <button class="rs-tab active" id="rtab-recent" onclick="rsTab('recent')">Recent projects</button>
-          <button class="rs-tab" id="rtab-tpl" onclick="rsTab('tpl')">Templates</button>
+          <button class="rs-tab active" id="rtab-tpl" onclick="rsTab('tpl')">Templates</button>
+          <button class="rs-tab" id="rtab-recent" onclick="rsTab('recent')">Recent projects</button>
         </div>
-        <div id="rs-recent" class="pgrid"></div>
-        <div id="rs-tpl" class="pgrid" style="display:none"></div>
+        <div id="rs-tpl" class="tpl-grid"></div>
+        <div id="rs-recent" class="pgrid" style="display:none"></div>
       </div>
     </div>
 
@@ -261,7 +343,7 @@
       <div style="padding:28px 32px">
         <h2 style="font-size:22px;font-weight:800;margin-bottom:6px">Templates</h2>
         <p style="color:#6B7280;font-size:13px;margin-bottom:20px">Start from a professionally designed template</p>
-        <div class="pgrid" id="all-tpl"></div>
+        <div class="tpl-grid" id="all-tpl"></div>
       </div>
     </div>
 
@@ -272,15 +354,12 @@
 var SUPA_URL='https://ljfkpkytcahmugwphrqo.supabase.co';
 var SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqZmtwa3l0Y2FobXVnd3BocnFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyODg3OTQsImV4cCI6MjA4OTg2NDc5NH0.iQ6xeBmD0VqnBK_E2IpNLQGr8O8cBn9SZ2_3etk6YA0';
 var sb;try{sb=window.supabase.createClient(SUPA_URL,SUPA_KEY)}catch(e){}
-var user=null,curModel='google/gemini-2.5-flash',curMode='build',attachB64=null;
+var user=null,curModel='anthropic/claude-sonnet-4.6',curMode='brainstorm',attachB64=null;
 
 var TPLS=[
-  {e:'🚀',n:'SaaS Landing',d:'Hero, features, pricing',p:'Modern SaaS landing page with hero, features grid, pricing, testimonials, CTA',bg:'linear-gradient(135deg,#1e3a5f,#3b82f6)'},
-  {e:'🛒',n:'E-Commerce',d:'Product page with cart',p:'E-commerce product page with image gallery, sizes, add to cart, reviews',bg:'linear-gradient(135deg,#5b21b6,#8b5cf6)'},
-  {e:'🍽',n:'Restaurant',d:'Menu, gallery, bookings',p:'Restaurant website with menu, photo gallery, reservation form, map',bg:'linear-gradient(135deg,#92400e,#f59e0b)'},
-  {e:'🎨',n:'Portfolio',d:'Gallery, about, contact',p:'Creative portfolio with grid gallery, about section, contact form',bg:'linear-gradient(135deg,#166534,#22c55e)'},
-  {e:'📝',n:'Blog',d:'Articles & newsletter',p:'Blog homepage with featured post, articles grid, newsletter signup',bg:'linear-gradient(135deg,#7f1d1d,#ef4444)'},
-  {e:'🏠',n:'Real Estate',d:'Listings with search',p:'Real estate listings with search filters, property cards, map view',bg:'linear-gradient(135deg,#1e3a5f,#06b6d4)'},
+  {n:'Digital Agency',d:'Services, portfolio & testimonials',p:'Professional digital agency landing page with gradient hero text, floating shapes, services grid, portfolio showcase, testimonials, and CTA. Dark theme with purple accents.',tag:'Popular',colors:['#6366F1','#8B5CF6','#0A0A0F'],file:'/templates/digital-agency.html'},
+  {n:'AI SaaS Platform',d:'Dashboard, pricing & features',p:'AI monitoring SaaS platform with dashboard hero, trusted by section, features grid, pricing with toggle, FAQ accordion, and CTA. Dark theme with blue accents.',tag:'Trending',colors:['#3B82F6','#60A5FA','#0A0A1A'],file:'/templates/ai-saas.html'},
+  {n:'Creative Studio',d:'Portfolio, team & contact',p:'Creative studio website with bold typography hero, portfolio grid, services, team section, and contact form. Dark theme with pink-orange gradient accents.',tag:'New',colors:['#F43F5E','#F97316','#0A0A0F'],file:'/templates/creative-studio.html'},
 ];
 var CHIPS=[
   {t:'SaaS Landing',p:'Modern SaaS landing page with hero, features, pricing, testimonials'},
@@ -299,6 +378,7 @@ var chipIdx=0;
 function init(){
   renderChips();
   setupDropdowns();
+  initSidebar();
   setupNav();
   setupProfile();
   setupCardMenus();
@@ -306,9 +386,9 @@ function init(){
     sb.auth.getSession().then(function(r){
       if(r.data.session&&r.data.session.user)user=r.data.session.user;
       updateAuth();loadProjects();
-      renderTpl('rs-tpl');renderTpl('all-tpl');
+      renderTplHome();
     });
-  }else{updateAuth();loadProjects();renderTpl('rs-tpl');renderTpl('all-tpl');}
+  }else{updateAuth();loadProjects();renderTplHome();}
 }
 
 // CHIPS
@@ -339,11 +419,14 @@ function setupDropdowns(){
     document.getElementById('menu-model').classList.toggle('open');
   });
   document.getElementById('menu-model').addEventListener('click',function(e){
-    var opt=e.target.closest('.dd-opt');if(!opt)return;
+    var opt=e.target.closest('.md-item');if(!opt)return;
     e.stopPropagation();
     curModel=opt.getAttribute('data-m');
     document.getElementById('m-lbl').textContent=opt.getAttribute('data-l');
-    document.getElementById('m-dot').style.background=opt.getAttribute('data-c');
+    var ico=opt.querySelector('.md-ico img');
+    if(ico)document.getElementById('m-ico').innerHTML='<img src="'+ico.src+'" alt="">';
+    document.querySelectorAll('.md-item').forEach(function(el){el.classList.remove('active');});
+    opt.classList.add('active');
     closeAllDD();
   });
 
@@ -417,22 +500,62 @@ function updateAuth(){
 function doLogout(){if(sb)sb.auth.signOut();user=null;localStorage.removeItem('builder_guest');localStorage.removeItem('guest_gen_count');updateAuth();location.href='/app/build/?auth=login';}
 
 // RECENT TABS
-function rsTab(t){
-  document.getElementById('rtab-recent').classList.toggle('active',t==='recent');
-  document.getElementById('rtab-tpl').classList.toggle('active',t==='tpl');
-  document.getElementById('rs-recent').style.display=t==='recent'?'grid':'none';
-  document.getElementById('rs-tpl').style.display=t==='tpl'?'grid':'none';
+function toggleSidebar(){
+  var sb=document.getElementById('sidebar');
+  sb.classList.toggle('collapsed');
+  localStorage.setItem('sb_collapsed', sb.classList.contains('collapsed')?'1':'0');
+}
+function initSidebar(){
+  if(localStorage.getItem('sb_collapsed')==='1'){
+    document.getElementById('sidebar').classList.add('collapsed');
+  }
 }
 
-// TEMPLATES
+function rsTab(t){
+  document.getElementById('rtab-tpl').classList.toggle('active',t==='tpl');
+  document.getElementById('rtab-recent').classList.toggle('active',t==='recent');
+  document.getElementById('rs-tpl').style.display=t==='tpl'?'grid':'none';
+  document.getElementById('rs-recent').style.display=t==='recent'?'grid':'none';
+}
+
+// TEMPLATES — real website previews
 function renderTpl(id){
   var g=document.getElementById(id);if(!g)return;
-  TPLS.forEach(function(t){
+  TPLS.forEach(function(t,i){
     var c=document.createElement('div');c.className='tcard';
-    c.onclick=function(){sessionStorage.setItem('builder_prompt',t.p);sessionStorage.setItem('builder_mode','build');sessionStorage.setItem('builder_model',curModel);location.href='/app/build/';};
-    c.innerHTML='<div class="tcard-thumb" style="background:'+t.bg+'">'+t.e+'</div><div class="tcard-info"><div class="tcard-name">'+t.n+'</div><div class="tcard-desc">'+t.d+'</div></div>';
+    c.onclick=function(){openPreview(t);};
+    var tagHtml=t.tag?'<div class="tcard-tag">'+t.tag+'</div>':'';
+    c.innerHTML='<div class="tcard-bg"><iframe src="'+t.file+'" style="width:300%;height:300%;transform:scale(0.333);transform-origin:top left;pointer-events:none;border:none;position:absolute;top:0;left:0"></iframe></div><div class="tcard-overlay">'+tagHtml+'<div class="tcard-name">'+t.n+'</div><div class="tcard-desc">'+t.d+'</div></div>';
     g.appendChild(c);
   });
+}
+function openPreview(t){
+  document.getElementById('pv-title').textContent=t.n;
+  document.getElementById('preview-frame').src=t.file;
+  document.getElementById('pv-use-btn').onclick=function(){
+    sessionStorage.setItem('builder_prompt',t.p);
+    sessionStorage.setItem('builder_mode','build');
+    sessionStorage.setItem('builder_model',curModel);
+    location.href='/app/build/';
+  };
+  document.getElementById('preview-modal').classList.add('open');
+}
+function closePreview(){
+  document.getElementById('preview-modal').classList.remove('open');
+  document.getElementById('preview-frame').src='about:blank';
+}
+function renderTplHome(){
+  renderTpl('rs-tpl');
+  var allTpl=document.getElementById('all-tpl');
+  if(allTpl){
+    TPLS.forEach(function(t,i){
+      var c=document.createElement('div');c.className='tcard';
+      c.onclick=function(){openPreview(t);};
+      var tagHtml=t.tag?'<div class="tcard-tag">'+t.tag+'</div>':'';
+      c.innerHTML='<div class="tcard-bg"><iframe src="'+t.file+'" style="width:300%;height:300%;transform:scale(0.333);transform-origin:top left;pointer-events:none;border:none;position:absolute;top:0;left:0"></iframe></div><div class="tcard-overlay">'+tagHtml+'<div class="tcard-name">'+t.n+'</div><div class="tcard-desc">'+t.d+'</div></div>';
+      allTpl.appendChild(c);
+    });
+  }
 }
 
 // PROJECTS
@@ -462,7 +585,8 @@ function closeCM(){document.querySelectorAll('.pcard-dd.show').forEach(function(
 function loadProjects(){
   function render(list){
     var rs=document.getElementById('recent-sec'),rg=document.getElementById('rs-recent');rg.innerHTML='';
-    if(list.length>0){rs.style.display='';list.slice(0,4).forEach(function(p){rg.appendChild(mkCard(p))});}else{rs.style.display='none';}
+    rs.style.display='';
+    if(list.length>0){list.slice(0,4).forEach(function(p){rg.appendChild(mkCard(p))});}
     var ag=document.getElementById('all-proj');
     ag.innerHTML='<div class="pcard pcard-new" onclick="location.href=\'/app/build/\'"><div class="plus">+</div><span>New Project</span></div>';
     var np=document.getElementById('no-proj');
@@ -483,7 +607,106 @@ function renProj(id,name){
   else{var p=JSON.parse(localStorage.getItem('guest_projects')||'[]');var f=p.find(function(x){return x.id===id});if(f){f.name=name;localStorage.setItem('guest_projects',JSON.stringify(p));}loadProjects();}
 }
 
+// VOICE MODE
+var isRecording=false,mediaRecorder=null,audioChunks=[],voiceLang='en';
+var voiceLangs=['en','uz','ru'];
+var voiceLangLabels={en:'EN',uz:'UZ',ru:'RU'};
+var voiceLangApi={en:'en',uz:'uz',ru:'ru'}; // GPT-4o supports Uzbek natively
+function setupVoice(){
+  var btn=document.getElementById('mic-btn');
+  btn.addEventListener('click',function(){
+    if(isRecording){stopRecording();return;}
+    startRecording();
+  });
+  var langBtn=document.getElementById('voice-lang');
+  langBtn.addEventListener('click',function(){
+    var idx=voiceLangs.indexOf(voiceLang);
+    voiceLang=voiceLangs[(idx+1)%voiceLangs.length];
+    langBtn.textContent=voiceLangLabels[voiceLang];
+  });
+}
+function startRecording(){
+  navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+    audioChunks=[];
+    var options={mimeType:'audio/webm;codecs=opus'};
+    try{mediaRecorder=new MediaRecorder(stream,options);}catch(e){
+      try{mediaRecorder=new MediaRecorder(stream,{mimeType:'audio/mp4'});}catch(e2){
+        mediaRecorder=new MediaRecorder(stream);
+      }
+    }
+    mediaRecorder.ondataavailable=function(e){if(e.data.size>0)audioChunks.push(e.data);};
+    mediaRecorder.onstop=function(){
+      stream.getTracks().forEach(function(t){t.stop();});
+      var blob=new Blob(audioChunks,{type:mediaRecorder.mimeType});
+      transcribeAudio(blob,mediaRecorder.mimeType);
+    };
+    mediaRecorder.start(100); // collect data every 100ms
+    isRecording=true;
+    window._recStart=Date.now();
+    var btn=document.getElementById('mic-btn');
+    btn.style.color='#EF4444';
+    btn.style.background='rgba(239,68,68,0.15)';
+    btn.title='Recording... click to stop';
+  }).catch(function(err){
+    alert('Microphone access denied. Please allow microphone access.');
+  });
+}
+function stopRecording(){
+  var elapsed=Date.now()-(window._recStart||0);
+  if(elapsed<500){console.warn('Recording too short:',elapsed,'ms');
+    if(mediaRecorder&&mediaRecorder.state!=='inactive'){mediaRecorder.stream.getTracks().forEach(function(t){t.stop();});try{mediaRecorder.stop();}catch(e){}}
+    isRecording=false;var btn=document.getElementById('mic-btn');btn.style.color='';btn.style.background='';btn.title='Voice input';return;}
+  if(mediaRecorder&&mediaRecorder.state!=='inactive')mediaRecorder.stop();
+  isRecording=false;
+  var btn=document.getElementById('mic-btn');
+  btn.style.color='';btn.style.background='';btn.title='Voice input';
+}
+function transcribeAudio(blob,mimeType){
+  var btn=document.getElementById('mic-btn');
+  console.log('Audio blob size:',blob.size,'type:',blob.type,'lang:',voiceLang);
+  if(blob.size<1000){console.warn('Audio too small, skipping');btn.style.color='';btn.title='Voice input';return;}
+  btn.style.color='#F59E0B';btn.title='Transcribing...';
+  var reader=new FileReader();
+  reader.onload=function(){
+    var base64=reader.result.split(',')[1];
+    console.log('Sending base64 length:',base64.length,'language:',voiceLang);
+    fetch('/api/transcribe',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({audio:base64,mimeType:mimeType||'audio/webm',language:voiceLangApi[voiceLang]||'en'})
+    }).then(function(r){return r.json();}).then(function(d){
+      btn.style.color='';btn.title='Voice input';
+      console.log('Transcribe result:',d);
+      if(d.text){
+        var prompt=document.getElementById('prompt');
+        prompt.value=(prompt.value?prompt.value+' ':'')+d.text;
+        prompt.focus();
+        prompt.style.height='auto';
+        prompt.style.height=Math.min(prompt.scrollHeight,140)+'px';
+      } else if(d.error){
+        console.error('Transcribe error:',d.error,d.details);
+      }
+    }).catch(function(err){
+      btn.style.color='';btn.title='Voice input';
+      console.error('Transcribe fetch error:',err);
+    });
+  };
+  reader.readAsDataURL(blob);
+}
+
 init();
+setupVoice();
 </script>
+<!-- PREVIEW MODAL -->
+<div class="preview-modal" id="preview-modal">
+  <div class="preview-bar">
+    <span class="pv-title" id="pv-title">Template Preview</span>
+    <div class="pv-actions">
+      <button class="pv-btn pv-close" onclick="closePreview()">Close</button>
+      <button class="pv-btn pv-use" id="pv-use-btn">Use this template →</button>
+    </div>
+  </div>
+  <iframe class="preview-frame" id="preview-frame" src="about:blank"></iframe>
+</div>
 </body>
 </html>
