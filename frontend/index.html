@@ -133,8 +133,19 @@
     .reveal.visible{opacity:1;transform:translateY(0)}
 
     @media(max-width:768px){
+      /* Compact navbar — one clean line */
+      nav{padding:10px 16px}
+      .nav-logo-icon{width:26px;height:26px;border-radius:6px}
+      .nav-logo span{font-size:13px}
       .nav-links{display:none}
       .hamburger{display:block}
+      .lang-select{font-size:11px;padding:4px 7px;border-radius:6px}
+      .btn-ghost{font-size:11px;padding:5px 10px;border-radius:6px}
+      .btn-primary{font-size:11px;padding:5px 12px;border-radius:6px}
+      .nav-right{gap:6px}
+      /* Hero buttons smaller on mobile */
+      .hero-cta .btn-lg{font-size:13px;padding:9px 20px}
+      /* Rest */
       .features-grid{grid-template-columns:1fr}
       .models-grid{grid-template-columns:repeat(2,1fr)}
       .pricing-grid{grid-template-columns:1fr;max-width:360px;margin:0 auto}

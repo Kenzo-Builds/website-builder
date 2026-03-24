@@ -40,9 +40,9 @@
     /* ===== HEADER ===== */
     #header {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 0 12px; background: var(--bg-2);
+      padding: 0 16px; background: var(--bg-2);
       border-bottom: 1px solid var(--border);
-      height: 48px; flex-shrink: 0; gap: 12px;
+      height: 52px; flex-shrink: 0; gap: 12px;
     }
     .h-left, .h-center, .h-right { display: flex; align-items: center; gap: 8px; }
     .h-left { min-width: 0; }
@@ -80,15 +80,15 @@
 
     /* Header buttons */
     .h-btn {
-      height: 32px; padding: 0 12px; border-radius: 8px; font-size: 12px; font-weight: 600;
+      height: 30px; padding: 0 12px; border-radius: 7px; font-size: 12px; font-weight: 600;
       border: 1px solid var(--border); background: transparent; color: var(--text-2);
       cursor: pointer; display: flex; align-items: center; gap: 6px;
-      transition: all 0.15s; white-space: nowrap;
+      transition: all 0.15s; white-space: nowrap; font-family: inherit;
     }
     .h-btn:hover { background: var(--bg-hover); color: var(--text); border-color: var(--border-2); }
-    .h-btn.primary { background: var(--green); border-color: var(--green); color: #000; font-weight: 700; }
-    .h-btn.primary:hover { opacity: 0.9; }
-    .h-btn.accent { background: linear-gradient(135deg,#3B82F6,#8B5CF6); border-color: transparent; color: white; }
+    .h-btn.primary { background: #fff; border-color: transparent; color: #0D0D0D; font-weight: 700; }
+    .h-btn.primary:hover { opacity: 0.88; }
+    .h-btn.accent { background: #fff; border-color: transparent; color: #0D0D0D; font-weight: 700; }
 
     #status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-3); flex-shrink: 0; }
     #status-dot.generating { background: var(--blue); animation: pulse 1s infinite; }
@@ -135,8 +135,8 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 12px; font-weight: 700;
     }
-    .msg-avatar.ai { background: linear-gradient(135deg,#3B82F6,#8B5CF6); color: white; }
-    .msg-avatar.user { background: var(--border); color: var(--text-2); }
+    .msg-avatar.ai { background: linear-gradient(135deg,#3B82F6,#8B5CF6); color: white; font-size:10px; }
+    .msg-avatar.user { background: rgba(255,255,255,0.06); color: var(--text-2); border: 1px solid var(--border); font-size:11px; }
     .msg-body { flex: 1; min-width: 0; }
     .msg-name { font-size: 12px; font-weight: 600; color: var(--text-2); margin-bottom: 3px; }
     .msg-text { font-size: 13px; line-height: 1.6; color: var(--text); word-wrap: break-word; }
@@ -398,15 +398,15 @@
       background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 2px;
     }
     .mode-btn {
-      padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600;
+      padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 600;
       border: none; background: transparent; color: var(--text-3);
-      cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 4px;
-      white-space: nowrap;
+      cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 5px;
+      white-space: nowrap; font-family: inherit;
     }
     .mode-btn:hover { color: var(--text-2); }
-    .mode-btn.active { background: var(--border); color: var(--text); }
-    .mode-btn .mode-dot { width: 6px; height: 6px; border-radius: 50%; }
-    .mode-btn.brainstorm .mode-dot { background: var(--yellow); }
+    .mode-btn.active { background: rgba(255,255,255,0.07); color: var(--text); }
+    .mode-btn .mode-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink:0; }
+    .mode-btn.brainstorm .mode-dot { background: #A78BFA; }
     .mode-btn.build .mode-dot { background: var(--green); }
 
     /* Build-it button in chat */
@@ -526,7 +526,7 @@
 
       <span id="usage-badge" style="font-size:11px;color:#a1a1aa;padding:4px 10px;border-radius:8px;background:#18181b;border:1px solid #27272a;display:none;white-space:nowrap;"></span>
 
-      <button class="h-btn accent" id="login-btn" onclick="showAuthModal('signup')">Sign In</button>
+      <button class="h-btn accent" id="login-btn" onclick="showAuthModal('signup')">Get started</button>
       <div class="user-menu" id="user-menu" style="display:none">
         <div class="user-avatar" id="user-avatar" onclick="toggleUserDropdown()"></div>
         <div class="user-dropdown" id="user-dropdown">
@@ -534,8 +534,8 @@
             <div class="ud-email" id="ud-email"></div>
             <div class="ud-plan" id="ud-plan">FREE PLAN</div>
           </div>
-          <button class="ud-item" onclick="showMyProjects()">📁 My Projects</button>
-          <button class="ud-item logout" onclick="logoutUser()">↩ Sign Out</button>
+          <button class="ud-item" onclick="showMyProjects()">My Projects</button>
+          <button class="ud-item logout" onclick="logoutUser()">Sign Out</button>
         </div>
       </div>
     </div>
@@ -562,10 +562,10 @@
     <!-- Chat panel -->
     <div id="chat-panel">
       <div class="chat-header">
-        <h3>💬 Chat</h3>
+        <h3>Chat</h3>
         <div class="chat-header-actions">
-          <button class="chat-icon-btn" onclick="clearChat()" title="New chat">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <button class="chat-icon-btn" onclick="clearChat()" title="New conversation">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
           </button>
         </div>
       </div>
@@ -575,12 +575,8 @@
           <div class="msg-body">
             <div class="msg-name">AI Builder</div>
             <div class="msg-text">
-              Hey! I'm in <strong>Brainstorm</strong> mode 🧠<br><br>
-              Tell me what you want to build and I'll help you plan it — audience, structure, copy — before we write any code.<br><br>
-              <span style="color:var(--text-3);font-size:12px">Try something like:<br>
-              • "I need a website for my coffee shop"<br>
-              • "I want a portfolio to get freelance clients"<br>
-              • "Landing page for my SaaS product"</span>
+              I'm in <strong>Brainstorm</strong> mode — tell me what you want to build and I'll help you plan it before writing any code.<br><br>
+              <span style="color:var(--text-3);font-size:12px">Try: "a website for my coffee shop" · "portfolio for freelance clients" · "landing page for my SaaS"</span>
             </div>
           </div>
         </div>

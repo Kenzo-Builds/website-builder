@@ -171,15 +171,24 @@
     .tpl-header a{font-size:12px;color:#6B7280;text-decoration:none;transition:color .15s}
     .tpl-header a:hover{color:#fff}
     .tpl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-    .tcard{position:relative;border-radius:14px;overflow:hidden;cursor:pointer;transition:all .3s;border:1px solid rgba(255,255,255,0.06);aspect-ratio:16/10}
+    .tcard{position:relative;border-radius:14px;overflow:hidden;cursor:pointer;transition:all .3s;border:1px solid rgba(255,255,255,0.06);aspect-ratio:16/10;min-height:60px}
     .tcard:hover{transform:translateY(-3px);border-color:rgba(255,255,255,0.15);box-shadow:0 12px 40px rgba(0,0,0,.4)}
-    .tcard-bg{position:absolute;inset:0;z-index:0}
+    .tcard-bg{position:absolute;inset:0;z-index:0;width:100%;height:100%}
     .tcard-bg canvas{width:100%;height:100%}
     .tcard-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,transparent 30%,rgba(0,0,0,0.75) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:16px}
     .tcard-name{font-size:14px;font-weight:600;color:#fff}
     .tcard-desc{font-size:11px;color:rgba(255,255,255,0.6);margin-top:3px}
     .tcard-tag{position:absolute;top:10px;right:10px;font-size:9px;font-weight:600;padding:3px 8px;border-radius:6px;background:rgba(0,0,0,0.4);backdrop-filter:blur(8px);color:rgba(255,255,255,0.8);letter-spacing:0.5px;text-transform:uppercase}
-    @media(max-width:768px){.tpl-grid{grid-template-columns:1fr}.tpl-section{padding:0 16px 24px}}
+    @media(max-width:768px){
+      .tpl-grid{grid-template-columns:1fr 1fr;gap:10px}
+      .tcard{position:relative;height:130px;aspect-ratio:unset;border-radius:12px;overflow:hidden}
+      .tcard-bg{position:absolute;inset:0;display:block}
+      .tcard-bg iframe{width:400%;height:400%;transform:scale(0.25);transform-origin:top left;pointer-events:none;border:none;position:absolute;top:0;left:0}
+      .tcard-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,transparent 20%,rgba(0,0,0,0.8) 100%);padding:12px;display:flex;flex-direction:column;justify-content:flex-end}
+      .tcard-tag{position:absolute;top:8px;right:8px}
+      .tcard-name{font-size:12px}
+      .tcard-desc{font-size:10px}
+    }
     /* PREVIEW MODAL */
     .preview-modal{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px)}
     .preview-modal.open{display:flex;flex-direction:column}
@@ -197,11 +206,27 @@
 
     @media(max-width:768px){
       .sidebar{display:none}
-      .hero h1{font-size:24px}
-      .prompt-wrap{padding:0 12px}
-      .chips-row{padding:0 12px}
-      .recent-section{padding:0 16px 24px}
+      /* Center hero+prompt, templates scroll below */
+      .main{padding:0;overflow-y:auto}
+      .hero{padding:100px 16px 20px}
+      .hero h1{font-size:20px;margin-bottom:6px}
+      .hero p{font-size:13px;margin-bottom:16px}
+      .prompt-wrap{padding:0;max-width:100%}
+      .prompt-card{padding:10px}
+      .prompt-card .prompt-textarea{font-size:16px;min-height:44px}
+      .chips-row{padding:0;max-width:100%;gap:6px;margin-top:10px}
+      .chip{font-size:11px;padding:5px 10px}
+      .tpl-section{margin-top:24px;padding:0 12px 40px}
+      .recent-section{padding:0 12px 24px}
       .pgrid{grid-template-columns:1fr 1fr}
+      /* Compact prompt bar on mobile */
+      .bar-left{gap:4px;flex-wrap:nowrap;min-width:0}
+      .dd-trigger#dd-model #m-lbl{display:none}
+      .dd-trigger#dd-model{min-width:auto;padding:0 8px;gap:4px}
+      .dd-trigger#dd-mode #mode-lbl{display:none}
+      .dd-trigger#dd-mode{min-width:auto;padding:0 8px}
+      .bar-right{gap:4px}
+      .voice-sel{display:none}
     }
   </style>
 </head>
@@ -391,6 +416,9 @@ function init(){
       if(r.data.session&&r.data.session.user)user=r.data.session.user;
       updateAuth();loadProjects();
       renderTplHome();
+    }).catch(function(e){
+      console.warn('Auth failed, rendering anyway:',e);
+      updateAuth();loadProjects();renderTplHome();
     });
   }else{updateAuth();loadProjects();renderTplHome();}
 }
@@ -524,12 +552,14 @@ function rsTab(t){
 
 // TEMPLATES — real website previews
 function renderTpl(id){
-  var g=document.getElementById(id);if(!g)return;
+  var g=document.getElementById(id);if(!g||g.children.length>0)return;
   TPLS.forEach(function(t,i){
     var c=document.createElement('div');c.className='tcard';
     c.onclick=function(){openPreview(t);};
     var tagHtml=t.tag?'<div class="tcard-tag">'+t.tag+'</div>':'';
-    c.innerHTML='<div class="tcard-bg"><iframe src="'+t.file+'" style="width:300%;height:300%;transform:scale(0.333);transform-origin:top left;pointer-events:none;border:none;position:absolute;top:0;left:0"></iframe></div><div class="tcard-overlay">'+tagHtml+'<div class="tcard-name">'+t.n+'</div><div class="tcard-desc">'+t.d+'</div></div>';
+    var grad='linear-gradient(135deg,'+t.colors[0]+','+t.colors[1]+','+t.colors[2]+')';
+    c.style.background=grad;
+    c.innerHTML='<div class="tcard-bg" style="background:'+grad+';position:absolute;inset:0"><iframe src="'+t.file+'" style="width:300%;height:300%;transform:scale(0.333);transform-origin:top left;pointer-events:none;border:none;position:absolute;top:0;left:0"></iframe></div><div class="tcard-overlay">'+tagHtml+'<div class="tcard-name">'+t.n+'</div><div class="tcard-desc">'+t.d+'</div></div>';
     g.appendChild(c);
   });
 }
@@ -551,12 +581,14 @@ function closePreview(){
 function renderTplHome(){
   renderTpl('rs-tpl');
   var allTpl=document.getElementById('all-tpl');
-  if(allTpl){
+  if(allTpl&&allTpl.children.length===0){
     TPLS.forEach(function(t,i){
       var c=document.createElement('div');c.className='tcard';
       c.onclick=function(){openPreview(t);};
       var tagHtml=t.tag?'<div class="tcard-tag">'+t.tag+'</div>':'';
-      c.innerHTML='<div class="tcard-bg"><iframe src="'+t.file+'" style="width:300%;height:300%;transform:scale(0.333);transform-origin:top left;pointer-events:none;border:none;position:absolute;top:0;left:0"></iframe></div><div class="tcard-overlay">'+tagHtml+'<div class="tcard-name">'+t.n+'</div><div class="tcard-desc">'+t.d+'</div></div>';
+      var grad2='linear-gradient(135deg,'+t.colors[0]+','+t.colors[1]+','+t.colors[2]+')';
+      c.style.background=grad2;
+      c.innerHTML='<div class="tcard-bg" style="background:'+grad2+';position:absolute;inset:0"><iframe src="'+t.file+'" style="width:300%;height:300%;transform:scale(0.333);transform-origin:top left;pointer-events:none;border:none;position:absolute;top:0;left:0"></iframe></div><div class="tcard-overlay">'+tagHtml+'<div class="tcard-name">'+t.n+'</div><div class="tcard-desc">'+t.d+'</div></div>';
       allTpl.appendChild(c);
     });
   }
@@ -699,6 +731,11 @@ function transcribeAudio(blob,mimeType){
 
 init();
 setupVoice();
+// Fallback: if templates not rendered after 2s (auth timeout), force render
+setTimeout(function(){
+  var g=document.getElementById('rs-tpl');
+  if(g&&g.children.length===0)renderTplHome();
+},2000);
 </script>
 <!-- PREVIEW MODAL -->
 <div class="preview-modal" id="preview-modal">
