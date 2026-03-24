@@ -307,7 +307,7 @@
         Already have an account? <a onclick="showAuth('login')">Sign in</a>
       </div>
       <div class="auth-divider"><span>or</span></div>
-      <button class="auth-guest-btn" onclick="location.href='/app/build/'">Continue without account</button>
+      <button class="auth-guest-btn" onclick="localStorage.setItem('builder_guest','true');location.href='/app/build/'">Continue without account</button>
     </div>
   </div>
 
