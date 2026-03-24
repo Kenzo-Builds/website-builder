@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 const https = require('https');
 const http = require('http');
 const fs = require('fs');
@@ -7,8 +8,32 @@ const path = require('path');
 const crypto = require('crypto');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: [
+    'https://builder.kenzoagent.com',
+    'http://localhost:3000',
+    'http://localhost:3500'
+  ]
+}));
 app.use(express.json({ limit: '10mb' }));
+
+// Rate limiting
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000,       // 1 minute
+  max: 30,                    // 30 requests per minute per IP
+  message: { error: 'Too many requests. Please slow down.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api/', apiLimiter);
+
+const signupLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,  // 1 hour
+  max: 5,                     // 5 signups per hour per IP
+  message: { error: 'Too many accounts created from this IP. Try again in 1 hour.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 // Load key from config.json (never hardcode or share in chat)
 let OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || '';
@@ -113,7 +138,7 @@ async function logGeneration(userId, model, prompt, projectId) {
 }
 
 // ── Auto-confirm signup endpoint ─────────────────────────────────────────────
-app.post('/api/auth/signup', async (req, res) => {
+app.post('/api/auth/signup', signupLimiter, async (req, res) => {
   const { email, password, name } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
 
@@ -174,6 +199,7 @@ if (!fs.existsSync(BUILDS_DIR)) fs.mkdirSync(BUILDS_DIR, { recursive: true });
 
 // In-memory job store
 const jobs = {};
+const guestUsage = {}; // IP -> { count, resetAt }
 
 const SYSTEM_PROMPT = `You are an expert web developer. Generate complete, beautiful, modern HTML pages.
 RULES:
@@ -296,6 +322,11 @@ app.post('/api/generate-stream', async (req, res) => {
   const { prompt, model = 'anthropic/claude-sonnet-4.6', existingCode, image, imageMimeType } = req.body;
   if (!prompt) return res.status(400).json({ error: 'Prompt is required' });
 
+  // Input size limits
+  if (prompt.length > 5000) return res.status(400).json({ error: 'Prompt too long. Maximum 5000 characters.' });
+  if (existingCode && existingCode.length > 200000) return res.status(400).json({ error: 'Code too large. Maximum 200KB.' });
+  if (image && image.length > 5000000) return res.status(400).json({ error: 'Image too large. Maximum 5MB.' });
+
   // Check usage limits
   const user = await verifyUser(req.headers.authorization);
   let userId = null;
@@ -311,6 +342,21 @@ app.post('/api/generate-stream', async (req, res) => {
         plan, used, limit
       });
     }
+  } else {
+    // Guest: server-side IP-based limit
+    const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip;
+    if (!guestUsage[ip]) guestUsage[ip] = { count: 0, resetAt: Date.now() + 24 * 60 * 60 * 1000 };
+    if (Date.now() > guestUsage[ip].resetAt) {
+      guestUsage[ip] = { count: 0, resetAt: Date.now() + 24 * 60 * 60 * 1000 };
+    }
+    if (guestUsage[ip].count >= PLAN_LIMITS.guest) {
+      return res.status(429).json({
+        error: 'limit_reached',
+        message: `Free limit reached (${PLAN_LIMITS.guest} builds). Sign up for more.`,
+        plan: 'guest', used: guestUsage[ip].count, limit: PLAN_LIMITS.guest
+      });
+    }
+    guestUsage[ip].count++;
   }
 
   // Set up SSE
@@ -451,6 +497,13 @@ app.post('/api/brainstorm', async (req, res) => {
   const { messages: chatHistory = [], model = 'anthropic/claude-sonnet-4.6' } = req.body;
   if (!chatHistory.length) return res.status(400).json({ error: 'Messages required' });
 
+  // Input size limits
+  if (chatHistory.length > 20) return res.status(400).json({ error: 'Too many messages. Maximum 20 per conversation.' });
+  for (const msg of chatHistory) {
+    const content = typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content);
+    if (content.length > 50000) return res.status(400).json({ error: 'Message too large.' });
+  }
+
   // Debug: check if last message has image
   const lastMsg = chatHistory[chatHistory.length - 1];
   const hasImage = Array.isArray(lastMsg?.content) && lastMsg.content.some(c => c.type === 'image_url');
@@ -478,6 +531,10 @@ app.post('/api/generate', async (req, res) => {
   const { prompt, model = 'google/gemini-2.5-flash', existingCode } = req.body;
   if (!prompt) return res.status(400).json({ error: 'Prompt is required' });
 
+  // Input size limits
+  if (prompt.length > 5000) return res.status(400).json({ error: 'Prompt too long. Maximum 5000 characters.' });
+  if (existingCode && existingCode.length > 200000) return res.status(400).json({ error: 'Code too large. Maximum 200KB.' });
+
   // Check usage limits
   const user = await verifyUser(req.headers.authorization);
   let userId = null;
@@ -497,7 +554,7 @@ app.post('/api/generate', async (req, res) => {
   // Guest users: no server-side enforcement (handled client-side via localStorage)
 
   const jobId = crypto.randomUUID();
-  jobs[jobId] = { status: 'pending', progress: 'Starting...', startedAt: Date.now(), userId, model, prompt };
+  jobs[jobId] = { status: 'pending', progress: 'Starting...', startedAt: Date.now(), createdAt: Date.now(), userId, model, prompt };
 
   // Return jobId immediately
   res.json({ jobId });
@@ -557,6 +614,16 @@ app.get('/api/job/:jobId', (req, res) => {
 app.post('/api/deploy', async (req, res) => {
   const { buildId, subdomain } = req.body;
   if (!buildId || !subdomain) return res.status(400).json({ error: 'buildId and subdomain required' });
+
+  // Validate subdomain: lowercase alphanumeric + hyphens, 3-32 chars, no leading/trailing hyphen
+  if (!/^[a-z0-9][a-z0-9-]{1,30}[a-z0-9]$/.test(subdomain)) {
+    return res.status(400).json({ error: 'Invalid subdomain. Use 3-32 lowercase letters, numbers, and hyphens only.' });
+  }
+  // Block reserved subdomains
+  const reserved = ['kenzo', 'admin', 'api', 'www', 'mail', 'builder', 'app', 'dashboard', 'auth', 'login', 'static', 'assets', 'cdn'];
+  if (reserved.includes(subdomain)) {
+    return res.status(400).json({ error: 'This subdomain is reserved.' });
+  }
   const buildPath = path.join(BUILDS_DIR, buildId);
   if (!fs.existsSync(buildPath)) return res.status(404).json({ error: 'Build not found' });
 
@@ -655,5 +722,47 @@ app.post('/api/transcribe', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// ── Auto-cleanup: old builds (>24h) and stale jobs (>10min) ─────────────────
+function cleanBuilds() {
+  if (!fs.existsSync(BUILDS_DIR)) return;
+  const now = Date.now();
+  const maxAge = 24 * 60 * 60 * 1000; // 24 hours
+  let cleaned = 0;
+  try {
+    fs.readdirSync(BUILDS_DIR).forEach(dir => {
+      const fullPath = path.join(BUILDS_DIR, dir);
+      try {
+        const stat = fs.statSync(fullPath);
+        if (now - stat.mtimeMs > maxAge) {
+          fs.rmSync(fullPath, { recursive: true, force: true });
+          cleaned++;
+        }
+      } catch(e) {}
+    });
+    if (cleaned > 0) console.log(`🧹 Cleaned ${cleaned} old builds`);
+  } catch(e) { console.warn('Build cleanup error:', e.message); }
+}
+
+function cleanJobs() {
+  const now = Date.now();
+  let cleaned = 0;
+  Object.keys(jobs).forEach(id => {
+    if (jobs[id].createdAt && now - jobs[id].createdAt > 10 * 60 * 1000) {
+      delete jobs[id];
+      cleaned++;
+    }
+  });
+  // Clean expired guest usage entries
+  Object.keys(guestUsage).forEach(ip => {
+    if (now > guestUsage[ip].resetAt) delete guestUsage[ip];
+  });
+  if (cleaned > 0) console.log(`🧹 Cleaned ${cleaned} stale jobs from memory`);
+}
+
+// Run cleanup every hour for builds, every minute for jobs
+setInterval(cleanBuilds, 60 * 60 * 1000);
+setInterval(cleanJobs, 60 * 1000);
+cleanBuilds(); // Run once at startup
 
 app.listen(PORT, () => console.log(`🚀 Website Builder API v3.3.0-voice on port ${PORT}`));
