@@ -413,14 +413,18 @@ function init(){
   setupCardMenus();
   if(sb){
     sb.auth.getSession().then(function(r){
-      if(r.data.session&&r.data.session.user)user=r.data.session.user;
-      updateAuth();loadProjects();
-      renderTplHome();
+      if(r.data.session&&r.data.session.user){
+        user=r.data.session.user;
+        updateAuth();loadProjects();renderTplHome();
+      }else{
+        // Not logged in → redirect to landing page
+        location.href='/';
+      }
     }).catch(function(e){
-      console.warn('Auth failed, rendering anyway:',e);
-      updateAuth();loadProjects();renderTplHome();
+      console.warn('Auth failed, redirecting to landing:',e);
+      location.href='/';
     });
-  }else{updateAuth();loadProjects();renderTplHome();}
+  }else{location.href='/';}
 }
 
 // CHIPS

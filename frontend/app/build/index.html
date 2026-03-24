@@ -857,10 +857,8 @@
         isGuest = false;
         localStorage.removeItem('builder_guest');
         localStorage.removeItem('guest_gen_count');
-        hideAuthModal();
-        updateAuthUI();
-        fetchUsage();
-        addMessage(authMode === 'signup' ? '🎉 Account created! You have 5 free builds per month.' : '👋 Welcome back!', 'ai');
+        // Redirect to dashboard after login
+        location.href = '/app/';
       } catch (err) {
         errorDiv.textContent = err.message || 'Something went wrong';
         errorDiv.style.display = 'block';

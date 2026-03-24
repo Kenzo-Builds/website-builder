@@ -6,6 +6,7 @@
   <title>AI Web Builder — Build websites with AI</title>
   <meta name="description" content="Describe your idea — AI builds your website in seconds. No coding required.">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html{scroll-behavior:smooth}
@@ -152,6 +153,31 @@
       .preview-body{flex-direction:column}
       .hero h1{font-size:26px}
     }
+
+    /* Auth Modal */
+    .auth-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+    .auth-overlay.show{display:flex}
+    .auth-box{background:#151515;border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:32px;width:90%;max-width:400px;box-shadow:0 20px 80px rgba(0,0,0,0.5)}
+    .auth-box h2{font-size:20px;font-weight:800;margin-bottom:4px;color:#F4F4F5}
+    .auth-sub{color:#52525B;font-size:13px;margin-bottom:24px}
+    .auth-field{margin-bottom:14px}
+    .auth-field label{display:block;font-size:12px;font-weight:600;color:#52525B;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px}
+    .auth-field input{width:100%;background:#0D0D0D;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:11px 14px;font-size:14px;color:#F4F4F5;outline:none;font-family:inherit;transition:border-color 0.15s}
+    .auth-field input:focus{border-color:#3B82F6;box-shadow:0 0 0 3px rgba(59,130,246,0.08)}
+    .auth-field input::placeholder{color:#52525B}
+    .auth-btn{width:100%;padding:11px;border-radius:10px;font-size:14px;font-weight:700;border:none;cursor:pointer;margin-top:6px;background:#3B82F6;color:white;transition:opacity 0.15s}
+    .auth-btn:hover{opacity:0.9}
+    .auth-btn:disabled{opacity:0.4;cursor:not-allowed}
+    .auth-switch{text-align:center;margin-top:14px;font-size:13px;color:#52525B}
+    .auth-switch a{color:#3B82F6;cursor:pointer;text-decoration:none;font-weight:600}
+    .auth-error{color:#EF4444;font-size:13px;margin-top:6px;display:none;text-align:center}
+    .auth-divider{display:flex;align-items:center;gap:12px;margin:18px 0}
+    .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.07)}
+    .auth-divider span{font-size:11px;color:#52525B}
+    .auth-guest-btn{width:100%;padding:10px;border-radius:10px;font-size:13px;font-weight:600;border:1px solid rgba(255,255,255,0.07);cursor:pointer;background:transparent;color:#52525B;transition:all 0.15s}
+    .auth-guest-btn:hover{border-color:rgba(255,255,255,0.12);color:#A1A1AA}
+    .auth-close{position:absolute;top:16px;right:16px;background:none;border:none;color:#52525B;font-size:20px;cursor:pointer}
+    .auth-close:hover{color:#A1A1AA}
   </style>
 </head>
 <body>
@@ -173,8 +199,8 @@
         <option value="ru">🇷🇺 RU</option>
         <option value="en">🇬🇧 EN</option>
       </select>
-      <a href="/app/build/?auth=login" class="btn-ghost" data-i18n="nav_signin">Kirish</a>
-      <a href="/app/build/?auth=signup" class="btn-primary" data-i18n="nav_start">Boshlash →</a>
+      <a href="javascript:void(0)" onclick="showAuth('login')" class="btn-ghost" data-i18n="nav_signin">Kirish</a>
+      <a href="javascript:void(0)" onclick="showAuth('signup')" class="btn-primary" data-i18n="nav_start">Boshlash →</a>
     </div>
     <button class="hamburger" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button>
   </nav>
@@ -182,7 +208,7 @@
     <a href="#features" onclick="toggleMobileMenu()" data-i18n="nav_features">Xususiyatlar</a>
     <a href="#models" onclick="toggleMobileMenu()" data-i18n="nav_models">Modellar</a>
     <a href="#pricing" onclick="toggleMobileMenu()" data-i18n="nav_pricing">Narxlar</a>
-    <a href="/app/build/?auth=login" data-i18n="nav_signin">Kirish</a>
+    <a href="javascript:void(0)" onclick="showAuth('login');toggleMobileMenu()" data-i18n="nav_signin">Kirish</a>
   </div>
 
   <section class="hero">
@@ -191,7 +217,7 @@
       <h1 data-i18n="hero_title">Veb-saytingizni <span class="grad">AI bilan</span> yarating</h1>
       <p data-i18n="hero_desc">Tasvirlang — AI yaratadi. Bir necha soniyada professional veb-saytlar. Kod yozish shart emas.</p>
       <div class="hero-cta">
-        <a href="/app/build/?auth=signup" class="btn-lg primary" data-i18n="hero_cta_start">Bepul boshlash →</a>
+        <a href="javascript:void(0)" onclick="showAuth('signup')" class="btn-lg primary" data-i18n="hero_cta_start">Bepul boshlash →</a>
         <a href="#features" class="btn-lg outline" data-i18n="hero_cta_learn">Batafsil →</a>
       </div>
       <div class="hero-preview reveal">
@@ -244,15 +270,46 @@
       <h2 class="sec-title reveal" data-i18n="pricing_title">Oddiy va shaffof narxlar</h2>
       <p class="sec-desc reveal" data-i18n="pricing_desc">Bepuldan boshlang, kerak bo'lganda oshiring</p>
       <div class="pricing-grid">
-        <div class="pr-card reveal"><h4 data-i18n="plan_free">Bepul</h4><div class="price">$0<span>/oy</span></div><p class="pr-desc" data-i18n="plan_free_desc">Sinab ko'rish uchun</p><ul><li data-i18n="plan_free_f1">5 ta generatsiya/oy</li><li data-i18n="plan_free_f2">1 ta deploy</li><li data-i18n="plan_free_f3">Asosiy modellar</li></ul><a href="/app/build/?auth=signup" class="pr-btn outline" data-i18n="plan_free_btn">Bepul boshlash</a></div>
-        <div class="pr-card reveal"><h4 data-i18n="plan_starter">Starter</h4><div class="price">$5<span>/oy</span></div><p class="pr-desc" data-i18n="plan_starter_desc">Kichik loyihalar uchun</p><ul><li data-i18n="plan_starter_f1">50 ta generatsiya/oy</li><li data-i18n="plan_starter_f2">5 ta deploy</li><li data-i18n="plan_starter_f3">Barcha modellar</li><li data-i18n="plan_starter_f4">Kodni yuklab olish</li></ul><a href="/app/build/?auth=signup" class="pr-btn outline" data-i18n="plan_starter_btn">Boshlash</a></div>
-        <div class="pr-card popular reveal"><h4 data-i18n="plan_pro">Pro</h4><div class="price">$15<span>/oy</span></div><p class="pr-desc" data-i18n="plan_pro_desc">Professional foydalanish</p><ul><li data-i18n="plan_pro_f1">200 ta generatsiya/oy</li><li data-i18n="plan_pro_f2">20 ta deploy</li><li data-i18n="plan_pro_f3">Barcha premium modellar</li><li data-i18n="plan_pro_f4">Custom domenlar</li><li data-i18n="plan_pro_f5">Ustuvor qo'llab-quvvatlash</li></ul><a href="/app/build/?auth=signup" class="pr-btn primary" data-i18n="plan_pro_btn">Pro'ga o'tish</a></div>
-        <div class="pr-card reveal"><h4 data-i18n="plan_expert">Expert</h4><div class="price">$30<span>/oy</span></div><p class="pr-desc" data-i18n="plan_expert_desc">Agentliklar va jamoalar</p><ul><li data-i18n="plan_expert_f1">Cheksiz generatsiya</li><li data-i18n="plan_expert_f2">Cheksiz deploy</li><li data-i18n="plan_expert_f3">API kirish</li><li data-i18n="plan_expert_f4">Oq label brending</li><li data-i18n="plan_expert_f5">24/7 qo'llab-quvvatlash</li></ul><a href="/app/build/?auth=signup" class="pr-btn outline" data-i18n="plan_expert_btn">Bog'lanish</a></div>
+        <div class="pr-card reveal"><h4 data-i18n="plan_free">Bepul</h4><div class="price">$0<span>/oy</span></div><p class="pr-desc" data-i18n="plan_free_desc">Sinab ko'rish uchun</p><ul><li data-i18n="plan_free_f1">5 ta generatsiya/oy</li><li data-i18n="plan_free_f2">1 ta deploy</li><li data-i18n="plan_free_f3">Asosiy modellar</li></ul><a href="javascript:void(0)" onclick="showAuth('signup')" class="pr-btn outline" data-i18n="plan_free_btn">Bepul boshlash</a></div>
+        <div class="pr-card reveal"><h4 data-i18n="plan_starter">Starter</h4><div class="price">$5<span>/oy</span></div><p class="pr-desc" data-i18n="plan_starter_desc">Kichik loyihalar uchun</p><ul><li data-i18n="plan_starter_f1">50 ta generatsiya/oy</li><li data-i18n="plan_starter_f2">5 ta deploy</li><li data-i18n="plan_starter_f3">Barcha modellar</li><li data-i18n="plan_starter_f4">Kodni yuklab olish</li></ul><a href="javascript:void(0)" onclick="showAuth('signup')" class="pr-btn outline" data-i18n="plan_starter_btn">Boshlash</a></div>
+        <div class="pr-card popular reveal"><h4 data-i18n="plan_pro">Pro</h4><div class="price">$15<span>/oy</span></div><p class="pr-desc" data-i18n="plan_pro_desc">Professional foydalanish</p><ul><li data-i18n="plan_pro_f1">200 ta generatsiya/oy</li><li data-i18n="plan_pro_f2">20 ta deploy</li><li data-i18n="plan_pro_f3">Barcha premium modellar</li><li data-i18n="plan_pro_f4">Custom domenlar</li><li data-i18n="plan_pro_f5">Ustuvor qo'llab-quvvatlash</li></ul><a href="javascript:void(0)" onclick="showAuth('signup')" class="pr-btn primary" data-i18n="plan_pro_btn">Pro'ga o'tish</a></div>
+        <div class="pr-card reveal"><h4 data-i18n="plan_expert">Expert</h4><div class="price">$30<span>/oy</span></div><p class="pr-desc" data-i18n="plan_expert_desc">Agentliklar va jamoalar</p><ul><li data-i18n="plan_expert_f1">Cheksiz generatsiya</li><li data-i18n="plan_expert_f2">Cheksiz deploy</li><li data-i18n="plan_expert_f3">API kirish</li><li data-i18n="plan_expert_f4">Oq label brending</li><li data-i18n="plan_expert_f5">24/7 qo'llab-quvvatlash</li></ul><a href="javascript:void(0)" onclick="showAuth('signup')" class="pr-btn outline" data-i18n="plan_expert_btn">Bog'lanish</a></div>
       </div>
     </div>
   </section>
 
   <footer><div class="container"><p>© 2026 AI Builder. <span data-i18n="footer_text">Barcha huquqlar himoyalangan.</span></p></div></footer>
+
+  <!-- Auth Modal -->
+  <div class="auth-overlay" id="auth-overlay" onclick="if(event.target===this)hideAuth()">
+    <div class="auth-box" style="position:relative">
+      <button class="auth-close" onclick="hideAuth()">&times;</button>
+      <h2 id="la-title">Create Account</h2>
+      <p class="auth-sub" id="la-sub">Start building websites with AI — free</p>
+      <div id="la-name-field" class="auth-field">
+        <label>Name</label>
+        <input type="text" id="la-name" placeholder="Your name" />
+      </div>
+      <div class="auth-field">
+        <label>Email</label>
+        <input type="email" id="la-email" placeholder="you@example.com" />
+      </div>
+      <div class="auth-field">
+        <label>Password</label>
+        <div style="position:relative">
+          <input type="password" id="la-password" placeholder="Min 6 characters" style="padding-right:40px" />
+          <div onclick="var p=document.getElementById('la-password'),e=this;if(p.type==='password'){p.type='text';e.textContent='🙈'}else{p.type='password';e.textContent='👁'}" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:#71717A;font-size:16px;user-select:none">👁</div>
+        </div>
+      </div>
+      <div class="auth-error" id="la-error"></div>
+      <button class="auth-btn" id="la-submit" onclick="handleLandingAuth()">Create Account</button>
+      <div class="auth-switch" id="la-switch">
+        Already have an account? <a onclick="showAuth('login')">Sign in</a>
+      </div>
+      <div class="auth-divider"><span>or</span></div>
+      <button class="auth-guest-btn" onclick="location.href='/app/build/'">Continue without account</button>
+    </div>
+  </div>
 
   <div class="modal-overlay" id="model-modal" onclick="if(event.target===this)closeModal()">
     <div class="modal">
@@ -280,6 +337,75 @@
     var observer=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.1});
     document.querySelectorAll('.reveal').forEach(function(el){observer.observe(el);});
     setLang(currentLang);
+
+    // ===== AUTH =====
+    var API='https://builder.kenzoagent.com';
+    var SUPA_URL='https://ljfkpkytcahmugwphrqo.supabase.co';
+    var SUPA_KEY='sb_publishable_7eIDQqzdu6zy7-tLpLVpXw_ciCm1doM';
+    var sb;try{sb=window.supabase.createClient(SUPA_URL,SUPA_KEY)}catch(e){}
+    var authMode='signup';
+
+    // Check if already logged in → go straight to dashboard
+    if(sb){sb.auth.getSession().then(function(r){
+      if(r.data&&r.data.session){location.href='/app/';}
+    }).catch(function(){});}
+
+    function showAuth(mode){
+      authMode=mode;
+      var err=document.getElementById('la-error');err.style.display='none';
+      if(mode==='login'){
+        document.getElementById('la-title').textContent='Welcome Back';
+        document.getElementById('la-sub').textContent='Sign in to your account';
+        document.getElementById('la-name-field').style.display='none';
+        document.getElementById('la-submit').textContent='Sign In';
+        document.getElementById('la-switch').innerHTML='Don\'t have an account? <a onclick="showAuth(\'signup\')">Create one</a>';
+      }else{
+        document.getElementById('la-title').textContent='Create Account';
+        document.getElementById('la-sub').textContent='Start building websites with AI — free';
+        document.getElementById('la-name-field').style.display='block';
+        document.getElementById('la-submit').textContent='Create Account';
+        document.getElementById('la-switch').innerHTML='Already have an account? <a onclick="showAuth(\'login\')">Sign in</a>';
+      }
+      document.getElementById('auth-overlay').classList.add('show');
+    }
+    function hideAuth(){document.getElementById('auth-overlay').classList.remove('show');}
+
+    async function handleLandingAuth(){
+      var email=document.getElementById('la-email').value.trim();
+      var password=document.getElementById('la-password').value;
+      var name=document.getElementById('la-name').value.trim();
+      var err=document.getElementById('la-error');
+      var btn=document.getElementById('la-submit');
+      err.style.display='none';
+      if(!email||!password){err.textContent='Please fill in all fields';err.style.display='block';return;}
+      if(password.length<6){err.textContent='Password must be at least 6 characters';err.style.display='block';return;}
+      btn.disabled=true;
+      btn.textContent=authMode==='login'?'Signing in...':'Creating account...';
+      try{
+        if(authMode==='signup'){
+          var res=await fetch(API+'/api/auth/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,password:password,name:name||email.split('@')[0]})});
+          var data=await res.json();
+          if(data.error)throw new Error(data.error);
+          var r=await sb.auth.signInWithPassword({email:email,password:password});
+          if(r.error)throw r.error;
+        }else{
+          var r=await sb.auth.signInWithPassword({email:email,password:password});
+          if(r.error)throw r.error;
+        }
+        // Success → go to dashboard
+        location.href='/app/';
+      }catch(e){
+        err.textContent=e.message||'Something went wrong';
+        err.style.display='block';
+      }finally{
+        btn.disabled=false;
+        btn.textContent=authMode==='login'?'Sign In':'Create Account';
+      }
+    }
+
+    // Check URL params for auth trigger
+    var urlAuth=new URLSearchParams(location.search).get('auth');
+    if(urlAuth==='login'||urlAuth==='signup')showAuth(urlAuth);
   </script>
 </body>
 </html>
