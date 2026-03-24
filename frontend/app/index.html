@@ -529,7 +529,7 @@ function updateAuth(){
     else gr.textContent='Good evening, '+fn+' 🌙';
   }else{av.textContent='?';nm.textContent='Guest';pl.textContent='Sign in';}
 }
-function doLogout(){if(sb)sb.auth.signOut();user=null;localStorage.removeItem('builder_guest');localStorage.removeItem('guest_gen_count');updateAuth();location.href='/app/build/?auth=login';}
+function doLogout(){if(sb)sb.auth.signOut();user=null;localStorage.removeItem('builder_guest');localStorage.removeItem('guest_gen_count');updateAuth();location.href='/app/?auth=login';}
 
 // RECENT TABS
 function toggleSidebar(){

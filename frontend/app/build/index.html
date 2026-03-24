@@ -701,7 +701,10 @@
       </div>
       <div class="auth-field">
         <label>Password</label>
-        <input type="password" id="auth-password" placeholder="Min 6 characters" />
+        <div style="position:relative">
+          <input type="password" id="auth-password" placeholder="Min 6 characters" style="padding-right:40px" />
+          <div onclick="togglePwVis()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:#71717A;font-size:16px;user-select:none" id="pw-eye">👁</div>
+        </div>
       </div>
       <div class="auth-error" id="auth-error"></div>
       <button class="auth-submit" id="auth-submit-btn" onclick="handleAuth()">Create Account</button>
@@ -813,6 +816,8 @@
     }
 
     function hideAuthModal() { document.getElementById('auth-modal').classList.remove('show'); }
+
+    function togglePwVis(){const p=document.getElementById('auth-password'),e=document.getElementById('pw-eye');if(p.type==='password'){p.type='text';e.textContent='🙈';}else{p.type='password';e.textContent='👁';}}
 
     async function handleAuth() {
       const email = document.getElementById('auth-email').value.trim();
