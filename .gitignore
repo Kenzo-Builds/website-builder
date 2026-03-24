@@ -1,3 +1,4 @@
 backend/builds/
 backend/config.json
 backend/ecosystem.config.js
+backend/supabase-config.json
