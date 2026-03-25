@@ -38,11 +38,12 @@
     .scanline{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,0.008) 2px,rgba(255,255,255,0.008) 4px);pointer-events:none}
 
     /* === NAV === */
-    nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(9,9,11,0.0);backdrop-filter:none;border-bottom:none}
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 40px;height:64px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;background:rgba(9,9,11,0.0);backdrop-filter:none;border-bottom:none}
+    .nav-right{display:flex;align-items:center;gap:20px;justify-content:flex-end}
     nav.scrolled{background:rgba(9,9,11,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.05)}
     .nav-logo{text-decoration:none;color:#fff;font-family:'Montserrat',sans-serif;font-weight:200;font-size:18px;letter-spacing:3px;text-transform:uppercase;transition:color .2s}
     .nav-logo:hover{color:#A1A1AA}
-    .nav-links{display:flex;align-items:center;gap:36px}
+    .nav-links{display:flex;align-items:center;gap:36px;justify-content:center}
     .nav-links a{color:#71717A;text-decoration:none;font-size:13px;font-weight:400;transition:color .2s;letter-spacing:.2px}
     .nav-links a:hover{color:#E4E4E7}
     .nav-right{display:flex;align-items:center;gap:20px}
@@ -59,8 +60,8 @@
 
     .btn-ghost-nav{font-size:13px;font-weight:400;color:#71717A;cursor:pointer;text-decoration:none;transition:color .2s;background:none;border:none;font-family:inherit;letter-spacing:.2px}
     .btn-ghost-nav:hover{color:#E4E4E7}
-    .btn-white-nav{font-size:13px;font-weight:600;padding:8px 20px;border-radius:10px;background:#fff;color:#09090B;border:none;cursor:pointer;text-decoration:none;transition:all .2s;font-family:inherit}
-    .btn-white-nav:hover{background:#F0FEFF;box-shadow:0 0 20px rgba(0,229,255,.12)}
+    .btn-white-nav{font-size:13px;font-weight:400;color:#71717A;cursor:pointer;text-decoration:none;transition:color .2s;background:none;border:none;font-family:inherit;letter-spacing:.2px}
+    .btn-white-nav:hover{color:#E4E4E7}
     .hamburger{display:none;background:none;border:none;cursor:pointer;padding:4px}
     .hamburger span{display:block;width:20px;height:2px;background:#A1A1AA;margin:4px 0;border-radius:2px;transition:all .2s}
     .mobile-menu{display:none;position:fixed;top:64px;left:0;right:0;z-index:99;background:rgba(9,9,11,0.97);backdrop-filter:blur(20px);padding:16px 24px;flex-direction:column;gap:4px}
