@@ -890,9 +890,14 @@
                 <div class="set-section" style="margin-bottom:0">
                   <div class="set-section-title">Editor Font Size</div>
                   <div class="set-section-desc">Adjust the code editor font size in the builder.</div>
-                  <div style="display:flex;align-items:center;gap:12px;margin-top:8px">
-                    <input type="range" id="sp-font-slider" min="11" max="20" value="14" aria-label="Editor font size" style="flex:1;accent-color:#3B82F6" oninput="updateFontSize(this.value)">
-                    <span id="sp-font-val" style="font-size:14px;color:#A1A1AA;min-width:36px;text-align:center">14px</span>
+                  <div style="display:flex;align-items:center;gap:10px;margin-top:12px">
+                    <button onclick="updateFontSize(Math.max(11,parseInt(document.getElementById('sp-font-slider').value)-1))" style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:#D1D5DB;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:inherit;transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">−</button>
+                    <input type="range" id="sp-font-slider" min="11" max="20" value="13" aria-label="Editor font size" style="flex:1;accent-color:#3B82F6;height:4px" oninput="updateFontSize(this.value)">
+                    <button onclick="updateFontSize(Math.min(20,parseInt(document.getElementById('sp-font-slider').value)+1))" style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:#D1D5DB;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:inherit;transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">+</button>
+                    <span id="sp-font-val" style="font-size:13px;font-weight:600;color:#A1A1AA;min-width:34px;text-align:center">13px</span>
+                  </div>
+                  <div style="margin-top:12px;padding:10px 14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px">
+                    <span style="font-family:'Courier New',monospace;color:#60A5FA" id="sp-font-preview">const website = buildWith('AI');</span>
                   </div>
                 </div>
               </div>
@@ -1231,9 +1236,11 @@ async function loadSettingsData(){
   // Appearance — restore saved theme button state
   var saved=localStorage.getItem('theme')||'dark';
   document.querySelectorAll('.theme-opt').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-theme')===saved);});
-  var fs=localStorage.getItem('editorFontSize')||'14';
+  var fs=parseInt(localStorage.getItem('editorFontSize')||'13');
   document.getElementById('sp-font-slider').value=fs;
   document.getElementById('sp-font-val').textContent=fs+'px';
+  var preview=document.getElementById('sp-font-preview');
+  if(preview) preview.style.fontSize=fs+'px';
 }
 
 // SETTINGS — SAVE PROFILE (re-auth if phone changed)
@@ -1435,8 +1442,14 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',func
 
 // SETTINGS — FONT SIZE
 function updateFontSize(val){
+  val=parseInt(val);
   localStorage.setItem('editorFontSize',val);
-  document.getElementById('sp-font-val').textContent=val+'px';
+  var slider=document.getElementById('sp-font-slider');
+  if(slider) slider.value=val;
+  var label=document.getElementById('sp-font-val');
+  if(label) label.textContent=val+'px';
+  var preview=document.getElementById('sp-font-preview');
+  if(preview) preview.style.fontSize=val+'px';
 }
 
 // FAQ TOGGLE

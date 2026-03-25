@@ -1165,9 +1165,10 @@
     // ===== MONACO =====
     require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
     require(['vs/editor/editor.main'], () => {
+      const savedFontSize = parseInt(localStorage.getItem('editorFontSize') || '13');
       monacoEditor = monaco.editor.create(document.getElementById('monaco-editor'), {
         value: '<!-- Generated code will appear here -->',
-        language: 'html', theme: 'vs-dark', fontSize: 13,
+        language: 'html', theme: 'vs-dark', fontSize: savedFontSize,
         minimap: { enabled: false }, scrollBeyondLastLine: false,
         automaticLayout: true, padding: { top: 12 },
         lineNumbers: 'on', renderLineHighlight: 'line',
