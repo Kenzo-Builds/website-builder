@@ -1084,36 +1084,85 @@ async function saveProfileSP(){
   var st=document.getElementById('sp-pf-save-status'); st.classList.add('show'); setTimeout(function(){st.classList.remove('show');},2000);
 }
 
+// REAUTH MODAL — verify current password before sensitive changes
+function requireReauth(onSuccess){
+  var overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);z-index:99999;display:flex;align-items:center;justify-content:center;animation:ppIn .15s ease';
+  overlay.innerHTML=`
+    <div style="background:#151518;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:28px;width:90%;max-width:380px;box-shadow:0 24px 64px rgba(0,0,0,.7);animation:cmIn .2s ease">
+      <div style="width:44px;height:44px;border-radius:12px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 16px">🔒</div>
+      <div style="font-size:17px;font-weight:700;color:#F4F4F5;text-align:center;margin-bottom:6px">Confirm your identity</div>
+      <div style="font-size:13px;color:#71717A;text-align:center;margin-bottom:20px">Enter your current password to continue</div>
+      <input id="reauth-pw" type="password" placeholder="Current password" aria-label="Current password"
+        style="width:100%;background:#0D0D0D;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:11px 14px;color:#F4F4F5;font-size:14px;font-family:inherit;outline:none;margin-bottom:8px;box-sizing:border-box;transition:border-color .15s"
+        onfocus="this.style.borderColor='rgba(59,130,246,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.08)'"
+        onkeydown="if(event.key==='Enter')document.getElementById('reauth-submit').click()">
+      <div id="reauth-error" style="font-size:12px;color:#EF4444;margin-bottom:12px;display:none;text-align:center"></div>
+      <div style="display:flex;gap:10px">
+        <button id="reauth-cancel" style="flex:1;padding:10px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:#D1D5DB;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Cancel</button>
+        <button id="reauth-submit" style="flex:1;padding:10px;border-radius:10px;background:#3B82F6;border:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s">Confirm</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  setTimeout(function(){overlay.querySelector('#reauth-pw').focus();},100);
+  overlay.querySelector('#reauth-cancel').onclick=function(){overlay.remove();};
+  overlay.addEventListener('click',function(e){if(e.target===overlay)overlay.remove();});
+  overlay.querySelector('#reauth-submit').onclick=async function(){
+    var pw=overlay.querySelector('#reauth-pw').value;
+    var errEl=overlay.querySelector('#reauth-error');
+    var btn=overlay.querySelector('#reauth-submit');
+    errEl.style.display='none';
+    if(!pw){errEl.textContent='Enter your current password';errEl.style.display='block';return;}
+    btn.textContent='Verifying...';btn.disabled=true;btn.style.opacity='0.6';
+    // Verify by re-signing in
+    var {error}=await sb.auth.signInWithPassword({email:user.email,password:pw});
+    if(error){
+      errEl.textContent='Incorrect password. Please try again.';
+      errEl.style.display='block';
+      btn.textContent='Confirm';btn.disabled=false;btn.style.opacity='1';
+      overlay.querySelector('#reauth-pw').value='';
+      overlay.querySelector('#reauth-pw').focus();
+      return;
+    }
+    overlay.remove();
+    onSuccess();
+  };
+}
+
 // SETTINGS — CHANGE PASSWORD
-async function changePW(){
+function changePW(){
   var pw=document.getElementById('sp-new-pw').value;
   var pw2=document.getElementById('sp-confirm-pw').value;
   var err=document.getElementById('sp-pw-error');
-  var st=document.getElementById('sp-pw-status');
   err.style.display='none';
   if(!pw){err.textContent='Enter a new password';err.style.display='block';return;}
   if(pw.length<6){err.textContent='Password must be at least 6 characters';err.style.display='block';return;}
   if(pw!==pw2){err.textContent='Passwords do not match';err.style.display='block';return;}
   if(!sb) return;
-  var {error}=await sb.auth.updateUser({password:pw});
-  if(error){err.textContent=error.message;err.style.display='block';return;}
-  document.getElementById('sp-new-pw').value='';
-  document.getElementById('sp-confirm-pw').value='';
-  st.classList.add('show'); setTimeout(function(){st.classList.remove('show');},2500);
+  requireReauth(async function(){
+    var {error}=await sb.auth.updateUser({password:pw});
+    if(error){document.getElementById('sp-pw-error').textContent=error.message;document.getElementById('sp-pw-error').style.display='block';return;}
+    document.getElementById('sp-new-pw').value='';
+    document.getElementById('sp-confirm-pw').value='';
+    var st=document.getElementById('sp-pw-status');st.classList.add('show');setTimeout(function(){st.classList.remove('show');},2500);
+    showToast('✓ Password updated successfully','#22C55E');
+  });
 }
 
 // SETTINGS — CHANGE EMAIL
-async function changeEmail(){
+function changeEmail(){
   var email=document.getElementById('sp-new-email').value.trim();
   var err=document.getElementById('sp-email-error');
-  var st=document.getElementById('sp-email-status');
   err.style.display='none';
   if(!email||!email.includes('@')){err.textContent='Enter a valid email address';err.style.display='block';return;}
   if(!sb) return;
-  var {error}=await sb.auth.updateUser({email:email});
-  if(error){err.textContent=error.message;err.style.display='block';return;}
-  document.getElementById('sp-new-email').value='';
-  st.classList.add('show'); setTimeout(function(){st.classList.remove('show');},3000);
+  requireReauth(async function(){
+    var {error}=await sb.auth.updateUser({email:email});
+    if(error){document.getElementById('sp-email-error').textContent=error.message;document.getElementById('sp-email-error').style.display='block';return;}
+    document.getElementById('sp-new-email').value='';
+    var st=document.getElementById('sp-email-status');st.classList.add('show');setTimeout(function(){st.classList.remove('show');},3000);
+    showToast('✓ Verification email sent to '+email,'#22C55E');
+  });
 }
 
 // SETTINGS — DELETE ACCOUNT (soft delete)
