@@ -287,6 +287,54 @@
     .pf-save-status{font-size:12px;color:#22C55E;margin-left:12px;opacity:0;transition:opacity .3s}
     .pf-save-status.show{opacity:1}
 
+    /* SETTINGS LAYOUT */
+    .settings-layout{display:flex;height:100%;min-height:100vh}
+    .settings-sidebar{width:220px;flex-shrink:0;border-right:1px solid rgba(255,255,255,0.06);padding:24px 12px;display:flex;flex-direction:column;gap:4px}
+    .settings-back{display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:8px;border:none;background:none;color:#6B7280;font-size:13px;font-family:inherit;cursor:pointer;transition:all .15s;margin-bottom:12px;width:100%;text-align:left}
+    .settings-back:hover{color:#D1D5DB;background:rgba(255,255,255,0.04)}
+    .settings-back svg{width:14px;height:14px}
+    .settings-section-label{font-size:10px;font-weight:600;color:#4B5563;text-transform:uppercase;letter-spacing:.8px;padding:12px 10px 4px}
+    .settings-nav-item{display:flex;align-items:center;gap:9px;width:100%;padding:8px 10px;border-radius:8px;border:none;background:none;color:#9CA3AF;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;text-align:left;transition:all .15s}
+    .settings-nav-item:hover{background:rgba(255,255,255,0.05);color:#D1D5DB}
+    .settings-nav-item.active{background:rgba(255,255,255,0.08);color:#fff}
+    .settings-nav-item svg{width:16px;height:16px;opacity:.6;flex-shrink:0}
+    .settings-nav-item.active svg{opacity:.9}
+    .settings-content{flex:1;overflow-y:auto}
+
+    /* SETTINGS SUBPAGES */
+    .spage{display:none}
+    .spage.active{display:block}
+
+    /* ACCOUNT SETTINGS */
+    .set-section{border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:20px;margin-bottom:16px;background:#111115}
+    .set-section-title{font-size:15px;font-weight:700;color:#F4F4F5;margin-bottom:4px}
+    .set-section-desc{font-size:12px;color:#71717A;margin-bottom:16px}
+    .set-error{font-size:12px;color:#EF4444;margin-top:8px;display:none}
+
+    /* APPEARANCE */
+    .theme-opt{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;border-radius:12px;border:2px solid rgba(255,255,255,0.07);background:transparent;cursor:pointer;transition:all .15s;color:#A1A1AA;font-size:12px;font-weight:600;font-family:inherit;flex:1}
+    .theme-opt:hover{border-color:rgba(255,255,255,0.15)}
+    .theme-opt.active{border-color:#3B82F6;color:#F4F4F5}
+    .theme-preview{width:100%;height:48px;border-radius:8px;border:1px solid rgba(255,255,255,0.06)}
+    .dark-prev{background:linear-gradient(135deg,#0D0D0D 50%,#1C1C22 50%)}
+    .light-prev{background:linear-gradient(135deg,#F4F4F5 50%,#E5E7EB 50%)}
+    .system-prev{background:linear-gradient(135deg,#0D0D0D 50%,#F4F4F5 50%)}
+
+    /* FAQ */
+    .faq-item{border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer}
+    .faq-item:last-child{border-bottom:none}
+    .faq-q{display:flex;justify-content:space-between;align-items:center;padding:12px 0;font-size:13px;font-weight:500;color:#E5E7EB;user-select:none}
+    .faq-chevron{color:#52525B;transition:transform .2s;font-size:16px;flex-shrink:0}
+    .faq-item.open .faq-chevron{transform:rotate(90deg)}
+    .faq-a{font-size:12px;color:#71717A;line-height:1.6;max-height:0;overflow:hidden;transition:max-height .25s ease,padding .25s ease;padding:0}
+    .faq-item.open .faq-a{max-height:120px;padding:0 0 12px}
+
+    /* USAGE BAR */
+    .usage-bar-wrap{background:rgba(255,255,255,0.04);border-radius:8px;height:8px;overflow:hidden;margin:8px 0 4px}
+    .usage-bar-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,#3B82F6,#8B5CF6);transition:width .5s ease}
+    .usage-bar-fill.warn{background:linear-gradient(90deg,#EAB308,#F97316)}
+    .usage-bar-fill.full{background:linear-gradient(90deg,#EF4444,#DC2626)}
+
     .hidden{display:none!important}
 
     @media(max-width:768px){
@@ -524,20 +572,291 @@
       </div>
     </div>
 
-    <!-- SETTINGS PAGE (placeholder) -->
+    <!-- SETTINGS SHELL — contains sidebar + all settings subpages -->
     <div class="page" id="page-settings">
-      <div style="padding:40px"><h2 style="font-size:22px;font-weight:800;margin-bottom:8px">Account Settings</h2><p style="color:#71717A;font-size:14px">Coming soon.</p></div>
-    </div>
+      <div class="settings-layout">
 
-    <!-- APPEARANCE PAGE (placeholder) -->
-    <div class="page" id="page-appearance">
-      <div style="padding:40px"><h2 style="font-size:22px;font-weight:800;margin-bottom:8px">Appearance</h2><p style="color:#71717A;font-size:14px">Coming soon.</p></div>
-    </div>
+        <!-- Settings Sidebar -->
+        <div class="settings-sidebar">
+          <button class="settings-back" onclick="switchPage('home')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+            Back
+          </button>
 
-    <!-- SUPPORT PAGE (placeholder) -->
-    <div class="page" id="page-support">
-      <div style="padding:40px"><h2 style="font-size:22px;font-weight:800;margin-bottom:8px">Support & Help</h2><p style="color:#71717A;font-size:14px">Coming soon.</p></div>
-    </div>
+          <div class="settings-section-label">Account</div>
+          <button class="settings-nav-item active" data-sp="profile" onclick="switchSP('profile')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Profile
+          </button>
+          <button class="settings-nav-item" data-sp="account" onclick="switchSP('account')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            Account Settings
+          </button>
+          <button class="settings-nav-item" data-sp="appearance" onclick="switchSP('appearance')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            Appearance
+          </button>
+
+          <div class="settings-section-label">Plan</div>
+          <button class="settings-nav-item" data-sp="subscription" onclick="switchSP('subscription')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            Subscription
+          </button>
+          <button class="settings-nav-item" data-sp="usage" onclick="switchSP('usage')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            Usage
+          </button>
+
+          <div class="settings-section-label">Support</div>
+          <button class="settings-nav-item" data-sp="help" onclick="switchSP('help')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Help & FAQ
+          </button>
+        </div>
+
+        <!-- Settings Content -->
+        <div class="settings-content">
+
+          <!-- PROFILE subpage (reuses existing prof-* styles) -->
+          <div class="spage active" id="sp-profile">
+            <div class="prof-banner"></div>
+            <div class="prof-top">
+              <div class="prof-av-big" id="sp-av-big">?</div>
+              <div class="prof-info">
+                <div class="prof-name" id="sp-prof-name">Guest</div>
+                <div class="prof-handle" id="sp-prof-handle">@guest</div>
+                <div class="prof-joined" id="sp-prof-joined">Joined March 2026</div>
+              </div>
+            </div>
+            <div class="prof-stats">
+              <div class="prof-stat"><div class="prof-stat-val" id="sp-builds">0</div><div class="prof-stat-label">Total Builds</div></div>
+              <div class="prof-stat"><div class="prof-stat-val" id="sp-projects">0</div><div class="prof-stat-label">Projects</div></div>
+              <div class="prof-stat"><div class="prof-stat-val" id="sp-deployed">0</div><div class="prof-stat-label">Deployed</div></div>
+            </div>
+            <div class="prof-form">
+              <div class="pf-field"><div class="pf-label">Display Name</div><input class="pf-input" type="text" id="sp-pf-name" aria-label="Display name" placeholder="Your name"></div>
+              <div class="pf-field">
+                <div class="pf-label">Username</div>
+                <input class="pf-input" type="text" id="sp-pf-username" aria-label="Username" placeholder="your-username" oninput="checkUsernameField(this,'sp-pf-username-hint')">
+                <div class="pf-hint" id="sp-pf-username-hint">Lowercase letters, numbers, and hyphens only (3-20 chars)</div>
+              </div>
+              <div class="pf-field"><div class="pf-label">Email</div><input class="pf-input" type="email" id="sp-pf-email" aria-label="Email address" readonly><div class="pf-hint">🔒 Change email in Account Settings</div></div>
+              <div class="pf-field"><div class="pf-label">Phone Number</div><input class="pf-input" type="tel" id="sp-pf-phone" aria-label="Phone number" placeholder="+998 90 123 4567"></div>
+              <div class="pf-field"><div class="pf-label">Bio</div><textarea class="pf-input pf-textarea" id="sp-pf-bio" aria-label="Bio" placeholder="Tell us about yourself" maxlength="220"></textarea></div>
+              <div class="pf-row">
+                <div class="pf-field"><div class="pf-label">Location</div><input class="pf-input" type="text" id="sp-pf-location" aria-label="Location" placeholder="City, Country"></div>
+                <div class="pf-field"><div class="pf-label">Website</div><input class="pf-input" type="text" id="sp-pf-website" aria-label="Website" placeholder="yourwebsite.com"></div>
+              </div>
+              <div style="display:flex;align-items:center">
+                <button class="pf-save" id="sp-pf-save-btn" onclick="saveProfileSP()">Save Changes</button>
+                <span class="pf-save-status" id="sp-pf-save-status">✓ Saved</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ACCOUNT SETTINGS subpage -->
+          <div class="spage" id="sp-account">
+            <div class="prof-form" style="max-width:520px">
+              <h2 style="font-size:22px;font-weight:800;margin-bottom:4px">Account Settings</h2>
+              <p style="color:#71717A;font-size:13px;margin-bottom:28px">Manage your account security.</p>
+
+              <div class="set-section">
+                <div class="set-section-title">Change Password</div>
+                <div class="set-section-desc">Update your password to keep your account secure.</div>
+                <div class="pf-field" style="margin-bottom:12px">
+                  <div class="pf-label">New Password</div>
+                  <input class="pf-input" type="password" id="sp-new-pw" aria-label="New password" placeholder="Min 6 characters">
+                </div>
+                <div class="pf-field" style="margin-bottom:16px">
+                  <div class="pf-label">Confirm Password</div>
+                  <input class="pf-input" type="password" id="sp-confirm-pw" aria-label="Confirm password" placeholder="Re-enter new password">
+                </div>
+                <div style="display:flex;align-items:center">
+                  <button class="pf-save" onclick="changePW()">Update Password</button>
+                  <span class="pf-save-status" id="sp-pw-status">✓ Updated</span>
+                </div>
+                <div class="set-error" id="sp-pw-error"></div>
+              </div>
+
+              <div class="set-section">
+                <div class="set-section-title">Change Email</div>
+                <div class="set-section-desc">A verification link will be sent to your new email.</div>
+                <div class="pf-field" style="margin-bottom:16px">
+                  <div class="pf-label">New Email</div>
+                  <input class="pf-input" type="email" id="sp-new-email" aria-label="New email" placeholder="you@example.com">
+                </div>
+                <div style="display:flex;align-items:center">
+                  <button class="pf-save" onclick="changeEmail()">Update Email</button>
+                  <span class="pf-save-status" id="sp-email-status">✓ Verification sent</span>
+                </div>
+                <div class="set-error" id="sp-email-error"></div>
+              </div>
+
+              <div class="set-section" style="border-color:rgba(239,68,68,0.2);background:rgba(239,68,68,0.03)">
+                <div class="set-section-title" style="color:#EF4444">Danger Zone</div>
+                <div class="set-section-desc">Permanently delete your account and all data. Cannot be undone.</div>
+                <button onclick="deleteAccount()" style="padding:9px 20px;border-radius:10px;background:transparent;color:#EF4444;border:1px solid rgba(239,68,68,0.3);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s" onmouseover="this.style.background='rgba(239,68,68,0.1)'" onmouseout="this.style.background='transparent'">Delete Account</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- APPEARANCE subpage -->
+          <div class="spage" id="sp-appearance">
+            <div class="prof-form" style="max-width:520px">
+              <h2 style="font-size:22px;font-weight:800;margin-bottom:4px">Appearance</h2>
+              <p style="color:#71717A;font-size:13px;margin-bottom:28px">Customize how AI Web Builder looks.</p>
+
+              <div class="set-section">
+                <div class="set-section-title">Theme</div>
+                <div class="set-section-desc">Choose your preferred color scheme.</div>
+                <div style="display:flex;gap:12px" id="sp-theme-options">
+                  <button class="theme-opt" data-theme="dark" onclick="setTheme('dark')">
+                    <div class="theme-preview dark-prev"></div>
+                    <span>Dark</span>
+                  </button>
+                  <button class="theme-opt" data-theme="light" onclick="setTheme('light')">
+                    <div class="theme-preview light-prev"></div>
+                    <span>Light</span>
+                  </button>
+                  <button class="theme-opt" data-theme="system" onclick="setTheme('system')">
+                    <div class="theme-preview system-prev"></div>
+                    <span>System</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="set-section">
+                <div class="set-section-title">Editor Font Size</div>
+                <div class="set-section-desc">Adjust the code editor font size in the builder.</div>
+                <div style="display:flex;align-items:center;gap:12px">
+                  <input type="range" id="sp-font-slider" min="11" max="20" value="14" aria-label="Editor font size" style="flex:1;accent-color:#3B82F6" oninput="updateFontSize(this.value)">
+                  <span id="sp-font-val" style="font-size:14px;color:#A1A1AA;min-width:36px;text-align:center">14px</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUBSCRIPTION subpage -->
+          <div class="spage" id="sp-subscription">
+            <div class="prof-form" style="max-width:560px">
+              <h2 style="font-size:22px;font-weight:800;margin-bottom:4px">Subscription</h2>
+              <p style="color:#71717A;font-size:13px;margin-bottom:28px">Manage your plan and billing.</p>
+
+              <!-- Current plan banner -->
+              <div id="sp-plan-banner" class="set-section" style="background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(139,92,246,0.08));border-color:rgba(59,130,246,0.2)">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                  <div>
+                    <div style="font-size:12px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Current Plan</div>
+                    <div style="font-size:22px;font-weight:800;color:#F4F4F5" id="sp-plan-name">Free</div>
+                  </div>
+                  <div style="padding:6px 14px;border-radius:8px;background:#3B82F6;color:#fff;font-size:12px;font-weight:600;cursor:pointer" onclick="location.href='/#pricing'">Upgrade</div>
+                </div>
+                <div style="font-size:12px;color:#6B7280">
+                  <span id="sp-plan-used">0</span> / <span id="sp-plan-limit">5</span> generations used this month
+                </div>
+                <div class="usage-bar-wrap"><div class="usage-bar-fill" id="sp-plan-bar" style="width:0%"></div></div>
+                <div style="font-size:11px;color:#52525B" id="sp-plan-reset">Resets monthly</div>
+              </div>
+
+              <!-- Plan cards -->
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <div class="set-section" style="position:relative">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                    <div><div class="set-section-title">Starter</div><div style="font-size:13px;color:#3B82F6;font-weight:700">$5 / month</div></div>
+                    <div style="padding:6px 14px;border-radius:8px;border:1px solid rgba(59,130,246,0.3);color:#3B82F6;font-size:12px;font-weight:600;cursor:pointer">Upgrade</div>
+                  </div>
+                  <div style="font-size:12px;color:#71717A;line-height:1.7">✓ 50 generations/month &nbsp;·&nbsp; ✓ 5 deploys &nbsp;·&nbsp; ✓ All models &nbsp;·&nbsp; ✓ Download code</div>
+                </div>
+                <div class="set-section" style="position:relative;border-color:rgba(139,92,246,0.2);background:rgba(139,92,246,0.03)">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                    <div><div class="set-section-title">Pro</div><div style="font-size:13px;color:#8B5CF6;font-weight:700">$15 / month</div></div>
+                    <div style="padding:6px 14px;border-radius:8px;background:linear-gradient(135deg,#3B82F6,#8B5CF6);color:#fff;font-size:12px;font-weight:600;cursor:pointer">Upgrade</div>
+                  </div>
+                  <div style="font-size:12px;color:#71717A;line-height:1.7">✓ 200 generations/month &nbsp;·&nbsp; ✓ 20 deploys &nbsp;·&nbsp; ✓ Premium models &nbsp;·&nbsp; ✓ Custom domains &nbsp;·&nbsp; ✓ Remove badge</div>
+                </div>
+                <div class="set-section">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                    <div><div class="set-section-title">Expert</div><div style="font-size:13px;color:#F4F4F5;font-weight:700">$30 / month</div></div>
+                    <div style="padding:6px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);color:#D1D5DB;font-size:12px;font-weight:600;cursor:pointer">Contact us</div>
+                  </div>
+                  <div style="font-size:12px;color:#71717A;line-height:1.7">✓ Unlimited generations &nbsp;·&nbsp; ✓ Unlimited deploys &nbsp;·&nbsp; ✓ API access &nbsp;·&nbsp; ✓ White label</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- USAGE subpage -->
+          <div class="spage" id="sp-usage">
+            <div class="prof-form" style="max-width:520px">
+              <h2 style="font-size:22px;font-weight:800;margin-bottom:4px">Usage</h2>
+              <p style="color:#71717A;font-size:13px;margin-bottom:28px">Track your usage for this billing period.</p>
+
+              <div class="set-section">
+                <div class="set-section-title">Generations</div>
+                <div class="set-section-desc">Website builds this month.</div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                  <span style="font-size:28px;font-weight:800;color:#F4F4F5" id="sp-usage-used">0</span>
+                  <span style="font-size:13px;color:#6B7280">of <span id="sp-usage-limit">5</span> used</span>
+                </div>
+                <div class="usage-bar-wrap"><div class="usage-bar-fill" id="sp-usage-bar" style="width:0%"></div></div>
+                <div style="display:flex;justify-content:space-between;margin-top:6px">
+                  <span style="font-size:11px;color:#52525B"><span id="sp-usage-remaining">5</span> remaining</span>
+                  <span style="font-size:11px;color:#52525B" id="sp-usage-plan">Free Plan</span>
+                </div>
+              </div>
+
+              <div class="set-section">
+                <div class="set-section-title">Deployed Sites</div>
+                <div class="set-section-desc">Active deployments on your account.</div>
+                <div style="font-size:28px;font-weight:800;color:#F4F4F5;margin-bottom:4px" id="sp-deployed-count">0</div>
+                <div style="font-size:12px;color:#6B7280">sites deployed to kenzoagent.com</div>
+              </div>
+
+              <div class="set-section">
+                <div class="set-section-title">Total Builds</div>
+                <div class="set-section-desc">All generations since you joined.</div>
+                <div style="font-size:28px;font-weight:800;color:#F4F4F5;margin-bottom:4px" id="sp-total-builds">0</div>
+                <div style="font-size:12px;color:#6B7280">total website generations</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- HELP & FAQ subpage -->
+          <div class="spage" id="sp-help">
+            <div class="prof-form" style="max-width:520px">
+              <h2 style="font-size:22px;font-weight:800;margin-bottom:4px">Help & FAQ</h2>
+              <p style="color:#71717A;font-size:13px;margin-bottom:28px">Get help with AI Web Builder.</p>
+
+              <div class="set-section">
+                <div class="set-section-title">Contact Us</div>
+                <div class="set-section-desc">Have a question or found a bug? Reach out anytime.</div>
+                <a href="mailto:support@kenzoagent.com" style="display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:10px;background:#151518;border:1px solid rgba(255,255,255,0.08);color:#F4F4F5;text-decoration:none;font-size:13px;font-weight:500;transition:border-color .15s" onmouseover="this.style.borderColor='rgba(59,130,246,0.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  support@kenzoagent.com
+                </a>
+              </div>
+
+              <div class="set-section">
+                <div class="set-section-title" style="margin-bottom:16px">Frequently Asked Questions</div>
+                <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">How many websites can I build for free?<span class="faq-chevron">›</span></div><div class="faq-a">Free plan includes 5 generations per month and 1 deployed site. Upgrade anytime for more.</div></div>
+                <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Which AI models can I use?<span class="faq-chevron">›</span></div><div class="faq-a">Free plan includes basic models. Paid plans unlock all models including Claude Opus 4.6 and Gemini 3.1 Pro.</div></div>
+                <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Can I use my own domain?<span class="faq-chevron">›</span></div><div class="faq-a">Custom domains are available on the Pro plan. Free and Starter plans deploy to *.kenzoagent.com subdomains.</div></div>
+                <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Can I download my code?<span class="faq-chevron">›</span></div><div class="faq-a">Yes! All plans can copy code. Starter and above can download full project files.</div></div>
+                <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">How do I delete my account?<span class="faq-chevron">›</span></div><div class="faq-a">Go to Account Settings → Danger Zone → Delete Account. This permanently removes all your data.</div></div>
+                <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">What is Brainstorm mode?<span class="faq-chevron">›</span></div><div class="faq-a">Brainstorm mode lets you plan your website with AI before building. The AI asks questions and creates a strategy, then you hit "Build it" to generate the site.</div></div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /settings-content -->
+      </div><!-- /settings-layout -->
+    </div><!-- /page-settings -->
+
+    <!-- APPEARANCE page (kept as alias — redirects to settings appearance) -->
+    <div class="page" id="page-appearance" style="display:none"></div>
+
+    <!-- SUPPORT page (kept as alias) -->
+    <div class="page" id="page-support" style="display:none"></div>
 
   </div>
 </div>
@@ -659,9 +978,185 @@ function setupNav(){
   });
 }
 function switchPage(name){
+  // If navigating to appearance/support, redirect to settings subpage
+  if(name==='appearance'){switchPage('settings');switchSP('appearance');return;}
+  if(name==='support'){switchPage('settings');switchSP('help');return;}
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   document.getElementById('page-'+name).classList.add('active');
   document.querySelectorAll('[data-v]').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-v')===name);});
+  // Load settings data when entering settings
+  if(name==='settings') loadSettingsData();
+}
+
+// SETTINGS SUBPAGE NAVIGATION
+function switchSP(name){
+  document.querySelectorAll('.spage').forEach(function(p){p.classList.remove('active');});
+  document.getElementById('sp-'+name).classList.add('active');
+  document.querySelectorAll('.settings-nav-item').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-sp')===name);});
+}
+
+// SETTINGS DATA LOAD
+async function loadSettingsData(){
+  if(!user||!sb) return;
+  // Profile subpage
+  var nm=user.user_metadata?.full_name||user.email.split('@')[0];
+  document.getElementById('sp-av-big').textContent=nm.charAt(0).toUpperCase();
+  document.getElementById('sp-prof-name').textContent=nm;
+  document.getElementById('sp-prof-handle').textContent='@'+(profileData.username||user.email.split('@')[0]);
+  var joined=new Date(user.created_at);
+  var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('sp-prof-joined').textContent='Joined '+months[joined.getMonth()]+' '+joined.getFullYear();
+  document.getElementById('sp-pf-name').value=nm;
+  document.getElementById('sp-pf-username').value=profileData.username||'';
+  document.getElementById('sp-pf-email').value=user.email||'';
+  document.getElementById('sp-pf-phone').value=profileData.phone||'';
+  document.getElementById('sp-pf-bio').value=profileData.bio||'';
+  document.getElementById('sp-pf-location').value=profileData.location||'';
+  document.getElementById('sp-pf-website').value=profileData.website||'';
+  // Stats
+  try{var {count:bc}=await sb.from('generations').select('*',{count:'exact',head:true}).eq('user_id',user.id);document.getElementById('sp-builds').textContent=bc||0;document.getElementById('sp-total-builds').textContent=bc||0;}catch(e){}
+  try{var {count:pc}=await sb.from('projects').select('*',{count:'exact',head:true}).eq('user_id',user.id);document.getElementById('sp-projects').textContent=pc||0;}catch(e){}
+  try{var {count:dc}=await sb.from('deployments').select('*',{count:'exact',head:true}).eq('user_id',user.id);document.getElementById('sp-deployed').textContent=dc||0;document.getElementById('sp-deployed-count').textContent=dc||0;}catch(e){}
+  // Usage data
+  try{
+    var res=await fetch('/api/usage',{headers:{'Authorization':'Bearer '+( await sb.auth.getSession()).data.session?.access_token}});
+    if(res.ok){
+      var ud=await res.json();
+      var used=ud.used||0,limit=ud.limit||5,plan=ud.plan||'free',remaining=Math.max(0,limit-used);
+      var pct=limit>0?Math.min(100,Math.round(used/limit*100)):0;
+      // Subscription page
+      document.getElementById('sp-plan-name').textContent=plan.charAt(0).toUpperCase()+plan.slice(1);
+      document.getElementById('sp-plan-used').textContent=used;
+      document.getElementById('sp-plan-limit').textContent=limit;
+      document.getElementById('sp-plan-bar').style.width=pct+'%';
+      document.getElementById('sp-plan-bar').className='usage-bar-fill'+(pct>=90?' full':pct>=70?' warn':'');
+      // Usage page
+      document.getElementById('sp-usage-used').textContent=used;
+      document.getElementById('sp-usage-limit').textContent=limit;
+      document.getElementById('sp-usage-bar').style.width=pct+'%';
+      document.getElementById('sp-usage-bar').className='usage-bar-fill'+(pct>=90?' full':pct>=70?' warn':'');
+      document.getElementById('sp-usage-remaining').textContent=remaining;
+      document.getElementById('sp-usage-plan').textContent=plan.charAt(0).toUpperCase()+plan.slice(1)+' Plan';
+    }
+  }catch(e){}
+  // Appearance — restore saved theme
+  var saved=localStorage.getItem('theme')||'dark';
+  document.querySelectorAll('.theme-opt').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-theme')===saved);});
+  var fs=localStorage.getItem('editorFontSize')||'14';
+  document.getElementById('sp-font-slider').value=fs;
+  document.getElementById('sp-font-val').textContent=fs+'px';
+}
+
+// SETTINGS — SAVE PROFILE
+async function saveProfileSP(){
+  if(!user||!sb) return;
+  var btn=document.getElementById('sp-pf-save-btn');
+  btn.disabled=true; btn.textContent='Saving...';
+  var nm=document.getElementById('sp-pf-name').value.trim();
+  var uname=document.getElementById('sp-pf-username').value.trim();
+  var phone=document.getElementById('sp-pf-phone').value.trim();
+  var bio=document.getElementById('sp-pf-bio').value.trim();
+  var loc=document.getElementById('sp-pf-location').value.trim();
+  var web=document.getElementById('sp-pf-website').value.trim();
+  if(uname&&(uname.length<3||uname.length>20||!/^[a-z0-9-]+$/.test(uname))){btn.disabled=false;btn.textContent='Save Changes';alert('Username: 3-20 lowercase letters, numbers, or hyphens');return;}
+  if(nm) await sb.auth.updateUser({data:{full_name:nm}});
+  try{
+    var ud={full_name:nm,bio:bio,location:loc,website:web,phone:phone,updated_at:new Date().toISOString()};
+    if(uname) ud.username=uname;
+    await sb.from('profiles').update(ud).eq('id',user.id);
+    profileData={bio,location:loc,website:web,username:uname,phone};
+  }catch(e){btn.disabled=false;btn.textContent='Save Changes';return;}
+  var u=await sb.auth.getUser(); if(u.data?.user) user=u.data.user;
+  loadProfileData(); loadSettingsData(); updateAuth();
+  btn.disabled=false; btn.textContent='Save Changes';
+  var st=document.getElementById('sp-pf-save-status'); st.classList.add('show'); setTimeout(function(){st.classList.remove('show');},2000);
+}
+
+// SETTINGS — CHANGE PASSWORD
+async function changePW(){
+  var pw=document.getElementById('sp-new-pw').value;
+  var pw2=document.getElementById('sp-confirm-pw').value;
+  var err=document.getElementById('sp-pw-error');
+  var st=document.getElementById('sp-pw-status');
+  err.style.display='none';
+  if(!pw){err.textContent='Enter a new password';err.style.display='block';return;}
+  if(pw.length<6){err.textContent='Password must be at least 6 characters';err.style.display='block';return;}
+  if(pw!==pw2){err.textContent='Passwords do not match';err.style.display='block';return;}
+  if(!sb) return;
+  var {error}=await sb.auth.updateUser({password:pw});
+  if(error){err.textContent=error.message;err.style.display='block';return;}
+  document.getElementById('sp-new-pw').value='';
+  document.getElementById('sp-confirm-pw').value='';
+  st.classList.add('show'); setTimeout(function(){st.classList.remove('show');},2500);
+}
+
+// SETTINGS — CHANGE EMAIL
+async function changeEmail(){
+  var email=document.getElementById('sp-new-email').value.trim();
+  var err=document.getElementById('sp-email-error');
+  var st=document.getElementById('sp-email-status');
+  err.style.display='none';
+  if(!email||!email.includes('@')){err.textContent='Enter a valid email address';err.style.display='block';return;}
+  if(!sb) return;
+  var {error}=await sb.auth.updateUser({email:email});
+  if(error){err.textContent=error.message;err.style.display='block';return;}
+  document.getElementById('sp-new-email').value='';
+  st.classList.add('show'); setTimeout(function(){st.classList.remove('show');},3000);
+}
+
+// SETTINGS — DELETE ACCOUNT
+async function deleteAccount(){
+  if(!confirm('Are you sure? This permanently deletes your account and ALL data. This cannot be undone.')) return;
+  if(!confirm('Last chance — delete everything?')) return;
+  if(!sb||!user) return;
+  try{
+    await sb.from('projects').delete().eq('user_id',user.id);
+    await sb.from('generations').delete().eq('user_id',user.id);
+    await sb.from('profiles').delete().eq('id',user.id);
+    await sb.auth.admin?.deleteUser(user.id);
+    await sb.auth.signOut();
+    location.href='/';
+  }catch(e){alert('Could not delete account. Please contact support@kenzoagent.com');}
+}
+
+// SETTINGS — THEME
+function setTheme(theme){
+  localStorage.setItem('theme',theme);
+  document.querySelectorAll('.theme-opt').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-theme')===theme);});
+  // Light theme CSS variable swap (foundation for future full light mode)
+  if(theme==='light'||( theme==='system'&&window.matchMedia('(prefers-color-scheme: light)').matches)){
+    document.documentElement.style.setProperty('--bg','#F4F4F5');
+    document.documentElement.style.setProperty('--text','#111115');
+  } else {
+    document.documentElement.style.removeProperty('--bg');
+    document.documentElement.style.removeProperty('--text');
+  }
+}
+
+// SETTINGS — FONT SIZE
+function updateFontSize(val){
+  localStorage.setItem('editorFontSize',val);
+  document.getElementById('sp-font-val').textContent=val+'px';
+}
+
+// FAQ TOGGLE
+function toggleFaq(el){el.classList.toggle('open');}
+
+// USERNAME CHECK (shared helper)
+function checkUsernameField(input,hintId){
+  var val=input.value.toLowerCase().replace(/[^a-z0-9-]/g,'');
+  input.value=val;
+  var hint=document.getElementById(hintId);
+  if(!val||val.length<3){hint.className='pf-hint';hint.textContent='Lowercase letters, numbers, and hyphens only (3-20 chars)';return;}
+  if(val.length>20){hint.className='pf-hint taken';hint.textContent='Max 20 characters';return;}
+  hint.className='pf-hint';hint.textContent='Checking...';
+  clearTimeout(window._unTimer);
+  window._unTimer=setTimeout(async function(){
+    try{var {data}=await sb.from('profiles').select('id').eq('username',val);
+      if(data&&data.length>0&&data[0].id!==user?.id){hint.className='pf-hint taken';hint.textContent='✗ Already taken';}
+      else{hint.className='pf-hint available';hint.textContent='✓ Available';}
+    }catch(e){hint.className='pf-hint';hint.textContent='Could not check';}
+  },400);
 }
 
 // PROFILE
@@ -686,6 +1181,10 @@ function renderProfilePopup(){
 }
 function ppNav(page){
   document.getElementById('pp').classList.remove('show');
+  // Route profile/settings/appearance to settings shell with correct subpage
+  if(page==='profile'){switchPage('settings');switchSP('profile');return;}
+  if(page==='settings'){switchPage('settings');switchSP('account');return;}
+  if(page==='appearance'){switchPage('settings');switchSP('appearance');return;}
   switchPage(page);
 }
 var profileData={bio:'',location:'',website:'',username:'',phone:''};
