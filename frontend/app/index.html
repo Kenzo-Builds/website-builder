@@ -610,15 +610,29 @@ function mkCard(p){
 }
 function setupCardMenus(){
   document.addEventListener('click',function(e){
+    // Handle action clicks (rename, delete)
+    var t=e.target.closest('[data-act]');
+    if(t){e.stopPropagation();e.preventDefault();
+      var a=t.getAttribute('data-act'),id=t.getAttribute('data-pid');closeCM();
+      if(a==='delete'){if(!confirm('Delete?'))return;delProj(id);}
+      if(a==='rename'){var nn=prompt('New name:');if(!nn||!nn.trim())return;renProj(id,nn.trim());}
+      return;
+    }
+    // Handle menu button click
     var mb=e.target.closest('.pcard-menu');
-    if(mb){e.stopPropagation();var dd=mb.nextElementSibling;var o=dd.classList.contains('show');closeCM();if(!o){var r=mb.getBoundingClientRect();dd.style.top=(r.bottom+4)+'px';dd.style.right=(window.innerWidth-r.right)+'px';dd.classList.add('show');}return;}
+    if(mb){e.stopPropagation();e.preventDefault();
+      var dd=mb.nextElementSibling;var wasOpen=dd.classList.contains('show');
+      closeCM();
+      if(!wasOpen){
+        var r=mb.getBoundingClientRect();
+        dd.style.top=(r.bottom+4)+'px';
+        dd.style.right=(window.innerWidth-r.right)+'px';
+        dd.classList.add('show');
+      }
+      return;
+    }
+    // Click outside — close
     if(!e.target.closest('.pcard-dd'))closeCM();
-  },true);
-  document.addEventListener('click',function(e){
-    var t=e.target.closest('[data-act]');if(!t)return;e.stopPropagation();
-    var a=t.getAttribute('data-act'),id=t.getAttribute('data-pid');closeCM();
-    if(a==='delete'){if(!confirm('Delete?'))return;delProj(id);}
-    if(a==='rename'){var nn=prompt('New name:');if(!nn||!nn.trim())return;renProj(id,nn.trim());}
   });
 }
 function closeCM(){document.querySelectorAll('.pcard-dd.show').forEach(function(d){d.classList.remove('show')})}
