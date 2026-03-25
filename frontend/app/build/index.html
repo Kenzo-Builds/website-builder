@@ -250,6 +250,63 @@
     .tab-action-btn:hover { color: var(--text-2); background: var(--bg-hover); }
     .tab-action-btn svg { width: 14px; height: 14px; }
 
+    /* ===== FILE TREE ===== */
+    #file-tree-panel {
+      width: 220px; flex-shrink: 0; background: var(--bg-2); border-right: 1px solid var(--border);
+      display: none; flex-direction: column; overflow: hidden;
+    }
+    #file-tree-panel.show { display: flex; }
+    .ft-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 12px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+    }
+    .ft-header span { font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; }
+    .ft-actions { display: flex; gap: 2px; }
+    .ft-action {
+      width: 22px; height: 22px; border-radius: 4px; border: none; background: none;
+      color: var(--text-3); cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 14px; transition: all 0.15s;
+    }
+    .ft-action:hover { background: var(--bg-hover); color: var(--text-2); }
+    .ft-list { flex: 1; overflow-y: auto; padding: 4px 0; }
+    .ft-item {
+      display: flex; align-items: center; gap: 6px; padding: 4px 12px; cursor: pointer;
+      font-size: 12px; color: var(--text-2); transition: background 0.1s; user-select: none;
+    }
+    .ft-item:hover { background: var(--bg-hover); }
+    .ft-item.active { background: rgba(59,130,246,0.1); color: var(--text); }
+    .ft-item .ft-icon { font-size: 14px; flex-shrink: 0; width: 18px; text-align: center; }
+    .ft-item .ft-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ft-item .ft-del {
+      opacity: 0; width: 18px; height: 18px; border: none; background: none;
+      color: var(--text-3); cursor: pointer; font-size: 12px; border-radius: 3px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ft-item:hover .ft-del { opacity: 1; }
+    .ft-item .ft-del:hover { background: rgba(239,68,68,0.15); color: var(--red); }
+    .ft-folder > .ft-children { padding-left: 16px; }
+    .ft-folder-toggle { cursor: pointer; font-size: 10px; color: var(--text-3); }
+
+    /* ===== EDITOR TABS (multi-file) ===== */
+    #editor-tabs {
+      display: flex; align-items: center; background: var(--bg-2);
+      border-bottom: 1px solid var(--border); height: 32px; overflow-x: auto; flex-shrink: 0;
+    }
+    #editor-tabs:empty { display: none; }
+    .etab {
+      display: flex; align-items: center; gap: 6px; padding: 0 12px; height: 32px;
+      font-size: 12px; color: var(--text-3); cursor: pointer; border-right: 1px solid var(--border);
+      white-space: nowrap; transition: all 0.1s; flex-shrink: 0;
+    }
+    .etab:hover { background: var(--bg-hover); }
+    .etab.active { background: var(--bg); color: var(--text); }
+    .etab .etab-close {
+      width: 16px; height: 16px; border: none; background: none; color: var(--text-3);
+      cursor: pointer; font-size: 14px; border-radius: 3px; display: flex;
+      align-items: center; justify-content: center; line-height: 1;
+    }
+    .etab .etab-close:hover { background: rgba(239,68,68,0.15); color: var(--red); }
+
     /* ===== PREVIEW PANE ===== */
     #pane-preview { flex: 1; min-height: 0; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
     #pane-code { flex: 1; min-height: 0; position: relative; display: none; }
@@ -623,9 +680,24 @@
     <!-- Resize handle -->
     <div id="resize-handle"></div>
 
+    <!-- File tree panel -->
+    <div id="file-tree-panel">
+      <div class="ft-header">
+        <span>Files</span>
+        <div class="ft-actions">
+          <button class="ft-action" onclick="createNewFile()" title="New file">＋</button>
+          <button class="ft-action" onclick="createNewFolder()" title="New folder">📁</button>
+        </div>
+      </div>
+      <div class="ft-list" id="ft-list"></div>
+    </div>
+
     <!-- Right panel -->
     <div id="right-panel">
       <div id="tab-bar">
+        <button class="tab-btn" id="tab-files" onclick="toggleFileTree()" title="Toggle file tree">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        </button>
         <button class="tab-btn active" id="tab-preview" onclick="switchTab('preview')">Preview</button>
         <button class="tab-btn" id="tab-code" onclick="switchTab('code')">Code</button>
         <div class="tab-spacer"></div>
@@ -665,6 +737,7 @@
 
       <!-- Code -->
       <div id="pane-code">
+        <div id="editor-tabs"></div>
         <div id="monaco-editor"></div>
       </div>
     </div>
@@ -733,6 +806,12 @@
     let currentBuildId = '';
     let monacoEditor = null;
     let activeTab = 'preview';
+
+    // ===== VIRTUAL FILE SYSTEM =====
+    let projectFiles = {}; // { 'index.html': '...', 'css/styles.css': '...', 'about.html': '...' }
+    let activeFile = null; // currently open file path
+    let openTabs = []; // array of file paths open as tabs
+    let fileTreeVisible = false;
     let currentUser = null;
     let isGuest = false;
     let authMode = 'signup';
@@ -975,8 +1054,14 @@
         bracketPairColorization: { enabled: true },
       });
       monacoEditor.onDidChangeModelContent(() => {
-        currentHtml = monacoEditor.getValue();
-        updatePreview(currentHtml);
+        const val = monacoEditor.getValue();
+        // Sync to file system
+        if (activeFile) projectFiles[activeFile] = val;
+        // Update preview if editing HTML
+        if (!activeFile || activeFile.endsWith('.html')) {
+          currentHtml = val;
+          updatePreview(currentHtml);
+        }
       });
     });
 
@@ -1172,6 +1257,7 @@
               clearInterval(poll);
               currentHtml = job.html;
               currentBuildId = job.buildId;
+              initProjectFiles(currentHtml);
               updatePreview(currentHtml, true);
               updateEditor(currentHtml);
               typingEl.innerHTML = `✅ Built in ${Math.round(job.duration/1000)}s from your plan! Ask me to refine anything.`;
@@ -1249,6 +1335,11 @@
       addMessage('Chat cleared. Tell me what you want to build — let\'s plan it first 🧠', 'ai');
       currentHtml = '';
       currentBuildId = '';
+      projectFiles = {};
+      activeFile = null;
+      openTabs = [];
+      renderFileTree();
+      renderEditorTabs();
       document.getElementById('empty-state').style.display = 'flex';
       document.getElementById('preview-frame').style.display = 'none';
       document.getElementById('deploy-btn').style.display = 'none';
@@ -1434,6 +1525,7 @@
                 window._streamRaw = '';
                 currentHtml = event.html;
                 currentBuildId = event.buildId;
+                initProjectFiles(currentHtml);
                 updatePreview(currentHtml, true);
                 updateEditor(currentHtml);
                 typingEl.innerHTML = `Done in ${Math.round(event.duration/1000)}s. Ask me to change anything.`;
@@ -1468,6 +1560,213 @@
         const m = monacoEditor.getModel();
         if (m) m.pushEditOperations([], [{ range: m.getFullModelRange(), text: html }], () => null);
       } catch(e) {}
+    }
+
+    // ===== FILE SYSTEM =====
+    function getFileIcon(path) {
+      const ext = path.split('.').pop().toLowerCase();
+      const icons = { html: '🌐', css: '🎨', js: '⚡', json: '📋', md: '📝', svg: '🖼️', txt: '📄' };
+      return icons[ext] || '📄';
+    }
+
+    function getMonacoLang(path) {
+      const ext = path.split('.').pop().toLowerCase();
+      const langs = { html: 'html', css: 'css', js: 'javascript', json: 'json', md: 'markdown', svg: 'xml', txt: 'plaintext' };
+      return langs[ext] || 'plaintext';
+    }
+
+    function initProjectFiles(html) {
+      // Convert single HTML to project files (keep existing if multi-file)
+      if (Object.keys(projectFiles).length <= 1) {
+        projectFiles = { 'index.html': html };
+      } else {
+        // Update current file
+        projectFiles['index.html'] = html;
+      }
+      if (!activeFile) activeFile = 'index.html';
+      if (!openTabs.includes('index.html')) openTabs = ['index.html', ...openTabs];
+      renderFileTree();
+      renderEditorTabs();
+      // Auto-show file tree if there are multiple files
+      if (Object.keys(projectFiles).length > 1 && !fileTreeVisible) {
+        toggleFileTree();
+      }
+    }
+
+    function renderFileTree() {
+      const list = document.getElementById('ft-list');
+      if (!list) return;
+      list.innerHTML = '';
+
+      // Sort: folders first, then files
+      const paths = Object.keys(projectFiles).sort((a, b) => {
+        const aDir = a.includes('/');
+        const bDir = b.includes('/');
+        if (aDir && !bDir) return -1;
+        if (!aDir && bDir) return 1;
+        return a.localeCompare(b);
+      });
+
+      // Build folder structure
+      const tree = {};
+      paths.forEach(p => {
+        const parts = p.split('/');
+        if (parts.length === 1) {
+          tree[p] = null; // file at root
+        } else {
+          const folder = parts[0];
+          if (!tree[folder]) tree[folder] = [];
+          tree[folder].push(p);
+        }
+      });
+
+      // Render
+      Object.keys(tree).forEach(key => {
+        if (tree[key] === null) {
+          // Root file
+          list.appendChild(createFileItem(key, key));
+        } else {
+          // Folder
+          const folder = document.createElement('div');
+          folder.className = 'ft-folder';
+          const fHeader = document.createElement('div');
+          fHeader.className = 'ft-item';
+          fHeader.innerHTML = `<span class="ft-icon">📁</span><span class="ft-name">${key}</span>`;
+          fHeader.onclick = () => {
+            const children = folder.querySelector('.ft-children');
+            if (children) children.style.display = children.style.display === 'none' ? 'block' : 'none';
+          };
+          folder.appendChild(fHeader);
+
+          const children = document.createElement('div');
+          children.className = 'ft-children';
+          tree[key].forEach(filePath => {
+            const fileName = filePath.split('/').pop();
+            children.appendChild(createFileItem(filePath, fileName));
+          });
+          folder.appendChild(children);
+          list.appendChild(folder);
+        }
+      });
+    }
+
+    function createFileItem(filePath, displayName) {
+      const item = document.createElement('div');
+      item.className = 'ft-item' + (filePath === activeFile ? ' active' : '');
+      item.innerHTML = `<span class="ft-icon">${getFileIcon(filePath)}</span><span class="ft-name">${displayName}</span><button class="ft-del" onclick="event.stopPropagation();deleteFile('${filePath}')" title="Delete">×</button>`;
+      item.onclick = () => openFile(filePath);
+      return item;
+    }
+
+    function openFile(filePath) {
+      if (!projectFiles[filePath] && projectFiles[filePath] !== '') return;
+      // Save current editor content
+      saveActiveFile();
+      activeFile = filePath;
+      if (!openTabs.includes(filePath)) openTabs.push(filePath);
+      renderFileTree();
+      renderEditorTabs();
+      // Update Monaco
+      if (monacoEditor) {
+        const lang = getMonacoLang(filePath);
+        const model = monacoEditor.getModel();
+        monaco.editor.setModelLanguage(model, lang);
+        model.pushEditOperations([], [{ range: model.getFullModelRange(), text: projectFiles[filePath] }], () => null);
+      }
+      // If it's an HTML file, update preview
+      if (filePath.endsWith('.html')) {
+        currentHtml = projectFiles[filePath];
+        updatePreview(currentHtml);
+      }
+      // Switch to code view
+      switchTab('code');
+    }
+
+    function saveActiveFile() {
+      if (activeFile && monacoEditor) {
+        projectFiles[activeFile] = monacoEditor.getValue();
+        // Keep currentHtml in sync
+        if (activeFile === 'index.html') {
+          currentHtml = projectFiles[activeFile];
+        }
+      }
+    }
+
+    function renderEditorTabs() {
+      const container = document.getElementById('editor-tabs');
+      if (!container) return;
+      container.innerHTML = '';
+      openTabs.forEach(filePath => {
+        const tab = document.createElement('div');
+        tab.className = 'etab' + (filePath === activeFile ? ' active' : '');
+        const name = filePath.split('/').pop();
+        tab.innerHTML = `<span>${getFileIcon(filePath)} ${name}</span><button class="etab-close" onclick="event.stopPropagation();closeTab('${filePath}')" title="Close">×</button>`;
+        tab.onclick = () => openFile(filePath);
+        container.appendChild(tab);
+      });
+    }
+
+    function closeTab(filePath) {
+      const idx = openTabs.indexOf(filePath);
+      if (idx === -1) return;
+      openTabs.splice(idx, 1);
+      if (activeFile === filePath) {
+        if (openTabs.length > 0) {
+          openFile(openTabs[Math.max(0, idx - 1)]);
+        } else {
+          activeFile = null;
+          renderEditorTabs();
+        }
+      } else {
+        renderEditorTabs();
+      }
+    }
+
+    function toggleFileTree() {
+      fileTreeVisible = !fileTreeVisible;
+      document.getElementById('file-tree-panel').classList.toggle('show', fileTreeVisible);
+      document.getElementById('tab-files').classList.toggle('active', fileTreeVisible);
+      if (monacoEditor) setTimeout(() => monacoEditor.layout(), 200);
+    }
+
+    function createNewFile() {
+      const name = prompt('File name (e.g. about.html, css/styles.css):');
+      if (!name || !name.trim()) return;
+      const path = name.trim().toLowerCase().replace(/[^a-z0-9._/-]/g, '');
+      if (projectFiles[path] !== undefined) { alert('File already exists'); return; }
+      // Create with template based on extension
+      const ext = path.split('.').pop();
+      let content = '';
+      if (ext === 'html') {
+        content = `<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>${path.replace('.html','')}</title>\n</head>\n<body>\n  \n</body>\n</html>`;
+      } else if (ext === 'css') {
+        content = '/* Styles */\n';
+      } else if (ext === 'js') {
+        content = '// JavaScript\n';
+      }
+      projectFiles[path] = content;
+      renderFileTree();
+      openFile(path);
+    }
+
+    function createNewFolder() {
+      const name = prompt('Folder name:');
+      if (!name || !name.trim()) return;
+      const folder = name.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+      // Create a placeholder file so folder shows up
+      const placeholder = folder + '/.gitkeep';
+      if (!projectFiles[placeholder]) {
+        projectFiles[placeholder] = '';
+        renderFileTree();
+      }
+    }
+
+    function deleteFile(filePath) {
+      if (filePath === 'index.html') { alert('Cannot delete index.html'); return; }
+      if (!confirm(`Delete ${filePath}?`)) return;
+      delete projectFiles[filePath];
+      closeTab(filePath);
+      renderFileTree();
     }
 
     // ===== TABS =====
@@ -1773,6 +2072,7 @@
           currentHtml = project.html;
           currentBuildId = project.build_id;
           lastPrompt = project.prompt;
+          initProjectFiles(currentHtml);
           updatePreview(currentHtml);
           updateEditor(currentHtml);
           setMode('build');
