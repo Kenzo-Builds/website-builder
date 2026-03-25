@@ -3,7 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Web Builder</title>
+  <title>AI Web Builder — Dashboard</title>
+  <meta name="description" content="Manage your AI-built websites. Create, edit, and deploy projects with one click." />
+  <meta property="og:title" content="AI Web Builder" />
+  <meta property="og:description" content="Build websites with AI in seconds. No coding required." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://builder.kenzoagent.com/app/" />
+  <link rel="canonical" href="https://builder.kenzoagent.com/app/" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%233B82F6'/%3E%3Cpath d='M8 10h16M8 16h12M8 22h8' stroke='%23fff' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
@@ -186,7 +196,7 @@
     .cm-input:focus{border-color:rgba(59,130,246,0.5)}
     .cm-btns{display:flex;gap:10px}
     .cm-btn{flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s}
-    .cm-btn.cancel{background:rgba(255,255,255,0.06);color:#A1A1AA}
+    .cm-btn.cancel{background:rgba(255,255,255,0.08);color:#D1D5DB}
     .cm-btn.cancel:hover{background:rgba(255,255,255,0.1)}
     .cm-btn.del{background:#EF4444;color:#fff}
     .cm-btn.del:hover{background:#DC2626}
@@ -353,7 +363,7 @@
                 <div class="bar-icon" onclick="document.getElementById('file-in').click()">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
                 </div>
-                <input type="file" id="file-in" class="hidden" accept="image/*" onchange="handleFile(this)">
+                <input type="file" id="file-in" class="hidden" aria-label="Upload image" accept="image/*" onchange="handleFile(this)">
 
                 <div class="dd-trigger" id="dd-model">
                   <span class="t-ico" id="m-ico"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect width='28' height='28' rx='6' fill='%23D97757'/%3E%3Cpath d='M18.3 8L14 20h-2.4l4.3-12h2.4zM11.4 8L7 20H4.7L9 8h2.4z' fill='%23F5E6D3'/%3E%3C/svg%3E" alt=""></span>
@@ -477,34 +487,34 @@
       <div class="prof-form">
         <div class="pf-field">
           <div class="pf-label">Display Name</div>
-          <input class="pf-input" type="text" id="pf-name" placeholder="Your name">
+          <input class="pf-input" type="text" id="pf-name" aria-label="Display name" placeholder="Your name">
         </div>
         <div class="pf-field">
           <div class="pf-label">Username</div>
-          <input class="pf-input" type="text" id="pf-username" placeholder="your-username" oninput="checkUsername(this.value)">
+          <input class="pf-input" type="text" id="pf-username" aria-label="Username" placeholder="your-username" oninput="checkUsername(this.value)">
           <div class="pf-hint" id="pf-username-hint">Lowercase letters, numbers, and hyphens only (3-20 chars)</div>
         </div>
         <div class="pf-field">
           <div class="pf-label">Email</div>
-          <input class="pf-input" type="email" id="pf-email" readonly>
+          <input class="pf-input" type="email" id="pf-email" aria-label="Email address" readonly>
           <div class="pf-hint">🔒 Email can be changed in Account Settings</div>
         </div>
         <div class="pf-field">
           <div class="pf-label">Phone Number</div>
-          <input class="pf-input" type="tel" id="pf-phone" placeholder="+998 90 123 4567">
+          <input class="pf-input" type="tel" id="pf-phone" aria-label="Phone number" placeholder="+998 90 123 4567">
         </div>
         <div class="pf-field">
           <div class="pf-label">Bio</div>
-          <textarea class="pf-input pf-textarea" id="pf-bio" placeholder="Tell us about yourself" maxlength="220"></textarea>
+          <textarea class="pf-input pf-textarea" id="pf-bio" aria-label="Bio" placeholder="Tell us about yourself" maxlength="220"></textarea>
         </div>
         <div class="pf-row">
           <div class="pf-field">
             <div class="pf-label">Location</div>
-            <input class="pf-input" type="text" id="pf-location" placeholder="City, Country">
+            <input class="pf-input" type="text" id="pf-location" aria-label="Location" placeholder="City, Country">
           </div>
           <div class="pf-field">
             <div class="pf-label">Website</div>
-            <input class="pf-input" type="text" id="pf-website" placeholder="yourwebsite.com">
+            <input class="pf-input" type="text" id="pf-website" aria-label="Website" placeholder="yourwebsite.com">
           </div>
         </div>
         <div style="display:flex;align-items:center">

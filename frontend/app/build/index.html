@@ -2,9 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>AI Website Builder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Website Builder — Build websites with AI in seconds</title>
+  <meta name="description" content="Describe your idea and AI builds your website instantly. Multi-page projects, live preview, one-click deploy. No coding required." />
+  <meta property="og:title" content="AI Website Builder" />
+  <meta property="og:description" content="Describe your idea — AI builds your website in seconds. No coding required." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://builder.kenzoagent.com" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="canonical" href="https://builder.kenzoagent.com/app/build/" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%233B82F6'/%3E%3Cpath d='M8 10h16M8 16h12M8 22h8' stroke='%23fff' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/editor/editor.main.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -751,8 +762,8 @@
             <div class="input-icon-btn" id="attach-btn" onclick="triggerAttach()" title="Attach image">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
             </div>
-            <input type="file" id="attach-file" accept="image/jpeg,image/png,image/gif,image/webp,image/heic,image/heif" style="display:none" onchange="handleAttach(this)">
-            <textarea id="prompt-input" placeholder="Describe your website..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();generate()}" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+            <input type="file" id="attach-file" aria-label="Attach image" accept="image/jpeg,image/png,image/gif,image/webp,image/heic,image/heif" style="display:none" onchange="handleAttach(this)">
+            <textarea id="prompt-input" aria-label="Describe your website" placeholder="Describe your website..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();generate()}" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
             <div class="input-icon-btn" id="mic-btn" onclick="toggleVoice()" title="Voice input">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
             </div>
@@ -769,7 +780,7 @@
                 <span class="mode-dot"></span> Build
               </button>
             </div>
-            <select id="model-select">
+            <select id="model-select" aria-label="Select AI model">
               <option value="openai/gpt-5.3-codex" selected>GPT-5.3 Codex</option>
               <option value="anthropic/claude-sonnet-4.6">Sonnet 4.6</option>
               <option value="anthropic/claude-opus-4.6">Opus 4.6</option>
@@ -812,7 +823,7 @@
         </div>
         <div id="preview-container">
           <div id="device-frame">
-            <iframe id="preview-frame" sandbox="allow-scripts allow-same-origin"></iframe>
+            <iframe id="preview-frame" title="Website preview" sandbox="allow-scripts allow-same-origin"></iframe>
           </div>
         </div>
       </div>
@@ -831,7 +842,7 @@
       <h3>🚀 Deploy Your Site</h3>
       <label>Choose a subdomain</label>
       <div class="domain-row">
-        <input class="modal-input" id="subdomain-input" type="text" placeholder="my-site" onkeydown="if(event.key==='Enter')confirmDeploy()" />
+        <input class="modal-input" id="subdomain-input" aria-label="Subdomain name" type="text" placeholder="my-site" onkeydown="if(event.key==='Enter')confirmDeploy()" />
         <span class="domain-suffix">.kenzoagent.com</span>
       </div>
       <div class="modal-actions">
@@ -848,16 +859,16 @@
       <p class="auth-subtitle" id="auth-subtitle">Start building websites with AI — free</p>
       <div id="auth-name-field" class="auth-field">
         <label>Name</label>
-        <input type="text" id="auth-name" placeholder="Your name" />
+        <input type="text" id="auth-name" aria-label="Your name" placeholder="Your name" />
       </div>
       <div class="auth-field">
         <label>Email</label>
-        <input type="email" id="auth-email" placeholder="you@example.com" onkeydown="if(event.key==='Enter')document.getElementById('auth-password').focus()" />
+        <input type="email" id="auth-email" aria-label="Email address" placeholder="you@example.com" onkeydown="if(event.key==='Enter')document.getElementById('auth-password').focus()" />
       </div>
       <div class="auth-field">
         <label>Password</label>
         <div style="position:relative">
-          <input type="password" id="auth-password" placeholder="Min 6 characters" style="padding-right:40px" onkeydown="if(event.key==='Enter')doAuth()" />
+          <input type="password" id="auth-password" aria-label="Password" placeholder="Min 6 characters" style="padding-right:40px" onkeydown="if(event.key==='Enter')doAuth()" />
           <div onclick="togglePwVis()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:#71717A;font-size:16px;user-select:none" id="pw-eye">👁</div>
         </div>
       </div>
@@ -2347,7 +2358,7 @@
       <div style="font-size:16px;font-weight:600;color:#F4F4F5;text-align:center;margin-bottom:6px" id="bc-title">Confirm</div>
       <div style="font-size:13px;color:#71717A;text-align:center;margin-bottom:20px" id="bc-sub">Are you sure?</div>
       <div style="display:flex;gap:10px">
-        <button onclick="closeBuilderConfirm()" style="flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:rgba(255,255,255,0.06);color:#A1A1AA">Cancel</button>
+        <button onclick="closeBuilderConfirm()" style="flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:rgba(255,255,255,0.08);color:#D1D5DB">Cancel</button>
         <button id="bc-confirm" onclick="doBuilderConfirm()" style="flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#EF4444;color:#fff">Confirm</button>
       </div>
     </div>
@@ -2358,9 +2369,9 @@
   <div class="cm-overlay" id="builder-prompt-overlay" onclick="if(event.target===this)closeBuilderPrompt()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
     <div style="background:#151518;border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:24px;width:340px;max-width:90vw;box-shadow:0 16px 48px rgba(0,0,0,0.6);animation:scaleIn .2s ease">
       <div style="font-size:16px;font-weight:600;color:#F4F4F5;text-align:center;margin-bottom:14px" id="bp-title">Input</div>
-      <input id="bp-input" style="width:100%;background:#0D0D0D;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#F4F4F5;font-size:14px;outline:none;margin-bottom:16px;font-family:inherit" onkeydown="if(event.key==='Enter')doBuilderPrompt()">
+      <input id="bp-input" aria-label="Input value" style="width:100%;background:#0D0D0D;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#F4F4F5;font-size:14px;outline:none;margin-bottom:16px;font-family:inherit" onkeydown="if(event.key==='Enter')doBuilderPrompt()">
       <div style="display:flex;gap:10px">
-        <button onclick="closeBuilderPrompt()" style="flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:rgba(255,255,255,0.06);color:#A1A1AA">Cancel</button>
+        <button onclick="closeBuilderPrompt()" style="flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:rgba(255,255,255,0.08);color:#D1D5DB">Cancel</button>
         <button id="bp-confirm" onclick="doBuilderPrompt()" style="flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#3B82F6;color:#fff">OK</button>
       </div>
     </div>
