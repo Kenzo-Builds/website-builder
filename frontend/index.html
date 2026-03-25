@@ -245,10 +245,13 @@
     .reveal-delay-3{transition-delay:.3s}
 
     /* === RESPONSIVE === */
+    @media(max-width:1100px){
+      .pricing-grid{grid-template-columns:repeat(2,1fr)!important}
+    }
     @media(max-width:900px){
       .features-grid{grid-template-columns:1fr}
       .models-grid{grid-template-columns:repeat(2,1fr)}
-      .pricing-grid{grid-template-columns:1fr;max-width:440px}
+      .pricing-grid{grid-template-columns:repeat(2,1fr)!important}
       .footer-nav{display:none}
     }
     @media(max-width:768px){
@@ -475,52 +478,67 @@
       <div class="sec-eyebrow reveal" data-i18n="pricing_label">PRICING</div>
       <h2 class="sec-title reveal" data-i18n="pricing_title">Simple, honest pricing</h2>
       <p class="sec-desc reveal" data-i18n="pricing_desc">Start for free. Upgrade when you're ready.</p>
-      <div class="pricing-grid">
+      <div class="pricing-grid" style="grid-template-columns:repeat(4,1fr);max-width:1080px">
         <!-- Free -->
         <div class="pr-card reveal">
-          <h4 data-i18n="plan_free">Free</h4>
+          <h4>Free</h4>
           <div class="pr-price"><sup>$</sup>0<span class="period">/mo</span></div>
-          <p class="pr-desc" data-i18n="plan_free_desc">Perfect for trying it out</p>
+          <p class="pr-desc">Try it out, no card needed</p>
           <div class="pr-divider"></div>
           <ul class="pr-list">
-            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span data-i18n="plan_free_f1">5 generations / month</span></li>
-            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span data-i18n="plan_free_f2">1 deploy</span></li>
-            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span data-i18n="plan_free_f3">Basic models</span></li>
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span>10 generations / month</span></li>
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span>1 deploy</span></li>
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span>Basic models (Flash)</span></li>
           </ul>
-          <a href="javascript:void(0)" onclick="showAuth('signup')" class="pr-btn-outline" data-i18n="plan_free_btn">Start Free</a>
+          <a href="javascript:void(0)" onclick="showAuth('signup')" class="pr-btn-outline">Start Free</a>
+        </div>
+
+        <!-- Starter -->
+        <div class="pr-card reveal">
+          <h4>Starter</h4>
+          <div class="pr-price"><sup>$</sup>9<span style="font-size:28px;font-weight:700">.99</span><span class="period">/mo</span></div>
+          <p class="pr-desc">For individuals & freelancers</p>
+          <div class="pr-divider"></div>
+          <ul class="pr-list">
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span>100 generations / month</span></li>
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span>10 deploys</span></li>
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span>All models</span></li>
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span>Download code</span></li>
+          </ul>
+          <a href="javascript:void(0)" onclick="showAuth('signup')" class="pr-btn-outline">Get Starter</a>
         </div>
 
         <!-- Pro -->
         <div class="pr-card popular reveal">
-          <div class="pr-badge" data-i18n="badge_popular">POPULAR</div>
-          <h4 data-i18n="plan_pro">Pro</h4>
-          <div class="pr-price"><sup>$</sup>15<span class="period">/mo</span></div>
-          <p class="pr-desc" data-i18n="plan_pro_desc">For professionals & creators</p>
+          <div class="pr-badge">POPULAR</div>
+          <h4>Pro</h4>
+          <div class="pr-price"><sup>$</sup>19<span style="font-size:28px;font-weight:700">.99</span><span class="period">/mo</span></div>
+          <p class="pr-desc">For professionals & creators</p>
           <div class="pr-divider"></div>
           <ul class="pr-list">
-            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span data-i18n="plan_pro_f1">200 generations / month</span></li>
-            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span data-i18n="plan_pro_f2">20 deploys</span></li>
-            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span data-i18n="plan_pro_f3">All premium models</span></li>
-            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span data-i18n="plan_pro_f4">Custom domains</span></li>
-            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span data-i18n="plan_pro_f5">Priority support</span></li>
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span>300 generations / month</span></li>
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span>30 deploys</span></li>
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span>All premium models</span></li>
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span>Custom domains</span></li>
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span>Remove badge</span></li>
           </ul>
-          <a href="javascript:void(0)" onclick="showAuth('signup')" class="pr-btn-cyan" data-i18n="plan_pro_btn">Upgrade to Pro</a>
+          <a href="javascript:void(0)" onclick="showAuth('signup')" class="pr-btn-cyan">Upgrade to Pro</a>
         </div>
 
         <!-- Expert -->
         <div class="pr-card reveal">
-          <h4 data-i18n="plan_expert">Expert</h4>
-          <div class="pr-price"><sup>$</sup>30<span class="period">/mo</span></div>
-          <p class="pr-desc" data-i18n="plan_expert_desc">For agencies & teams</p>
+          <h4>Expert</h4>
+          <div class="pr-price"><sup>$</sup>69<span style="font-size:28px;font-weight:700">.99</span><span class="period">/mo</span></div>
+          <p class="pr-desc">For agencies & teams</p>
           <div class="pr-divider"></div>
           <ul class="pr-list">
-            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span data-i18n="plan_expert_f1">Unlimited generations</span></li>
-            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span data-i18n="plan_expert_f2">Unlimited deploys</span></li>
-            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span data-i18n="plan_expert_f3">API access</span></li>
-            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span data-i18n="plan_expert_f4">White label branding</span></li>
-            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span data-i18n="plan_expert_f5">24/7 support</span></li>
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span>1,000 generations / month</span></li>
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span>Unlimited deploys</span></li>
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span>API access</span></li>
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span>White label branding</span></li>
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span>24/7 support</span></li>
           </ul>
-          <a href="javascript:void(0)" onclick="showAuth('signup')" class="pr-btn-outline" data-i18n="plan_expert_btn">Contact Us</a>
+          <a href="javascript:void(0)" onclick="showAuth('signup')" class="pr-btn-outline">Contact Us</a>
         </div>
       </div>
     </div>
