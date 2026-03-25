@@ -612,6 +612,54 @@ app.post('/api/deploy', async (req, res) => {
   const buildPath = path.join(BUILDS_DIR, buildId);
   if (!fs.existsSync(buildPath)) return res.status(404).json({ error: 'Build not found' });
 
+  // ── Deploy Security: File Validation ──
+  const ALLOWED_EXT = ['.html', '.css', '.js', '.json', '.svg', '.png', '.jpg', '.jpeg', '.gif', '.ico', '.txt', '.md', '.webp', '.woff', '.woff2'];
+  const BLOCKED_CONTENT = ['<?php', '#!/bin', '<%', '<jsp:', 'eval(', 'require(', 'import os', 'import subprocess'];
+  const MAX_FILES = 30;
+  const MAX_TOTAL_SIZE = 5 * 1024 * 1024; // 5MB
+
+  function scanDir(dir, base = '') {
+    const entries = [];
+    for (const item of fs.readdirSync(dir, { withFileTypes: true })) {
+      const rel = path.join(base, item.name);
+      if (item.isSymbolicLink()) continue; // skip symlinks
+      if (item.isDirectory()) {
+        entries.push(...scanDir(path.join(dir, item.name), rel));
+      } else if (item.isFile()) {
+        entries.push({ path: rel, full: path.join(dir, item.name), size: fs.statSync(path.join(dir, item.name)).size });
+      }
+    }
+    return entries;
+  }
+
+  const deployFiles = scanDir(buildPath);
+  // Check file count
+  if (deployFiles.length > MAX_FILES) {
+    return res.status(400).json({ error: `Too many files (${deployFiles.length}). Maximum ${MAX_FILES}.` });
+  }
+  // Check total size
+  const totalSize = deployFiles.reduce((s, f) => s + f.size, 0);
+  if (totalSize > MAX_TOTAL_SIZE) {
+    return res.status(400).json({ error: `Project too large (${(totalSize/1024/1024).toFixed(1)}MB). Maximum 5MB.` });
+  }
+  // Check extensions and content
+  for (const file of deployFiles) {
+    if (file.path === 'nginx.conf') continue; // allow our generated conf
+    const ext = path.extname(file.path).toLowerCase();
+    if (!ALLOWED_EXT.includes(ext) && file.path !== '.gitkeep') {
+      return res.status(400).json({ error: `Blocked file type: ${file.path}. Allowed: ${ALLOWED_EXT.join(', ')}` });
+    }
+    // Content scan text files only
+    if (['.html', '.css', '.js', '.json', '.svg', '.txt', '.md'].includes(ext)) {
+      const content = fs.readFileSync(file.full, 'utf8');
+      for (const blocked of BLOCKED_CONTENT) {
+        if (content.includes(blocked)) {
+          return res.status(400).json({ error: `Blocked content detected in ${file.path}: server-side code not allowed.` });
+        }
+      }
+    }
+  }
+
   const nginxConf = `server {\n    listen 80;\n    server_name ${subdomain}.kenzoagent.com;\n    root /var/www/${subdomain}.kenzoagent.com;\n    index index.html;\n    location / { try_files $uri $uri/ /index.html; }\n}`;
   fs.writeFileSync(path.join(buildPath, 'nginx.conf'), nginxConf);
 

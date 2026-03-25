@@ -557,6 +557,7 @@
       .chat-header { display: none; }
     }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
 
@@ -1895,10 +1896,29 @@
     }
 
     function downloadCode() {
-      if (!currentHtml) return;
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(new Blob([currentHtml], { type: 'text/html' }));
-      a.download = 'index.html'; a.click();
+      if (!currentHtml && Object.keys(projectFiles).length === 0) return;
+      saveActiveFile();
+      const files = Object.keys(projectFiles).length > 0 ? projectFiles : { 'index.html': currentHtml };
+      // Single file → direct download
+      if (Object.keys(files).length === 1) {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([Object.values(files)[0]], { type: 'text/html' }));
+        a.download = 'index.html'; a.click();
+        return;
+      }
+      // Multi-file → ZIP
+      if (typeof JSZip === 'undefined') { alert('ZIP library loading, try again in a moment'); return; }
+      const zip = new JSZip();
+      for (const [path, content] of Object.entries(files)) {
+        if (path.endsWith('.gitkeep')) continue; // skip placeholders
+        zip.file(path, content);
+      }
+      const projectName = currentProjectName || 'website';
+      zip.generateAsync({ type: 'blob' }).then(blob => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = projectName + '.zip'; a.click();
+      });
     }
 
     // ===== USAGE TRACKING =====
