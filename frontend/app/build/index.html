@@ -1036,14 +1036,41 @@
       updateAuthUI();
     }
 
+    var _builderConfirmCb=null,_builderPromptCb=null;
+    function showBuilderConfirm(title,sub,btnText,btnClass,cb){
+      var o=document.getElementById('builder-confirm-overlay');
+      document.getElementById('bc-title').textContent=title;
+      document.getElementById('bc-sub').textContent=sub;
+      var btn=document.getElementById('bc-confirm');btn.textContent=btnText;btn.className='cm-btn '+(btnClass||'del');
+      _builderConfirmCb=cb;o.classList.add('show');
+    }
+    function closeBuilderConfirm(){document.getElementById('builder-confirm-overlay').classList.remove('show');_builderConfirmCb=null;}
+    function doBuilderConfirm(){var cb=_builderConfirmCb;closeBuilderConfirm();if(cb)cb();}
+    function showBuilderPrompt(title,placeholder,btnText,cb){
+      var o=document.getElementById('builder-prompt-overlay');
+      document.getElementById('bp-title').textContent=title;
+      var inp=document.getElementById('bp-input');inp.value='';inp.placeholder=placeholder;
+      document.getElementById('bp-confirm').textContent=btnText;
+      _builderPromptCb=cb;o.classList.add('show');setTimeout(function(){inp.focus();},100);
+    }
+    function closeBuilderPrompt(){document.getElementById('builder-prompt-overlay').classList.remove('show');_builderPromptCb=null;}
+    function doBuilderPrompt(){var cb=_builderPromptCb;var v=document.getElementById('bp-input').value;closeBuilderPrompt();if(cb)cb(v);}
+    document.addEventListener('keydown',function(e){
+      if(e.key==='Escape'){
+        if(document.getElementById('builder-confirm-overlay').classList.contains('show'))closeBuilderConfirm();
+        if(document.getElementById('builder-prompt-overlay').classList.contains('show'))closeBuilderPrompt();
+      }
+    });
+
     async function logoutUser() {
-      if(!confirm('Are you sure you want to sign out?'))return;
-      if(sb) await sb.auth.signOut();
-      currentUser = null; isGuest = false;
-      localStorage.removeItem('builder_guest');
-      updateAuthUI();
-      document.getElementById('user-dropdown').classList.remove('show');
-      location.href='/';
+      showBuilderConfirm('Sign out?','You will be redirected to the landing page.','Sign out','del',async function(){
+        if(sb) await sb.auth.signOut();
+        currentUser = null; isGuest = false;
+        localStorage.removeItem('builder_guest');
+        updateAuthUI();
+        document.getElementById('user-dropdown').classList.remove('show');
+        location.href='/';
+      });
     }
 
     function updateAuthUI() {
@@ -1894,7 +1921,7 @@
     }
 
     function createNewFile() {
-      const name = prompt('File name (e.g. about.html, css/styles.css):');
+      showBuilderPrompt('New file','File name (e.g. about.html, css/styles.css):','Create',function(name){
       if (!name || !name.trim()) return;
       const path = name.trim().toLowerCase().replace(/[^a-z0-9._/-]/g, '');
       if (projectFiles[path] !== undefined) { alert('File already exists'); return; }
@@ -1911,10 +1938,11 @@
       projectFiles[path] = content;
       renderFileTree();
       openFile(path);
+      });
     }
 
     function createNewFolder() {
-      const name = prompt('Folder name:');
+      showBuilderPrompt('New folder','Folder name:','Create',function(name){
       if (!name || !name.trim()) return;
       const folder = name.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
       // Create a placeholder file so folder shows up
@@ -1923,14 +1951,16 @@
         projectFiles[placeholder] = '';
         renderFileTree();
       }
+      });
     }
 
     function deleteFile(filePath) {
       if (filePath === 'index.html') { alert('Cannot delete index.html'); return; }
-      if (!confirm(`Delete ${filePath}?`)) return;
-      delete projectFiles[filePath];
-      closeTab(filePath);
-      renderFileTree();
+      showBuilderConfirm('Delete '+filePath+'?','This file will be permanently removed.','Delete','del',function(){
+        delete projectFiles[filePath];
+        closeTab(filePath);
+        renderFileTree();
+      });
     }
 
     // ===== TABS =====
@@ -2310,5 +2340,32 @@
     })();
   </script>
   <div class="url-bar-dropdown" id="url-dropdown"></div>
+
+  <!-- Builder Confirm Modal -->
+  <div class="cm-overlay" id="builder-confirm-overlay" onclick="if(event.target===this)closeBuilderConfirm()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
+    <div style="background:#151518;border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:24px;width:340px;max-width:90vw;box-shadow:0 16px 48px rgba(0,0,0,0.6);animation:scaleIn .2s ease">
+      <div style="font-size:16px;font-weight:600;color:#F4F4F5;text-align:center;margin-bottom:6px" id="bc-title">Confirm</div>
+      <div style="font-size:13px;color:#71717A;text-align:center;margin-bottom:20px" id="bc-sub">Are you sure?</div>
+      <div style="display:flex;gap:10px">
+        <button onclick="closeBuilderConfirm()" style="flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:rgba(255,255,255,0.06);color:#A1A1AA">Cancel</button>
+        <button id="bc-confirm" onclick="doBuilderConfirm()" style="flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#EF4444;color:#fff">Confirm</button>
+      </div>
+    </div>
+  </div>
+  <style>#builder-confirm-overlay.show{display:flex!important}</style>
+
+  <!-- Builder Prompt Modal -->
+  <div class="cm-overlay" id="builder-prompt-overlay" onclick="if(event.target===this)closeBuilderPrompt()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
+    <div style="background:#151518;border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:24px;width:340px;max-width:90vw;box-shadow:0 16px 48px rgba(0,0,0,0.6);animation:scaleIn .2s ease">
+      <div style="font-size:16px;font-weight:600;color:#F4F4F5;text-align:center;margin-bottom:14px" id="bp-title">Input</div>
+      <input id="bp-input" style="width:100%;background:#0D0D0D;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#F4F4F5;font-size:14px;outline:none;margin-bottom:16px;font-family:inherit" onkeydown="if(event.key==='Enter')doBuilderPrompt()">
+      <div style="display:flex;gap:10px">
+        <button onclick="closeBuilderPrompt()" style="flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:rgba(255,255,255,0.06);color:#A1A1AA">Cancel</button>
+        <button id="bp-confirm" onclick="doBuilderPrompt()" style="flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#3B82F6;color:#fff">OK</button>
+      </div>
+    </div>
+  </div>
+  <style>#builder-prompt-overlay.show{display:flex!important}</style>
+
 </body>
 </html>

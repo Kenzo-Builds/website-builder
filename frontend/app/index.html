@@ -50,9 +50,7 @@
     .sb-profile{display:flex;align-items:center;gap:10px;width:100%;padding:8px;border-radius:10px;border:none;background:none;cursor:pointer;overflow:hidden}
     .sb-profile:hover{background:rgba(255,255,255,0.04)}
     .sb-avatar{width:30px;height:30px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,#3B82F6,#8B5CF6);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
-    .sb-pname{font-size:13px;font-weight:600;color:#fff;text-align:left;white-space:nowrap;transition:opacity .15s}
-    .sb-pplan{font-size:10px;color:#22C55E;font-weight:600;text-align:left;white-space:nowrap}
-    .sidebar.collapsed .sb-pname,.sidebar.collapsed .sb-pplan{opacity:0}
+
     .profile-popup{display:none;position:fixed;bottom:66px;left:8px;width:240px;background:#1A1A1E;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:6px;z-index:200;box-shadow:0 -8px 32px rgba(0,0,0,.6);animation:ppIn .15s ease}
     @keyframes ppIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
     .profile-popup.show{display:block}
@@ -245,8 +243,7 @@
     .prof-name{font-size:22px;font-weight:700;color:#F4F4F5}
     .prof-handle{font-size:13px;color:#71717A;margin-top:2px}
     .prof-joined{font-size:12px;color:#52525B;margin-top:2px}
-    .prof-edit-btn{padding:8px 16px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#D1D5DB;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;font-family:inherit;flex-shrink:0;margin-bottom:8px}
-    .prof-edit-btn:hover{background:rgba(255,255,255,0.1);color:#fff}
+
     .prof-stats{display:flex;gap:32px;padding:24px 40px;margin-top:16px}
     .prof-stat{display:flex;flex-direction:column;align-items:center}
     .prof-stat-val{font-size:20px;font-weight:700;color:#F4F4F5}
@@ -515,6 +512,21 @@
           <span class="pf-save-status" id="pf-save-status">✓ Saved</span>
         </div>
       </div>
+    </div>
+
+    <!-- SETTINGS PAGE (placeholder) -->
+    <div class="page" id="page-settings">
+      <div style="padding:40px"><h2 style="font-size:22px;font-weight:800;margin-bottom:8px">Account Settings</h2><p style="color:#71717A;font-size:14px">Coming soon.</p></div>
+    </div>
+
+    <!-- APPEARANCE PAGE (placeholder) -->
+    <div class="page" id="page-appearance">
+      <div style="padding:40px"><h2 style="font-size:22px;font-weight:800;margin-bottom:8px">Appearance</h2><p style="color:#71717A;font-size:14px">Coming soon.</p></div>
+    </div>
+
+    <!-- SUPPORT PAGE (placeholder) -->
+    <div class="page" id="page-support">
+      <div style="padding:40px"><h2 style="font-size:22px;font-weight:800;margin-bottom:8px">Support & Help</h2><p style="color:#71717A;font-size:14px">Coming soon.</p></div>
     </div>
 
   </div>
