@@ -1,5 +1,5 @@
-backend/builds/
 backend/node_modules/
 backend/config.json
 backend/ecosystem.config.js
 backend/supabase-config.json
+backend/builds/
