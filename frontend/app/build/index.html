@@ -1766,7 +1766,6 @@
       const bar = document.getElementById('url-bar');
       const isOpen = dropdown.classList.toggle('show');
       if (isOpen) {
-        // Position fixed dropdown below the URL bar
         const rect = bar.getBoundingClientRect();
         dropdown.style.top = (rect.bottom + 4) + 'px';
         dropdown.style.left = rect.left + 'px';
