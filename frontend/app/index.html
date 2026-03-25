@@ -754,15 +754,15 @@ function go(){
 
 // AUTH
 function updateAuth(){
-  var av=document.getElementById('d-av'),nm=document.getElementById('d-nm'),pl=document.getElementById('d-pl'),gr=document.getElementById('greeting');
+  var av=document.getElementById('d-av'),gr=document.getElementById('greeting');
   if(user){
     var n=(user.user_metadata&&user.user_metadata.full_name)||(user.email&&user.email.split('@')[0])||'User';
-    av.textContent=n[0].toUpperCase();nm.textContent=n;pl.textContent='FREE PLAN';
+    av.textContent=n[0].toUpperCase();
     var h=new Date().getHours();var fn=n.split(' ')[0];
     if(h<12)gr.textContent='Good morning, '+fn+' ☀️';
     else if(h<18)gr.textContent='Good afternoon, '+fn;
     else gr.textContent='Good evening, '+fn+' 🌙';
-  }else{av.textContent='?';nm.textContent='Guest';pl.textContent='Sign in';}
+  }else{av.textContent='?';}
 }
 async function doLogout(){
   showCModal('delete',null);
