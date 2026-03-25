@@ -168,9 +168,14 @@
     /* === PRICING === */
     .pricing{padding:100px 0}
     .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:900px;margin:0 auto}
-    .pr-card{background:rgba(255,255,255,0.03);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:32px 28px;text-align:left;transition:all .3s;position:relative;animation:cardFloat 6s ease-in-out infinite alternate}
-    .pr-card:nth-child(2){animation-delay:-3s}
+    .pr-card{background:rgba(255,255,255,0.03);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:32px 28px;text-align:left;transition:all .35s cubic-bezier(.2,0,.2,1);position:relative;animation:cardFloat 6s ease-in-out infinite alternate}
+    .pr-card:nth-child(2){animation-delay:-2s}
+    .pr-card:nth-child(3){animation-delay:-4s}
+    .pr-card::before{content:'';position:absolute;inset:-1px;border-radius:25px;background:linear-gradient(135deg,rgba(0,229,255,0),rgba(0,229,255,0),rgba(0,229,255,0));transition:all .35s ease;z-index:-1;opacity:0}
+    .pr-card:hover{transform:scale(1.03) translateY(-4px)!important;border-color:rgba(0,229,255,0.4);box-shadow:0 0 40px rgba(0,229,255,0.12),0 16px 40px rgba(0,0,0,.4)}
+    .pr-card:hover::before{opacity:1;background:linear-gradient(135deg,rgba(0,229,255,0.5),rgba(103,232,249,0.3),rgba(0,229,255,0.5))}
     .pr-card.popular{border-color:rgba(0,229,255,0.3);box-shadow:0 0 40px rgba(0,229,255,0.08)}
+    .pr-card.popular:hover{transform:scale(1.04) translateY(-6px)!important;box-shadow:0 0 60px rgba(0,229,255,0.2),0 20px 50px rgba(0,0,0,.5)}
     .pr-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#00E5FF;color:#09090B;font-size:10px;font-weight:800;padding:4px 14px;border-radius:20px;letter-spacing:.5px;white-space:nowrap}
     .pr-card h4{font-size:14px;font-weight:700;color:#71717A;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px}
     .pr-price{font-size:48px;font-weight:900;color:#FAFAFA;letter-spacing:-2px;line-height:1}
