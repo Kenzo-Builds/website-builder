@@ -45,9 +45,9 @@
       height: 52px; flex-shrink: 0; gap: 12px;
     }
     .h-left, .h-center, .h-right { display: flex; align-items: center; gap: 8px; }
-    .h-left { min-width: 0; }
-    .h-center { flex: 1; justify-content: center; }
-    .h-right { flex-shrink: 0; }
+    .h-left { flex: 1; min-width: 0; }
+    .h-center { flex: 0 0 auto; justify-content: center; }
+    .h-right { flex: 1; flex-shrink: 0; justify-content: flex-end; }
 
     .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
     .logo-icon {
@@ -59,13 +59,28 @@
 
     /* URL bar (centered, Lovable-style) */
     .url-bar {
-      display: flex; align-items: center; gap: 6px;
+      display: flex; align-items: center; gap: 6px; position: relative;
       background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
       padding: 5px 12px; font-size: 13px; color: var(--text-2);
-      min-width: 200px; max-width: 360px; width: 100%;
+      min-width: 200px; max-width: 360px; width: 100%; cursor: pointer;
     }
+    .url-bar:hover { border-color: var(--border-2); }
     .url-bar svg { flex-shrink: 0; opacity: 0.5; }
-    .url-bar span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .url-bar span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+    .url-bar .url-chevron { opacity: 0; transition: opacity 0.15s; font-size: 10px; color: var(--text-3); }
+    .url-bar.has-pages .url-chevron { opacity: 1; }
+    .url-bar-dropdown {
+      display: none; position: absolute; top: 100%; left: 0; right: 0; margin-top: 4px;
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+      overflow: hidden; z-index: 100; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    .url-bar-dropdown.show { display: block; }
+    .url-bar-dropdown-item {
+      display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+      font-size: 13px; color: var(--text-2); cursor: pointer; transition: background 0.1s;
+    }
+    .url-bar-dropdown-item:hover { background: var(--bg-hover); }
+    .url-bar-dropdown-item.active { color: var(--text); background: rgba(59,130,246,0.1); }
 
     /* Device toggle buttons */
     .device-toggles { display: flex; align-items: center; gap: 2px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 2px; }
@@ -555,9 +570,11 @@
     </div>
 
     <div class="h-center">
-      <div class="url-bar">
+      <div class="url-bar" id="url-bar" onclick="toggleUrlDropdown(event)">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
         <span id="url-display">index.html</span>
+        <span class="url-chevron">▼</span>
+        <div class="url-bar-dropdown" id="url-dropdown"></div>
       </div>
     </div>
 
@@ -1584,6 +1601,7 @@
       if (!openTabs.includes('index.html')) openTabs = ['index.html', ...openTabs];
       renderFileTree();
       renderEditorTabs();
+      updatePageRouteDropdown();
     }
 
     function renderFileTree() {
@@ -1641,6 +1659,7 @@
           list.appendChild(folder);
         }
       });
+      updatePageRouteDropdown();
     }
 
     function createFileItem(filePath, displayName) {
@@ -1670,6 +1689,9 @@
       if (filePath.endsWith('.html')) {
         currentHtml = projectFiles[filePath];
         updatePreview(currentHtml);
+        // Sync route dropdown
+        const sel = document.getElementById('page-route');
+        if (sel) sel.value = filePath;
       }
       // Switch to code view
       switchTab('code');
@@ -1713,6 +1735,59 @@
       } else {
         renderEditorTabs();
       }
+    }
+
+    let previewingFile = 'index.html';
+
+    function updatePageRouteDropdown() {
+      const bar = document.getElementById('url-bar');
+      const dropdown = document.getElementById('url-dropdown');
+      const display = document.getElementById('url-display');
+      if (!bar || !dropdown) return;
+      const htmlFiles = Object.keys(projectFiles).filter(f => f.endsWith('.html'));
+      // Show chevron only if multiple pages
+      bar.classList.toggle('has-pages', htmlFiles.length > 1);
+      // Update display text
+      const label = previewingFile === 'index.html' ? '/' : '/' + previewingFile.replace('.html', '');
+      display.textContent = label;
+      // Build dropdown items
+      dropdown.innerHTML = '';
+      htmlFiles.sort((a, b) => a === 'index.html' ? -1 : b === 'index.html' ? 1 : a.localeCompare(b));
+      htmlFiles.forEach(f => {
+        const item = document.createElement('div');
+        item.className = 'url-bar-dropdown-item' + (f === previewingFile ? ' active' : '');
+        const route = f === 'index.html' ? '/' : '/' + f.replace('.html', '');
+        item.innerHTML = `<span>${getFileIcon(f)}</span><span>${route}</span>`;
+        item.onclick = (e) => { e.stopPropagation(); switchPreviewPage(f); };
+        dropdown.appendChild(item);
+      });
+    }
+
+    function toggleUrlDropdown(e) {
+      const htmlFiles = Object.keys(projectFiles).filter(f => f.endsWith('.html'));
+      if (htmlFiles.length <= 1) return;
+      const dropdown = document.getElementById('url-dropdown');
+      dropdown.classList.toggle('show');
+      // Close on outside click
+      if (dropdown.classList.contains('show')) {
+        setTimeout(() => {
+          document.addEventListener('click', function closeDropdown() {
+            dropdown.classList.remove('show');
+            document.removeEventListener('click', closeDropdown);
+          }, { once: true });
+        }, 10);
+      }
+    }
+
+    function switchPreviewPage(filePath) {
+      if (!projectFiles[filePath]) return;
+      previewingFile = filePath;
+      currentHtml = projectFiles[filePath];
+      updatePreview(currentHtml);
+      document.getElementById('url-dropdown').classList.remove('show');
+      updatePageRouteDropdown();
+      // Auto-switch to preview so user sees the page
+      if (activeTab !== 'preview') switchTab('preview');
     }
 
     function toggleFileTree() {
