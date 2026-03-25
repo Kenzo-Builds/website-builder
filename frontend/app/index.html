@@ -259,28 +259,26 @@
     .prof-empty-btn{padding:8px 20px;border-radius:8px;background:#3B82F6;color:#fff;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
     .prof-empty-btn:hover{opacity:0.9}
 
-    /* EDIT PROFILE MODAL */
-    .edit-prof-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
-    .edit-prof-overlay.show{display:flex}
-    .edit-prof-box{background:#151518;border:1px solid rgba(255,255,255,0.1);border-radius:16px;width:480px;max-width:92vw;max-height:85vh;overflow-y:auto;animation:cmIn .2s ease}
-    .ep-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 0}
-    .ep-header h2{font-size:18px;font-weight:700;color:#F4F4F5}
-    .ep-close{width:32px;height:32px;border-radius:8px;border:none;background:rgba(255,255,255,0.06);color:#A1A1AA;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .15s}
-    .ep-close:hover{background:rgba(255,255,255,0.1);color:#fff}
-    .ep-avatar{display:flex;justify-content:center;padding:20px 24px 8px}
-    .ep-avatar-circle{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#3B82F6,#8B5CF6);color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700}
-    .ep-form{padding:8px 24px 24px;display:flex;flex-direction:column;gap:16px}
-    .ep-field label{display:block;font-size:12px;font-weight:600;color:#71717A;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px}
-    .ep-field input,.ep-field textarea{width:100%;background:#0D0D0D;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#F4F4F5;font-size:14px;font-family:inherit;outline:none;transition:border-color .15s}
-    .ep-field input:focus,.ep-field textarea:focus{border-color:rgba(59,130,246,0.5)}
-    .ep-field textarea{min-height:80px;resize:vertical}
-    .ep-field input::placeholder,.ep-field textarea::placeholder{color:#52525B}
-    .ep-actions{display:flex;gap:10px;justify-content:flex-end;padding:0 24px 20px}
-    .ep-btn{padding:9px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s;font-family:inherit}
-    .ep-btn.cancel{background:rgba(255,255,255,0.06);color:#A1A1AA}
-    .ep-btn.cancel:hover{background:rgba(255,255,255,0.1)}
-    .ep-btn.save{background:#3B82F6;color:#fff}
-    .ep-btn.save:hover{background:#2563EB}
+    /* PROFILE FORM (inline) */
+    .prof-form{max-width:560px;padding:24px 40px 40px;display:flex;flex-direction:column;gap:18px}
+    .pf-field{display:flex;flex-direction:column;gap:6px}
+    .pf-label{font-size:12px;font-weight:600;color:#71717A;text-transform:uppercase;letter-spacing:0.5px}
+    .pf-input{width:100%;background:#151518;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:11px 14px;color:#F4F4F5;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s}
+    .pf-input:focus{border-color:rgba(59,130,246,0.5);background:#1a1a1e}
+    .pf-input::placeholder{color:#52525B}
+    .pf-input:read-only{opacity:0.5;cursor:not-allowed}
+    .pf-input:read-only:focus{border-color:rgba(255,255,255,0.08)}
+    .pf-hint{font-size:11px;color:#52525B;margin-top:2px}
+    .pf-hint.available{color:#22C55E}
+    .pf-hint.taken{color:#EF4444}
+    .pf-textarea{min-height:80px;resize:vertical}
+    .pf-row{display:flex;gap:16px}
+    .pf-row .pf-field{flex:1}
+    .pf-save{align-self:flex-start;padding:10px 28px;border-radius:10px;background:#3B82F6;color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit;margin-top:4px}
+    .pf-save:hover{background:#2563EB}
+    .pf-save:disabled{opacity:0.4;cursor:not-allowed}
+    .pf-save-status{font-size:12px;color:#22C55E;margin-left:12px;opacity:0;transition:opacity .3s}
+    .pf-save-status.show{opacity:1}
 
     .hidden{display:none!important}
 
@@ -464,7 +462,6 @@
           <div class="prof-handle" id="prof-handle">@guest</div>
           <div class="prof-joined" id="prof-joined">Joined March 2026</div>
         </div>
-        <button class="prof-edit-btn" onclick="openEditProfile()">✏️ Edit</button>
       </div>
       <div class="prof-stats">
         <div class="prof-stat">
@@ -480,12 +477,42 @@
           <div class="prof-stat-label">Deployed</div>
         </div>
       </div>
-      <div class="prof-section">
-        <h3>Published Sites</h3>
-        <div class="prof-empty">
-          <div class="prof-empty-icon">🌐</div>
-          <div class="prof-empty-text">No published sites yet. Deploy a project to see it here.</div>
-          <button class="prof-empty-btn" onclick="location.href='/app/build/'">Start Building</button>
+      <div class="prof-form">
+        <div class="pf-field">
+          <div class="pf-label">Display Name</div>
+          <input class="pf-input" type="text" id="pf-name" placeholder="Your name">
+        </div>
+        <div class="pf-field">
+          <div class="pf-label">Username</div>
+          <input class="pf-input" type="text" id="pf-username" placeholder="your-username" oninput="checkUsername(this.value)">
+          <div class="pf-hint" id="pf-username-hint">Lowercase letters, numbers, and hyphens only (3-20 chars)</div>
+        </div>
+        <div class="pf-field">
+          <div class="pf-label">Email</div>
+          <input class="pf-input" type="email" id="pf-email" readonly>
+          <div class="pf-hint">🔒 Email can be changed in Account Settings</div>
+        </div>
+        <div class="pf-field">
+          <div class="pf-label">Phone Number</div>
+          <input class="pf-input" type="tel" id="pf-phone" placeholder="+998 90 123 4567">
+        </div>
+        <div class="pf-field">
+          <div class="pf-label">Bio</div>
+          <textarea class="pf-input pf-textarea" id="pf-bio" placeholder="Tell us about yourself" maxlength="220"></textarea>
+        </div>
+        <div class="pf-row">
+          <div class="pf-field">
+            <div class="pf-label">Location</div>
+            <input class="pf-input" type="text" id="pf-location" placeholder="City, Country">
+          </div>
+          <div class="pf-field">
+            <div class="pf-label">Website</div>
+            <input class="pf-input" type="text" id="pf-website" placeholder="yourwebsite.com">
+          </div>
+        </div>
+        <div style="display:flex;align-items:center">
+          <button class="pf-save" id="pf-save-btn" onclick="saveProfileInline()">Save Changes</button>
+          <span class="pf-save-status" id="pf-save-status">✓ Saved</span>
         </div>
       </div>
     </div>
@@ -493,40 +520,7 @@
   </div>
 </div>
 
-<!-- EDIT PROFILE MODAL -->
-<div class="edit-prof-overlay" id="edit-prof-overlay" onclick="if(event.target===this)closeEditProfile()">
-  <div class="edit-prof-box">
-    <div class="ep-header">
-      <h2>Edit profile</h2>
-      <button class="ep-close" onclick="closeEditProfile()">✕</button>
-    </div>
-    <div class="ep-avatar">
-      <div class="ep-avatar-circle" id="ep-av">?</div>
-    </div>
-    <div class="ep-form">
-      <div class="ep-field">
-        <label>Name</label>
-        <input type="text" id="ep-name" placeholder="Your name">
-      </div>
-      <div class="ep-field">
-        <label>Bio</label>
-        <textarea id="ep-bio" placeholder="Tell us about yourself" maxlength="220"></textarea>
-      </div>
-      <div class="ep-field">
-        <label>Location</label>
-        <input type="text" id="ep-location" placeholder="Where are you based?">
-      </div>
-      <div class="ep-field">
-        <label>Website</label>
-        <input type="text" id="ep-website" placeholder="yourwebsite.com">
-      </div>
-    </div>
-    <div class="ep-actions">
-      <button class="ep-btn cancel" onclick="closeEditProfile()">Cancel</button>
-      <button class="ep-btn save" onclick="saveProfile()">Save</button>
-    </div>
-  </div>
-</div>
+
 
 <script>
 var SUPA_URL='https://ljfkpkytcahmugwphrqo.supabase.co';
@@ -672,70 +666,88 @@ function ppNav(page){
   document.getElementById('pp').classList.remove('show');
   switchPage(page);
 }
-function openEditProfile(){
-  if(!user)return;
-  document.getElementById('ep-name').value=user.user_metadata?.full_name||'';
-  document.getElementById('ep-bio').value=profileData.bio||'';
-  document.getElementById('ep-location').value=profileData.location||'';
-  document.getElementById('ep-website').value=profileData.website||'';
-  var av=(user.user_metadata?.full_name||user.email||'?').charAt(0).toUpperCase();
-  document.getElementById('ep-av').textContent=av;
-  document.getElementById('edit-prof-overlay').classList.add('show');
-}
-function closeEditProfile(){document.getElementById('edit-prof-overlay').classList.remove('show');}
-var profileData={bio:'',location:'',website:''};
+var profileData={bio:'',location:'',website:'',username:'',phone:''};
+var usernameTimer=null;
 async function loadProfileData(){
   if(!user||!sb)return;
-  // Load from Supabase profiles
   try{
     var {data}=await sb.from('profiles').select('*').eq('id',user.id).single();
     if(data){
       profileData.bio=data.bio||'';
       profileData.location=data.location||'';
       profileData.website=data.website||'';
+      profileData.username=data.username||'';
+      profileData.phone=data.phone||'';
     }
   }catch(e){}
-  // Update profile page
+  // Update header area
   var nm=user.user_metadata?.full_name||user.email.split('@')[0];
   var av=nm.charAt(0).toUpperCase();
   document.getElementById('prof-av-big').textContent=av;
   document.getElementById('prof-name').textContent=nm;
-  document.getElementById('prof-handle').textContent='@'+user.email.split('@')[0];
+  document.getElementById('prof-handle').textContent='@'+(profileData.username||user.email.split('@')[0]);
   var joined=new Date(user.created_at);
   var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
   document.getElementById('prof-joined').textContent='Joined '+months[joined.getMonth()]+' '+joined.getFullYear();
+  // Fill form fields
+  document.getElementById('pf-name').value=user.user_metadata?.full_name||'';
+  document.getElementById('pf-username').value=profileData.username||'';
+  document.getElementById('pf-email').value=user.email||'';
+  document.getElementById('pf-phone').value=profileData.phone||'';
+  document.getElementById('pf-bio').value=profileData.bio||'';
+  document.getElementById('pf-location').value=profileData.location||'';
+  document.getElementById('pf-website').value=profileData.website||'';
   // Stats
-  try{
-    var {count}=await sb.from('generations').select('*',{count:'exact',head:true}).eq('user_id',user.id);
-    document.getElementById('prof-builds').textContent=count||0;
-  }catch(e){}
-  try{
-    var {count}=await sb.from('projects').select('*',{count:'exact',head:true}).eq('user_id',user.id);
-    document.getElementById('prof-projects').textContent=count||0;
-  }catch(e){}
-  try{
-    var {count}=await sb.from('deployments').select('*',{count:'exact',head:true}).eq('user_id',user.id);
-    document.getElementById('prof-deployed').textContent=count||0;
-  }catch(e){}
+  try{var {count}=await sb.from('generations').select('*',{count:'exact',head:true}).eq('user_id',user.id);document.getElementById('prof-builds').textContent=count||0;}catch(e){}
+  try{var {count}=await sb.from('projects').select('*',{count:'exact',head:true}).eq('user_id',user.id);document.getElementById('prof-projects').textContent=count||0;}catch(e){}
+  try{var {count}=await sb.from('deployments').select('*',{count:'exact',head:true}).eq('user_id',user.id);document.getElementById('prof-deployed').textContent=count||0;}catch(e){}
 }
-async function saveProfile(){
+function checkUsername(val){
+  val=val.toLowerCase().replace(/[^a-z0-9-]/g,'');
+  document.getElementById('pf-username').value=val;
+  var hint=document.getElementById('pf-username-hint');
+  if(!val||val.length<3){hint.className='pf-hint';hint.textContent='Lowercase letters, numbers, and hyphens only (3-20 chars)';return;}
+  if(val.length>20){hint.className='pf-hint taken';hint.textContent='Max 20 characters';return;}
+  if(val===profileData.username){hint.className='pf-hint available';hint.textContent='✓ Your current username';return;}
+  hint.className='pf-hint';hint.textContent='Checking...';
+  clearTimeout(usernameTimer);
+  usernameTimer=setTimeout(async function(){
+    try{
+      var {data}=await sb.from('profiles').select('id').eq('username',val);
+      if(data&&data.length>0&&data[0].id!==user.id){hint.className='pf-hint taken';hint.textContent='✗ Already taken';}
+      else{hint.className='pf-hint available';hint.textContent='✓ Available';}
+    }catch(e){hint.className='pf-hint';hint.textContent='Could not check';}
+  },400);
+}
+async function saveProfileInline(){
   if(!user||!sb)return;
-  var nm=document.getElementById('ep-name').value.trim();
-  var bio=document.getElementById('ep-bio').value.trim();
-  var loc=document.getElementById('ep-location').value.trim();
-  var web=document.getElementById('ep-website').value.trim();
+  var btn=document.getElementById('pf-save-btn');
+  btn.disabled=true;btn.textContent='Saving...';
+  var nm=document.getElementById('pf-name').value.trim();
+  var uname=document.getElementById('pf-username').value.trim();
+  var phone=document.getElementById('pf-phone').value.trim();
+  var bio=document.getElementById('pf-bio').value.trim();
+  var loc=document.getElementById('pf-location').value.trim();
+  var web=document.getElementById('pf-website').value.trim();
+  // Validate username
+  if(uname&&(uname.length<3||uname.length>20||!/^[a-z0-9-]+$/.test(uname))){
+    btn.disabled=false;btn.textContent='Save Changes';alert('Username must be 3-20 lowercase letters, numbers, or hyphens');return;
+  }
   // Update auth metadata (name)
   if(nm){await sb.auth.updateUser({data:{full_name:nm}});}
   // Update profiles table
   try{
-    await sb.from('profiles').update({full_name:nm,bio:bio,location:loc,website:web,updated_at:new Date().toISOString()}).eq('id',user.id);
-    profileData={bio,location:loc,website:web};
-  }catch(e){console.warn('Profile update failed:',e);}
-  closeEditProfile();
-  // Refresh display
+    var updateData={full_name:nm,bio:bio,location:loc,website:web,phone:phone,updated_at:new Date().toISOString()};
+    if(uname)updateData.username=uname;
+    await sb.from('profiles').update(updateData).eq('id',user.id);
+    profileData={bio,location:loc,website:web,username:uname,phone};
+  }catch(e){console.warn('Profile update failed:',e);btn.disabled=false;btn.textContent='Save Changes';return;}
+  // Refresh
   var u=await sb.auth.getUser();if(u.data?.user)user=u.data.user;
   loadProfileData();
   updateAuth();
+  btn.disabled=false;btn.textContent='Save Changes';
+  var st=document.getElementById('pf-save-status');st.classList.add('show');setTimeout(function(){st.classList.remove('show');},2000);
 }
 
 // ATTACHMENT
