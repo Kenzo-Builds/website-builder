@@ -1,300 +1,521 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Web Builder — Build websites with AI</title>
+  <title>AI Web Builder — Build the future of the web</title>
   <meta name="description" content="Describe your idea — AI builds your website in seconds. No coding required.">
-  <meta property="og:title" content="AI Web Builder — Build websites with AI" />
+  <meta property="og:title" content="AI Web Builder — Build the future of the web" />
   <meta property="og:description" content="Describe your idea — AI builds your website in seconds. No coding required." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://builder.kenzoagent.com" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="canonical" href="https://builder.kenzoagent.com" />
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%233B82F6'/%3E%3Cpath d='M8 10h16M8 16h12M8 22h8' stroke='%23fff' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2300E5FF' opacity='.15'/%3E%3Cpath d='M8 10 L4 16 L8 22M24 10 L28 16 L24 22M14 8 L18 24' stroke='%2300E5FF' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html{scroll-behavior:smooth}
-    body{background:#0D0D0D;color:#E5E5E5;font-family:'Inter',sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+    body{background:#09090B;color:#E4E4E7;font-family:'Inter',sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative}
 
-    /* Subtle grid bg */
-    .bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.015) 1px,transparent 1px);background-size:60px 60px}
+    /* === BACKGROUND === */
+    .bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 
-    /* Nav */
-    nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;background:rgba(13,13,13,0.85);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.05)}
+    /* Fine dot grid */
+    .bg-dots{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,0.06) 1px,transparent 1px);background-size:24px 24px}
+
+    /* Floating blobs */
+    .blob{position:absolute;border-radius:50%;filter:blur(120px);opacity:.06;animation:blobFloat 20s ease-in-out infinite}
+    .blob-1{width:700px;height:700px;background:#00E5FF;top:-200px;left:-100px;animation-delay:0s}
+    .blob-2{width:600px;height:600px;background:#00E5FF;bottom:-200px;right:-100px;animation-delay:-10s}
+    @keyframes blobFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(40px,-60px) scale(1.05)}66%{transform:translate(-30px,40px) scale(.95)}}
+
+    /* Scan line */
+    .scanline{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,0.008) 2px,rgba(255,255,255,0.008) 4px);pointer-events:none}
+
+    /* === NAV === */
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;background:rgba(9,9,11,0.8);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.06)}
     .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff}
-    .nav-logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#3B82F6,#8B5CF6);display:flex;align-items:center;justify-content:center}
-    .nav-logo-icon svg{width:14px;height:14px}
-    .nav-logo span{font-weight:700;font-size:15px;color:#fff}
-    .nav-links{display:flex;align-items:center;gap:28px}
-    .nav-links a{color:#6B7280;text-decoration:none;font-size:13px;font-weight:500;transition:color .2s}
-    .nav-links a:hover{color:#D1D5DB}
+    .nav-logo-icon{width:32px;height:32px;border-radius:8px;background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.2);display:flex;align-items:center;justify-content:center}
+    .nav-logo-icon svg{width:16px;height:16px;color:#00E5FF}
+    .nav-logo span{font-weight:800;font-size:15px;letter-spacing:-.3px}
+    .nav-links{display:flex;align-items:center;gap:32px}
+    .nav-links a{color:#71717A;text-decoration:none;font-size:13px;font-weight:500;transition:color .2s}
+    .nav-links a:hover{color:#E4E4E7}
     .nav-right{display:flex;align-items:center;gap:10px}
-    .lang-select{background:transparent;border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#9CA3AF;font-size:12px;padding:6px 10px;cursor:pointer;outline:none;font-family:inherit}
-    .lang-select option{background:#1A1A1A}
-    .btn-ghost{font-size:13px;font-weight:600;padding:7px 18px;border-radius:8px;background:none;border:1px solid rgba(255,255,255,0.08);color:#9CA3AF;cursor:pointer;text-decoration:none;transition:all .2s}
-    .btn-ghost:hover{border-color:rgba(255,255,255,0.15);color:#D1D5DB}
-    .btn-primary{font-size:13px;font-weight:600;padding:7px 18px;border-radius:8px;background:#fff;color:#0D0D0D;border:none;cursor:pointer;text-decoration:none;transition:all .2s}
-    .btn-primary:hover{opacity:.9}
+    .lang-btn{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#71717A;font-size:12px;font-weight:600;padding:6px 10px;cursor:pointer;outline:none;font-family:inherit;transition:all .2s}
+    .lang-btn:hover,.lang-btn.active{background:rgba(0,229,255,0.06);border-color:rgba(0,229,255,0.2);color:#00E5FF}
+    .lang-select{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#71717A;font-size:12px;padding:6px 10px;cursor:pointer;outline:none;font-family:inherit;appearance:none;-webkit-appearance:none}
+    .lang-select option{background:#0D0D0F;color:#E4E4E7}
+    .btn-ghost-nav{font-size:13px;font-weight:600;padding:7px 16px;border-radius:9px;background:none;border:1px solid rgba(255,255,255,0.08);color:#A1A1AA;cursor:pointer;text-decoration:none;transition:all .2s;font-family:inherit}
+    .btn-ghost-nav:hover{border-color:rgba(255,255,255,0.15);color:#E4E4E7}
+    .btn-white-nav{font-size:13px;font-weight:700;padding:7px 16px;border-radius:9px;background:#fff;color:#09090B;border:none;cursor:pointer;text-decoration:none;transition:all .2s;font-family:inherit}
+    .btn-white-nav:hover{background:#E4E4E7;transform:translateY(-1px)}
     .hamburger{display:none;background:none;border:none;cursor:pointer;padding:4px}
-    .hamburger span{display:block;width:20px;height:2px;background:#9CA3AF;margin:4px 0;border-radius:2px}
-    .mobile-menu{display:none;position:fixed;top:60px;left:0;right:0;z-index:99;background:rgba(13,13,13,0.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.06);padding:16px 24px;flex-direction:column;gap:12px}
+    .hamburger span{display:block;width:20px;height:2px;background:#A1A1AA;margin:4px 0;border-radius:2px;transition:all .2s}
+    .mobile-menu{display:none;position:fixed;top:60px;left:0;right:0;z-index:99;background:rgba(9,9,11,0.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.06);padding:16px 24px;flex-direction:column;gap:4px}
     .mobile-menu.show{display:flex}
-    .mobile-menu a{color:#9CA3AF;text-decoration:none;font-size:14px;padding:8px 0}
+    .mobile-menu a{color:#A1A1AA;text-decoration:none;font-size:14px;font-weight:500;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
 
-    /* Sections */
+    /* === LAYOUT === */
     section{position:relative;z-index:1}
-    .container{max-width:1060px;margin:0 auto;padding:0 24px}
+    .container{max-width:1080px;margin:0 auto;padding:0 24px}
 
-    /* Hero */
-    .hero{padding:120px 0 60px;text-align:center}
-    .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:40px;padding:5px 14px;font-size:12px;color:#9CA3AF;margin-bottom:20px;font-weight:500}
-    .hero-badge .dot{width:5px;height:5px;border-radius:50%;background:#22C55E;animation:blink 2s infinite}
-    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-    .hero h1{font-size:clamp(28px,5vw,48px);font-weight:800;line-height:1.15;margin-bottom:16px;letter-spacing:-.5px;color:#fff}
-    .hero h1 .grad{background:linear-gradient(135deg,#60A5FA,#A78BFA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .hero p{font-size:15px;color:#6B7280;max-width:480px;margin:0 auto 28px;line-height:1.7}
-    .hero-cta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-    .hero-cta .btn-lg{font-size:14px;font-weight:600;padding:11px 28px;border-radius:10px;cursor:pointer;transition:all .2s;text-decoration:none}
-    .hero-cta .btn-lg.primary{background:#fff;color:#0D0D0D;border:none}
-    .hero-cta .btn-lg.primary:hover{opacity:.9;transform:translateY(-1px)}
-    .hero-cta .btn-lg.outline{background:none;border:1px solid rgba(255,255,255,0.1);color:#9CA3AF}
-    .hero-cta .btn-lg.outline:hover{border-color:rgba(255,255,255,0.2);color:#D1D5DB}
+    /* === HERO === */
+    .hero{min-height:100vh;display:flex;align-items:center;padding:100px 0 60px;text-align:center;position:relative}
 
-    /* Preview */
-    .hero-preview{margin-top:48px;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,0.06);background:#151515;box-shadow:0 20px 60px rgba(0,0,0,.3);max-width:860px;margin-left:auto;margin-right:auto}
-    .preview-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;background:#111;border-bottom:1px solid rgba(255,255,255,0.05)}
-    .preview-bar .d{width:9px;height:9px;border-radius:50%}
-    .preview-bar .d:nth-child(1){background:#EF4444}
-    .preview-bar .d:nth-child(2){background:#F59E0B}
-    .preview-bar .d:nth-child(3){background:#22C55E}
-    .preview-body{padding:24px;display:flex;gap:16px;min-height:200px}
-    .preview-chat{flex:1;display:flex;flex-direction:column;gap:10px}
-    .p-bubble{padding:9px 12px;border-radius:10px;font-size:12px;max-width:90%}
-    .p-bubble.user{background:rgba(59,130,246,0.1);color:#93C5FD;align-self:flex-end;border-bottom-right-radius:3px}
-    .p-bubble.ai{background:rgba(255,255,255,0.04);color:#9CA3AF;align-self:flex-start;border-bottom-left-radius:3px}
-    .preview-result{flex:1.5;background:#fafafa;border-radius:8px;min-height:180px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-    .preview-result::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,#f0f9ff,#e0f2fe 30%,#fdf2f8 70%,#fce7f3);opacity:.7}
-    .preview-result span{z-index:1;font-weight:600;color:#3B82F6;font-size:13px}
+    /* Spotlight breathe */
+    .hero-spotlight{position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);width:800px;height:800px;background:radial-gradient(ellipse,rgba(0,229,255,0.07) 0%,transparent 70%);border-radius:50%;pointer-events:none;animation:breathe 8s ease-in-out infinite;z-index:0}
+    @keyframes breathe{0%,100%{transform:translate(-50%,-60%) scale(1);opacity:.7}50%{transform:translate(-50%,-60%) scale(1.2);opacity:1}}
 
-    /* Features */
-    .features{padding:80px 0}
-    .sec-label{text-align:center;font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px}
-    .sec-title{text-align:center;font-size:clamp(22px,3.5vw,32px);font-weight:700;margin-bottom:12px;letter-spacing:-.3px;color:#fff}
-    .sec-desc{text-align:center;font-size:14px;color:#6B7280;max-width:440px;margin:0 auto 40px}
-    .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-    .f-card{background:#151515;border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:24px;transition:all .25s}
-    .f-card:hover{border-color:rgba(255,255,255,0.1);transform:translateY(-2px)}
-    .f-icon{width:40px;height:40px;border-radius:10px;margin-bottom:14px;display:flex;align-items:center;justify-content:center;font-size:18px}
-    .f-card h3{font-size:14px;font-weight:700;margin-bottom:6px;color:#E5E5E5}
-    .f-card p{font-size:13px;color:#6B7280;line-height:1.6}
+    /* Pulsing glow dots */
+    .glow-dot{position:absolute;border-radius:50%;pointer-events:none}
+    .glow-dot-1{width:6px;height:6px;background:#00E5FF;top:20%;left:15%;box-shadow:0 0 12px #00E5FF,0 0 24px rgba(0,229,255,.4);animation:glowPulse 3s ease-in-out infinite}
+    .glow-dot-2{width:4px;height:4px;background:#00E5FF;top:35%;right:20%;box-shadow:0 0 8px #00E5FF,0 0 16px rgba(0,229,255,.4);animation:glowPulse 3s ease-in-out infinite 1s}
+    .glow-dot-3{width:5px;height:5px;background:#00E5FF;bottom:30%;left:25%;box-shadow:0 0 10px #00E5FF,0 0 20px rgba(0,229,255,.4);animation:glowPulse 3s ease-in-out infinite 2s}
+    @keyframes glowPulse{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:1;transform:scale(1.4)}}
 
-    /* Models */
-    .models{padding:80px 0}
-    .models-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
-    .m-card{background:#151515;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:all .25s}
-    .m-card:hover{border-color:rgba(255,255,255,0.12);transform:translateY(-2px)}
-    .m-card .m-icon{font-size:24px;margin-bottom:10px}
-    .m-card h4{font-size:14px;font-weight:700;margin-bottom:3px;color:#E5E5E5}
-    .m-card p{font-size:11px;color:#6B7280}
-    .m-badge{display:inline-block;margin-top:8px;font-size:10px;font-weight:600;padding:3px 10px;border-radius:16px}
+    .hero-inner{position:relative;z-index:1;width:100%}
+    .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:40px;padding:6px 16px;font-size:12px;color:#71717A;margin-bottom:28px;font-weight:500}
+    .hero-badge .live-dot{width:6px;height:6px;border-radius:50%;background:#00E5FF;box-shadow:0 0 6px #00E5FF;animation:livePulse 2s infinite}
+    @keyframes livePulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-    /* Modal */
-    .modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);align-items:center;justify-content:center}
+    .hero h1{font-size:clamp(36px,6vw,72px);font-weight:900;line-height:1.08;letter-spacing:-2px;color:#FAFAFA;margin-bottom:20px}
+    .hero h1 .shimmer{background:linear-gradient(90deg,#00E5FF 0%,#7FFFFF 40%,#00E5FF 80%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmerMove 3s linear infinite}
+    @keyframes shimmerMove{0%{background-position:200% center}100%{background-position:-200% center}}
+
+    .hero p{font-size:17px;color:#71717A;max-width:500px;margin:0 auto 36px;line-height:1.75;font-weight:400}
+    .hero-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:64px}
+    .btn-cyan{font-size:14px;font-weight:700;padding:13px 28px;border-radius:12px;background:#00E5FF;color:#09090B;border:none;cursor:pointer;text-decoration:none;transition:all .2s;font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+    .btn-cyan:hover{background:#33ECFF;transform:translateY(-2px);box-shadow:0 0 24px rgba(0,229,255,.3)}
+    .btn-outline-hero{font-size:14px;font-weight:600;padding:13px 28px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);color:#A1A1AA;cursor:pointer;text-decoration:none;transition:all .2s;font-family:inherit}
+    .btn-outline-hero:hover{border-color:rgba(255,255,255,0.2);color:#E4E4E7;background:rgba(255,255,255,0.05)}
+
+    /* Hero mock card */
+    .hero-mock{background:rgba(255,255,255,0.03);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.08);border-radius:24px;max-width:800px;margin:0 auto;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,0.04);animation:cardFloat 6s ease-in-out infinite alternate}
+    @keyframes cardFloat{0%{transform:translateY(0)}100%{transform:translateY(-8px)}}
+    .mock-bar{display:flex;align-items:center;gap:6px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02)}
+    .mock-bar .dot{width:9px;height:9px;border-radius:50%}
+    .mock-bar .dot:nth-child(1){background:#FF5F57}
+    .mock-bar .dot:nth-child(2){background:#FEBC2E}
+    .mock-bar .dot:nth-child(3){background:#28C840}
+    .mock-bar .url-bar{flex:1;margin-left:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:6px;padding:4px 12px;font-size:11px;color:#52525B;text-align:center}
+    .mock-body{display:grid;grid-template-columns:1fr 1.6fr;min-height:220px}
+    .mock-chat{padding:20px;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;gap:10px}
+    .mock-chat .chat-label{font-size:10px;font-weight:700;color:#3F3F46;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+    .chat-bubble{padding:9px 13px;border-radius:10px;font-size:12px;line-height:1.5;max-width:95%}
+    .chat-bubble.user{background:rgba(0,229,255,0.08);color:#67E8F9;border:1px solid rgba(0,229,255,0.12);align-self:flex-end;border-bottom-right-radius:3px}
+    .chat-bubble.ai{background:rgba(255,255,255,0.04);color:#A1A1AA;border:1px solid rgba(255,255,255,0.07);align-self:flex-start;border-bottom-left-radius:3px}
+    .chat-cursor{display:inline-block;width:7px;height:12px;background:#00E5FF;margin-left:4px;border-radius:1px;animation:blink 1s infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+    .mock-preview{padding:20px;display:flex;flex-direction:column;gap:10px;justify-content:center}
+    .mock-preview .preview-label{font-size:10px;font-weight:700;color:#3F3F46;text-transform:uppercase;letter-spacing:1px}
+    .mock-site{flex:1;background:linear-gradient(135deg,#FAFAFA 0%,#F0F9FF 50%,#ECFDF5 100%);border-radius:12px;min-height:150px;overflow:hidden;position:relative;display:flex;flex-direction:column}
+    .mock-site-nav{background:rgba(255,255,255,0.9);padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(0,0,0,0.06)}
+    .mock-site-dot{width:24px;height:6px;border-radius:3px;background:#0EA5E9}
+    .mock-site-links{display:flex;gap:6px;margin-left:auto}
+    .mock-site-link{width:24px;height:6px;border-radius:3px;background:rgba(0,0,0,0.08)}
+    .mock-site-hero{padding:16px;flex:1;display:flex;flex-direction:column;gap:8px;align-items:center;justify-content:center;text-align:center}
+    .mock-site-h{width:70%;height:12px;background:linear-gradient(90deg,#1E3A5F,#0EA5E9);border-radius:6px}
+    .mock-site-p{width:50%;height:6px;background:rgba(0,0,0,0.1);border-radius:3px}
+    .mock-site-btn{width:80px;height:20px;background:#0EA5E9;border-radius:5px;margin-top:4px}
+    .mock-site-badge{position:absolute;bottom:10px;right:10px;background:rgba(0,229,255,0.9);color:#09090B;font-size:9px;font-weight:800;padding:3px 8px;border-radius:10px}
+
+    /* === SECTIONS COMMON === */
+    .sec-eyebrow{text-align:center;font-size:11px;font-weight:700;color:#00E5FF;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px}
+    .sec-title{text-align:center;font-size:clamp(24px,4vw,40px);font-weight:800;letter-spacing:-1px;color:#FAFAFA;margin-bottom:12px}
+    .sec-desc{text-align:center;font-size:15px;color:#71717A;max-width:460px;margin:0 auto 52px;line-height:1.7}
+
+    /* === FEATURES === */
+    .features{padding:100px 0}
+    .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+    .f-card{background:rgba(255,255,255,0.03);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:32px 28px;transition:all .3s ease;cursor:default;animation:cardFloat 6s ease-in-out infinite alternate}
+    .f-card:nth-child(2){animation-delay:-2s}
+    .f-card:nth-child(3){animation-delay:-4s}
+    .f-card:hover{border-color:rgba(0,229,255,0.25);box-shadow:0 0 30px rgba(0,229,255,0.07),0 8px 32px rgba(0,0,0,.3);transform:translateY(-4px) !important}
+    .f-icon-wrap{width:48px;height:48px;border-radius:14px;background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.15);display:flex;align-items:center;justify-content:center;margin-bottom:20px;transition:all .3s}
+    .f-card:hover .f-icon-wrap{background:rgba(0,229,255,0.12);box-shadow:0 0 20px rgba(0,229,255,0.2)}
+    .f-icon-wrap svg{width:22px;height:22px;color:#00E5FF}
+    .f-card h3{font-size:17px;font-weight:700;color:#FAFAFA;margin-bottom:10px;letter-spacing:-.3px}
+    .f-card p{font-size:14px;color:#71717A;line-height:1.7}
+
+    /* === MODELS === */
+    .models{padding:100px 0}
+    .models-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .m-card{background:rgba(255,255,255,0.03);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:24px 22px;display:flex;align-items:center;gap:16px;transition:all .3s;cursor:pointer}
+    .m-card:hover{border-color:rgba(0,229,255,0.2);background:rgba(0,229,255,0.04);transform:translateY(-2px)}
+    .m-icon-box{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08)}
+    .m-info{flex:1;min-width:0}
+    .m-info h4{font-size:14px;font-weight:700;color:#FAFAFA;margin-bottom:2px;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .m-info p{font-size:12px;color:#52525B}
+    .m-pill{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+
+    /* === PRICING === */
+    .pricing{padding:100px 0}
+    .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:900px;margin:0 auto}
+    .pr-card{background:rgba(255,255,255,0.03);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:32px 28px;text-align:left;transition:all .3s;position:relative;animation:cardFloat 6s ease-in-out infinite alternate}
+    .pr-card:nth-child(2){animation-delay:-3s}
+    .pr-card.popular{border-color:rgba(0,229,255,0.3);box-shadow:0 0 40px rgba(0,229,255,0.08)}
+    .pr-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#00E5FF;color:#09090B;font-size:10px;font-weight:800;padding:4px 14px;border-radius:20px;letter-spacing:.5px;white-space:nowrap}
+    .pr-card h4{font-size:14px;font-weight:700;color:#71717A;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px}
+    .pr-price{font-size:48px;font-weight:900;color:#FAFAFA;letter-spacing:-2px;line-height:1}
+    .pr-price sup{font-size:22px;font-weight:700;vertical-align:top;margin-top:6px;display:inline-block}
+    .pr-price .period{font-size:14px;font-weight:400;color:#52525B;letter-spacing:0}
+    .pr-desc{font-size:13px;color:#52525B;margin:12px 0 24px;line-height:1.6}
+    .pr-divider{height:1px;background:rgba(255,255,255,0.06);margin-bottom:24px}
+    .pr-list{list-style:none;margin-bottom:32px}
+    .pr-list li{font-size:13px;color:#A1A1AA;padding:8px 0;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.04)}
+    .pr-list li:last-child{border-bottom:none}
+    .check-icon{width:16px;height:16px;border-radius:50%;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .check-icon svg{width:9px;height:9px;color:#00E5FF}
+    .pr-btn-cyan{width:100%;padding:12px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .2s;font-family:inherit;background:#00E5FF;color:#09090B;display:block;text-align:center;text-decoration:none}
+    .pr-btn-cyan:hover{background:#33ECFF;transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,229,255,.25)}
+    .pr-btn-outline{width:100%;padding:12px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#A1A1AA;display:block;text-align:center;text-decoration:none}
+    .pr-btn-outline:hover{border-color:rgba(255,255,255,0.2);color:#E4E4E7}
+
+    /* === FOOTER === */
+    footer{padding:48px 0 32px;border-top:1px solid rgba(255,255,255,0.06);position:relative;z-index:1}
+    .footer-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px}
+    .footer-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:#FAFAFA}
+    .footer-logo-icon{width:28px;height:28px;border-radius:7px;background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.2);display:flex;align-items:center;justify-content:center}
+    .footer-logo-icon svg{width:14px;height:14px;color:#00E5FF}
+    .footer-logo span{font-weight:800;font-size:14px}
+    .footer-nav{display:flex;gap:24px}
+    .footer-nav a{color:#52525B;text-decoration:none;font-size:13px;transition:color .2s}
+    .footer-nav a:hover{color:#A1A1AA}
+    .footer-copy{font-size:12px;color:#3F3F46}
+
+    /* === MODAL === */
+    .modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);align-items:center;justify-content:center}
     .modal-overlay.show{display:flex}
-    .modal{background:#1A1A1A;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:28px;width:90%;max-width:420px;box-shadow:0 0 40px rgba(0,0,0,.4)}
-    .modal h3{font-size:18px;font-weight:700;margin-bottom:4px;color:#fff}
-    .modal .m-sub{font-size:12px;color:#6B7280;margin-bottom:16px}
+    .modal{background:#111113;border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:28px;width:90%;max-width:380px;box-shadow:0 0 60px rgba(0,0,0,.6)}
+    .modal h3{font-size:17px;font-weight:800;margin-bottom:4px;color:#FAFAFA;letter-spacing:-.3px}
+    .modal .m-sub{font-size:12px;color:#52525B;margin-bottom:16px}
     .modal .m-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:13px}
-    .modal .m-row .lbl{color:#6B7280}
-    .modal .m-row .val{color:#E5E5E5;font-weight:600}
-    .modal .m-close{margin-top:16px;width:100%;padding:9px;border-radius:8px;background:rgba(255,255,255,0.06);border:none;color:#9CA3AF;font-weight:600;cursor:pointer;font-size:13px;font-family:inherit}
+    .modal .m-row .lbl{color:#52525B}
+    .modal .m-row .val{color:#E4E4E7;font-weight:600}
+    .modal .m-close{margin-top:16px;width:100%;padding:10px;border-radius:10px;background:rgba(255,255,255,0.06);border:none;color:#A1A1AA;font-weight:600;cursor:pointer;font-size:13px;font-family:inherit;transition:background .2s}
     .modal .m-close:hover{background:rgba(255,255,255,0.1)}
 
-    /* Pricing */
-    .pricing{padding:80px 0}
-    .pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-    .pr-card{background:#151515;border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:24px;text-align:center;transition:all .25s;position:relative}
-    .pr-card.popular{border-color:rgba(59,130,246,0.3)}
-    .pr-card.popular::before{content:'POPULAR';position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:#fff;color:#0D0D0D;font-size:9px;font-weight:700;padding:2px 10px;border-radius:12px;letter-spacing:.5px}
-    .pr-card h4{font-size:15px;font-weight:700;margin-bottom:3px;color:#E5E5E5}
-    .pr-card .price{font-size:30px;font-weight:800;margin:10px 0;color:#fff}
-    .pr-card .price span{font-size:13px;font-weight:400;color:#6B7280}
-    .pr-card .pr-desc{font-size:12px;color:#6B7280;margin-bottom:16px}
-    .pr-card ul{list-style:none;text-align:left;margin-bottom:20px}
-    .pr-card ul li{font-size:12px;color:#9CA3AF;padding:5px 0;display:flex;align-items:center;gap:7px}
-    .pr-card ul li::before{content:'✓';color:#22C55E;font-weight:700;font-size:11px}
-    .pr-btn{width:100%;padding:9px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .2s;text-decoration:none;display:block;text-align:center;font-family:inherit}
-    .pr-btn.primary{background:#fff;color:#0D0D0D}
-    .pr-btn.primary:hover{opacity:.9}
-    .pr-btn.outline{background:none;border:1px solid rgba(255,255,255,0.08);color:#9CA3AF}
-    .pr-btn.outline:hover{border-color:rgba(255,255,255,0.15);color:#D1D5DB}
+    /* === AUTH MODAL === */
+    .auth-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+    .auth-overlay.show{display:flex}
+    .auth-box{background:#111113;border:1px solid rgba(255,255,255,0.1);border-radius:24px;padding:36px;width:90%;max-width:400px;box-shadow:0 24px 80px rgba(0,0,0,.6);position:relative}
+    .auth-box h2{font-size:22px;font-weight:900;margin-bottom:4px;color:#FAFAFA;letter-spacing:-.5px}
+    .auth-sub{color:#52525B;font-size:13px;margin-bottom:28px;line-height:1.5}
+    .auth-field{margin-bottom:16px}
+    .auth-field label{display:block;font-size:11px;font-weight:700;color:#52525B;margin-bottom:6px;text-transform:uppercase;letter-spacing:.8px}
+    .auth-field input{width:100%;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 16px;font-size:14px;color:#FAFAFA;outline:none;font-family:inherit;transition:all .2s}
+    .auth-field input:focus{border-color:rgba(0,229,255,0.4);box-shadow:0 0 0 3px rgba(0,229,255,0.08)}
+    .auth-field input::placeholder{color:#3F3F46}
+    .auth-btn{width:100%;padding:13px;border-radius:12px;font-size:14px;font-weight:800;border:none;cursor:pointer;margin-top:4px;background:#00E5FF;color:#09090B;transition:all .2s;font-family:inherit;letter-spacing:-.2px}
+    .auth-btn:hover:not(:disabled){background:#33ECFF;box-shadow:0 4px 20px rgba(0,229,255,.2)}
+    .auth-btn:disabled{opacity:.4;cursor:not-allowed}
+    .auth-switch{text-align:center;margin-top:16px;font-size:13px;color:#52525B}
+    .auth-switch a{color:#00E5FF;cursor:pointer;text-decoration:none;font-weight:600}
+    .auth-error{color:#F87171;font-size:13px;margin-top:8px;display:none;text-align:center;padding:10px;background:rgba(239,68,68,0.08);border-radius:8px;border:1px solid rgba(239,68,68,0.15)}
+    .auth-divider{display:flex;align-items:center;gap:12px;margin:20px 0}
+    .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.07)}
+    .auth-divider span{font-size:11px;color:#3F3F46;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+    .auth-guest-btn{width:100%;padding:12px;border-radius:12px;font-size:13px;font-weight:600;border:1px solid rgba(255,255,255,0.08);cursor:pointer;background:rgba(255,255,255,0.03);color:#71717A;transition:all .2s;font-family:inherit}
+    .auth-guest-btn:hover{border-color:rgba(255,255,255,0.15);color:#A1A1AA}
+    .auth-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.06);border:none;color:#71717A;width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+    .auth-close:hover{background:rgba(255,255,255,0.1);color:#A1A1AA}
 
-    /* Footer */
-    footer{padding:32px 0;border-top:1px solid rgba(255,255,255,0.05);text-align:center}
-    footer p{font-size:12px;color:#4B5563}
-
-    /* Reveal */
-    .reveal{opacity:0;transform:translateY(20px);transition:all .5s ease}
+    /* === REVEAL === */
+    .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
     .reveal.visible{opacity:1;transform:translateY(0)}
+    .reveal-delay-1{transition-delay:.1s}
+    .reveal-delay-2{transition-delay:.2s}
+    .reveal-delay-3{transition-delay:.3s}
 
-    @media(max-width:768px){
-      /* Compact navbar — one clean line */
-      nav{padding:10px 16px}
-      .nav-logo-icon{width:26px;height:26px;border-radius:6px}
-      .nav-logo span{font-size:13px}
-      .nav-links{display:none}
-      .hamburger{display:block}
-      .lang-select{font-size:11px;padding:4px 7px;border-radius:6px}
-      .btn-ghost{font-size:11px;padding:5px 12px;border-radius:6px}
-      .btn-primary{font-size:11px;padding:5px 12px;border-radius:6px}
-      .nav-right{gap:6px}
-      /* Hero buttons smaller on mobile */
-      .hero-cta .btn-lg{font-size:13px;padding:9px 20px}
-      /* Rest */
+    /* === RESPONSIVE === */
+    @media(max-width:900px){
       .features-grid{grid-template-columns:1fr}
       .models-grid{grid-template-columns:repeat(2,1fr)}
-      .pricing-grid{grid-template-columns:1fr;max-width:360px;margin:0 auto}
-      .preview-body{flex-direction:column}
-      .hero h1{font-size:26px}
+      .pricing-grid{grid-template-columns:1fr;max-width:400px}
+      .footer-nav{display:none}
     }
-
-    /* Auth Modal */
-    .auth-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
-    .auth-overlay.show{display:flex}
-    .auth-box{background:#151515;border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:32px;width:90%;max-width:400px;box-shadow:0 20px 80px rgba(0,0,0,0.5)}
-    .auth-box h2{font-size:20px;font-weight:800;margin-bottom:4px;color:#F4F4F5}
-    .auth-sub{color:#52525B;font-size:13px;margin-bottom:24px}
-    .auth-field{margin-bottom:14px}
-    .auth-field label{display:block;font-size:12px;font-weight:600;color:#52525B;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px}
-    .auth-field input{width:100%;background:#0D0D0D;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:11px 14px;font-size:14px;color:#F4F4F5;outline:none;font-family:inherit;transition:border-color 0.15s}
-    .auth-field input:focus{border-color:#3B82F6;box-shadow:0 0 0 3px rgba(59,130,246,0.08)}
-    .auth-field input::placeholder{color:#52525B}
-    .auth-btn{width:100%;padding:11px;border-radius:10px;font-size:14px;font-weight:700;border:none;cursor:pointer;margin-top:6px;background:#3B82F6;color:white;transition:opacity 0.15s}
-    .auth-btn:hover{opacity:0.9}
-    .auth-btn:disabled{opacity:0.4;cursor:not-allowed}
-    .auth-switch{text-align:center;margin-top:14px;font-size:13px;color:#52525B}
-    .auth-switch a{color:#3B82F6;cursor:pointer;text-decoration:none;font-weight:600}
-    .auth-error{color:#EF4444;font-size:13px;margin-top:6px;display:none;text-align:center}
-    .auth-divider{display:flex;align-items:center;gap:12px;margin:18px 0}
-    .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.07)}
-    .auth-divider span{font-size:11px;color:#52525B}
-    .auth-guest-btn{width:100%;padding:10px;border-radius:10px;font-size:13px;font-weight:600;border:1px solid rgba(255,255,255,0.07);cursor:pointer;background:transparent;color:#52525B;transition:all 0.15s}
-    .auth-guest-btn:hover{border-color:rgba(255,255,255,0.12);color:#A1A1AA}
-    .auth-close{position:absolute;top:16px;right:16px;background:none;border:none;color:#52525B;font-size:20px;cursor:pointer}
-    .auth-close:hover{color:#A1A1AA}
+    @media(max-width:768px){
+      .nav-links{display:none}
+      .hamburger{display:block}
+      .hero h1{font-size:38px;letter-spacing:-1.5px}
+      .mock-body{grid-template-columns:1fr}
+      .mock-preview{display:none}
+      .models-grid{grid-template-columns:1fr}
+      .footer-inner{flex-direction:column;text-align:center}
+    }
   </style>
 </head>
 <body>
-  <div class="bg-grid"></div>
 
+  <!-- Background layer -->
+  <div class="bg-layer">
+    <div class="bg-dots"></div>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="scanline"></div>
+  </div>
+
+  <!-- NAV -->
   <nav>
     <a href="/" class="nav-logo">
-      <div class="nav-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+      <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+        </svg>
+      </div>
       <span>AI Builder</span>
     </a>
     <div class="nav-links">
-      <a href="#features" data-i18n="nav_features">Xususiyatlar</a>
-      <a href="#models" data-i18n="nav_models">Modellar</a>
-      <a href="#pricing" data-i18n="nav_pricing">Narxlar</a>
+      <a href="#features" data-i18n="nav_features">Features</a>
+      <a href="#models" data-i18n="nav_models">Models</a>
+      <a href="#pricing" data-i18n="nav_pricing">Pricing</a>
     </div>
     <div class="nav-right">
-      <select class="lang-select" id="lang-select" onchange="setLang(this.value)">
-        <option value="uz">🇺🇿 UZ</option>
-        <option value="ru">🇷🇺 RU</option>
-        <option value="en">🇬🇧 EN</option>
-      </select>
-      <a href="javascript:void(0)" onclick="showAuth('login')" class="btn-ghost" data-i18n="nav_signin">Kirish</a>
-      <a href="javascript:void(0)" onclick="showAuth('signup')" class="btn-primary" data-i18n="nav_start">Boshlash →</a>
+      <div style="display:flex;gap:4px" id="lang-switcher">
+        <button class="lang-btn" onclick="setLang('uz')">UZ</button>
+        <button class="lang-btn" onclick="setLang('ru')">RU</button>
+        <button class="lang-btn" onclick="setLang('en')">EN</button>
+      </div>
+      <button class="btn-ghost-nav" onclick="showAuth('login')" data-i18n="nav_signin">Sign In</button>
+      <button class="btn-white-nav" onclick="showAuth('signup')" data-i18n="nav_start">Get Started</button>
     </div>
-    <button class="hamburger" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button>
+    <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
   </nav>
+
+  <!-- Mobile menu -->
   <div class="mobile-menu" id="mobile-menu">
-    <a href="#features" onclick="toggleMobileMenu()" data-i18n="nav_features">Xususiyatlar</a>
-    <a href="#models" onclick="toggleMobileMenu()" data-i18n="nav_models">Modellar</a>
-    <a href="#pricing" onclick="toggleMobileMenu()" data-i18n="nav_pricing">Narxlar</a>
-    <a href="javascript:void(0)" onclick="showAuth('login');toggleMobileMenu()" data-i18n="nav_signin">Kirish</a>
+    <a href="#features" onclick="toggleMobileMenu()" data-i18n="nav_features">Features</a>
+    <a href="#models" onclick="toggleMobileMenu()" data-i18n="nav_models">Models</a>
+    <a href="#pricing" onclick="toggleMobileMenu()" data-i18n="nav_pricing">Pricing</a>
+    <a href="javascript:void(0)" onclick="showAuth('login');toggleMobileMenu()" data-i18n="nav_signin">Sign In</a>
+    <a href="javascript:void(0)" onclick="showAuth('signup');toggleMobileMenu()" data-i18n="nav_start">Get Started</a>
   </div>
 
+  <!-- HERO -->
   <section class="hero">
+    <div class="hero-spotlight"></div>
+    <div class="glow-dot glow-dot-1"></div>
+    <div class="glow-dot glow-dot-2"></div>
+    <div class="glow-dot glow-dot-3"></div>
     <div class="container">
-      <div class="hero-badge"><span class="dot"></span> <span data-i18n="hero_badge">Hozir ishlayapti — bepul sinab ko'ring</span></div>
-      <h1 data-i18n="hero_title">Veb-saytingizni <span class="grad">AI bilan</span> yarating</h1>
-      <p data-i18n="hero_desc">Tasvirlang — AI yaratadi. Bir necha soniyada professional veb-saytlar. Kod yozish shart emas.</p>
-      <div class="hero-cta">
-        <a href="javascript:void(0)" onclick="showAuth('signup')" class="btn-lg primary" data-i18n="hero_cta_start">Bepul boshlash →</a>
-        <a href="#features" class="btn-lg outline" data-i18n="hero_cta_learn">Batafsil →</a>
-      </div>
-      <div class="hero-preview reveal">
-        <div class="preview-bar"><div class="d"></div><div class="d"></div><div class="d"></div></div>
-        <div class="preview-body">
-          <div class="preview-chat">
-            <div class="p-bubble user" data-i18n="preview_user">Toshkentdagi kofe do'kon uchun landing sahifa yarating</div>
-            <div class="p-bubble ai" data-i18n="preview_ai">✨ Tayyorlayman! Professional kofe do'kon sahifasi...</div>
+      <div class="hero-inner">
+        <div class="hero-badge reveal">
+          <span class="live-dot"></span>
+          <span data-i18n="hero_badge">Live now — try it free</span>
+        </div>
+        <h1 class="reveal reveal-delay-1" data-i18n="hero_title_raw">Build the <span class="shimmer">future</span> of the web</h1>
+        <p class="reveal reveal-delay-2" data-i18n="hero_desc">Describe your idea — AI builds a professional website in seconds. No coding required.</p>
+        <div class="hero-cta reveal reveal-delay-3">
+          <a href="javascript:void(0)" onclick="showAuth('signup')" class="btn-cyan" data-i18n="hero_cta_start">Start Building Free →</a>
+          <a href="#features" class="btn-outline-hero" data-i18n="hero_cta_learn">See how it works</a>
+        </div>
+
+        <!-- Mock card -->
+        <div class="hero-mock reveal">
+          <div class="mock-bar">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            <div class="url-bar">builder.kenzoagent.com/app</div>
           </div>
-          <div class="preview-result"><span data-i18n="preview_result">✨ Tayyor veb-sayt</span></div>
+          <div class="mock-body">
+            <div class="mock-chat">
+              <div class="chat-label" data-i18n="mock_label_chat">AI Chat</div>
+              <div class="chat-bubble user" data-i18n="preview_user">Build a landing page for a coffee shop in Tashkent</div>
+              <div class="chat-bubble ai">✨ <span data-i18n="preview_ai">Building your professional coffee shop page...</span><span class="chat-cursor"></span></div>
+            </div>
+            <div class="mock-preview">
+              <div class="preview-label" data-i18n="mock_label_preview">Live Preview</div>
+              <div class="mock-site">
+                <div class="mock-site-nav">
+                  <div class="mock-site-dot"></div>
+                  <div class="mock-site-links">
+                    <div class="mock-site-link"></div>
+                    <div class="mock-site-link"></div>
+                    <div class="mock-site-link"></div>
+                  </div>
+                </div>
+                <div class="mock-site-hero">
+                  <div class="mock-site-h"></div>
+                  <div class="mock-site-p"></div>
+                  <div class="mock-site-btn"></div>
+                </div>
+                <div class="mock-site-badge" data-i18n="preview_result">✓ Live</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
+  <!-- FEATURES -->
   <section class="features" id="features">
     <div class="container">
-      <div class="sec-label reveal" data-i18n="features_label">XUSUSIYATLAR</div>
-      <h2 class="sec-title reveal" data-i18n="features_title">Nima uchun aynan biz?</h2>
-      <p class="sec-desc reveal" data-i18n="features_desc">Oddiy tasvirdan professional veb-saytgacha — bir necha soniyada</p>
+      <div class="sec-eyebrow reveal" data-i18n="features_label">FEATURES</div>
+      <h2 class="sec-title reveal" data-i18n="features_title">Everything you need to ship</h2>
+      <p class="sec-desc reveal" data-i18n="features_desc">From a single prompt to a fully deployed website — in seconds</p>
       <div class="features-grid">
-        <div class="f-card reveal"><div class="f-icon" style="background:rgba(59,130,246,0.08)">⚡</div><h3 data-i18n="f1_title">Bir zumda yaratish</h3><p data-i18n="f1_desc">Tasvirlang — AI bir necha soniyada professional veb-sayt yaratadi.</p></div>
-        <div class="f-card reveal"><div class="f-icon" style="background:rgba(139,92,246,0.08)">🎨</div><h3 data-i18n="f2_title">Zamonaviy dizayn</h3><p data-i18n="f2_desc">Har bir sayt mobile-first, responsive va professional ko'rinishda.</p></div>
-        <div class="f-card reveal"><div class="f-icon" style="background:rgba(34,197,94,0.08)">🚀</div><h3 data-i18n="f3_title">Bir bosishda deploy</h3><p data-i18n="f3_desc">Saytingizni bir bosishda internetga chiqaring.</p></div>
-        <div class="f-card reveal"><div class="f-icon" style="background:rgba(236,72,153,0.08)">🤖</div><h3 data-i18n="f4_title">6 ta AI model</h3><p data-i18n="f4_desc">Claude, Gemini, GPT — eng yaxshi modellarni tanlang.</p></div>
-        <div class="f-card reveal"><div class="f-icon" style="background:rgba(245,158,11,0.08)">✏️</div><h3 data-i18n="f5_title">Kod tahrirlash</h3><p data-i18n="f5_desc">Monaco editor bilan kodni tahrirlang va natijani real-time ko'ring.</p></div>
-        <div class="f-card reveal"><div class="f-icon" style="background:rgba(99,102,241,0.08)">💬</div><h3 data-i18n="f6_title">Chat orqali takomillashtirish</h3><p data-i18n="f6_desc">Chat orqali saytingizni takomillashtiring.</p></div>
+        <div class="f-card reveal">
+          <div class="f-icon-wrap"><i data-lucide="zap"></i></div>
+          <h3 data-i18n="f1_title">Instant Generation</h3>
+          <p data-i18n="f1_desc">Describe your website in plain language. Our AI understands your vision and generates pixel-perfect code instantly.</p>
+        </div>
+        <div class="f-card reveal reveal-delay-1">
+          <div class="f-icon-wrap"><i data-lucide="monitor-smartphone"></i></div>
+          <h3 data-i18n="f2_title">Any Device</h3>
+          <p data-i18n="f2_desc">Every site is mobile-first and fully responsive. Looks perfect on phones, tablets, and desktops — always.</p>
+        </div>
+        <div class="f-card reveal reveal-delay-2">
+          <div class="f-icon-wrap"><i data-lucide="rocket"></i></div>
+          <h3 data-i18n="f3_title">One-Click Deploy</h3>
+          <p data-i18n="f3_desc">Push your website live with one click. Custom domains, SSL certificates, and global CDN included.</p>
+        </div>
       </div>
     </div>
   </section>
 
+  <!-- MODELS -->
   <section class="models" id="models">
     <div class="container">
-      <div class="sec-label reveal" data-i18n="models_label">AI MODELLAR</div>
-      <h2 class="sec-title reveal" data-i18n="models_title">Eng kuchli modellar</h2>
-      <p class="sec-desc reveal" data-i18n="models_desc">Har bir loyiha uchun eng mos modelni tanlang</p>
+      <div class="sec-eyebrow reveal" data-i18n="models_label">AI MODELS</div>
+      <h2 class="sec-title reveal" data-i18n="models_title">Powered by the best AI</h2>
+      <p class="sec-desc reveal" data-i18n="models_desc">Choose from 6 frontier models. Each optimized for different tasks and budgets.</p>
       <div class="models-grid">
-        <div class="m-card reveal" onclick="showModelInfo('sonnet')"><div class="m-icon">💎</div><h4>Claude Sonnet 4.6</h4><p>Anthropic</p><div class="m-badge" style="background:rgba(59,130,246,0.08);color:#60A5FA" data-i18n="badge_default">Standart</div></div>
-        <div class="m-card reveal" onclick="showModelInfo('opus')"><div class="m-icon">👑</div><h4>Claude Opus 4.6</h4><p>Anthropic</p><div class="m-badge" style="background:rgba(245,158,11,0.08);color:#F59E0B" data-i18n="badge_best">Eng yaxshi</div></div>
-        <div class="m-card reveal" onclick="showModelInfo('gemini')"><div class="m-icon">🔮</div><h4>Gemini 3.1 Pro</h4><p>Google</p><div class="m-badge" style="background:rgba(139,92,246,0.08);color:#A78BFA" data-i18n="badge_smart">Aqlli</div></div>
-        <div class="m-card reveal" onclick="showModelInfo('flash')"><div class="m-icon">⚡</div><h4>Gemini 3 Flash</h4><p>Google</p><div class="m-badge" style="background:rgba(34,197,94,0.08);color:#22C55E" data-i18n="badge_fast">Tez</div></div>
-        <div class="m-card reveal" onclick="showModelInfo('gpt5')"><div class="m-icon">🧠</div><h4>GPT-5.4</h4><p>OpenAI</p><div class="m-badge" style="background:rgba(236,72,153,0.08);color:#EC4899" data-i18n="badge_premium">Premium</div></div>
-        <div class="m-card reveal" onclick="showModelInfo('codex')"><div class="m-icon">⭐</div><h4>GPT-5.3 Codex</h4><p>OpenAI</p><div class="m-badge" style="background:rgba(99,102,241,0.08);color:#818CF8">Kod</div></div>
+        <div class="m-card reveal" onclick="showModelInfo('sonnet')">
+          <div class="m-icon-box">💎</div>
+          <div class="m-info"><h4>Claude Sonnet 4.6</h4><p>Anthropic</p></div>
+          <div class="m-pill" style="background:rgba(0,229,255,0.08);color:#00E5FF;border:1px solid rgba(0,229,255,0.15)" data-i18n="badge_default">Default</div>
+        </div>
+        <div class="m-card reveal reveal-delay-1" onclick="showModelInfo('opus')">
+          <div class="m-icon-box">👑</div>
+          <div class="m-info"><h4>Claude Opus 4.6</h4><p>Anthropic</p></div>
+          <div class="m-pill" style="background:rgba(251,191,36,0.08);color:#FBBf24;border:1px solid rgba(251,191,36,0.15)" data-i18n="badge_best">Best</div>
+        </div>
+        <div class="m-card reveal reveal-delay-2" onclick="showModelInfo('gemini')">
+          <div class="m-icon-box">🔮</div>
+          <div class="m-info"><h4>Gemini 3.1 Pro</h4><p>Google</p></div>
+          <div class="m-pill" style="background:rgba(99,102,241,0.08);color:#818CF8;border:1px solid rgba(99,102,241,0.15)" data-i18n="badge_smart">Smart</div>
+        </div>
+        <div class="m-card reveal" onclick="showModelInfo('flash')">
+          <div class="m-icon-box">⚡</div>
+          <div class="m-info"><h4>Gemini 3 Flash</h4><p>Google</p></div>
+          <div class="m-pill" style="background:rgba(34,197,94,0.08);color:#22C55E;border:1px solid rgba(34,197,94,0.15)" data-i18n="badge_fast">Fast</div>
+        </div>
+        <div class="m-card reveal reveal-delay-1" onclick="showModelInfo('gpt5')">
+          <div class="m-icon-box">🧠</div>
+          <div class="m-info"><h4>GPT-5.4</h4><p>OpenAI</p></div>
+          <div class="m-pill" style="background:rgba(236,72,153,0.08);color:#EC4899;border:1px solid rgba(236,72,153,0.15)" data-i18n="badge_premium">Premium</div>
+        </div>
+        <div class="m-card reveal reveal-delay-2" onclick="showModelInfo('codex')">
+          <div class="m-icon-box">⭐</div>
+          <div class="m-info"><h4>GPT-5.3 Codex</h4><p>OpenAI</p></div>
+          <div class="m-pill" style="background:rgba(0,229,255,0.06);color:#67E8F9;border:1px solid rgba(0,229,255,0.1)">Code</div>
+        </div>
       </div>
     </div>
   </section>
 
+  <!-- PRICING -->
   <section class="pricing" id="pricing">
     <div class="container">
-      <div class="sec-label reveal" data-i18n="pricing_label">NARXLAR</div>
-      <h2 class="sec-title reveal" data-i18n="pricing_title">Oddiy va shaffof narxlar</h2>
-      <p class="sec-desc reveal" data-i18n="pricing_desc">Bepuldan boshlang, kerak bo'lganda oshiring</p>
+      <div class="sec-eyebrow reveal" data-i18n="pricing_label">PRICING</div>
+      <h2 class="sec-title reveal" data-i18n="pricing_title">Simple, honest pricing</h2>
+      <p class="sec-desc reveal" data-i18n="pricing_desc">Start for free. Upgrade when you're ready.</p>
       <div class="pricing-grid">
-        <div class="pr-card reveal"><h4 data-i18n="plan_free">Bepul</h4><div class="price">$0<span>/oy</span></div><p class="pr-desc" data-i18n="plan_free_desc">Sinab ko'rish uchun</p><ul><li data-i18n="plan_free_f1">5 ta generatsiya/oy</li><li data-i18n="plan_free_f2">1 ta deploy</li><li data-i18n="plan_free_f3">Asosiy modellar</li></ul><a href="javascript:void(0)" onclick="showAuth('signup')" class="pr-btn outline" data-i18n="plan_free_btn">Bepul boshlash</a></div>
-        <div class="pr-card reveal"><h4 data-i18n="plan_starter">Starter</h4><div class="price">$5<span>/oy</span></div><p class="pr-desc" data-i18n="plan_starter_desc">Kichik loyihalar uchun</p><ul><li data-i18n="plan_starter_f1">50 ta generatsiya/oy</li><li data-i18n="plan_starter_f2">5 ta deploy</li><li data-i18n="plan_starter_f3">Barcha modellar</li><li data-i18n="plan_starter_f4">Kodni yuklab olish</li></ul><a href="javascript:void(0)" onclick="showAuth('signup')" class="pr-btn outline" data-i18n="plan_starter_btn">Boshlash</a></div>
-        <div class="pr-card popular reveal"><h4 data-i18n="plan_pro">Pro</h4><div class="price">$15<span>/oy</span></div><p class="pr-desc" data-i18n="plan_pro_desc">Professional foydalanish</p><ul><li data-i18n="plan_pro_f1">200 ta generatsiya/oy</li><li data-i18n="plan_pro_f2">20 ta deploy</li><li data-i18n="plan_pro_f3">Barcha premium modellar</li><li data-i18n="plan_pro_f4">Custom domenlar</li><li data-i18n="plan_pro_f5">Ustuvor qo'llab-quvvatlash</li></ul><a href="javascript:void(0)" onclick="showAuth('signup')" class="pr-btn primary" data-i18n="plan_pro_btn">Pro'ga o'tish</a></div>
-        <div class="pr-card reveal"><h4 data-i18n="plan_expert">Expert</h4><div class="price">$30<span>/oy</span></div><p class="pr-desc" data-i18n="plan_expert_desc">Agentliklar va jamoalar</p><ul><li data-i18n="plan_expert_f1">Cheksiz generatsiya</li><li data-i18n="plan_expert_f2">Cheksiz deploy</li><li data-i18n="plan_expert_f3">API kirish</li><li data-i18n="plan_expert_f4">Oq label brending</li><li data-i18n="plan_expert_f5">24/7 qo'llab-quvvatlash</li></ul><a href="javascript:void(0)" onclick="showAuth('signup')" class="pr-btn outline" data-i18n="plan_expert_btn">Bog'lanish</a></div>
+        <!-- Free -->
+        <div class="pr-card reveal">
+          <h4 data-i18n="plan_free">Free</h4>
+          <div class="pr-price"><sup>$</sup>0<span class="period">/mo</span></div>
+          <p class="pr-desc" data-i18n="plan_free_desc">Perfect for trying it out</p>
+          <div class="pr-divider"></div>
+          <ul class="pr-list">
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span data-i18n="plan_free_f1">5 generations / month</span></li>
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span data-i18n="plan_free_f2">1 deploy</span></li>
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span data-i18n="plan_free_f3">Basic models</span></li>
+          </ul>
+          <a href="javascript:void(0)" onclick="showAuth('signup')" class="pr-btn-outline" data-i18n="plan_free_btn">Start Free</a>
+        </div>
+
+        <!-- Pro -->
+        <div class="pr-card popular reveal">
+          <div class="pr-badge" data-i18n="badge_popular">POPULAR</div>
+          <h4 data-i18n="plan_pro">Pro</h4>
+          <div class="pr-price"><sup>$</sup>15<span class="period">/mo</span></div>
+          <p class="pr-desc" data-i18n="plan_pro_desc">For professionals & creators</p>
+          <div class="pr-divider"></div>
+          <ul class="pr-list">
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span data-i18n="plan_pro_f1">200 generations / month</span></li>
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span data-i18n="plan_pro_f2">20 deploys</span></li>
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span data-i18n="plan_pro_f3">All premium models</span></li>
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span data-i18n="plan_pro_f4">Custom domains</span></li>
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span data-i18n="plan_pro_f5">Priority support</span></li>
+          </ul>
+          <a href="javascript:void(0)" onclick="showAuth('signup')" class="pr-btn-cyan" data-i18n="plan_pro_btn">Upgrade to Pro</a>
+        </div>
+
+        <!-- Expert -->
+        <div class="pr-card reveal">
+          <h4 data-i18n="plan_expert">Expert</h4>
+          <div class="pr-price"><sup>$</sup>30<span class="period">/mo</span></div>
+          <p class="pr-desc" data-i18n="plan_expert_desc">For agencies & teams</p>
+          <div class="pr-divider"></div>
+          <ul class="pr-list">
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span data-i18n="plan_expert_f1">Unlimited generations</span></li>
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span data-i18n="plan_expert_f2">Unlimited deploys</span></li>
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span data-i18n="plan_expert_f3">API access</span></li>
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span data-i18n="plan_expert_f4">White label branding</span></li>
+            <li><div class="check-icon"><i data-lucide="check" style="width:9px;height:9px"></i></div><span data-i18n="plan_expert_f5">24/7 support</span></li>
+          </ul>
+          <a href="javascript:void(0)" onclick="showAuth('signup')" class="pr-btn-outline" data-i18n="plan_expert_btn">Contact Us</a>
+        </div>
       </div>
     </div>
   </section>
 
-  <footer><div class="container"><p>© 2026 AI Builder. <span data-i18n="footer_text">Barcha huquqlar himoyalangan.</span> · <a href="/privacy.html" style="color:#6B7280;text-decoration:none">Privacy Policy</a></p></div></footer>
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <a href="/" class="footer-logo">
+          <div class="footer-logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+            </svg>
+          </div>
+          <span>AI Builder</span>
+        </a>
+        <div class="footer-nav">
+          <a href="#features" data-i18n="nav_features">Features</a>
+          <a href="#models" data-i18n="nav_models">Models</a>
+          <a href="#pricing" data-i18n="nav_pricing">Pricing</a>
+          <a href="/privacy.html" data-i18n="footer_privacy">Privacy Policy</a>
+        </div>
+        <div class="footer-copy">© 2026 AI Builder. <span data-i18n="footer_text">All rights reserved.</span></div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Model info modal -->
+  <div class="modal-overlay" id="model-modal" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <h3 id="mm-title"></h3>
+      <p class="m-sub" id="mm-sub"></p>
+      <div id="mm-rows"></div>
+      <button class="m-close" onclick="closeModal()" data-i18n="modal_close">Close</button>
+    </div>
+  </div>
 
   <!-- Auth Modal -->
   <div class="auth-overlay" id="auth-overlay" onclick="if(event.target===this)hideAuth()">
-    <div class="auth-box" style="position:relative">
-      <button class="auth-close" onclick="hideAuth()">&times;</button>
+    <div class="auth-box">
+      <button class="auth-close" onclick="hideAuth()">✕</button>
       <h2 id="la-title">Create Account</h2>
       <p class="auth-sub" id="la-sub">Start building websites with AI — free</p>
       <div id="la-name-field" class="auth-field">
@@ -308,14 +529,14 @@
       <div class="auth-field">
         <label>Password</label>
         <div style="position:relative">
-          <input type="password" id="la-password" placeholder="Min 6 characters" style="padding-right:40px" onkeydown="if(event.key==='Enter')doLandingAuth()" />
-          <div onclick="var p=document.getElementById('la-password'),e=this;if(p.type==='password'){p.type='text';e.textContent='🙈'}else{p.type='password';e.textContent='👁'}" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:#71717A;font-size:16px;user-select:none">👁</div>
+          <input type="password" id="la-password" placeholder="Min 6 characters" style="padding-right:44px" onkeydown="if(event.key==='Enter')handleLandingAuth()" />
+          <div onclick="var p=document.getElementById('la-password'),e=this;if(p.type==='password'){p.type='text';e.textContent='🙈'}else{p.type='password';e.textContent='👁'}" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:#3F3F46;font-size:16px;user-select:none">👁</div>
         </div>
       </div>
       <div class="auth-error" id="la-error"></div>
       <button class="auth-btn" id="la-submit" onclick="handleLandingAuth()">Create Account</button>
-      <div id="la-forgot" style="text-align:right;margin-top:8px;display:none">
-        <a onclick="sendForgotPassword()" style="font-size:12px;color:#6B7280;cursor:pointer;text-decoration:none" onmouseover="this.style.color='#9CA3AF'" onmouseout="this.style.color='#6B7280'">Forgot password?</a>
+      <div id="la-forgot" style="text-align:right;margin-top:10px;display:none">
+        <a onclick="sendForgotPassword()" style="font-size:12px;color:#52525B;cursor:pointer;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#A1A1AA'" onmouseout="this.style.color='#52525B'">Forgot password?</a>
       </div>
       <div class="auth-switch" id="la-switch">
         Already have an account? <a onclick="showAuth('login')">Sign in</a>
@@ -325,124 +546,238 @@
     </div>
   </div>
 
-  <div class="modal-overlay" id="model-modal" onclick="if(event.target===this)closeModal()">
-    <div class="modal">
-      <h3 id="mm-title"></h3>
-      <p class="m-sub" id="mm-sub"></p>
-      <div id="mm-rows"></div>
-      <button class="m-close" onclick="closeModal()" data-i18n="modal_close">Yopish</button>
-    </div>
-  </div>
-
   <script>
-    var T={uz:{nav_features:'Xususiyatlar',nav_models:'Modellar',nav_pricing:'Narxlar',nav_signin:'Kirish',nav_start:'Boshlash →',hero_badge:"Hozir ishlayapti — bepul sinab ko'ring",hero_title:'Veb-saytingizni <span class="grad">AI bilan</span> yarating',hero_desc:"Tasvirlang — AI yaratadi. Bir necha soniyada professional veb-saytlar. Kod yozish shart emas.",hero_cta_start:'Bepul boshlash →',hero_cta_learn:'Batafsil →',preview_user:"Toshkentdagi kofe do'kon uchun landing sahifa yarating",preview_ai:"✨ Tayyorlayman! Professional kofe do'kon sahifasi...",preview_result:'✨ Tayyor veb-sayt',features_label:'XUSUSIYATLAR',features_title:'Nima uchun aynan biz?',features_desc:"Oddiy tasvirdan professional veb-saytgacha — bir necha soniyada",f1_title:'Bir zumda yaratish',f1_desc:'Tasvirlang — AI bir necha soniyada professional veb-sayt yaratadi.',f2_title:'Zamonaviy dizayn',f2_desc:"Har bir sayt mobile-first, responsive va professional ko'rinishda.",f3_title:'Bir bosishda deploy',f3_desc:'Saytingizni bir bosishda internetga chiqaring.',f4_title:'6 ta AI model',f4_desc:'Claude, Gemini, GPT — eng yaxshi modellarni tanlang.',f5_title:'Kod tahrirlash',f5_desc:"Monaco editor bilan kodni tahrirlang va natijani real-time ko'ring.",f6_title:'Chat orqali takomillashtirish',f6_desc:'Chat orqali saytingizni takomillashtiring.',models_label:'AI MODELLAR',models_title:'Eng kuchli modellar',models_desc:'Har bir loyiha uchun eng mos modelni tanlang',badge_default:'Standart',badge_fast:'Tez',badge_smart:'Aqlli',badge_premium:'Premium',badge_best:'Eng yaxshi',pricing_label:'NARXLAR',pricing_title:'Oddiy va shaffof narxlar',pricing_desc:"Bepuldan boshlang, kerak bo'lganda oshiring",plan_free:'Bepul',plan_free_desc:"Sinab ko'rish uchun",plan_free_f1:'5 ta generatsiya/oy',plan_free_f2:'1 ta deploy',plan_free_f3:'Asosiy modellar',plan_free_btn:'Bepul boshlash',plan_starter:'Starter',plan_starter_desc:'Kichik loyihalar uchun',plan_starter_f1:'50 ta generatsiya/oy',plan_starter_f2:'5 ta deploy',plan_starter_f3:'Barcha modellar',plan_starter_f4:'Kodni yuklab olish',plan_starter_btn:'Boshlash',plan_pro:'Pro',plan_pro_desc:'Professional foydalanish',plan_pro_f1:'200 ta generatsiya/oy',plan_pro_f2:'20 ta deploy',plan_pro_f3:'Barcha premium modellar',plan_pro_f4:'Custom domenlar',plan_pro_f5:"Ustuvor qo'llab-quvvatlash",plan_pro_btn:"Pro'ga o'tish",plan_expert:'Expert',plan_expert_desc:'Agentliklar va jamoalar',plan_expert_f1:'Cheksiz generatsiya',plan_expert_f2:'Cheksiz deploy',plan_expert_f3:'API kirish',plan_expert_f4:'Oq label brending',plan_expert_f5:"24/7 qo'llab-quvvatlash",plan_expert_btn:"Bog'lanish",footer_text:'Barcha huquqlar himoyalangan.',modal_close:'Yopish',mm_company:'Kompaniya',mm_released:'Chiqarilgan',mm_strength:'Kuchli tomoni',mm_best_for:'Eng yaxshi',mm_tier:'Daraja'},
-    ru:{nav_features:'Возможности',nav_models:'Модели',nav_pricing:'Цены',nav_signin:'Войти',nav_start:'Начать →',hero_badge:'Работает прямо сейчас — попробуйте бесплатно',hero_title:'Создайте сайт <span class="grad">с помощью AI</span>',hero_desc:'Опишите — AI создаст. Профессиональные сайты за секунды. Код не нужен.',hero_cta_start:'Начать бесплатно →',hero_cta_learn:'Подробнее →',preview_user:'Создайте лендинг для кофейни в Ташкенте',preview_ai:'✨ Создаю! Профессиональная страница кофейни...',preview_result:'✨ Готовый сайт',features_label:'ВОЗМОЖНОСТИ',features_title:'Почему именно мы?',features_desc:'От описания до профессионального сайта — за секунды',f1_title:'Мгновенное создание',f1_desc:'Опишите — AI создаст профессиональный сайт за секунды.',f2_title:'Современный дизайн',f2_desc:'Каждый сайт создаётся mobile-first и адаптивным.',f3_title:'Деплой в один клик',f3_desc:'Запустите сайт в интернет одним кликом.',f4_title:'6 AI моделей',f4_desc:'Claude, Gemini, GPT — выбирайте лучшие модели.',f5_title:'Редактор кода',f5_desc:'Редактируйте код в Monaco editor в реальном времени.',f6_title:'Улучшение через чат',f6_desc:'Улучшайте сайт через чат.',models_label:'AI МОДЕЛИ',models_title:'Самые мощные модели',models_desc:'Выберите лучшую модель для каждого проекта',badge_default:'По умолчанию',badge_fast:'Быстрая',badge_smart:'Умная',badge_premium:'Премиум',badge_best:'Лучшая',pricing_label:'ЦЕНЫ',pricing_title:'Простые и прозрачные цены',pricing_desc:'Начните бесплатно, масштабируйте при необходимости',plan_free:'Бесплатно',plan_free_desc:'Для тестирования',plan_free_f1:'5 генераций/мес',plan_free_f2:'1 деплой',plan_free_f3:'Базовые модели',plan_free_btn:'Начать бесплатно',plan_starter:'Стартер',plan_starter_desc:'Для небольших проектов',plan_starter_f1:'50 генераций/мес',plan_starter_f2:'5 деплоев',plan_starter_f3:'Все модели',plan_starter_f4:'Скачать код',plan_starter_btn:'Начать',plan_pro:'Про',plan_pro_desc:'Профессиональное использование',plan_pro_f1:'200 генераций/мес',plan_pro_f2:'20 деплоев',plan_pro_f3:'Все премиум модели',plan_pro_f4:'Свои домены',plan_pro_f5:'Приоритетная поддержка',plan_pro_btn:'Перейти на Про',plan_expert:'Эксперт',plan_expert_desc:'Для агентств и команд',plan_expert_f1:'Безлимит генераций',plan_expert_f2:'Безлимит деплоев',plan_expert_f3:'API доступ',plan_expert_f4:'White label',plan_expert_f5:'24/7 поддержка',plan_expert_btn:'Связаться',footer_text:'Все права защищены.',modal_close:'Закрыть',mm_company:'Компания',mm_released:'Выпущена',mm_strength:'Сильная сторона',mm_best_for:'Лучше всего для',mm_tier:'Уровень'},
-    en:{nav_features:'Features',nav_models:'Models',nav_pricing:'Pricing',nav_signin:'Sign In',nav_start:'Get Started →',hero_badge:'Live now — try it for free',hero_title:'Build websites <span class="grad">with AI</span>',hero_desc:'Describe it — AI builds it. Professional websites in seconds. No coding required.',hero_cta_start:'Start for Free →',hero_cta_learn:'Learn More →',preview_user:'Build a landing page for a coffee shop in Tashkent',preview_ai:'✨ Building! Professional coffee shop page...',preview_result:'✨ Ready Website',features_label:'FEATURES',features_title:'Why choose us?',features_desc:'From description to professional website — in seconds',f1_title:'Instant creation',f1_desc:'Describe it — AI creates a professional website in seconds.',f2_title:'Modern design',f2_desc:'Every site is built mobile-first and responsive.',f3_title:'One-click deploy',f3_desc:'Launch your site live with one click.',f4_title:'6 AI models',f4_desc:'Claude, Gemini, GPT — choose the best models.',f5_title:'Code editor',f5_desc:'Edit code in Monaco editor and see results in real-time.',f6_title:'Chat to refine',f6_desc:'Refine your site through chat.',models_label:'AI MODELS',models_title:'Most powerful models',models_desc:'Choose the best model for each project',badge_default:'Default',badge_fast:'Fast',badge_smart:'Smart',badge_premium:'Premium',badge_best:'Best',pricing_label:'PRICING',pricing_title:'Simple, transparent pricing',pricing_desc:'Start free, scale when you need',plan_free:'Free',plan_free_desc:'To try it out',plan_free_f1:'5 generations/mo',plan_free_f2:'1 deploy',plan_free_f3:'Basic models',plan_free_btn:'Start Free',plan_starter:'Starter',plan_starter_desc:'For small projects',plan_starter_f1:'50 generations/mo',plan_starter_f2:'5 deploys',plan_starter_f3:'All models',plan_starter_f4:'Download code',plan_starter_btn:'Get Started',plan_pro:'Pro',plan_pro_desc:'Professional use',plan_pro_f1:'200 generations/mo',plan_pro_f2:'20 deploys',plan_pro_f3:'All premium models',plan_pro_f4:'Custom domains',plan_pro_f5:'Priority support',plan_pro_btn:'Upgrade to Pro',plan_expert:'Expert',plan_expert_desc:'For agencies & teams',plan_expert_f1:'Unlimited generations',plan_expert_f2:'Unlimited deploys',plan_expert_f3:'API access',plan_expert_f4:'White label branding',plan_expert_f5:'24/7 support',plan_expert_btn:'Contact Us',footer_text:'All rights reserved.',modal_close:'Close',mm_company:'Company',mm_released:'Released',mm_strength:'Strength',mm_best_for:'Best for',mm_tier:'Tier'}};
+  // ===== i18n =====
+  var T={
+    uz:{
+      nav_features:'Xususiyatlar',nav_models:'Modellar',nav_pricing:'Narxlar',nav_signin:'Kirish',nav_start:'Boshlash',
+      hero_badge:"Hozir ishlayapti — bepul sinab ko'ring",
+      hero_title_raw:'Veb kelajagini <span class="shimmer">quring</span>',
+      hero_desc:"Tasvirlang — AI bir necha soniyada professional veb-sayt yaratadi. Kod yozish shart emas.",
+      hero_cta_start:"Bepul boshlash →",hero_cta_learn:"Qanday ishlashini ko'ring",
+      mock_label_chat:'AI Chat',mock_label_preview:'Natija',
+      preview_user:"Toshkentdagi kofe do'kon uchun landing sahifa yarating",
+      preview_ai:"Professional kofe do'kon sahifasi tayyorlanmoqda...",
+      preview_result:'✓ Tayyor',
+      features_label:'XUSUSIYATLAR',features_title:'Hammasi bir joyda',features_desc:"Tasvirdan tayyor veb-saytgacha — bir necha soniyada",
+      f1_title:'Bir zumda yaratish',f1_desc:"Veb-saytingizni oddiy tilda tasvirlang. AI g'oyangizni tushunadi va bir zumda kod yaratadi.",
+      f2_title:'Har qanday qurilma',f2_desc:"Har bir sayt mobile-first va to'liq responsive. Telefon, planshet va kompyuterlarda mukammal ko'rinadi.",
+      f3_title:"Bir bosishda deploy",f3_desc:"Veb-saytingizni bir bosishda internetga chiqaring. Custom domenlar, SSL va global CDN kiritilgan.",
+      models_label:'AI MODELLAR',models_title:'Eng yaxshi AI bilan ishlaydi',models_desc:"6 ta frontier modeldan tanlang. Har biri turli vazifalar uchun optimallashtirilgan.",
+      badge_default:'Standart',badge_fast:'Tez',badge_smart:'Aqlli',badge_premium:'Premium',badge_best:'Eng yaxshi',badge_popular:'MASHHUR',
+      pricing_label:'NARXLAR',pricing_title:"Oddiy va halol narxlar",pricing_desc:"Bepuldan boshlang. Tayyor bo'lganda oshiring.",
+      plan_free:"Bepul",plan_free_desc:"Sinab ko'rish uchun",plan_free_f1:"5 ta generatsiya/oy",plan_free_f2:"1 ta deploy",plan_free_f3:"Asosiy modellar",plan_free_btn:"Bepul boshlash",
+      plan_pro:"Pro",plan_pro_desc:"Professional va kreatorlar uchun",plan_pro_f1:"200 ta generatsiya/oy",plan_pro_f2:"20 ta deploy",plan_pro_f3:"Barcha premium modellar",plan_pro_f4:"Custom domenlar",plan_pro_f5:"Ustuvor qo'llab-quvvatlash",plan_pro_btn:"Pro'ga o'tish",
+      plan_expert:"Expert",plan_expert_desc:"Agentliklar va jamoalar uchun",plan_expert_f1:"Cheksiz generatsiya",plan_expert_f2:"Cheksiz deploy",plan_expert_f3:"API kirish",plan_expert_f4:"Oq label brending",plan_expert_f5:"24/7 qo'llab-quvvatlash",plan_expert_btn:"Bog'lanish",
+      footer_text:'Barcha huquqlar himoyalangan.',footer_privacy:"Maxfiylik siyosati",
+      modal_close:'Yopish',mm_company:'Kompaniya',mm_released:'Chiqarilgan',mm_strength:'Kuchli tomoni',mm_best_for:'Eng yaxshi',mm_tier:'Daraja',
+      // kept for compat
+      plan_starter:'Starter',plan_starter_desc:'Kichik loyihalar uchun',plan_starter_f1:'50 ta generatsiya/oy',plan_starter_f2:'5 ta deploy',plan_starter_f3:'Barcha modellar',plan_starter_f4:'Kodni yuklab olish',plan_starter_btn:'Boshlash',
+      f4_title:'6 ta AI model',f4_desc:'Claude, Gemini, GPT — eng yaxshi modellarni tanlang.',f5_title:'Kod tahrirlash',f5_desc:"Monaco editor bilan kodni tahrirlang va natijani real-time ko'ring.",f6_title:'Chat orqali takomillashtirish',f6_desc:'Chat orqali saytingizni takomillashtiring.',
+    },
+    ru:{
+      nav_features:'Возможности',nav_models:'Модели',nav_pricing:'Цены',nav_signin:'Войти',nav_start:'Начать',
+      hero_badge:'Работает прямо сейчас — попробуйте бесплатно',
+      hero_title_raw:'Стройте <span class="shimmer">будущее</span> веба',
+      hero_desc:'Опишите идею — AI создаст профессиональный сайт за секунды. Код не нужен.',
+      hero_cta_start:'Начать бесплатно →',hero_cta_learn:'Как это работает',
+      mock_label_chat:'AI Чат',mock_label_preview:'Предпросмотр',
+      preview_user:'Создайте лендинг для кофейни в Ташкенте',
+      preview_ai:'Создаю профессиональную страницу кофейни...',
+      preview_result:'✓ Готово',
+      features_label:'ВОЗМОЖНОСТИ',features_title:'Всё что нужно для запуска',features_desc:'От промпта до задеплоенного сайта — за секунды',
+      f1_title:'Мгновенное создание',f1_desc:'Опишите сайт обычным языком. AI понимает вашу идею и генерирует идеальный код мгновенно.',
+      f2_title:'Любое устройство',f2_desc:'Каждый сайт mobile-first и полностью адаптивный. Идеально выглядит на телефонах, планшетах и ПК.',
+      f3_title:'Деплой в один клик',f3_desc:'Запустите сайт одним кликом. Свои домены, SSL и глобальный CDN включены.',
+      models_label:'AI МОДЕЛИ',models_title:'На базе лучшего AI',models_desc:'Выбирайте из 6 frontier-моделей. Каждая оптимизирована под разные задачи.',
+      badge_default:'По умолчанию',badge_fast:'Быстрая',badge_smart:'Умная',badge_premium:'Премиум',badge_best:'Лучшая',badge_popular:'ПОПУЛЯРНЫЙ',
+      pricing_label:'ЦЕНЫ',pricing_title:'Простые и честные цены',pricing_desc:'Начните бесплатно. Масштабируйтесь когда будете готовы.',
+      plan_free:'Бесплатно',plan_free_desc:'Для тестирования',plan_free_f1:'5 генераций/мес',plan_free_f2:'1 деплой',plan_free_f3:'Базовые модели',plan_free_btn:'Начать бесплатно',
+      plan_pro:'Про',plan_pro_desc:'Для профессионалов и создателей',plan_pro_f1:'200 генераций/мес',plan_pro_f2:'20 деплоев',plan_pro_f3:'Все премиум модели',plan_pro_f4:'Свои домены',plan_pro_f5:'Приоритетная поддержка',plan_pro_btn:'Перейти на Про',
+      plan_expert:'Эксперт',plan_expert_desc:'Для агентств и команд',plan_expert_f1:'Безлимит генераций',plan_expert_f2:'Безлимит деплоев',plan_expert_f3:'API доступ',plan_expert_f4:'White label',plan_expert_f5:'24/7 поддержка',plan_expert_btn:'Связаться',
+      footer_text:'Все права защищены.',footer_privacy:'Политика конфиденциальности',
+      modal_close:'Закрыть',mm_company:'Компания',mm_released:'Выпущена',mm_strength:'Сильная сторона',mm_best_for:'Лучше всего для',mm_tier:'Уровень',
+      plan_starter:'Стартер',plan_starter_desc:'Для небольших проектов',plan_starter_f1:'50 генераций/мес',plan_starter_f2:'5 деплоев',plan_starter_f3:'Все модели',plan_starter_f4:'Скачать код',plan_starter_btn:'Начать',
+      f4_title:'6 AI моделей',f4_desc:'Claude, Gemini, GPT — выбирайте лучшие модели.',f5_title:'Редактор кода',f5_desc:'Редактируйте код в Monaco editor в реальном времени.',f6_title:'Улучшение через чат',f6_desc:'Улучшайте сайт через чат.',
+    },
+    en:{
+      nav_features:'Features',nav_models:'Models',nav_pricing:'Pricing',nav_signin:'Sign In',nav_start:'Get Started',
+      hero_badge:'Live now — try it free',
+      hero_title_raw:'Build the <span class="shimmer">future</span> of the web',
+      hero_desc:'Describe your idea — AI builds a professional website in seconds. No coding required.',
+      hero_cta_start:'Start Building Free →',hero_cta_learn:'See how it works',
+      mock_label_chat:'AI Chat',mock_label_preview:'Live Preview',
+      preview_user:'Build a landing page for a coffee shop in Tashkent',
+      preview_ai:'Building your professional coffee shop page...',
+      preview_result:'✓ Live',
+      features_label:'FEATURES',features_title:'Everything you need to ship',features_desc:'From a single prompt to a fully deployed website — in seconds',
+      f1_title:'Instant Generation',f1_desc:'Describe your website in plain language. Our AI understands your vision and generates pixel-perfect code instantly.',
+      f2_title:'Any Device',f2_desc:'Every site is mobile-first and fully responsive. Looks perfect on phones, tablets, and desktops — always.',
+      f3_title:'One-Click Deploy',f3_desc:'Push your website live with one click. Custom domains, SSL certificates, and global CDN included.',
+      models_label:'AI MODELS',models_title:'Powered by the best AI',models_desc:'Choose from 6 frontier models. Each optimized for different tasks and budgets.',
+      badge_default:'Default',badge_fast:'Fast',badge_smart:'Smart',badge_premium:'Premium',badge_best:'Best',badge_popular:'POPULAR',
+      pricing_label:'PRICING',pricing_title:'Simple, honest pricing',pricing_desc:"Start for free. Upgrade when you're ready.",
+      plan_free:'Free',plan_free_desc:'Perfect for trying it out',plan_free_f1:'5 generations / month',plan_free_f2:'1 deploy',plan_free_f3:'Basic models',plan_free_btn:'Start Free',
+      plan_pro:'Pro',plan_pro_desc:'For professionals & creators',plan_pro_f1:'200 generations / month',plan_pro_f2:'20 deploys',plan_pro_f3:'All premium models',plan_pro_f4:'Custom domains',plan_pro_f5:'Priority support',plan_pro_btn:'Upgrade to Pro',
+      plan_expert:'Expert',plan_expert_desc:'For agencies & teams',plan_expert_f1:'Unlimited generations',plan_expert_f2:'Unlimited deploys',plan_expert_f3:'API access',plan_expert_f4:'White label branding',plan_expert_f5:'24/7 support',plan_expert_btn:'Contact Us',
+      footer_text:'All rights reserved.',footer_privacy:'Privacy Policy',
+      modal_close:'Close',mm_company:'Company',mm_released:'Released',mm_strength:'Strength',mm_best_for:'Best for',mm_tier:'Tier',
+      plan_starter:'Starter',plan_starter_desc:'For small projects',plan_starter_f1:'50 generations/mo',plan_starter_f2:'5 deploys',plan_starter_f3:'All models',plan_starter_f4:'Download code',plan_starter_btn:'Get Started',
+      f4_title:'6 AI models',f4_desc:'Claude, Gemini, GPT — choose the best models.',f5_title:'Code editor',f5_desc:'Edit code in Monaco editor and see results in real-time.',f6_title:'Chat to refine',f6_desc:'Refine your site through chat.',
+    }
+  };
 
-    var currentLang=localStorage.getItem('builder_lang')||'uz';
-    function setLang(l){currentLang=l;localStorage.setItem('builder_lang',l);document.getElementById('lang-select').value=l;document.querySelectorAll('[data-i18n]').forEach(function(el){var k=el.getAttribute('data-i18n');if(T[l]&&T[l][k])el.innerHTML=T[l][k];});}
+  var currentLang = localStorage.getItem('builder_lang') || 'uz';
 
-    var models={sonnet:{name:'Claude Sonnet 4.6',company:'Anthropic',released:'2025',strength_uz:'Kod sifati',strength_ru:'Качество кода',strength_en:'Code quality',best_uz:'Har qanday loyiha',best_ru:'Любой проект',best_en:'Any project',tier_uz:'Bepul',tier_ru:'Бесплатная',tier_en:'Free'},opus:{name:'Claude Opus 4.6',company:'Anthropic',released:'2025',strength_uz:'Eng yuqori sifat',strength_ru:'Наивысшее качество',strength_en:'Highest quality',best_uz:'Enterprise loyihalar',best_ru:'Корпоративные проекты',best_en:'Enterprise projects',tier_uz:'Pro+',tier_ru:'Про+',tier_en:'Pro+'},gemini:{name:'Gemini 3.1 Pro',company:'Google',released:'2025',strength_uz:'Chuqur fikrlash',strength_ru:'Глубокое мышление',strength_en:'Deep reasoning',best_uz:'Murakkab loyihalar',best_ru:'Сложные проекты',best_en:'Complex projects',tier_uz:'Starter+',tier_ru:'Стартер+',tier_en:'Starter+'},flash:{name:'Gemini 3 Flash',company:'Google',released:'2025',strength_uz:'Tezlik',strength_ru:'Скорость',strength_en:'Speed',best_uz:'Tez prototiplar',best_ru:'Быстрые прототипы',best_en:'Quick prototypes',tier_uz:'Bepul',tier_ru:'Бесплатная',tier_en:'Free'},gpt5:{name:'GPT-5.4',company:'OpenAI',released:'2025',strength_uz:'Kreativlik',strength_ru:'Креативность',strength_en:'Creativity',best_uz:'Kreativ saytlar',best_ru:'Креативные сайты',best_en:'Creative sites',tier_uz:'Pro+',tier_ru:'Про+',tier_en:'Pro+'},codex:{name:'GPT-5.3 Codex',company:'OpenAI',released:'2025',strength_uz:'Kod generatsiyasi',strength_ru:'Генерация кода',strength_en:'Code generation',best_uz:'Dasturchilar',best_ru:'Разработчики',best_en:'Developers',tier_uz:'Starter+',tier_ru:'Стартер+',tier_en:'Starter+'}};
+  function setLang(l) {
+    currentLang = l;
+    localStorage.setItem('builder_lang', l);
+    // Update lang buttons
+    document.querySelectorAll('.lang-btn').forEach(function(btn) {
+      btn.classList.remove('active');
+      if (btn.textContent.trim().toUpperCase() === l.toUpperCase()) btn.classList.add('active');
+    });
+    document.querySelectorAll('[data-i18n]').forEach(function(el) {
+      var k = el.getAttribute('data-i18n');
+      if (T[l] && T[l][k] !== undefined) el.innerHTML = T[l][k];
+    });
+  }
 
-    function showModelInfo(id){var m=models[id],l=currentLang,lb=T[l];document.getElementById('mm-title').textContent=m.name;document.getElementById('mm-sub').textContent=m.company;document.getElementById('mm-rows').innerHTML='<div class="m-row"><span class="lbl">'+lb.mm_company+'</span><span class="val">'+m.company+'</span></div><div class="m-row"><span class="lbl">'+lb.mm_released+'</span><span class="val">'+m.released+'</span></div><div class="m-row"><span class="lbl">'+lb.mm_strength+'</span><span class="val">'+m['strength_'+l]+'</span></div><div class="m-row"><span class="lbl">'+lb.mm_best_for+'</span><span class="val">'+m['best_'+l]+'</span></div><div class="m-row"><span class="lbl">'+lb.mm_tier+'</span><span class="val">'+m['tier_'+l]+'</span></div>';document.getElementById('model-modal').classList.add('show');}
-    function closeModal(){document.getElementById('model-modal').classList.remove('show');}
-    function toggleMobileMenu(){document.getElementById('mobile-menu').classList.toggle('show');}
+  // ===== Models data =====
+  var models = {
+    sonnet:{name:'Claude Sonnet 4.6',company:'Anthropic',released:'2025',strength_uz:'Kod sifati',strength_ru:'Качество кода',strength_en:'Code quality',best_uz:'Har qanday loyiha',best_ru:'Любой проект',best_en:'Any project',tier_uz:'Bepul',tier_ru:'Бесплатная',tier_en:'Free'},
+    opus:{name:'Claude Opus 4.6',company:'Anthropic',released:'2025',strength_uz:'Eng yuqori sifat',strength_ru:'Наивысшее качество',strength_en:'Highest quality',best_uz:'Enterprise loyihalar',best_ru:'Корпоративные проекты',best_en:'Enterprise projects',tier_uz:'Pro+',tier_ru:'Про+',tier_en:'Pro+'},
+    gemini:{name:'Gemini 3.1 Pro',company:'Google',released:'2025',strength_uz:'Chuqur fikrlash',strength_ru:'Глубокое мышление',strength_en:'Deep reasoning',best_uz:'Murakkab loyihalar',best_ru:'Сложные проекты',best_en:'Complex projects',tier_uz:'Starter+',tier_ru:'Стартер+',tier_en:'Starter+'},
+    flash:{name:'Gemini 3 Flash',company:'Google',released:'2025',strength_uz:'Tezlik',strength_ru:'Скорость',strength_en:'Speed',best_uz:'Tez prototiplar',best_ru:'Быстрые прототипы',best_en:'Quick prototypes',tier_uz:'Bepul',tier_ru:'Бесплатная',tier_en:'Free'},
+    gpt5:{name:'GPT-5.4',company:'OpenAI',released:'2025',strength_uz:'Kreativlik',strength_ru:'Креативность',strength_en:'Creativity',best_uz:'Kreativ saytlar',best_ru:'Креативные сайты',best_en:'Creative sites',tier_uz:'Pro+',tier_ru:'Про+',tier_en:'Pro+'},
+    codex:{name:'GPT-5.3 Codex',company:'OpenAI',released:'2025',strength_uz:'Kod generatsiyasi',strength_ru:'Генерация кода',strength_en:'Code generation',best_uz:'Dasturchilar',best_ru:'Разработчики',best_en:'Developers',tier_uz:'Starter+',tier_ru:'Стартер+',tier_en:'Starter+'}
+  };
 
-    var observer=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.1});
-    document.querySelectorAll('.reveal').forEach(function(el){observer.observe(el);});
-    setLang(currentLang);
+  function showModelInfo(id) {
+    var m = models[id], l = currentLang, lb = T[l];
+    document.getElementById('mm-title').textContent = m.name;
+    document.getElementById('mm-sub').textContent = m.company;
+    document.getElementById('mm-rows').innerHTML =
+      '<div class="m-row"><span class="lbl">'+lb.mm_company+'</span><span class="val">'+m.company+'</span></div>'+
+      '<div class="m-row"><span class="lbl">'+lb.mm_released+'</span><span class="val">'+m.released+'</span></div>'+
+      '<div class="m-row"><span class="lbl">'+lb.mm_strength+'</span><span class="val">'+m['strength_'+l]+'</span></div>'+
+      '<div class="m-row"><span class="lbl">'+lb.mm_best_for+'</span><span class="val">'+m['best_'+l]+'</span></div>'+
+      '<div class="m-row"><span class="lbl">'+lb.mm_tier+'</span><span class="val">'+m['tier_'+l]+'</span></div>';
+    document.getElementById('model-modal').classList.add('show');
+  }
+  function closeModal() { document.getElementById('model-modal').classList.remove('show'); }
+  function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('show'); }
 
-    // ===== AUTH =====
-    var API='https://builder.kenzoagent.com';
-    var SUPA_URL='https://ljfkpkytcahmugwphrqo.supabase.co';
-    var SUPA_KEY='sb_publishable_7eIDQqzdu6zy7-tLpLVpXw_ciCm1doM';
-    var sb;try{sb=window.supabase.createClient(SUPA_URL,SUPA_KEY)}catch(e){}
-    var authMode='signup';
+  // ===== Scroll reveal =====
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, {threshold: 0.08});
+  document.querySelectorAll('.reveal').forEach(function(el) { observer.observe(el); });
 
-    // Check if already logged in → go straight to dashboard
-    if(sb){sb.auth.getSession().then(function(r){
-      if(r.data&&r.data.session){location.href='/app/';}
-    }).catch(function(){});}
+  // ===== Auth =====
+  var API = 'https://builder.kenzoagent.com';
+  var SUPA_URL = 'https://ljfkpkytcahmugwphrqo.supabase.co';
+  var SUPA_KEY = 'sb_publishable_7eIDQqzdu6zy7-tLpLVpXw_ciCm1doM';
+  var sb;
+  try { sb = window.supabase.createClient(SUPA_URL, SUPA_KEY); } catch(e) {}
 
-    function showAuth(mode){
-      authMode=mode;
-      var err=document.getElementById('la-error');err.style.display='none';
-      if(mode==='login'){
-        document.getElementById('la-title').textContent='Welcome Back';
-        document.getElementById('la-sub').textContent='Sign in to your account';
-        document.getElementById('la-name-field').style.display='none';
-        document.getElementById('la-submit').textContent='Sign In';
-        document.getElementById('la-switch').innerHTML='Don\'t have an account? <a onclick="showAuth(\'signup\')">Create one</a>';
-        document.getElementById('la-forgot').style.display='block';
-      }else{
-        document.getElementById('la-title').textContent='Create Account';
-        document.getElementById('la-sub').textContent='Start building websites with AI — free';
-        document.getElementById('la-name-field').style.display='block';
-        document.getElementById('la-submit').textContent='Create Account';
-        document.getElementById('la-switch').innerHTML='Already have an account? <a onclick="showAuth(\'login\')">Sign in</a>';
-        document.getElementById('la-forgot').style.display='none';
+  // Check session on load
+  if (sb) {
+    sb.auth.getSession().then(function(r) {
+      if (r.data && r.data.session) { location.href = '/app/'; }
+    }).catch(function(){});
+  }
+
+  var authMode = 'signup';
+
+  function showAuth(mode) {
+    authMode = mode;
+    var err = document.getElementById('la-error');
+    err.style.display = 'none';
+    if (mode === 'login') {
+      document.getElementById('la-title').textContent = 'Welcome Back';
+      document.getElementById('la-sub').textContent = 'Sign in to your account';
+      document.getElementById('la-name-field').style.display = 'none';
+      document.getElementById('la-submit').textContent = 'Sign In';
+      document.getElementById('la-switch').innerHTML = "Don't have an account? <a onclick=\"showAuth('signup')\">Create one</a>";
+      document.getElementById('la-forgot').style.display = 'block';
+    } else {
+      document.getElementById('la-title').textContent = 'Create Account';
+      document.getElementById('la-sub').textContent = 'Start building websites with AI — free';
+      document.getElementById('la-name-field').style.display = 'block';
+      document.getElementById('la-submit').textContent = 'Create Account';
+      document.getElementById('la-switch').innerHTML = "Already have an account? <a onclick=\"showAuth('login')\">Sign in</a>";
+      document.getElementById('la-forgot').style.display = 'none';
+    }
+    document.getElementById('auth-overlay').classList.add('show');
+  }
+
+  function hideAuth() { document.getElementById('auth-overlay').classList.remove('show'); }
+
+  async function sendForgotPassword() {
+    var email = document.getElementById('la-email').value.trim();
+    var err = document.getElementById('la-error');
+    err.style.display = 'none';
+    if (!email || !email.includes('@')) {
+      err.textContent = 'Enter your email address first';
+      err.style.display = 'block';
+      return;
+    }
+    if (!sb) return;
+    var {error} = await sb.auth.resetPasswordForEmail(email, {redirectTo: 'https://builder.kenzoagent.com/app/'});
+    if (error) { err.textContent = error.message; err.style.display = 'block'; return; }
+    document.getElementById('la-forgot').innerHTML = '<span style="font-size:12px;color:#22C55E">✓ Reset link sent to '+email+'</span>';
+  }
+
+  async function handleLandingAuth() {
+    var email = document.getElementById('la-email').value.trim();
+    var password = document.getElementById('la-password').value;
+    var name = document.getElementById('la-name').value.trim();
+    var err = document.getElementById('la-error');
+    var btn = document.getElementById('la-submit');
+    err.style.display = 'none';
+    if (!email || !password) { err.textContent = 'Please fill in all fields'; err.style.display = 'block'; return; }
+    if (password.length < 6) { err.textContent = 'Password must be at least 6 characters'; err.style.display = 'block'; return; }
+    btn.disabled = true;
+    btn.textContent = authMode === 'login' ? 'Signing in...' : 'Creating account...';
+    try {
+      if (authMode === 'signup') {
+        var res = await fetch(API + '/api/auth/signup', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,password:password,name:name||email.split('@')[0]})});
+        var data = await res.json();
+        if (data.error) throw new Error(data.error);
+        var r = await sb.auth.signInWithPassword({email: email, password: password});
+        if (r.error) throw r.error;
+      } else {
+        var r = await sb.auth.signInWithPassword({email: email, password: password});
+        if (r.error) throw r.error;
       }
-      document.getElementById('auth-overlay').classList.add('show');
+      location.href = '/app/';
+    } catch(e) {
+      err.textContent = e.message || 'Something went wrong';
+      err.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = authMode === 'login' ? 'Sign In' : 'Create Account';
     }
-    function hideAuth(){document.getElementById('auth-overlay').classList.remove('show');}
+  }
 
-    async function sendForgotPassword(){
-      var email=document.getElementById('la-email').value.trim();
-      var err=document.getElementById('la-error');
-      err.style.display='none';
-      if(!email||!email.includes('@')){err.textContent='Enter your email address first';err.style.display='block';return;}
-      if(!sb) return;
-      var {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://builder.kenzoagent.com/app/'});
-      if(error){err.textContent=error.message;err.style.display='block';return;}
-      err.style.display='none';
-      // Show success inline
-      var forgot=document.getElementById('la-forgot');
-      forgot.innerHTML='<span style="font-size:12px;color:#22C55E">✓ Reset link sent to '+email+'</span>';
-    }
+  // URL param triggers
+  var urlAuth = new URLSearchParams(location.search).get('auth');
+  if (urlAuth === 'login' || urlAuth === 'signup') showAuth(urlAuth);
 
-    async function handleLandingAuth(){
-      var email=document.getElementById('la-email').value.trim();
-      var password=document.getElementById('la-password').value;
-      var name=document.getElementById('la-name').value.trim();
-      var err=document.getElementById('la-error');
-      var btn=document.getElementById('la-submit');
-      err.style.display='none';
-      if(!email||!password){err.textContent='Please fill in all fields';err.style.display='block';return;}
-      if(password.length<6){err.textContent='Password must be at least 6 characters';err.style.display='block';return;}
-      btn.disabled=true;
-      btn.textContent=authMode==='login'?'Signing in...':'Creating account...';
-      try{
-        if(authMode==='signup'){
-          var res=await fetch(API+'/api/auth/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,password:password,name:name||email.split('@')[0]})});
-          var data=await res.json();
-          if(data.error)throw new Error(data.error);
-          var r=await sb.auth.signInWithPassword({email:email,password:password});
-          if(r.error)throw r.error;
-        }else{
-          var r=await sb.auth.signInWithPassword({email:email,password:password});
-          if(r.error)throw r.error;
-        }
-        // Success → go to dashboard
-        location.href='/app/';
-      }catch(e){
-        err.textContent=e.message||'Something went wrong';
-        err.style.display='block';
-      }finally{
-        btn.disabled=false;
-        btn.textContent=authMode==='login'?'Sign In':'Create Account';
-      }
-    }
+  // Deleted account banner
+  if (new URLSearchParams(location.search).get('deleted') === '1') {
+    var banner = document.createElement('div');
+    banner.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#111113;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:20px 28px;max-width:460px;width:90%;z-index:999;box-shadow:0 8px 40px rgba(0,0,0,.7);text-align:center';
+    banner.innerHTML = '<div style="font-size:20px;margin-bottom:8px">👋 Sorry to see you go</div><div style="font-size:13px;color:#71717A;line-height:1.7">Your account is scheduled for deletion. We\'ll keep your data safe for <strong style="color:#E4E4E7">30 days</strong>.<br>If you change your mind, simply log back in and everything will be restored.</div><button onclick="this.parentElement.remove()" style="margin-top:16px;padding:9px 22px;border-radius:10px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);color:#A1A1AA;font-size:12px;cursor:pointer;font-family:inherit;transition:all .2s">Got it</button>';
+    document.body.appendChild(banner);
+  }
 
-    // Check URL params for auth trigger
-    var urlAuth=new URLSearchParams(location.search).get('auth');
-    if(urlAuth==='login'||urlAuth==='signup')showAuth(urlAuth);
-    // Show soft-delete confirmation message
-    if(new URLSearchParams(location.search).get('deleted')==='1'){
-      var banner=document.createElement('div');
-      banner.style.cssText='position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1A1A1E;border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:18px 28px;max-width:460px;width:90%;z-index:999;box-shadow:0 8px 32px rgba(0,0,0,.6);text-align:center';
-      banner.innerHTML='<div style="font-size:18px;margin-bottom:6px">👋 Sorry to see you go</div><div style="font-size:13px;color:#9CA3AF;line-height:1.6">Your account is scheduled for deletion. We\'ll keep your data safe for <strong style="color:#F4F4F5">30 days</strong>.<br>If you change your mind, simply log back in and everything will be restored.</div><button onclick="this.parentElement.remove()" style="margin-top:14px;padding:8px 20px;border-radius:8px;background:rgba(255,255,255,0.08);border:none;color:#D1D5DB;font-size:12px;cursor:pointer;font-family:inherit">Got it</button>';
-      document.body.appendChild(banner);
-    }
+  // Init language
+  setLang(currentLang);
+
+  // Init Lucide icons
+  lucide.createIcons();
   </script>
 </body>
 </html>
