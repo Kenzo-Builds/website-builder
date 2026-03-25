@@ -14,7 +14,7 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2300E5FF' opacity='.15'/%3E%3Cpath d='M8 10 L4 16 L8 22M24 10 L28 16 L24 22M14 8 L18 24' stroke='%2300E5FF' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
   <style>
@@ -48,7 +48,7 @@
     .nav-links a:hover{color:#E4E4E7}
     .nav-right{display:flex;align-items:center;gap:10px}
     .lang-btn{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#71717A;font-size:12px;font-weight:600;padding:6px 10px;cursor:pointer;outline:none;font-family:inherit;transition:all .2s}
-    .lang-btn:hover,.lang-btn.active{background:rgba(0,229,255,0.06);border-color:rgba(0,229,255,0.2);color:#00E5FF}
+    .lang-btn:hover,.lang-btn.active{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.15);color:#E4E4E7}
     .lang-select{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#71717A;font-size:12px;padding:6px 10px;cursor:pointer;outline:none;font-family:inherit;appearance:none;-webkit-appearance:none}
     .lang-select option{background:#0D0D0F;color:#E4E4E7}
     .btn-ghost-nav{font-size:13px;font-weight:600;padding:7px 16px;border-radius:9px;background:none;border:1px solid rgba(255,255,255,0.08);color:#A1A1AA;cursor:pointer;text-decoration:none;transition:all .2s;font-family:inherit}
@@ -84,14 +84,14 @@
     .hero-badge .live-dot{width:6px;height:6px;border-radius:50%;background:#00E5FF;box-shadow:0 0 6px #00E5FF;animation:livePulse 2s infinite}
     @keyframes livePulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-    .hero h1{font-size:clamp(36px,6vw,72px);font-weight:900;line-height:1.08;letter-spacing:-2px;color:#FAFAFA;margin-bottom:20px}
-    .hero h1 .shimmer{background:linear-gradient(90deg,#00E5FF 0%,#7FFFFF 40%,#00E5FF 80%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmerMove 3s linear infinite}
+    .hero h1{font-size:clamp(40px,6.5vw,80px);font-weight:400;line-height:1.06;letter-spacing:-1px;color:#FAFAFA;margin-bottom:20px;font-family:'DM Serif Display',serif}
+    .hero h1 .shimmer{background:linear-gradient(90deg,#00E5FF 0%,#A5F3FC 35%,#00E5FF 70%,#E0FFFE 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmerMove 4s linear infinite;font-style:italic}
     @keyframes shimmerMove{0%{background-position:200% center}100%{background-position:-200% center}}
 
     .hero p{font-size:17px;color:#71717A;max-width:500px;margin:0 auto 36px;line-height:1.75;font-weight:400}
     .hero-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:64px}
-    .btn-cyan{font-size:14px;font-weight:700;padding:13px 28px;border-radius:12px;background:#00E5FF;color:#09090B;border:none;cursor:pointer;text-decoration:none;transition:all .2s;font-family:inherit;display:inline-flex;align-items:center;gap:6px}
-    .btn-cyan:hover{background:#33ECFF;transform:translateY(-2px);box-shadow:0 0 24px rgba(0,229,255,.3)}
+    .btn-cyan{font-size:14px;font-weight:700;padding:13px 28px;border-radius:12px;background:#FFFFFF;color:#09090B;border:1px solid rgba(255,255,255,0.9);cursor:pointer;text-decoration:none;transition:all .2s;font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+    .btn-cyan:hover{background:#F0FEFF;transform:translateY(-2px);box-shadow:0 0 32px rgba(0,229,255,.15),0 4px 20px rgba(0,0,0,.3)}
     .btn-outline-hero{font-size:14px;font-weight:600;padding:13px 28px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);color:#A1A1AA;cursor:pointer;text-decoration:none;transition:all .2s;font-family:inherit}
     .btn-outline-hero:hover{border-color:rgba(255,255,255,0.2);color:#E4E4E7;background:rgba(255,255,255,0.05)}
 
@@ -170,10 +170,10 @@
     .pr-list{list-style:none;margin-bottom:32px}
     .pr-list li{font-size:13px;color:#A1A1AA;padding:8px 0;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.04)}
     .pr-list li:last-child{border-bottom:none}
-    .check-icon{width:16px;height:16px;border-radius:50%;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .check-icon{width:16px;height:16px;border-radius:50%;background:transparent;border:1px solid rgba(0,229,255,0.35);display:flex;align-items:center;justify-content:center;flex-shrink:0}
     .check-icon svg{width:9px;height:9px;color:#00E5FF}
-    .pr-btn-cyan{width:100%;padding:12px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .2s;font-family:inherit;background:#00E5FF;color:#09090B;display:block;text-align:center;text-decoration:none}
-    .pr-btn-cyan:hover{background:#33ECFF;transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,229,255,.25)}
+    .pr-btn-cyan{width:100%;padding:12px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.8);transition:all .2s;font-family:inherit;background:#FFFFFF;color:#09090B;display:block;text-align:center;text-decoration:none}
+    .pr-btn-cyan:hover{background:#F0FEFF;transform:translateY(-1px);box-shadow:0 4px 24px rgba(0,229,255,.12),0 2px 12px rgba(0,0,0,.3)}
     .pr-btn-outline{width:100%;padding:12px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#A1A1AA;display:block;text-align:center;text-decoration:none}
     .pr-btn-outline:hover{border-color:rgba(255,255,255,0.2);color:#E4E4E7}
 
@@ -212,8 +212,8 @@
     .auth-field input{width:100%;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 16px;font-size:14px;color:#FAFAFA;outline:none;font-family:inherit;transition:all .2s}
     .auth-field input:focus{border-color:rgba(0,229,255,0.4);box-shadow:0 0 0 3px rgba(0,229,255,0.08)}
     .auth-field input::placeholder{color:#3F3F46}
-    .auth-btn{width:100%;padding:13px;border-radius:12px;font-size:14px;font-weight:800;border:none;cursor:pointer;margin-top:4px;background:#00E5FF;color:#09090B;transition:all .2s;font-family:inherit;letter-spacing:-.2px}
-    .auth-btn:hover:not(:disabled){background:#33ECFF;box-shadow:0 4px 20px rgba(0,229,255,.2)}
+    .auth-btn{width:100%;padding:13px;border-radius:12px;font-size:14px;font-weight:800;border:none;cursor:pointer;margin-top:4px;background:#FFFFFF;color:#09090B;transition:all .2s;font-family:inherit;letter-spacing:-.2px}
+    .auth-btn:hover:not(:disabled){background:#F0FEFF;box-shadow:0 4px 20px rgba(0,229,255,.1)}
     .auth-btn:disabled{opacity:.4;cursor:not-allowed}
     .auth-switch{text-align:center;margin-top:16px;font-size:13px;color:#52525B}
     .auth-switch a{color:#00E5FF;cursor:pointer;text-decoration:none;font-weight:600}
