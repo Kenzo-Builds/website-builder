@@ -18,6 +18,7 @@
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/editor/editor.main.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -643,7 +644,7 @@
     <div class="h-left">
       <a href="/" class="logo" title="Back to Home" onclick="if(currentUser){this.href='/app/'}">
         <div class="logo-icon">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          <i data-lucide="code-2" style="width:14px;height:14px;stroke:white;stroke-width:2.5"></i>
         </div>
         <span class="logo-text">AI Builder</span>
       </a>
@@ -655,7 +656,7 @@
         <button class="pill-btn" id="tab-code" onclick="switchTab('code')">Code</button>
       </div>
       <div class="url-bar" id="url-bar" onclick="toggleUrlDropdown(event)">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <i data-lucide="globe" style="width:14px;height:14px;stroke-width:1.75"></i>
         <span id="url-display">/</span>
         <span class="url-chevron">▼</span>
       </div>
@@ -664,31 +665,31 @@
     <div class="h-right">
       <div class="tab-actions-header">
         <button class="tab-action-btn" onclick="openNewTab()" title="Open in new tab">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          <i data-lucide="external-link" style="width:14px;height:14px;stroke-width:1.75"></i>
         </button>
         <button class="tab-action-btn" onclick="copyCode()" title="Copy code">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <i data-lucide="copy" style="width:14px;height:14px;stroke-width:1.75"></i>
         </button>
         <button class="tab-action-btn" onclick="downloadCode()" title="Download">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <i data-lucide="download" style="width:14px;height:14px;stroke-width:1.75"></i>
         </button>
       </div>
       <div class="device-toggles">
         <button class="device-btn active" id="dev-desktop" onclick="setDevice('desktop')" title="Desktop">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          <i data-lucide="monitor" style="width:14px;height:14px;stroke-width:1.75"></i>
         </button>
         <button class="device-btn" id="dev-tablet" onclick="setDevice('tablet')" title="Tablet">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg>
+          <i data-lucide="tablet" style="width:14px;height:14px;stroke-width:1.75"></i>
         </button>
         <button class="device-btn" id="dev-phone" onclick="setDevice('phone')" title="Phone">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg>
+          <i data-lucide="smartphone" style="width:14px;height:14px;stroke-width:1.75"></i>
         </button>
       </div>
 
       <span id="status-dot"></span>
 
       <button class="h-btn" id="deploy-btn" onclick="deploysite()" style="display:none">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        <i data-lucide="rocket" style="width:14px;height:14px;stroke-width:1.75"></i>
         Deploy
       </button>
 
@@ -712,15 +713,15 @@
   <!-- Mobile tab bar -->
   <div id="mobile-tabs">
     <button class="m-tab active" id="mtab-chat" onclick="switchMobileTab('chat')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <i data-lucide="message-square" style="width:18px;height:18px;stroke-width:1.75"></i>
       Chat
     </button>
     <button class="m-tab" id="mtab-preview" onclick="switchMobileTab('preview')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
+      <i data-lucide="layout-panel-top" style="width:18px;height:18px;stroke-width:1.75"></i>
       Preview
     </button>
     <button class="m-tab" id="mtab-code" onclick="switchMobileTab('code')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      <i data-lucide="code-2" style="width:18px;height:18px;stroke-width:1.75"></i>
       Code
     </button>
   </div>
@@ -733,10 +734,10 @@
         <h3>Chat</h3>
         <div class="chat-header-actions">
           <button class="chat-icon-btn" onclick="clearChat()" title="New conversation">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            <i data-lucide="square-pen" style="width:14px;height:14px;stroke-width:1.75"></i>
           </button>
           <button class="chat-icon-btn" id="chat-collapse-btn" onclick="toggleChatPanel()" title="Collapse chat">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+            <i data-lucide="panel-left-close" style="width:14px;height:14px;stroke-width:1.75"></i>
           </button>
         </div>
       </div>
@@ -760,15 +761,15 @@
         <div class="input-box">
           <div class="input-row">
             <div class="input-icon-btn" id="attach-btn" onclick="triggerAttach()" title="Attach image">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+              <i data-lucide="paperclip" style="width:16px;height:16px;stroke-width:1.75"></i>
             </div>
             <input type="file" id="attach-file" aria-label="Attach image" accept="image/jpeg,image/png,image/gif,image/webp,image/heic,image/heif" style="display:none" onchange="handleAttach(this)">
             <textarea id="prompt-input" aria-label="Describe your website" placeholder="Describe your website..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();generate()}" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
             <div class="input-icon-btn" id="mic-btn" onclick="toggleVoice()" title="Voice input">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+              <i data-lucide="mic" style="width:16px;height:16px;stroke-width:1.75"></i>
             </div>
             <div id="send-btn" onclick="generate()" title="Send">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              <i data-lucide="send" style="width:13px;height:13px;stroke-width:2.5"></i>
             </div>
           </div>
           <div class="input-footer">
@@ -814,7 +815,7 @@
       <div id="pane-preview">
         <div id="empty-state">
           <div class="empty-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+            <i data-lucide="panel-left" style="width:20px;height:20px;stroke:var(--text-3);stroke-width:1.5"></i>
           </div>
           <div class="empty-text">
             <div>Your website will appear here</div>
@@ -2379,5 +2380,9 @@
   </div>
   <style>#builder-prompt-overlay.show{display:flex!important}</style>
 
+  <script>
+    // Initialize Lucide icons
+    if(window.lucide) lucide.createIcons();
+  </script>
 </body>
 </html>
