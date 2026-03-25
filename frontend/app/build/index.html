@@ -252,7 +252,7 @@
 
     /* ===== FILE TREE ===== */
     #file-tree-panel {
-      width: 220px; flex-shrink: 0; background: var(--bg-2); border-right: 1px solid var(--border);
+      width: 200px; flex-shrink: 0; background: var(--bg-2); border-right: 1px solid var(--border);
       display: none; flex-direction: column; overflow: hidden;
     }
     #file-tree-panel.show { display: flex; }
@@ -309,8 +309,8 @@
 
     /* ===== PREVIEW PANE ===== */
     #pane-preview { flex: 1; min-height: 0; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-    #pane-code { flex: 1; min-height: 0; position: relative; display: none; }
-    #monaco-editor { width: 100%; height: 100%; }
+    #pane-code { flex: 1; min-height: 0; position: relative; display: none; flex-direction: column; }
+    #monaco-editor { width: 100%; flex: 1; min-height: 0; }
 
     #empty-state {
       position: absolute; inset: 0; display: flex; flex-direction: column;
@@ -1765,7 +1765,7 @@
     function switchTab(tab) {
       activeTab = tab;
       document.getElementById('pane-preview').style.display = tab === 'preview' ? 'flex' : 'none';
-      document.getElementById('pane-code').style.display = tab === 'code' ? 'block' : 'none';
+      document.getElementById('pane-code').style.display = tab === 'code' ? 'flex' : 'none';
       document.getElementById('tab-preview').classList.toggle('active', tab === 'preview');
       document.getElementById('tab-code').classList.toggle('active', tab === 'code');
       // File tree: show with code, hide with preview
