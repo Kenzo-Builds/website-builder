@@ -218,3 +218,42 @@
 - [ ] Payment flow: Payme integration (after LLC) must be frictionless for Uzbek users
 
 **Core principle: User should go from "I want a website" to "my site is live" in under 5 minutes.**
+
+---
+
+## Phase 4 — AI Builder Platform (2026-2027 Vision)
+
+### Evolution: Website Builder → AI Builder Platform
+
+Three pillars:
+
+**Pillar 1: Vibe Coding (current)**
+- Build websites, apps, e-commerce by describing it
+- Target: freelancers, designers, regular users
+
+**Pillar 2: Agent Builder (new)**
+- Users create personal AI assistants for their business
+- Agent learns over time — financials, marketing, operations, mistakes
+- Under the hood: OpenClaw or custom agent framework
+- Moat: switching cost increases as agent accumulates business knowledge
+
+**Pillar 3: Agentic Services (convergence)**
+- Built tools + embedded agents = smarter tools
+- POS with AI advisor (director-only access)
+- E-commerce with AI customer support
+- Any tool + agent = competitive advantage
+
+### Target Users
+- Freelancers: build anything for clients
+- Regular people: personal projects, no-code apps
+- Business owners: tools + AI advisors that grow with them
+
+### Key Principle
+"Build anything you can imagine, with words."
+The platform is limited only by imagination, not technical skill.
+
+### Technical Direction
+- OpenClaw as agent runtime (or custom framework later)
+- Per-user agent memory (RAG + vector store)
+- Multi-tenant isolation (PocketBase or similar)
+- Agent context accumulates over weeks/months → deep business understanding

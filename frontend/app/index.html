@@ -17,14 +17,14 @@
     .sidebar{width:230px;flex-shrink:0;background:#0D0D0D;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;height:100vh;transition:width .2s ease;overflow:hidden}
     .sidebar.collapsed{width:56px}
     .sb-logo{display:flex;align-items:center;gap:10px;padding:14px 12px;text-decoration:none;color:#fff;position:relative;cursor:pointer;user-select:none;transition:all .2s}
-    .sidebar.collapsed .sb-logo{padding:14px 0;justify-content:center;gap:0}
+    .sidebar.collapsed .sb-logo{padding:14px 0;justify-content:center;gap:0;cursor:pointer}
     .sb-logo-icon{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#3B82F6,#8B5CF6);display:flex;align-items:center;justify-content:center;flex-shrink:0}
     .sb-logo-icon svg{width:14px;height:14px}
     .sb-logo-text{font-weight:700;font-size:15px;white-space:nowrap;opacity:1;transition:opacity .15s;flex:1}
     .sidebar.collapsed .sb-logo-text{opacity:0;width:0;overflow:hidden;flex:0}
     .sb-toggle{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:0.5;transition:opacity .15s,background .15s;background:none}
     .sb-toggle:hover{opacity:1;background:rgba(255,255,255,0.08)}
-    .sidebar.collapsed .sb-toggle{display:flex;opacity:0.7}
+    .sidebar.collapsed .sb-toggle{display:none}
     .sb-toggle svg{width:13px;height:13px;color:#9CA3AF}
     .sb-nav{flex:1;padding:4px 0;overflow-y:auto;overflow-x:hidden}
     .sb-item{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-radius:8px;border:none;background:none;color:#9CA3AF;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;text-align:left;transition:all .15s;white-space:nowrap;box-sizing:border-box}
@@ -235,7 +235,7 @@
 
   <!-- SIDEBAR -->
   <div class="sidebar" id="sidebar">
-    <div class="sb-logo" id="sb-logo-toggle">
+    <div class="sb-logo" id="sb-logo-toggle" onclick="if(document.querySelector('.sidebar').classList.contains('collapsed'))toggleSidebar()">
       <div class="sb-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
       <span class="sb-logo-text">AI Builder</span>
       <div class="sb-toggle" onclick="event.stopPropagation();toggleSidebar()" style="cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="18"/><path d="M14 3h7M14 12h7M14 21h7"/></svg></div>
