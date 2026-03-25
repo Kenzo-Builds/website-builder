@@ -155,7 +155,7 @@
     .pcard-meta{font-size:10px;color:#6B7280;margin-top:2px}
     .pcard-menu{position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:6px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);color:#9CA3AF;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10}
     .pcard-menu:hover{background:rgba(255,255,255,0.1)}
-    .pcard-dd{display:none;position:absolute;top:34px;right:8px;background:#1A1A1A;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:3px;min-width:120px;z-index:50;box-shadow:0 4px 16px rgba(0,0,0,.5)}
+    .pcard-dd{display:none;position:fixed;background:#1A1A1A;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:3px;min-width:120px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.5)}
     .pcard-dd.show{display:block}
     .pcard-dd div{padding:6px 8px;border-radius:5px;color:#D1D5DB;font-size:11px;cursor:pointer}
     .pcard-dd div:hover{background:rgba(255,255,255,0.06)}
@@ -611,7 +611,7 @@ function mkCard(p){
 function setupCardMenus(){
   document.addEventListener('click',function(e){
     var mb=e.target.closest('.pcard-menu');
-    if(mb){e.stopPropagation();var dd=mb.nextElementSibling;var o=dd.classList.contains('show');closeCM();if(!o)dd.classList.add('show');return;}
+    if(mb){e.stopPropagation();var dd=mb.nextElementSibling;var o=dd.classList.contains('show');closeCM();if(!o){var r=mb.getBoundingClientRect();dd.style.top=(r.bottom+4)+'px';dd.style.right=(window.innerWidth-r.right)+'px';dd.classList.add('show');}return;}
     if(!e.target.closest('.pcard-dd'))closeCM();
   },true);
   document.addEventListener('click',function(e){
