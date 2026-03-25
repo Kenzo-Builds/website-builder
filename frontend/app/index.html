@@ -148,6 +148,7 @@
     .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
     .pcard{background:#151515;border:1px solid rgba(255,255,255,0.06);border-radius:12px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
     .pcard:hover{border-color:rgba(255,255,255,0.12);transform:translateY(-1px)}
+    .pcard.menu-open{transform:none !important}
     .pcard-thumb{height:120px;overflow:hidden;background:#1E1E1E;position:relative}
     .pcard-thumb iframe{width:200%;height:200%;transform:scale(.5);transform-origin:top left;pointer-events:none;border:none}
     .pcard-info{padding:10px 12px;position:relative}
@@ -624,6 +625,8 @@ function setupCardMenus(){
       var dd=mb.nextElementSibling;var wasOpen=dd.classList.contains('show');
       closeCM();
       if(!wasOpen){
+        var card=mb.closest('.pcard');
+        if(card)card.classList.add('menu-open');
         var r=mb.getBoundingClientRect();
         dd.style.top=(r.bottom+4)+'px';
         dd.style.right=(window.innerWidth-r.right)+'px';
@@ -635,7 +638,7 @@ function setupCardMenus(){
     if(!e.target.closest('.pcard-dd'))closeCM();
   });
 }
-function closeCM(){document.querySelectorAll('.pcard-dd.show').forEach(function(d){d.classList.remove('show')})}
+function closeCM(){document.querySelectorAll('.pcard-dd.show').forEach(function(d){d.classList.remove('show')});document.querySelectorAll('.pcard.menu-open').forEach(function(c){c.classList.remove('menu-open')})}
 function loadProjects(){
   function render(list){
     var rs=document.getElementById('recent-sec'),rg=document.getElementById('rs-recent');rg.innerHTML='';
