@@ -933,6 +933,18 @@ function init(){
   setupProfile();
   setupCardMenus();
   if(sb){
+    // Handle Supabase redirect callbacks (email confirmation, password reset)
+    // Supabase puts #access_token=... in the URL after email/password changes
+    sb.auth.onAuthStateChange(function(event, session){
+      if((event==='USER_UPDATED'||event==='SIGNED_IN') && session){
+        user=session.user;
+        updateAuth();
+        loadProfileData();
+        // Clean up hash from URL
+        if(window.location.hash) history.replaceState(null,'',window.location.pathname);
+        if(event==='USER_UPDATED') showToast('✓ Account updated successfully','#22C55E');
+      }
+    });
     sb.auth.getSession().then(function(r){
       if(r.data.session&&r.data.session.user){
         user=r.data.session.user;
