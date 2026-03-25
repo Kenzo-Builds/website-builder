@@ -71,14 +71,15 @@
     .url-bar .url-chevron { opacity: 0; transition: opacity 0.15s; font-size: 10px; color: var(--text-3); }
     .url-bar.has-pages .url-chevron { opacity: 1; }
     .url-bar-dropdown {
-      display: none; position: absolute; top: 100%; left: 0; right: 0; margin-top: 4px;
+      display: none; position: fixed; width: 240px; margin-top: 4px;
       background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
-      overflow: hidden; z-index: 9999; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      overflow: hidden; z-index: 99999; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      transform: translateZ(0); /* force GPU layer */
     }
     .url-bar-dropdown.show { display: block; }
     .url-bar-dropdown-item {
-      display: flex; align-items: center; gap: 8px; padding: 8px 12px;
-      font-size: 13px; color: var(--text-2); cursor: pointer; transition: background 0.1s;
+      display: flex; align-items: center; gap: 8px; padding: 10px 14px;
+      font-size: 13px; color: var(--text-2); cursor: pointer;
     }
     .url-bar-dropdown-item:hover { background: var(--bg-hover); }
     .url-bar-dropdown-item.active { color: var(--text); background: rgba(59,130,246,0.1); }
@@ -579,7 +580,6 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
         <span id="url-display">/</span>
         <span class="url-chevron">▼</span>
-        <div class="url-bar-dropdown" id="url-dropdown"></div>
       </div>
     </div>
 
@@ -699,12 +699,12 @@
             </button>
           </div>
           <select id="model-select">
-            <option value="anthropic/claude-sonnet-4.6" selected>Sonnet 4.6</option>
+            <option value="openai/gpt-5.3-codex" selected>GPT-5.3 Codex</option>
+            <option value="anthropic/claude-sonnet-4.6">Sonnet 4.6</option>
             <option value="anthropic/claude-opus-4.6">Opus 4.6</option>
             <option value="google/gemini-3.1-pro-preview">Gemini 3.1 Pro</option>
             <option value="google/gemini-3-flash-preview">Gemini 3 Flash</option>
             <option value="openai/gpt-5.4">GPT-5.4</option>
-            <option value="openai/gpt-5.3-codex">GPT-5.3 Codex</option>
           </select>
         </div>
       </div>
@@ -1763,16 +1763,17 @@
       const htmlFiles = Object.keys(projectFiles).filter(f => f.endsWith('.html'));
       if (htmlFiles.length <= 1) return;
       const dropdown = document.getElementById('url-dropdown');
-      const iframe = document.getElementById('preview-frame');
+      const bar = document.getElementById('url-bar');
       const isOpen = dropdown.classList.toggle('show');
-      // Block iframe from stealing pointer events while dropdown is open
-      if (iframe) iframe.style.pointerEvents = isOpen ? 'none' : '';
-      // Close on outside click
       if (isOpen) {
+        // Position fixed dropdown below the URL bar
+        const rect = bar.getBoundingClientRect();
+        dropdown.style.top = (rect.bottom + 4) + 'px';
+        dropdown.style.left = rect.left + 'px';
+        dropdown.style.width = Math.max(rect.width, 200) + 'px';
         setTimeout(() => {
           document.addEventListener('click', function closeDropdown() {
             dropdown.classList.remove('show');
-            if (iframe) iframe.style.pointerEvents = '';
             document.removeEventListener('click', closeDropdown);
           }, { once: true });
         }, 10);
@@ -1783,10 +1784,9 @@
       if (!projectFiles[filePath]) return;
       previewingFile = filePath;
       currentHtml = projectFiles[filePath];
-      updatePreview(currentHtml);
       document.getElementById('url-dropdown').classList.remove('show');
+      updatePreview(currentHtml);
       updatePageRouteDropdown();
-      // Auto-switch to preview so user sees the page
       if (activeTab !== 'preview') switchTab('preview');
     }
 
@@ -2174,5 +2174,6 @@
       }
     })();
   </script>
+  <div class="url-bar-dropdown" id="url-dropdown"></div>
 </body>
 </html>
