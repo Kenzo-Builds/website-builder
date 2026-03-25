@@ -37,6 +37,55 @@
       overflow: hidden; -webkit-font-smoothing: antialiased;
     }
 
+    /* ===== GLOBAL ANIMATIONS ===== */
+    @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    @keyframes slideRight { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: translateX(0); } }
+
+    /* Chat messages — slide up */
+    .msg { animation: slideUp 0.3s ease both; }
+
+    /* Modals — scale in */
+    .modal-box, .auth-box { animation: scaleIn 0.2s ease both; }
+
+    /* File tree items — slide right */
+    .ft-item { animation: slideRight 0.15s ease both; }
+
+    /* Editor tabs — fade in */
+    .etab { animation: fadeIn 0.2s ease both; }
+
+    /* Smooth scroll for chat */
+    #chat-history { scroll-behavior: smooth; }
+
+    /* Attach preview — slide down */
+    .attach-preview { transition: all 0.25s ease; }
+    .attach-preview.show { animation: slideUp 0.25s ease both; }
+
+    /* Textarea smooth height */
+    #prompt-input { transition: height 0.15s ease; }
+
+    /* File tree panel — slide in */
+    #file-tree-panel { transition: width 0.25s ease, opacity 0.25s ease; }
+
+    /* Empty state — fade in */
+    #empty-state { animation: fadeIn 0.4s ease both; }
+
+    /* Preview frame — fade in when shown */
+    #preview-frame { transition: opacity 0.3s ease; }
+
+    /* Status dot — smooth color */
+    #status-dot { transition: background 0.3s ease; }
+
+    /* URL bar dropdown — slide down */
+    .url-bar-dropdown.show { animation: slideUp 0.15s ease both; }
+
+    /* Mode toggle switch — smooth bg */
+    .mode-btn { transition: all 0.2s ease; }
+
+    /* Pill toggle — smooth switch */
+    .pill-btn { transition: all 0.2s ease; }
+
     /* ===== HEADER ===== */
     #header {
       display: flex; align-items: center; justify-content: space-between;
@@ -280,10 +329,11 @@
 
     /* ===== FILE TREE ===== */
     #file-tree-panel {
-      width: 200px; flex-shrink: 0; background: var(--bg-2); border-right: 1px solid var(--border);
-      display: none; flex-direction: column; overflow: hidden;
+      width: 0; flex-shrink: 0; background: var(--bg-2); border-right: 1px solid transparent;
+      display: flex; flex-direction: column; overflow: hidden;
+      transition: width 0.25s ease, border-color 0.25s ease;
     }
-    #file-tree-panel.show { display: flex; }
+    #file-tree-panel.show { width: 200px; border-right-color: var(--border); }
     .ft-header {
       display: flex; align-items: center; justify-content: space-between;
       padding: 10px 12px; border-bottom: 1px solid var(--border); flex-shrink: 0;
@@ -343,6 +393,7 @@
     #empty-state {
       position: absolute; inset: 0; display: flex; flex-direction: column;
       align-items: center; justify-content: center; gap: 16px; background: var(--bg);
+      transition: opacity 0.3s ease;
     }
     .empty-icon {
       width: 64px; height: 64px; border-radius: 16px;
@@ -1354,7 +1405,7 @@
       wrapper.appendChild(avatarDiv);
       wrapper.appendChild(bodyDiv);
       h.appendChild(wrapper);
-      h.scrollTop = h.scrollHeight;
+      h.scrollTo({ top: h.scrollHeight, behavior: 'smooth' });
       return textDiv;
     }
 
@@ -1371,16 +1422,21 @@
       openTabs = [];
       renderFileTree();
       renderEditorTabs();
+      document.getElementById('empty-state').style.opacity = '1';
       document.getElementById('empty-state').style.display = 'flex';
       document.getElementById('preview-frame').style.display = 'none';
+      document.getElementById('preview-frame').style.opacity = '0';
       document.getElementById('deploy-btn').style.display = 'none';
     }
 
     function updatePreview(html, animate) {
       if (!html) return;
-      document.getElementById('empty-state').style.display = 'none';
+      var es = document.getElementById('empty-state');
+      es.style.opacity = '0';
+      setTimeout(function(){ es.style.display = 'none'; }, 300);
       var f = document.getElementById('preview-frame');
       f.style.display = 'block';
+      requestAnimationFrame(function(){ f.style.opacity = '1'; });
       if (html.includes('<head>')) {
         html = html.replace('<head>', '<head><base target="_blank">');
       } else if (html.includes('<html>')) {
