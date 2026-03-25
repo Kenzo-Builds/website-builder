@@ -760,7 +760,7 @@
       <h3>🚀 Deploy Your Site</h3>
       <label>Choose a subdomain</label>
       <div class="domain-row">
-        <input class="modal-input" id="subdomain-input" type="text" placeholder="my-site" />
+        <input class="modal-input" id="subdomain-input" type="text" placeholder="my-site" onkeydown="if(event.key==='Enter')confirmDeploy()" />
         <span class="domain-suffix">.kenzoagent.com</span>
       </div>
       <div class="modal-actions">
@@ -781,12 +781,12 @@
       </div>
       <div class="auth-field">
         <label>Email</label>
-        <input type="email" id="auth-email" placeholder="you@example.com" />
+        <input type="email" id="auth-email" placeholder="you@example.com" onkeydown="if(event.key==='Enter')document.getElementById('auth-password').focus()" />
       </div>
       <div class="auth-field">
         <label>Password</label>
         <div style="position:relative">
-          <input type="password" id="auth-password" placeholder="Min 6 characters" style="padding-right:40px" />
+          <input type="password" id="auth-password" placeholder="Min 6 characters" style="padding-right:40px" onkeydown="if(event.key==='Enter')doAuth()" />
           <div onclick="togglePwVis()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:#71717A;font-size:16px;user-select:none" id="pw-eye">👁</div>
         </div>
       </div>
