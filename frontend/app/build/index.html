@@ -235,6 +235,16 @@
 
     .typing-dots { display: inline-flex; gap: 4px; align-items: center; padding: 4px 0; }
     .typing-dots span { width: 5px; height: 5px; background: var(--blue); border-radius: 50%; animation: tbounce 1.2s infinite; }
+
+    /* Live code stream block */
+    .stream-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+    .stream-label{font-size:11px;font-weight:600;color:var(--text-3);display:flex;align-items:center;gap:4px}
+    .stream-counter{font-size:11px;color:var(--text-4);font-variant-numeric:tabular-nums}
+    .stream-code-wrap{background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.06);border-radius:8px;max-height:220px;overflow-y:auto;overflow-x:hidden}
+    .stream-code-wrap::-webkit-scrollbar{width:3px}
+    .stream-code-wrap::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px}
+    .stream-code{margin:0;padding:10px 12px;font-family:'Courier New',monospace;font-size:11px;line-height:1.6;color:#a8b4c0;white-space:pre-wrap;word-break:break-all}
+    .stream-code code{background:none;padding:0;color:inherit}
     .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
     .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
     @keyframes tbounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
@@ -1620,7 +1630,48 @@
         let charCount = 0;
         let lastPreviewUpdate = 0;
         window._streamRaw = '';
-        typingEl.innerHTML = '<span style="color:var(--text-2)">⚡ Generating...</span>';
+
+        // ── Live code typewriter ──────────────────────────────────
+        // Build the code block in the chat bubble
+        typingEl.innerHTML = `
+          <div class="stream-header">
+            <span class="stream-label"><i data-lucide="code-2" style="width:12px;height:12px;vertical-align:middle;margin-right:4px;stroke-width:2"></i>Generating</span>
+            <span class="stream-counter" id="stream-line-count">0 lines</span>
+          </div>
+          <div class="stream-code-wrap">
+            <pre class="stream-code" id="stream-code-pre"><code id="stream-code-el"></code></pre>
+          </div>`;
+        if(window.lucide) lucide.createIcons({el: typingEl});
+
+        // Typewriter queue — chars arrive in chunks, drain at ~400 chars/sec
+        let typeQueue = '';
+        let typePos = 0;
+        let lineCount = 0;
+        let typeTimer = null;
+        const codeEl = document.getElementById('stream-code-el');
+        const lineCountEl = document.getElementById('stream-line-count');
+        const codeWrap = typingEl.querySelector('.stream-code-wrap');
+
+        function drainQueue() {
+          if (!codeEl) return;
+          const batch = 8; // chars per frame tick
+          const chunk = typeQueue.slice(typePos, typePos + batch);
+          if (!chunk) { typeTimer = null; return; }
+          typePos += batch;
+          const escaped = chunk.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+          codeEl.innerHTML += escaped;
+          lineCount += (chunk.match(/\n/g)||[]).length;
+          if(lineCountEl) lineCountEl.textContent = lineCount + ' lines';
+          // Auto-scroll code block
+          if(codeWrap) codeWrap.scrollTop = codeWrap.scrollHeight;
+          typeTimer = setTimeout(drainQueue, 10);
+        }
+
+        function queueChars(text) {
+          typeQueue += text;
+          if (!typeTimer) drainQueue();
+        }
+
         // Show building animation in preview
         updatePreview(`<!DOCTYPE html><html><head><style>
           body{margin:0;background:#09090B;display:flex;align-items:center;justify-content:center;height:100vh;font-family:Inter,sans-serif;}
@@ -1647,13 +1698,8 @@
 
               if (event.type === 'chunk') {
                 charCount = event.length;
-                typingEl.innerHTML = `<span style="color:var(--text-2)">⚡ Streaming... ${charCount} chars</span>`;
-                // Update the loading screen char counter
-                try {
-                  var pf = document.getElementById('preview-frame');
-                  var charsEl = pf && pf.contentDocument && pf.contentDocument.getElementById('chars');
-                  if (charsEl) charsEl.textContent = charCount + ' characters generated...';
-                } catch(e) {}
+                // Feed delta (new chars only) into typewriter queue
+                if (event.delta) queueChars(event.delta);
               }
 
               if (event.type === 'done') {
@@ -1673,10 +1719,16 @@
                 }
                 updatePreview(currentHtml, true);
                 updateEditor(currentHtml);
+                // Stop typewriter, flush remaining queue instantly
+                if (typeTimer) { clearTimeout(typeTimer); typeTimer = null; }
                 const fileCount = event.files ? Object.keys(event.files).length : 1;
-                typingEl.innerHTML = fileCount > 1
-                  ? `Done in ${Math.round(event.duration/1000)}s — ${fileCount} files created. Ask me to change anything.`
-                  : `Done in ${Math.round(event.duration/1000)}s. Ask me to change anything.`;
+                const totalLines = (event.html || '').split('\n').length;
+                typingEl.innerHTML = `
+                  <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-2)">
+                    <span style="color:#22C55E;font-size:15px">✓</span>
+                    <span>Done in ${Math.round(event.duration/1000)}s · ${totalLines.toLocaleString()} lines${fileCount > 1 ? ` · ${fileCount} files` : ''}</span>
+                  </div>
+                  <div style="font-size:12px;color:var(--text-4);margin-top:4px">Ask me to change anything.</div>`;
                 setStatus('ready');
                 document.getElementById('deploy-btn').style.display = 'flex';
                 // Auto-save + usage
