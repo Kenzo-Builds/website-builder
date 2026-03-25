@@ -53,8 +53,9 @@
     .lang-dd{position:relative;cursor:pointer}
     .lang-dd-trigger{font-size:13px;font-weight:400;color:#71717A;transition:color .2s;letter-spacing:.2px;padding:4px 0;background:none;border:none;cursor:pointer;font-family:inherit}
     .lang-dd:hover .lang-dd-trigger{color:#00E5FF}
-    .lang-dd-menu{position:absolute;top:calc(100% + 8px);right:0;background:rgba(9,9,11,0.95);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:4px;min-width:80px;opacity:0;pointer-events:none;transform:translateY(-4px);transition:all .2s ease;z-index:200}
-    .lang-dd:hover .lang-dd-menu{opacity:1;pointer-events:all;transform:translateY(0)}
+    .lang-dd-menu{position:absolute;top:100%;right:0;padding-top:8px;opacity:0;pointer-events:none;transition:opacity .15s ease;z-index:200}
+    .lang-dd-menu-inner{background:rgba(9,9,11,0.97);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:4px;min-width:90px}
+    .lang-dd:hover .lang-dd-menu{opacity:1;pointer-events:all}
     .lang-dd-item{display:block;padding:7px 14px;font-size:13px;color:#71717A;cursor:pointer;border-radius:6px;transition:all .15s;border:none;background:none;width:100%;text-align:left;font-family:inherit;font-weight:400}
     .lang-dd-item:hover{color:#00E5FF;background:rgba(0,229,255,0.06)}
     .lang-dd-item.active{color:#E4E4E7}
@@ -321,9 +322,11 @@
       <div class="lang-dd">
         <button class="lang-dd-trigger" id="lang-trigger">EN</button>
         <div class="lang-dd-menu">
-          <button class="lang-dd-item" onclick="setLang('uz');updateLangTrigger('UZ')">Uzbek</button>
-          <button class="lang-dd-item" onclick="setLang('ru');updateLangTrigger('RU')">Русский</button>
-          <button class="lang-dd-item active" onclick="setLang('en');updateLangTrigger('EN')">English</button>
+          <div class="lang-dd-menu-inner">
+            <button class="lang-dd-item" onclick="setLang('uz');updateLangTrigger('UZ')">Uzbek</button>
+            <button class="lang-dd-item" onclick="setLang('ru');updateLangTrigger('RU')">Русский</button>
+            <button class="lang-dd-item active" onclick="setLang('en');updateLangTrigger('EN')">English</button>
+          </div>
         </div>
       </div>
       <button class="btn-ghost-nav" onclick="showAuth('login')" data-i18n="nav_signin">Sign In</button>
