@@ -38,28 +38,34 @@
     .scanline{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,0.008) 2px,rgba(255,255,255,0.008) 4px);pointer-events:none}
 
     /* === NAV === */
-    nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;background:rgba(9,9,11,0.8);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.06)}
-    .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff}
-    .nav-logo-icon{width:32px;height:32px;border-radius:8px;background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.2);display:flex;align-items:center;justify-content:center}
-    .nav-logo-icon svg{width:16px;height:16px;color:#00E5FF}
-    .nav-logo span{font-weight:800;font-size:15px;letter-spacing:-.3px}
-    .nav-links{display:flex;align-items:center;gap:32px}
-    .nav-links a{color:#71717A;text-decoration:none;font-size:13px;font-weight:500;transition:color .2s}
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(9,9,11,0.0);backdrop-filter:none;border-bottom:none}
+    nav.scrolled{background:rgba(9,9,11,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.05)}
+    .nav-logo{text-decoration:none;color:#fff;font-family:'Montserrat',sans-serif;font-weight:200;font-size:18px;letter-spacing:3px;text-transform:uppercase;transition:color .2s}
+    .nav-logo:hover{color:#A1A1AA}
+    .nav-links{display:flex;align-items:center;gap:36px}
+    .nav-links a{color:#71717A;text-decoration:none;font-size:13px;font-weight:400;transition:color .2s;letter-spacing:.2px}
     .nav-links a:hover{color:#E4E4E7}
-    .nav-right{display:flex;align-items:center;gap:10px}
-    .lang-btn{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#71717A;font-size:12px;font-weight:600;padding:6px 10px;cursor:pointer;outline:none;font-family:inherit;transition:all .2s}
-    .lang-btn:hover,.lang-btn.active{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.15);color:#E4E4E7}
-    .lang-select{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#71717A;font-size:12px;padding:6px 10px;cursor:pointer;outline:none;font-family:inherit;appearance:none;-webkit-appearance:none}
-    .lang-select option{background:#0D0D0F;color:#E4E4E7}
-    .btn-ghost-nav{font-size:13px;font-weight:600;padding:7px 16px;border-radius:9px;background:none;border:1px solid rgba(255,255,255,0.08);color:#A1A1AA;cursor:pointer;text-decoration:none;transition:all .2s;font-family:inherit}
-    .btn-ghost-nav:hover{border-color:rgba(255,255,255,0.15);color:#E4E4E7}
-    .btn-white-nav{font-size:13px;font-weight:700;padding:7px 16px;border-radius:9px;background:#fff;color:#09090B;border:none;cursor:pointer;text-decoration:none;transition:all .2s;font-family:inherit}
-    .btn-white-nav:hover{background:#E4E4E7;transform:translateY(-1px)}
+    .nav-right{display:flex;align-items:center;gap:20px}
+
+    /* Language hover dropdown — no borders, no buttons */
+    .lang-dd{position:relative;cursor:pointer}
+    .lang-dd-trigger{font-size:13px;font-weight:400;color:#71717A;transition:color .2s;letter-spacing:.2px;padding:4px 0;background:none;border:none;cursor:pointer;font-family:inherit}
+    .lang-dd:hover .lang-dd-trigger{color:#00E5FF}
+    .lang-dd-menu{position:absolute;top:calc(100% + 8px);right:0;background:rgba(9,9,11,0.95);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:4px;min-width:80px;opacity:0;pointer-events:none;transform:translateY(-4px);transition:all .2s ease;z-index:200}
+    .lang-dd:hover .lang-dd-menu{opacity:1;pointer-events:all;transform:translateY(0)}
+    .lang-dd-item{display:block;padding:7px 14px;font-size:13px;color:#71717A;cursor:pointer;border-radius:6px;transition:all .15s;border:none;background:none;width:100%;text-align:left;font-family:inherit;font-weight:400}
+    .lang-dd-item:hover{color:#00E5FF;background:rgba(0,229,255,0.06)}
+    .lang-dd-item.active{color:#E4E4E7}
+
+    .btn-ghost-nav{font-size:13px;font-weight:400;color:#71717A;cursor:pointer;text-decoration:none;transition:color .2s;background:none;border:none;font-family:inherit;letter-spacing:.2px}
+    .btn-ghost-nav:hover{color:#E4E4E7}
+    .btn-white-nav{font-size:13px;font-weight:600;padding:8px 20px;border-radius:10px;background:#fff;color:#09090B;border:none;cursor:pointer;text-decoration:none;transition:all .2s;font-family:inherit}
+    .btn-white-nav:hover{background:#F0FEFF;box-shadow:0 0 20px rgba(0,229,255,.12)}
     .hamburger{display:none;background:none;border:none;cursor:pointer;padding:4px}
     .hamburger span{display:block;width:20px;height:2px;background:#A1A1AA;margin:4px 0;border-radius:2px;transition:all .2s}
-    .mobile-menu{display:none;position:fixed;top:60px;left:0;right:0;z-index:99;background:rgba(9,9,11,0.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.06);padding:16px 24px;flex-direction:column;gap:4px}
+    .mobile-menu{display:none;position:fixed;top:64px;left:0;right:0;z-index:99;background:rgba(9,9,11,0.97);backdrop-filter:blur(20px);padding:16px 24px;flex-direction:column;gap:4px}
     .mobile-menu.show{display:flex}
-    .mobile-menu a{color:#A1A1AA;text-decoration:none;font-size:14px;font-weight:500;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+    .mobile-menu a{color:#A1A1AA;text-decoration:none;font-size:14px;font-weight:400;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
 
     /* === LAYOUT === */
     section{position:relative;z-index:1}
@@ -264,25 +270,22 @@
   </div>
 
   <!-- NAV -->
-  <nav>
-    <a href="/" class="nav-logo">
-      <div class="nav-logo-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
-        </svg>
-      </div>
-      <span>AI Builder</span>
-    </a>
+  <nav id="main-nav">
+    <a href="/" class="nav-logo">AI Builder</a>
     <div class="nav-links">
       <a href="#features" data-i18n="nav_features">Features</a>
       <a href="#models" data-i18n="nav_models">Models</a>
       <a href="#pricing" data-i18n="nav_pricing">Pricing</a>
     </div>
     <div class="nav-right">
-      <div style="display:flex;gap:4px" id="lang-switcher">
-        <button class="lang-btn" onclick="setLang('uz')">UZ</button>
-        <button class="lang-btn" onclick="setLang('ru')">RU</button>
-        <button class="lang-btn" onclick="setLang('en')">EN</button>
+      <!-- Language hover dropdown -->
+      <div class="lang-dd">
+        <button class="lang-dd-trigger" id="lang-trigger">EN</button>
+        <div class="lang-dd-menu">
+          <button class="lang-dd-item" onclick="setLang('uz');updateLangTrigger('UZ')">Uzbek</button>
+          <button class="lang-dd-item" onclick="setLang('ru');updateLangTrigger('RU')">Русский</button>
+          <button class="lang-dd-item active" onclick="setLang('en');updateLangTrigger('EN')">English</button>
+        </div>
       </div>
       <button class="btn-ghost-nav" onclick="showAuth('login')" data-i18n="nav_signin">Sign In</button>
       <button class="btn-white-nav" onclick="showAuth('signup')" data-i18n="nav_start">Get Started</button>
@@ -630,6 +633,24 @@
   };
 
   var currentLang = localStorage.getItem('builder_lang') || 'uz';
+
+  // Nav scroll effect
+  window.addEventListener('scroll', function() {
+    document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 20);
+  });
+
+  // Lang trigger label updater
+  function updateLangTrigger(label) {
+    var t = document.getElementById('lang-trigger');
+    if(t) t.textContent = label;
+    document.querySelectorAll('.lang-dd-item').forEach(function(b){
+      b.classList.toggle('active', b.textContent.trim().toUpperCase().includes(label));
+    });
+  }
+  // Set initial lang trigger from localStorage
+  var savedLang = localStorage.getItem('builder_lang') || 'en';
+  var labels = {uz:'UZ',ru:'RU',en:'EN'};
+  if(document.getElementById('lang-trigger')) document.getElementById('lang-trigger').textContent = labels[savedLang] || 'EN';
 
   function setLang(l) {
     currentLang = l;
