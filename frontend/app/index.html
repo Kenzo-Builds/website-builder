@@ -644,7 +644,7 @@
                 <div class="pf-hint" id="sp-pf-username-hint">Lowercase letters, numbers, and hyphens only (3-20 chars)</div>
               </div>
               <div class="pf-field"><div class="pf-label">Email</div><input class="pf-input" type="email" id="sp-pf-email" aria-label="Email address" readonly><div class="pf-hint">🔒 Change email in Account Settings</div></div>
-              <div class="pf-field"><div class="pf-label">Phone Number</div><input class="pf-input" type="tel" id="sp-pf-phone" aria-label="Phone number" placeholder="+998 90 123 4567"></div>
+              <div class="pf-field"><div class="pf-label">Phone Number</div><input class="pf-input" type="tel" id="sp-pf-phone" aria-label="Phone number" readonly><div class="pf-hint">🔒 Change phone number in Account Settings</div></div>
               <div class="pf-field"><div class="pf-label">Bio</div><textarea class="pf-input pf-textarea" id="sp-pf-bio" aria-label="Bio" placeholder="Tell us about yourself" maxlength="220"></textarea></div>
               <div class="pf-row">
                 <div class="pf-field"><div class="pf-label">Location</div><input class="pf-input" type="text" id="sp-pf-location" aria-label="Location" placeholder="City, Country"></div>
@@ -659,47 +659,75 @@
 
           <!-- ACCOUNT SETTINGS subpage -->
           <div class="spage" id="sp-account">
-            <div class="prof-form" style="max-width:800px">
+            <div class="prof-form" style="max-width:900px">
               <h2 style="font-size:22px;font-weight:800;margin-bottom:4px">Account Settings</h2>
-              <p style="color:#71717A;font-size:13px;margin-bottom:28px">Manage your account security.</p>
+              <p style="color:#71717A;font-size:13px;margin-bottom:28px">Manage your account security. All changes require your current password.</p>
 
-              <div class="set-grid" style="margin-bottom:16px">
+              <!-- 3-column: Password | Email | Phone -->
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px">
+
+                <!-- Change Password -->
                 <div class="set-section" style="margin-bottom:0">
                   <div class="set-section-title">Change Password</div>
-                  <div class="set-section-desc">Update your password to keep your account secure.</div>
+                  <div class="set-section-desc">Keep your account secure with a strong password.</div>
                   <div class="pf-field" style="margin-bottom:12px">
                     <div class="pf-label">New Password</div>
                     <input class="pf-input" type="password" id="sp-new-pw" aria-label="New password" placeholder="Min 6 characters">
                   </div>
                   <div class="pf-field" style="margin-bottom:16px">
                     <div class="pf-label">Confirm Password</div>
-                    <input class="pf-input" type="password" id="sp-confirm-pw" aria-label="Confirm password" placeholder="Re-enter new password">
+                    <input class="pf-input" type="password" id="sp-confirm-pw" aria-label="Confirm password" placeholder="Re-enter password">
                   </div>
                   <div style="display:flex;align-items:center">
-                    <button class="pf-save" onclick="changePW()">Update Password</button>
+                    <button class="pf-save" onclick="changePW()">Update</button>
                     <span class="pf-save-status" id="sp-pw-status">✓ Updated</span>
                   </div>
                   <div class="set-error" id="sp-pw-error"></div>
                 </div>
 
+                <!-- Change Email -->
                 <div class="set-section" style="margin-bottom:0">
                   <div class="set-section-title">Change Email</div>
                   <div class="set-section-desc">A verification link will be sent to your new email.</div>
+                  <div class="pf-field" style="margin-bottom:16px">
+                    <div class="pf-label">Current Email</div>
+                    <input class="pf-input" type="email" id="sp-current-email-display" aria-label="Current email" readonly style="opacity:0.5;cursor:not-allowed">
+                  </div>
                   <div class="pf-field" style="margin-bottom:16px">
                     <div class="pf-label">New Email</div>
                     <input class="pf-input" type="email" id="sp-new-email" aria-label="New email" placeholder="you@example.com">
                   </div>
                   <div style="display:flex;align-items:center">
-                    <button class="pf-save" onclick="changeEmail()">Update Email</button>
-                    <span class="pf-save-status" id="sp-email-status">✓ Verification sent</span>
+                    <button class="pf-save" onclick="changeEmail()">Update</button>
+                    <span class="pf-save-status" id="sp-email-status">✓ Sent</span>
                   </div>
                   <div class="set-error" id="sp-email-error"></div>
                 </div>
+
+                <!-- Change Phone -->
+                <div class="set-section" style="margin-bottom:0">
+                  <div class="set-section-title">Change Phone</div>
+                  <div class="set-section-desc">Update your phone number on your account.</div>
+                  <div class="pf-field" style="margin-bottom:16px">
+                    <div class="pf-label">Current Phone</div>
+                    <input class="pf-input" type="tel" id="sp-current-phone-display" aria-label="Current phone" readonly style="opacity:0.5;cursor:not-allowed" placeholder="Not set">
+                  </div>
+                  <div class="pf-field" style="margin-bottom:16px">
+                    <div class="pf-label">New Phone Number</div>
+                    <input class="pf-input" type="tel" id="sp-new-phone" aria-label="New phone number" placeholder="+998 90 123 4567">
+                  </div>
+                  <div style="display:flex;align-items:center">
+                    <button class="pf-save" onclick="changePhone()">Update</button>
+                    <span class="pf-save-status" id="sp-phone-status">✓ Saved</span>
+                  </div>
+                  <div class="set-error" id="sp-phone-error"></div>
+                </div>
               </div>
 
+              <!-- Danger Zone -->
               <div class="set-section" style="border-color:rgba(239,68,68,0.2);background:rgba(239,68,68,0.03)">
                 <div class="set-section-title" style="color:#EF4444">Danger Zone</div>
-                <div class="set-section-desc">Permanently delete your account and all data. Cannot be undone.</div>
+                <div class="set-section-desc">Delete your account. Your data will be kept for 30 days — log back in anytime to restore everything.</div>
                 <button onclick="deleteAccount()" style="padding:9px 20px;border-radius:10px;background:transparent;color:#EF4444;border:1px solid rgba(239,68,68,0.3);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s" onmouseover="this.style.background='rgba(239,68,68,0.1)'" onmouseout="this.style.background='transparent'">Delete Account</button>
               </div>
             </div>
@@ -1022,6 +1050,9 @@ async function loadSettingsData(){
   document.getElementById('sp-pf-username').value=profileData.username||'';
   document.getElementById('sp-pf-email').value=user.email||'';
   document.getElementById('sp-pf-phone').value=profileData.phone||'';
+  // Account settings display fields
+  if(document.getElementById('sp-current-email-display')) document.getElementById('sp-current-email-display').value=user.email||'';
+  if(document.getElementById('sp-current-phone-display')) document.getElementById('sp-current-phone-display').value=profileData.phone||'';
   document.getElementById('sp-pf-bio').value=profileData.bio||'';
   document.getElementById('sp-pf-location').value=profileData.location||'';
   document.getElementById('sp-pf-website').value=profileData.website||'';
@@ -1064,24 +1095,21 @@ function saveProfileSP(){
   if(!user||!sb) return;
   var nm=document.getElementById('sp-pf-name').value.trim();
   var uname=document.getElementById('sp-pf-username').value.trim();
-  var phone=document.getElementById('sp-pf-phone').value.trim();
   var bio=document.getElementById('sp-pf-bio').value.trim();
   var loc=document.getElementById('sp-pf-location').value.trim();
   var web=document.getElementById('sp-pf-website').value.trim();
   if(uname&&(uname.length<3||uname.length>20||!/^[a-z0-9-]+$/.test(uname))){
     showToast('Username: 3-20 lowercase letters, numbers, or hyphens','#EF4444');return;
   }
-  // Re-auth only if phone number is being changed
-  var phoneChanged = phone !== (profileData.phone||'');
   var doSave = async function(){
     var btn=document.getElementById('sp-pf-save-btn');
     btn.disabled=true; btn.textContent='Saving...';
     if(nm) await sb.auth.updateUser({data:{full_name:nm}});
     try{
-      var ud={full_name:nm,bio:bio,location:loc,website:web,phone:phone,updated_at:new Date().toISOString()};
+      var ud={full_name:nm,bio:bio,location:loc,website:web,updated_at:new Date().toISOString()};
       if(uname) ud.username=uname;
       await sb.from('profiles').update(ud).eq('id',user.id);
-      profileData={bio,location:loc,website:web,username:uname,phone};
+      profileData={bio,location:loc,website:web,username:uname,phone:profileData.phone};
     }catch(e){btn.disabled=false;btn.textContent='Save Changes';return;}
     var u=await sb.auth.getUser(); if(u.data?.user) user=u.data.user;
     loadProfileData(); loadSettingsData(); updateAuth();
@@ -1089,8 +1117,7 @@ function saveProfileSP(){
     var st=document.getElementById('sp-pf-save-status'); st.classList.add('show'); setTimeout(function(){st.classList.remove('show');},2000);
     showToast('✓ Profile saved','#22C55E');
   };
-  if(phoneChanged) requireReauth(doSave);
-  else doSave();
+  doSave();
 }
 
 // CHECK IF USER HAS PASSWORD (vs OAuth-only)
@@ -1164,6 +1191,30 @@ function changePW(){
     document.getElementById('sp-confirm-pw').value='';
     var st=document.getElementById('sp-pw-status');st.classList.add('show');setTimeout(function(){st.classList.remove('show');},2500);
     showToast('✓ Password updated successfully','#22C55E');
+  });
+}
+
+// SETTINGS — CHANGE PHONE
+function changePhone(){
+  var phone=document.getElementById('sp-new-phone').value.trim();
+  var err=document.getElementById('sp-phone-error');
+  err.style.display='none';
+  if(!phone){err.textContent='Enter a new phone number';err.style.display='block';return;}
+  if(!sb) return;
+  requireReauth(async function(){
+    try{
+      await sb.from('profiles').update({phone:phone,updated_at:new Date().toISOString()}).eq('id',user.id);
+      profileData.phone=phone;
+      document.getElementById('sp-new-phone').value='';
+      document.getElementById('sp-current-phone-display').value=phone;
+      // Also update profile page display
+      if(document.getElementById('sp-pf-phone')) document.getElementById('sp-pf-phone').value=phone;
+      var st=document.getElementById('sp-phone-status');st.classList.add('show');setTimeout(function(){st.classList.remove('show');},2500);
+      showToast('✓ Phone number updated','#22C55E');
+    }catch(e){
+      document.getElementById('sp-phone-error').textContent='Could not update phone number';
+      document.getElementById('sp-phone-error').style.display='block';
+    }
   });
 }
 
