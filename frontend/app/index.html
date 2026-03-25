@@ -484,20 +484,22 @@
 
     @media(max-width:768px){
       .sidebar{display:none}
-      /* Center hero+prompt, templates scroll below */
       .main{padding:0;overflow-y:auto}
-      .hero{padding:100px 16px 20px}
+      /* Hero */
+      .hero{padding:80px 16px 16px}
       .hero h1{font-size:20px;margin-bottom:6px}
       .hero p{font-size:13px;margin-bottom:16px}
+      /* Prompt */
       .prompt-wrap{padding:0;max-width:100%}
-      .prompt-card{padding:10px}
+      .prompt-card{padding:10px;border-radius:12px}
       .prompt-card .prompt-textarea{font-size:16px;min-height:44px}
       .chips-row{padding:0;max-width:100%;gap:6px;margin-top:10px}
       .chip{font-size:11px;padding:5px 10px}
-      .tpl-section{margin-top:24px;padding:0 12px 40px}
+      /* Sections */
+      .tpl-section{margin-top:16px;padding:0 12px 40px}
       .recent-section{padding:0 12px 24px}
       .pgrid{grid-template-columns:1fr 1fr}
-      /* Compact prompt bar on mobile */
+      /* Prompt bar compact */
       .bar-left{gap:4px;flex-wrap:nowrap;min-width:0}
       .dd-trigger#dd-model #m-lbl{display:none}
       .dd-trigger#dd-model{min-width:auto;padding:0 8px;gap:4px}
@@ -505,6 +507,27 @@
       .dd-trigger#dd-mode{min-width:auto;padding:0 8px}
       .bar-right{gap:4px}
       .voice-sel{display:none}
+      /* Profile page */
+      .prof-top{padding:0 16px;flex-direction:column;align-items:flex-start;gap:12px;margin-top:-40px}
+      .prof-av-big{width:72px;height:72px;font-size:22px}
+      .prof-stats{padding:16px;gap:20px;flex-wrap:wrap;justify-content:center}
+      .prof-form{padding:16px 16px 40px;max-width:100%}
+      .pf-row{flex-direction:column;gap:16px}
+      /* Settings */
+      .settings-layout{flex-direction:column;height:auto}
+      .settings-sidebar{width:100%;height:auto;border-right:none;border-bottom:1px solid rgba(255,255,255,0.06);flex-direction:row;flex-wrap:wrap;padding:12px;gap:4px;overflow-x:auto}
+      .settings-back{margin-bottom:0;width:auto}
+      .settings-section-label{display:none}
+      .settings-nav-item{width:auto;padding:7px 12px;font-size:12px}
+      .settings-content{height:auto}
+      .set-grid{grid-template-columns:1fr}
+      .prof-form{max-width:100%!important}
+      /* Cards */
+      .pcard-thumb{height:90px}
+      /* Modals */
+      .cm-box{width:92vw}
+      /* Subscription */
+      .pr-card{padding:20px 16px}
     }
   </style>
 </head>
