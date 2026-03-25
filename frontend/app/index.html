@@ -1117,19 +1117,39 @@ async function changeEmail(){
 }
 
 // SETTINGS — DELETE ACCOUNT (soft delete)
-async function deleteAccount(){
-  if(!confirm('Are you sure you want to delete your account?\n\nYour data will be kept for 30 days. If you change your mind, just log back in and everything will be restored.')) return;
-  if(!confirm('Confirm account deletion. You can restore it within 30 days by logging back in.')) return;
-  if(!sb||!user) return;
-  try{
-    var sess=await sb.auth.getSession();
-    var token=sess.data?.session?.access_token;
-    var res=await fetch('/api/delete-account',{method:'POST',headers:{'Authorization':'Bearer '+token}});
-    if(!res.ok) throw new Error('Failed');
-    await sb.auth.signOut();
-    // Redirect to landing with message
-    location.href='/?deleted=1';
-  }catch(e){alert('Could not delete account. Please contact support@kenzoagent.com');}
+function deleteAccount(){
+  // Show custom branded confirmation modal
+  var overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);z-index:99999;display:flex;align-items:center;justify-content:center;animation:ppIn .15s ease';
+  overlay.innerHTML=`
+    <div style="background:#151518;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:28px 28px 20px;width:90%;max-width:400px;box-shadow:0 24px 64px rgba(0,0,0,.7);animation:cmIn .2s ease">
+      <div style="width:44px;height:44px;border-radius:12px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.2);display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 16px">🗑️</div>
+      <div style="font-size:17px;font-weight:700;color:#F4F4F5;text-align:center;margin-bottom:10px">Delete account?</div>
+      <div style="font-size:13px;color:#71717A;text-align:center;line-height:1.7;margin-bottom:24px">Your data will be kept safe for <span style="color:#F4F4F5;font-weight:600">30 days</span>. If you change your mind, just log back in and everything will be restored.</div>
+      <div style="display:flex;gap:10px">
+        <button id="da-cancel" style="flex:1;padding:10px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:#D1D5DB;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s">Cancel</button>
+        <button id="da-confirm" style="flex:1;padding:10px;border-radius:10px;background:#EF4444;border:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s">Delete Account</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#da-cancel').onclick=function(){overlay.remove();};
+  overlay.addEventListener('click',function(e){if(e.target===overlay)overlay.remove();});
+  overlay.querySelector('#da-confirm').onclick=async function(){
+    var btn=overlay.querySelector('#da-confirm');
+    btn.textContent='Deleting...';btn.disabled=true;btn.style.opacity='0.6';
+    if(!sb||!user){overlay.remove();return;}
+    try{
+      var sess=await sb.auth.getSession();
+      var token=sess.data?.session?.access_token;
+      var res=await fetch('/api/delete-account',{method:'POST',headers:{'Authorization':'Bearer '+token}});
+      if(!res.ok) throw new Error('Failed');
+      await sb.auth.signOut();
+      location.href='/?deleted=1';
+    }catch(e){
+      overlay.remove();
+      showToast('Could not delete account. Contact support@kenzoagent.com','#EF4444');
+    }
+  };
 }
 
 // SETTINGS — THEME
