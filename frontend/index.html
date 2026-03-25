@@ -314,6 +314,9 @@
       </div>
       <div class="auth-error" id="la-error"></div>
       <button class="auth-btn" id="la-submit" onclick="handleLandingAuth()">Create Account</button>
+      <div id="la-forgot" style="text-align:right;margin-top:8px;display:none">
+        <a onclick="sendForgotPassword()" style="font-size:12px;color:#6B7280;cursor:pointer;text-decoration:none" onmouseover="this.style.color='#9CA3AF'" onmouseout="this.style.color='#6B7280'">Forgot password?</a>
+      </div>
       <div class="auth-switch" id="la-switch">
         Already have an account? <a onclick="showAuth('login')">Sign in</a>
       </div>
@@ -370,16 +373,32 @@
         document.getElementById('la-name-field').style.display='none';
         document.getElementById('la-submit').textContent='Sign In';
         document.getElementById('la-switch').innerHTML='Don\'t have an account? <a onclick="showAuth(\'signup\')">Create one</a>';
+        document.getElementById('la-forgot').style.display='block';
       }else{
         document.getElementById('la-title').textContent='Create Account';
         document.getElementById('la-sub').textContent='Start building websites with AI — free';
         document.getElementById('la-name-field').style.display='block';
         document.getElementById('la-submit').textContent='Create Account';
         document.getElementById('la-switch').innerHTML='Already have an account? <a onclick="showAuth(\'login\')">Sign in</a>';
+        document.getElementById('la-forgot').style.display='none';
       }
       document.getElementById('auth-overlay').classList.add('show');
     }
     function hideAuth(){document.getElementById('auth-overlay').classList.remove('show');}
+
+    async function sendForgotPassword(){
+      var email=document.getElementById('la-email').value.trim();
+      var err=document.getElementById('la-error');
+      err.style.display='none';
+      if(!email||!email.includes('@')){err.textContent='Enter your email address first';err.style.display='block';return;}
+      if(!sb) return;
+      var {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://builder.kenzoagent.com/app/'});
+      if(error){err.textContent=error.message;err.style.display='block';return;}
+      err.style.display='none';
+      // Show success inline
+      var forgot=document.getElementById('la-forgot');
+      forgot.innerHTML='<span style="font-size:12px;color:#22C55E">✓ Reset link sent to '+email+'</span>';
+    }
 
     async function handleLandingAuth(){
       var email=document.getElementById('la-email').value.trim();

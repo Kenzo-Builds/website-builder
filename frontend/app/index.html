@@ -1059,33 +1059,51 @@ async function loadSettingsData(){
   document.getElementById('sp-font-val').textContent=fs+'px';
 }
 
-// SETTINGS — SAVE PROFILE
-async function saveProfileSP(){
+// SETTINGS — SAVE PROFILE (re-auth if phone changed)
+function saveProfileSP(){
   if(!user||!sb) return;
-  var btn=document.getElementById('sp-pf-save-btn');
-  btn.disabled=true; btn.textContent='Saving...';
   var nm=document.getElementById('sp-pf-name').value.trim();
   var uname=document.getElementById('sp-pf-username').value.trim();
   var phone=document.getElementById('sp-pf-phone').value.trim();
   var bio=document.getElementById('sp-pf-bio').value.trim();
   var loc=document.getElementById('sp-pf-location').value.trim();
   var web=document.getElementById('sp-pf-website').value.trim();
-  if(uname&&(uname.length<3||uname.length>20||!/^[a-z0-9-]+$/.test(uname))){btn.disabled=false;btn.textContent='Save Changes';alert('Username: 3-20 lowercase letters, numbers, or hyphens');return;}
-  if(nm) await sb.auth.updateUser({data:{full_name:nm}});
-  try{
-    var ud={full_name:nm,bio:bio,location:loc,website:web,phone:phone,updated_at:new Date().toISOString()};
-    if(uname) ud.username=uname;
-    await sb.from('profiles').update(ud).eq('id',user.id);
-    profileData={bio,location:loc,website:web,username:uname,phone};
-  }catch(e){btn.disabled=false;btn.textContent='Save Changes';return;}
-  var u=await sb.auth.getUser(); if(u.data?.user) user=u.data.user;
-  loadProfileData(); loadSettingsData(); updateAuth();
-  btn.disabled=false; btn.textContent='Save Changes';
-  var st=document.getElementById('sp-pf-save-status'); st.classList.add('show'); setTimeout(function(){st.classList.remove('show');},2000);
+  if(uname&&(uname.length<3||uname.length>20||!/^[a-z0-9-]+$/.test(uname))){
+    showToast('Username: 3-20 lowercase letters, numbers, or hyphens','#EF4444');return;
+  }
+  // Re-auth only if phone number is being changed
+  var phoneChanged = phone !== (profileData.phone||'');
+  var doSave = async function(){
+    var btn=document.getElementById('sp-pf-save-btn');
+    btn.disabled=true; btn.textContent='Saving...';
+    if(nm) await sb.auth.updateUser({data:{full_name:nm}});
+    try{
+      var ud={full_name:nm,bio:bio,location:loc,website:web,phone:phone,updated_at:new Date().toISOString()};
+      if(uname) ud.username=uname;
+      await sb.from('profiles').update(ud).eq('id',user.id);
+      profileData={bio,location:loc,website:web,username:uname,phone};
+    }catch(e){btn.disabled=false;btn.textContent='Save Changes';return;}
+    var u=await sb.auth.getUser(); if(u.data?.user) user=u.data.user;
+    loadProfileData(); loadSettingsData(); updateAuth();
+    btn.disabled=false; btn.textContent='Save Changes';
+    var st=document.getElementById('sp-pf-save-status'); st.classList.add('show'); setTimeout(function(){st.classList.remove('show');},2000);
+    showToast('✓ Profile saved','#22C55E');
+  };
+  if(phoneChanged) requireReauth(doSave);
+  else doSave();
+}
+
+// CHECK IF USER HAS PASSWORD (vs OAuth-only)
+function userHasPassword(){
+  if(!user) return false;
+  var identities=user.identities||[];
+  return identities.some(function(i){return i.provider==='email';});
 }
 
 // REAUTH MODAL — verify current password before sensitive changes
 function requireReauth(onSuccess){
+  // OAuth users (Google, etc.) — can't verify with password, proceed directly
+  if(!userHasPassword()){onSuccess();return;}
   var overlay=document.createElement('div');
   overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);z-index:99999;display:flex;align-items:center;justify-content:center;animation:ppIn .15s ease';
   overlay.innerHTML=`
