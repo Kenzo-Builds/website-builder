@@ -130,12 +130,12 @@
     .chat-collapsed #chat-panel .chat-header h3,
     .chat-collapsed #chat-panel .chat-header .chat-icon-btn:not(#chat-collapse-btn),
     .chat-collapsed #chat-panel #chat-history,
-    .chat-collapsed #chat-panel #input-area { display: none; }
+    .chat-collapsed #chat-panel #input-area { display: none !important; }
     .chat-collapsed #chat-panel .chat-header {
-      flex-direction: column; align-items: center; padding: 12px 8px;
+      flex-direction: column !important; align-items: center !important; padding: 12px 8px !important;
     }
-    .chat-collapsed #chat-panel .chat-header-actions { flex-direction: column; }
-    .chat-collapsed #resize-handle { display: none; }
+    .chat-collapsed #chat-panel .chat-header-actions { flex-direction: column !important; }
+    .chat-collapsed #resize-handle { display: none !important; }
 
     /* Chat header */
     .chat-header {
@@ -726,6 +726,7 @@
               <option value="openai/gpt-5.4">GPT-5.4</option>
             </select>
           </div>
+        </div>
       </div>
     </div>
 
