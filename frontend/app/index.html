@@ -711,8 +711,9 @@ function cmConfirm(){
 }
 // Enter key on rename input
 document.addEventListener('keydown',function(e){
-  if(e.key==='Enter'&&document.getElementById('cm-overlay').classList.contains('show')&&_cmAction==='rename')cmConfirm();
-  if(e.key==='Escape'&&document.getElementById('cm-overlay').classList.contains('show'))closeCModal();
+  if(!document.getElementById('cm-overlay').classList.contains('show'))return;
+  if(e.key==='Enter')cmConfirm();
+  if(e.key==='Escape')closeCModal();
 });
 function loadProjects(){
   function render(list){
