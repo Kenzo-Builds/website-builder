@@ -14,7 +14,7 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2300E5FF' opacity='.15'/%3E%3Cpath d='M8 10 L4 16 L8 22M24 10 L28 16 L24 22M14 8 L18 24' stroke='%2300E5FF' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:ital,wght@0,200;0,300;0,400;1,200;1,300&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
   <style>
@@ -84,8 +84,8 @@
     .hero-badge .live-dot{width:6px;height:6px;border-radius:50%;background:#00E5FF;box-shadow:0 0 6px #00E5FF;animation:livePulse 2s infinite}
     @keyframes livePulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-    .hero h1{font-size:clamp(40px,6.5vw,80px);font-weight:400;line-height:1.06;letter-spacing:-1px;color:#FAFAFA;margin-bottom:20px;font-family:'DM Serif Display',serif}
-    .hero h1 .shimmer{background:linear-gradient(90deg,#00E5FF 0%,#A5F3FC 35%,#00E5FF 70%,#E0FFFE 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmerMove 4s linear infinite;font-style:italic}
+    .hero h1{font-size:clamp(42px,6.5vw,84px);font-weight:200;line-height:1.06;letter-spacing:-1.5px;color:#FAFAFA;margin-bottom:20px;font-family:'Montserrat',sans-serif}
+    .hero h1 .shimmer{background:linear-gradient(90deg,#00E5FF 0%,#A5F3FC 35%,#00E5FF 70%,#E0FFFE 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmerMove 4s linear infinite;font-weight:300}
     @keyframes shimmerMove{0%{background-position:200% center}100%{background-position:-200% center}}
 
     .hero p{font-size:17px;color:#71717A;max-width:500px;margin:0 auto 36px;line-height:1.75;font-weight:400}
@@ -127,7 +127,7 @@
 
     /* === SECTIONS COMMON === */
     .sec-eyebrow{text-align:center;font-size:11px;font-weight:700;color:#00E5FF;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px}
-    .sec-title{text-align:center;font-size:clamp(24px,4vw,40px);font-weight:800;letter-spacing:-1px;color:#FAFAFA;margin-bottom:12px}
+    .sec-title{text-align:center;font-size:clamp(26px,4vw,44px);font-weight:300;letter-spacing:-1px;color:#FAFAFA;margin-bottom:12px;font-family:'Montserrat',sans-serif}
     .sec-desc{text-align:center;font-size:15px;color:#71717A;max-width:460px;margin:0 auto 52px;line-height:1.7}
 
     /* === FEATURES === */
