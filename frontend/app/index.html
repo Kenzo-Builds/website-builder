@@ -161,6 +161,30 @@
     .pcard-dd div{padding:6px 8px;border-radius:5px;color:#D1D5DB;font-size:11px;cursor:pointer}
     .pcard-dd div:hover{background:rgba(255,255,255,0.06)}
     .pcard-dd div.danger{color:#EF4444}
+    /* Delete animation */
+    .pcard.deleting{opacity:0;transform:scale(0.92);transition:all .35s ease;pointer-events:none}
+
+    /* Custom confirm/prompt modal */
+    .cm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+    .cm-overlay.show{display:flex}
+    .cm-box{background:#151518;border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:24px;width:340px;max-width:90vw;box-shadow:0 16px 48px rgba(0,0,0,0.6);animation:cmIn .2s ease}
+    @keyframes cmIn{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
+    .cm-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 16px}
+    .cm-icon.danger{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.2)}
+    .cm-icon.edit{background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.2)}
+    .cm-title{font-size:16px;font-weight:600;color:#F4F4F5;text-align:center;margin-bottom:6px}
+    .cm-sub{font-size:13px;color:#71717A;text-align:center;margin-bottom:20px}
+    .cm-input{width:100%;background:#0D0D0D;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#F4F4F5;font-size:14px;outline:none;margin-bottom:16px}
+    .cm-input:focus{border-color:rgba(59,130,246,0.5)}
+    .cm-btns{display:flex;gap:10px}
+    .cm-btn{flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s}
+    .cm-btn.cancel{background:rgba(255,255,255,0.06);color:#A1A1AA}
+    .cm-btn.cancel:hover{background:rgba(255,255,255,0.1)}
+    .cm-btn.del{background:#EF4444;color:#fff}
+    .cm-btn.del:hover{background:#DC2626}
+    .cm-btn.primary{background:#3B82F6;color:#fff}
+    .cm-btn.primary:hover{background:#2563EB}
+
     .pcard-new{border-style:dashed;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:170px;gap:6px}
     .pcard-new .plus{width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:16px;color:#6B7280}
     .pcard-new span{font-size:11px;color:#6B7280}
@@ -615,8 +639,8 @@ function setupCardMenus(){
     var t=e.target.closest('[data-act]');
     if(t){e.stopPropagation();e.preventDefault();
       var a=t.getAttribute('data-act'),id=t.getAttribute('data-pid');closeCM();
-      if(a==='delete'){if(!confirm('Delete?'))return;delProj(id);}
-      if(a==='rename'){var nn=prompt('New name:');if(!nn||!nn.trim())return;renProj(id,nn.trim());}
+      if(a==='delete'){showCModal('delete',id);}
+      if(a==='rename'){showCModal('rename',id);}
       return;
     }
     // Handle menu button click
@@ -639,6 +663,56 @@ function setupCardMenus(){
   });
 }
 function closeCM(){document.querySelectorAll('.pcard-dd.show').forEach(function(d){d.classList.remove('show')});document.querySelectorAll('.pcard.menu-open').forEach(function(c){c.classList.remove('menu-open')})}
+
+var _cmAction=null,_cmId=null;
+function showCModal(action,id){
+  _cmAction=action;_cmId=id;
+  var overlay=document.getElementById('cm-overlay');
+  var icon=document.getElementById('cm-icon');
+  var title=document.getElementById('cm-title');
+  var sub=document.getElementById('cm-sub');
+  var input=document.getElementById('cm-input');
+  var btn=document.getElementById('cm-confirm');
+  if(action==='delete'){
+    icon.className='cm-icon danger';icon.textContent='🗑️';
+    title.textContent='Delete this project?';
+    sub.textContent='This action cannot be undone.';
+    input.style.display='none';
+    btn.className='cm-btn del';btn.textContent='Delete';
+  }else{
+    icon.className='cm-icon edit';icon.textContent='✏️';
+    title.textContent='Rename project';
+    sub.textContent='Enter a new name for this project.';
+    input.style.display='block';input.value='';
+    btn.className='cm-btn primary';btn.textContent='Rename';
+    setTimeout(function(){input.focus()},100);
+  }
+  overlay.classList.add('show');
+}
+function closeCModal(){document.getElementById('cm-overlay').classList.remove('show');_cmAction=null;_cmId=null;}
+function cmConfirm(){
+  if(_cmAction==='delete'&&_cmId){
+    closeCModal();
+    // Animate card out
+    var cards=document.querySelectorAll('.pcard');
+    cards.forEach(function(c){
+      if(c.querySelector('[data-pid="'+_cmId+'"]')){
+        c.classList.add('deleting');
+        setTimeout(function(){delProj(_cmId);},350);
+      }
+    });
+  }else if(_cmAction==='rename'&&_cmId){
+    var nn=document.getElementById('cm-input').value.trim();
+    if(!nn)return;
+    closeCModal();
+    renProj(_cmId,nn);
+  }
+}
+// Enter key on rename input
+document.addEventListener('keydown',function(e){
+  if(e.key==='Enter'&&document.getElementById('cm-overlay').classList.contains('show')&&_cmAction==='rename')cmConfirm();
+  if(e.key==='Escape'&&document.getElementById('cm-overlay').classList.contains('show'))closeCModal();
+});
 function loadProjects(){
   function render(list){
     var rs=document.getElementById('recent-sec'),rg=document.getElementById('rs-recent');rg.innerHTML='';
@@ -769,5 +843,20 @@ setTimeout(function(){
   </div>
   <iframe class="preview-frame" id="preview-frame" src="about:blank"></iframe>
 </div>
+
+<!-- Custom confirm modal -->
+<div class="cm-overlay" id="cm-overlay" onclick="if(event.target===this)closeCModal()">
+  <div class="cm-box">
+    <div class="cm-icon" id="cm-icon">🗑️</div>
+    <div class="cm-title" id="cm-title">Delete this project?</div>
+    <div class="cm-sub" id="cm-sub">This action cannot be undone.</div>
+    <input class="cm-input" id="cm-input" style="display:none" placeholder="Enter new name">
+    <div class="cm-btns">
+      <button class="cm-btn cancel" onclick="closeCModal()">Cancel</button>
+      <button class="cm-btn del" id="cm-confirm" onclick="cmConfirm()">Delete</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
