@@ -123,6 +123,7 @@
       flex-shrink: 0; height: 100%; position: relative;
       transition: width 0.3s ease, min-width 0.3s ease;
       overflow: hidden;
+      border-radius: 0 12px 12px 0;
     }
     .chat-collapsed #chat-panel {
       width: 48px !important; min-width: 48px !important; max-width: 48px !important;
@@ -227,12 +228,13 @@
     #send-btn.disabled { opacity: 0.25; cursor: not-allowed; pointer-events:none; }
     #send-btn svg { color: #0D0D0D; }
 
-    .input-footer { display: flex; align-items: center; justify-content: space-between; gap:6px; padding-top: 6px; border-top: 1px solid var(--border); }
+    .input-footer { display: flex; align-items: center; justify-content: space-between; gap:6px; padding-top: 6px; border-top: 1px solid var(--border); min-width: 0; overflow: hidden; }
     .input-hint { font-size: 11px; color: var(--text-3); }
     #model-select {
       font-size: 11px; background: var(--bg); color: var(--text-2);
       border: 1px solid var(--border); border-radius: 8px;
       padding: 4px 8px; outline: none; cursor: pointer; height: 28px;
+      min-width: 0; max-width: 100%;
     }
 
     /* ===== RESIZE HANDLE ===== */
