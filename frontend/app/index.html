@@ -1244,11 +1244,11 @@ function changeEmail(){
   requireReauth(async function(){
     var {error}=await sb.auth.updateUser({email:email});
     if(error){document.getElementById('sp-email-error').textContent=error.message;document.getElementById('sp-email-error').style.display='block';return;}
-    // Also update profiles table so it stays in sync
-    try{await sb.from('profiles').update({email:email,updated_at:new Date().toISOString()}).eq('id',user.id);}catch(e){}
+    // Do NOT update profiles table here — wait for onAuthStateChange USER_UPDATED
+    // which fires only after the user clicks the confirmation link
     document.getElementById('sp-new-email').value='';
     var st=document.getElementById('sp-email-status');st.classList.add('show');setTimeout(function(){st.classList.remove('show');},3000);
-    showToast('✓ Verification email sent to '+email,'#22C55E');
+    showToast('✓ Confirmation email sent to '+email+' — click the link to confirm','#3B82F6');
   });
 }
 
