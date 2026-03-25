@@ -2029,10 +2029,12 @@
         // Guest: save to localStorage
         try {
           const guestProjects = JSON.parse(localStorage.getItem('guest_projects') || '[]');
+          const filesJson = Object.keys(projectFiles).length > 0 ? projectFiles : { 'index.html': html };
           const project = {
             id: 'local-' + Date.now(),
             name: autoNameProject(prompt),
             prompt, html, model, build_id: buildId,
+            files: filesJson,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           };
@@ -2057,10 +2059,12 @@
         const token = (await sb.auth.getSession()).data.session?.access_token;
         if (!token) return;
 
+        const filesJson = Object.keys(projectFiles).length > 0 ? projectFiles : { 'index.html': html };
         const projectData = {
           user_id: currentUser.id,
           name: currentProjectName || autoNameProject(prompt),
           prompt, html, model, build_id: buildId,
+          files: filesJson,
           updated_at: new Date().toISOString()
         };
 
@@ -2068,6 +2072,7 @@
           // Update existing project
           const { error } = await sb.from('projects').update({
             html, prompt, model, build_id: buildId,
+            files: filesJson,
             updated_at: new Date().toISOString()
           }).eq('id', currentProjectId);
           if (error) console.warn('Project update failed:', error);
@@ -2188,7 +2193,17 @@
           currentHtml = project.html;
           currentBuildId = project.build_id;
           lastPrompt = project.prompt;
-          initProjectFiles(currentHtml);
+          // Restore multi-file project if available
+          if (project.files && Object.keys(project.files).length > 1) {
+            projectFiles = project.files;
+            activeFile = 'index.html';
+            openTabs = ['index.html'];
+            renderFileTree();
+            renderEditorTabs();
+            updatePageRouteDropdown();
+          } else {
+            initProjectFiles(currentHtml);
+          }
           updatePreview(currentHtml);
           updateEditor(currentHtml);
           setMode('build');
