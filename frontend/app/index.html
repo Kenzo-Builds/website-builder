@@ -692,13 +692,14 @@ function showCModal(action,id){
 function closeCModal(){document.getElementById('cm-overlay').classList.remove('show');_cmAction=null;_cmId=null;}
 function cmConfirm(){
   if(_cmAction==='delete'&&_cmId){
+    var delId=_cmId; // capture before closeCModal nulls it
     closeCModal();
     // Animate card out
     var cards=document.querySelectorAll('.pcard');
     cards.forEach(function(c){
-      if(c.querySelector('[data-pid="'+_cmId+'"]')){
+      if(c.querySelector('[data-pid="'+delId+'"]')){
         c.classList.add('deleting');
-        setTimeout(function(){delProj(_cmId);},350);
+        setTimeout(function(){delProj(delId);},350);
       }
     });
   }else if(_cmAction==='rename'&&_cmId){
