@@ -2279,11 +2279,10 @@
       }
     })();
 
-    // Auth last — non-critical, shouldn't break the builder
-    try { initAuth(); } catch(e) { console.error('initAuth error:', e); }
-
-    // Fetch usage after auth loads
-    setTimeout(() => { fetchUsage(); updateUsageBadge(); }, 1000);
+    // Auth + project load (must be sequential — project load needs auth session)
+    (async function initAndLoad() {
+    try { await initAuth(); } catch(e) { console.error('initAuth error:', e); }
+    setTimeout(() => { fetchUsage(); updateUsageBadge(); }, 500);
 
     // Check for incoming prompt OR project from dashboard
     (async function checkDashboardContext() {
@@ -2337,6 +2336,7 @@
           }
         }, 500);
       }
+    })();
     })();
   </script>
   <div class="url-bar-dropdown" id="url-dropdown"></div>
