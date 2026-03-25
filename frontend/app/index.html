@@ -288,18 +288,21 @@
     .pf-save-status.show{opacity:1}
 
     /* SETTINGS LAYOUT */
-    .settings-layout{display:flex;height:100%;min-height:100vh}
-    .settings-sidebar{width:220px;flex-shrink:0;border-right:1px solid rgba(255,255,255,0.06);padding:24px 12px;display:flex;flex-direction:column;gap:4px}
-    .settings-back{display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:8px;border:none;background:none;color:#6B7280;font-size:13px;font-family:inherit;cursor:pointer;transition:all .15s;margin-bottom:12px;width:100%;text-align:left}
+    .settings-layout{display:flex;height:100vh;width:100%}
+    .settings-sidebar{width:240px;flex-shrink:0;background:#0D0D0D;border-right:1px solid rgba(255,255,255,0.06);padding:20px 12px;display:flex;flex-direction:column;gap:2px;height:100vh;overflow-y:auto}
+    .settings-back{display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:8px;border:none;background:none;color:#6B7280;font-size:13px;font-family:inherit;cursor:pointer;transition:all .15s;margin-bottom:16px;width:100%;text-align:left}
     .settings-back:hover{color:#D1D5DB;background:rgba(255,255,255,0.04)}
     .settings-back svg{width:14px;height:14px}
-    .settings-section-label{font-size:10px;font-weight:600;color:#4B5563;text-transform:uppercase;letter-spacing:.8px;padding:12px 10px 4px}
-    .settings-nav-item{display:flex;align-items:center;gap:9px;width:100%;padding:8px 10px;border-radius:8px;border:none;background:none;color:#9CA3AF;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;text-align:left;transition:all .15s}
+    .settings-section-label{font-size:10px;font-weight:600;color:#4B5563;text-transform:uppercase;letter-spacing:.8px;padding:14px 10px 4px}
+    .settings-nav-item{display:flex;align-items:center;gap:9px;width:100%;padding:9px 10px;border-radius:8px;border:none;background:none;color:#9CA3AF;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;text-align:left;transition:all .15s}
     .settings-nav-item:hover{background:rgba(255,255,255,0.05);color:#D1D5DB}
     .settings-nav-item.active{background:rgba(255,255,255,0.08);color:#fff}
     .settings-nav-item svg{width:16px;height:16px;opacity:.6;flex-shrink:0}
     .settings-nav-item.active svg{opacity:.9}
-    .settings-content{flex:1;overflow-y:auto}
+    .settings-content{flex:1;overflow-y:auto;height:100vh}
+    /* 2-column grid for settings boxes */
+    .set-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    @media(max-width:900px){.set-grid{grid-template-columns:1fr}}
 
     /* SETTINGS SUBPAGES */
     .spage{display:none}
@@ -656,40 +659,42 @@
 
           <!-- ACCOUNT SETTINGS subpage -->
           <div class="spage" id="sp-account">
-            <div class="prof-form" style="max-width:520px">
+            <div class="prof-form" style="max-width:800px">
               <h2 style="font-size:22px;font-weight:800;margin-bottom:4px">Account Settings</h2>
               <p style="color:#71717A;font-size:13px;margin-bottom:28px">Manage your account security.</p>
 
-              <div class="set-section">
-                <div class="set-section-title">Change Password</div>
-                <div class="set-section-desc">Update your password to keep your account secure.</div>
-                <div class="pf-field" style="margin-bottom:12px">
-                  <div class="pf-label">New Password</div>
-                  <input class="pf-input" type="password" id="sp-new-pw" aria-label="New password" placeholder="Min 6 characters">
+              <div class="set-grid" style="margin-bottom:16px">
+                <div class="set-section" style="margin-bottom:0">
+                  <div class="set-section-title">Change Password</div>
+                  <div class="set-section-desc">Update your password to keep your account secure.</div>
+                  <div class="pf-field" style="margin-bottom:12px">
+                    <div class="pf-label">New Password</div>
+                    <input class="pf-input" type="password" id="sp-new-pw" aria-label="New password" placeholder="Min 6 characters">
+                  </div>
+                  <div class="pf-field" style="margin-bottom:16px">
+                    <div class="pf-label">Confirm Password</div>
+                    <input class="pf-input" type="password" id="sp-confirm-pw" aria-label="Confirm password" placeholder="Re-enter new password">
+                  </div>
+                  <div style="display:flex;align-items:center">
+                    <button class="pf-save" onclick="changePW()">Update Password</button>
+                    <span class="pf-save-status" id="sp-pw-status">✓ Updated</span>
+                  </div>
+                  <div class="set-error" id="sp-pw-error"></div>
                 </div>
-                <div class="pf-field" style="margin-bottom:16px">
-                  <div class="pf-label">Confirm Password</div>
-                  <input class="pf-input" type="password" id="sp-confirm-pw" aria-label="Confirm password" placeholder="Re-enter new password">
-                </div>
-                <div style="display:flex;align-items:center">
-                  <button class="pf-save" onclick="changePW()">Update Password</button>
-                  <span class="pf-save-status" id="sp-pw-status">✓ Updated</span>
-                </div>
-                <div class="set-error" id="sp-pw-error"></div>
-              </div>
 
-              <div class="set-section">
-                <div class="set-section-title">Change Email</div>
-                <div class="set-section-desc">A verification link will be sent to your new email.</div>
-                <div class="pf-field" style="margin-bottom:16px">
-                  <div class="pf-label">New Email</div>
-                  <input class="pf-input" type="email" id="sp-new-email" aria-label="New email" placeholder="you@example.com">
+                <div class="set-section" style="margin-bottom:0">
+                  <div class="set-section-title">Change Email</div>
+                  <div class="set-section-desc">A verification link will be sent to your new email.</div>
+                  <div class="pf-field" style="margin-bottom:16px">
+                    <div class="pf-label">New Email</div>
+                    <input class="pf-input" type="email" id="sp-new-email" aria-label="New email" placeholder="you@example.com">
+                  </div>
+                  <div style="display:flex;align-items:center">
+                    <button class="pf-save" onclick="changeEmail()">Update Email</button>
+                    <span class="pf-save-status" id="sp-email-status">✓ Verification sent</span>
+                  </div>
+                  <div class="set-error" id="sp-email-error"></div>
                 </div>
-                <div style="display:flex;align-items:center">
-                  <button class="pf-save" onclick="changeEmail()">Update Email</button>
-                  <span class="pf-save-status" id="sp-email-status">✓ Verification sent</span>
-                </div>
-                <div class="set-error" id="sp-email-error"></div>
               </div>
 
               <div class="set-section" style="border-color:rgba(239,68,68,0.2);background:rgba(239,68,68,0.03)">
@@ -702,35 +707,37 @@
 
           <!-- APPEARANCE subpage -->
           <div class="spage" id="sp-appearance">
-            <div class="prof-form" style="max-width:520px">
+            <div class="prof-form" style="max-width:800px">
               <h2 style="font-size:22px;font-weight:800;margin-bottom:4px">Appearance</h2>
               <p style="color:#71717A;font-size:13px;margin-bottom:28px">Customize how AI Web Builder looks.</p>
 
-              <div class="set-section">
-                <div class="set-section-title">Theme</div>
-                <div class="set-section-desc">Choose your preferred color scheme.</div>
-                <div style="display:flex;gap:12px" id="sp-theme-options">
-                  <button class="theme-opt" data-theme="dark" onclick="setTheme('dark')">
-                    <div class="theme-preview dark-prev"></div>
-                    <span>Dark</span>
-                  </button>
-                  <button class="theme-opt" data-theme="light" onclick="setTheme('light')">
-                    <div class="theme-preview light-prev"></div>
-                    <span>Light</span>
-                  </button>
-                  <button class="theme-opt" data-theme="system" onclick="setTheme('system')">
-                    <div class="theme-preview system-prev"></div>
-                    <span>System</span>
-                  </button>
+              <div class="set-grid">
+                <div class="set-section" style="margin-bottom:0">
+                  <div class="set-section-title">Theme</div>
+                  <div class="set-section-desc">Choose your preferred color scheme.</div>
+                  <div style="display:flex;gap:10px" id="sp-theme-options">
+                    <button class="theme-opt" data-theme="dark" onclick="setTheme('dark')">
+                      <div class="theme-preview dark-prev"></div>
+                      <span>Dark</span>
+                    </button>
+                    <button class="theme-opt" data-theme="light" onclick="setTheme('light')">
+                      <div class="theme-preview light-prev"></div>
+                      <span>Light</span>
+                    </button>
+                    <button class="theme-opt" data-theme="system" onclick="setTheme('system')">
+                      <div class="theme-preview system-prev"></div>
+                      <span>System</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
 
-              <div class="set-section">
-                <div class="set-section-title">Editor Font Size</div>
-                <div class="set-section-desc">Adjust the code editor font size in the builder.</div>
-                <div style="display:flex;align-items:center;gap:12px">
-                  <input type="range" id="sp-font-slider" min="11" max="20" value="14" aria-label="Editor font size" style="flex:1;accent-color:#3B82F6" oninput="updateFontSize(this.value)">
-                  <span id="sp-font-val" style="font-size:14px;color:#A1A1AA;min-width:36px;text-align:center">14px</span>
+                <div class="set-section" style="margin-bottom:0">
+                  <div class="set-section-title">Editor Font Size</div>
+                  <div class="set-section-desc">Adjust the code editor font size in the builder.</div>
+                  <div style="display:flex;align-items:center;gap:12px;margin-top:8px">
+                    <input type="range" id="sp-font-slider" min="11" max="20" value="14" aria-label="Editor font size" style="flex:1;accent-color:#3B82F6" oninput="updateFontSize(this.value)">
+                    <span id="sp-font-val" style="font-size:14px;color:#A1A1AA;min-width:36px;text-align:center">14px</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -738,7 +745,7 @@
 
           <!-- SUBSCRIPTION subpage -->
           <div class="spage" id="sp-subscription">
-            <div class="prof-form" style="max-width:560px">
+            <div class="prof-form" style="max-width:800px">
               <h2 style="font-size:22px;font-weight:800;margin-bottom:4px">Subscription</h2>
               <p style="color:#71717A;font-size:13px;margin-bottom:28px">Manage your plan and billing.</p>
 
@@ -759,7 +766,7 @@
               </div>
 
               <!-- Plan cards -->
-              <div style="display:flex;flex-direction:column;gap:12px">
+              <div class="set-grid" style="margin-bottom:0">
                 <div class="set-section" style="position:relative">
                   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
                     <div><div class="set-section-title">Starter</div><div style="font-size:13px;color:#3B82F6;font-weight:700">$5 / month</div></div>
@@ -787,13 +794,13 @@
 
           <!-- USAGE subpage -->
           <div class="spage" id="sp-usage">
-            <div class="prof-form" style="max-width:520px">
+            <div class="prof-form" style="max-width:800px">
               <h2 style="font-size:22px;font-weight:800;margin-bottom:4px">Usage</h2>
               <p style="color:#71717A;font-size:13px;margin-bottom:28px">Track your usage for this billing period.</p>
 
-              <div class="set-section">
-                <div class="set-section-title">Generations</div>
-                <div class="set-section-desc">Website builds this month.</div>
+              <div class="set-section" style="margin-bottom:16px">
+                <div class="set-section-title">Generations This Month</div>
+                <div class="set-section-desc">Website builds used in this billing period.</div>
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
                   <span style="font-size:28px;font-weight:800;color:#F4F4F5" id="sp-usage-used">0</span>
                   <span style="font-size:13px;color:#6B7280">of <span id="sp-usage-limit">5</span> used</span>
@@ -805,25 +812,26 @@
                 </div>
               </div>
 
-              <div class="set-section">
-                <div class="set-section-title">Deployed Sites</div>
-                <div class="set-section-desc">Active deployments on your account.</div>
-                <div style="font-size:28px;font-weight:800;color:#F4F4F5;margin-bottom:4px" id="sp-deployed-count">0</div>
-                <div style="font-size:12px;color:#6B7280">sites deployed to kenzoagent.com</div>
-              </div>
-
-              <div class="set-section">
-                <div class="set-section-title">Total Builds</div>
-                <div class="set-section-desc">All generations since you joined.</div>
-                <div style="font-size:28px;font-weight:800;color:#F4F4F5;margin-bottom:4px" id="sp-total-builds">0</div>
-                <div style="font-size:12px;color:#6B7280">total website generations</div>
+              <div class="set-grid">
+                <div class="set-section" style="margin-bottom:0">
+                  <div class="set-section-title">Deployed Sites</div>
+                  <div class="set-section-desc">Active deployments on your account.</div>
+                  <div style="font-size:28px;font-weight:800;color:#F4F4F5;margin-bottom:4px;margin-top:8px" id="sp-deployed-count">0</div>
+                  <div style="font-size:12px;color:#6B7280">sites deployed</div>
+                </div>
+                <div class="set-section" style="margin-bottom:0">
+                  <div class="set-section-title">Total Builds</div>
+                  <div class="set-section-desc">All generations since you joined.</div>
+                  <div style="font-size:28px;font-weight:800;color:#F4F4F5;margin-bottom:4px;margin-top:8px" id="sp-total-builds">0</div>
+                  <div style="font-size:12px;color:#6B7280">total generations</div>
+                </div>
               </div>
             </div>
           </div>
 
           <!-- HELP & FAQ subpage -->
           <div class="spage" id="sp-help">
-            <div class="prof-form" style="max-width:520px">
+            <div class="prof-form" style="max-width:800px">
               <h2 style="font-size:22px;font-weight:800;margin-bottom:4px">Help & FAQ</h2>
               <p style="color:#71717A;font-size:13px;margin-bottom:28px">Get help with AI Web Builder.</p>
 
@@ -984,8 +992,10 @@ function switchPage(name){
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   document.getElementById('page-'+name).classList.add('active');
   document.querySelectorAll('[data-v]').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-v')===name);});
-  // Load settings data when entering settings
-  if(name==='settings') loadSettingsData();
+  // Hide dashboard sidebar in settings, show it everywhere else
+  var dashSidebar=document.getElementById('sidebar');
+  if(name==='settings'){dashSidebar.style.display='none';loadSettingsData();}
+  else{dashSidebar.style.display='';}
 }
 
 // SETTINGS SUBPAGE NAVIGATION
