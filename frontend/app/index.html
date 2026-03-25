@@ -909,6 +909,8 @@ function init(){
       if(r.data.session&&r.data.session.user){
         user=r.data.session.user;
         updateAuth();loadProjects();renderTplHome();loadProfileData();
+        // Check if account was pending deletion — restore it
+        checkAndRestoreAccount(r.data.session.access_token);
       }else{
         // Not logged in → redirect to landing page
         location.href='/';
@@ -1114,18 +1116,19 @@ async function changeEmail(){
   st.classList.add('show'); setTimeout(function(){st.classList.remove('show');},3000);
 }
 
-// SETTINGS — DELETE ACCOUNT
+// SETTINGS — DELETE ACCOUNT (soft delete)
 async function deleteAccount(){
-  if(!confirm('Are you sure? This permanently deletes your account and ALL data. This cannot be undone.')) return;
-  if(!confirm('Last chance — delete everything?')) return;
+  if(!confirm('Are you sure you want to delete your account?\n\nYour data will be kept for 30 days. If you change your mind, just log back in and everything will be restored.')) return;
+  if(!confirm('Confirm account deletion. You can restore it within 30 days by logging back in.')) return;
   if(!sb||!user) return;
   try{
-    await sb.from('projects').delete().eq('user_id',user.id);
-    await sb.from('generations').delete().eq('user_id',user.id);
-    await sb.from('profiles').delete().eq('id',user.id);
-    await sb.auth.admin?.deleteUser(user.id);
+    var sess=await sb.auth.getSession();
+    var token=sess.data?.session?.access_token;
+    var res=await fetch('/api/delete-account',{method:'POST',headers:{'Authorization':'Bearer '+token}});
+    if(!res.ok) throw new Error('Failed');
     await sb.auth.signOut();
-    location.href='/';
+    // Redirect to landing with message
+    location.href='/?deleted=1';
   }catch(e){alert('Could not delete account. Please contact support@kenzoagent.com');}
 }
 
@@ -1151,6 +1154,28 @@ function updateFontSize(val){
 
 // FAQ TOGGLE
 function toggleFaq(el){el.classList.toggle('open');}
+
+// RESTORE CHECK — called on every login
+async function checkAndRestoreAccount(token){
+  try{
+    var res=await fetch('/api/restore-account',{method:'POST',headers:{'Authorization':'Bearer '+token}});
+    if(!res.ok) return;
+    var data=await res.json();
+    if(data.status==='restored'){
+      // Show welcome back toast
+      showToast('👋 Welcome back! Your account has been fully restored.','#22C55E');
+    }
+  }catch(e){}
+}
+
+// TOAST NOTIFICATION
+function showToast(msg,color){
+  var t=document.createElement('div');
+  t.textContent=msg;
+  t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:'+(color||'#3B82F6')+';color:#fff;padding:12px 24px;border-radius:12px;font-size:13px;font-weight:600;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,.4);animation:ppIn .2s ease';
+  document.body.appendChild(t);
+  setTimeout(function(){t.style.opacity='0';t.style.transition='opacity .4s';setTimeout(function(){t.remove();},400);},4000);
+}
 
 // USERNAME CHECK (shared helper)
 function checkUsernameField(input,hintId){

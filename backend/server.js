@@ -592,6 +592,47 @@ app.post('/api/brainstorm', async (req, res) => {
 // ── Health ──────────────────────────────────────────────────────────────────
 app.get('/health', (req, res) => res.json({ status: 'ok', version: '3.2.0-usage-tracking' }));
 
+// ── Soft Delete Account ──────────────────────────────────────────────────────
+app.post('/api/delete-account', async (req, res) => {
+  try {
+    const user = await verifyUser(req.headers.authorization);
+    if (!user?.id) return res.status(401).json({ error: 'Unauthorized' });
+
+    // Soft delete: set deleted_at on profile
+    await supabaseRequest('PATCH', `profiles?id=eq.${user.id}`, {
+      deleted_at: new Date().toISOString()
+    });
+
+    res.json({ success: true });
+  } catch (e) {
+    console.error('Delete account error:', e);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ── Check / Restore Account ──────────────────────────────────────────────────
+app.post('/api/restore-account', async (req, res) => {
+  try {
+    const user = await verifyUser(req.headers.authorization);
+    if (!user?.id) return res.status(401).json({ error: 'Unauthorized' });
+
+    // Get profile deleted_at
+    const profiles = await supabaseRequest('GET', `profiles?id=eq.${user.id}&select=deleted_at`);
+    const profile = Array.isArray(profiles) ? profiles[0] : null;
+
+    if (!profile?.deleted_at) return res.json({ status: 'active' });
+
+    const daysSince = (Date.now() - new Date(profile.deleted_at).getTime()) / (1000 * 60 * 60 * 24);
+    if (daysSince > 30) return res.json({ status: 'wiped' });
+
+    // Restore — clear deleted_at
+    await supabaseRequest('PATCH', `profiles?id=eq.${user.id}`, { deleted_at: null });
+    res.json({ status: 'restored' });
+  } catch (e) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Legacy /api/generate and /api/job/:jobId endpoints removed (v3.8)
 // All generation now uses /api/generate-stream (SSE)
 
