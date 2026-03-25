@@ -695,9 +695,6 @@
     <!-- Right panel -->
     <div id="right-panel">
       <div id="tab-bar">
-        <button class="tab-btn" id="tab-files" onclick="toggleFileTree()" title="Toggle file tree">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-        </button>
         <button class="tab-btn active" id="tab-preview" onclick="switchTab('preview')">Preview</button>
         <button class="tab-btn" id="tab-code" onclick="switchTab('code')">Code</button>
         <div class="tab-spacer"></div>
@@ -1587,10 +1584,6 @@
       if (!openTabs.includes('index.html')) openTabs = ['index.html', ...openTabs];
       renderFileTree();
       renderEditorTabs();
-      // Auto-show file tree if there are multiple files
-      if (Object.keys(projectFiles).length > 1 && !fileTreeVisible) {
-        toggleFileTree();
-      }
     }
 
     function renderFileTree() {
@@ -1725,7 +1718,6 @@
     function toggleFileTree() {
       fileTreeVisible = !fileTreeVisible;
       document.getElementById('file-tree-panel').classList.toggle('show', fileTreeVisible);
-      document.getElementById('tab-files').classList.toggle('active', fileTreeVisible);
       if (monacoEditor) setTimeout(() => monacoEditor.layout(), 200);
     }
 
@@ -1776,6 +1768,15 @@
       document.getElementById('pane-code').style.display = tab === 'code' ? 'block' : 'none';
       document.getElementById('tab-preview').classList.toggle('active', tab === 'preview');
       document.getElementById('tab-code').classList.toggle('active', tab === 'code');
+      // File tree: show with code, hide with preview
+      const hasFiles = Object.keys(projectFiles).length > 0;
+      if (tab === 'code' && hasFiles) {
+        fileTreeVisible = true;
+        document.getElementById('file-tree-panel').classList.add('show');
+      } else {
+        fileTreeVisible = false;
+        document.getElementById('file-tree-panel').classList.remove('show');
+      }
       if (tab === 'code' && monacoEditor) setTimeout(() => monacoEditor.layout(), 50);
     }
 

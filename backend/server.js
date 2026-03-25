@@ -70,6 +70,9 @@ const PLAN_LIMITS = {
   expert: Infinity
 };
 
+// Admin accounts — unlimited access
+const ADMIN_USERS = ['69ef123f-b5de-4d16-999d-aa1fef63001e'];
+
 // ── Supabase helpers ────────────────────────────────────────────────────────
 async function supabaseRequest(method, path, body, token) {
   const url = `${SUPABASE_URL}/rest/v1/${path}`;
@@ -332,6 +335,8 @@ app.post('/api/generate-stream', async (req, res) => {
   let userId = null;
   if (user) {
     userId = user.id;
+    if (ADMIN_USERS.includes(userId)) { /* admin bypass */ }
+    else {
     const plan = await getUserPlan(userId);
     const used = await getMonthlyUsage(userId);
     const limit = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
@@ -342,6 +347,7 @@ app.post('/api/generate-stream', async (req, res) => {
         plan, used, limit
       });
     }
+    } // close else for admin bypass
   } else {
     // Guest: server-side IP-based limit
     const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip;
