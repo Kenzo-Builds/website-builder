@@ -1465,7 +1465,15 @@
           if (token) genHeaders['Authorization'] = `Bearer ${token}`;
         }
 
-        const genBody = { prompt, model, existingCode: currentHtml || null };
+        // Send all project files as context for multi-file awareness
+        let existingCode = null;
+        if (Object.keys(projectFiles).length > 1) {
+          saveActiveFile();
+          existingCode = Object.entries(projectFiles).map(([f, c]) => `--- FILE: ${f} ---\n${c}`).join('\n\n');
+        } else {
+          existingCode = currentHtml || null;
+        }
+        const genBody = { prompt, model, existingCode };
         if (attachSnapshot) {
           genBody.image = attachSnapshot.base64;
           genBody.imageMimeType = attachSnapshot.mimeType;
@@ -1535,10 +1543,23 @@
                 window._streamRaw = '';
                 currentHtml = event.html;
                 currentBuildId = event.buildId;
-                initProjectFiles(currentHtml);
+                // Multi-file support: load all files if present
+                if (event.files && Object.keys(event.files).length > 1) {
+                  projectFiles = event.files;
+                  activeFile = 'index.html';
+                  openTabs = ['index.html'];
+                  renderFileTree();
+                  renderEditorTabs();
+                  updatePageRouteDropdown();
+                } else {
+                  initProjectFiles(currentHtml);
+                }
                 updatePreview(currentHtml, true);
                 updateEditor(currentHtml);
-                typingEl.innerHTML = `Done in ${Math.round(event.duration/1000)}s. Ask me to change anything.`;
+                const fileCount = event.files ? Object.keys(event.files).length : 1;
+                typingEl.innerHTML = fileCount > 1
+                  ? `Done in ${Math.round(event.duration/1000)}s — ${fileCount} files created. Ask me to change anything.`
+                  : `Done in ${Math.round(event.duration/1000)}s. Ask me to change anything.`;
                 setStatus('ready');
                 document.getElementById('deploy-btn').style.display = 'flex';
                 // Auto-save + usage

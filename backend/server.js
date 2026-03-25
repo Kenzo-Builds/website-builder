@@ -204,17 +204,43 @@ if (!fs.existsSync(BUILDS_DIR)) fs.mkdirSync(BUILDS_DIR, { recursive: true });
 const jobs = {};
 const guestUsage = {}; // IP -> { count, resetAt }
 
-const SYSTEM_PROMPT = `You are an expert web developer. Generate complete, beautiful, modern HTML pages.
-RULES:
-- Always return COMPLETE HTML (<!DOCTYPE html> to </html>)
-- Use Tailwind CSS via CDN for styling
-- Make it visually stunning
-- Include all content inline (no external files needed)
+const SYSTEM_PROMPT = `You are an expert web developer building multi-page websites.
+
+## OUTPUT FORMAT
+Return a multi-file project using this EXACT format. Each file starts with "--- FILE: filename ---" on its own line:
+
+--- FILE: index.html ---
+<!DOCTYPE html>
+<html>...</html>
+
+--- FILE: about.html ---
+<!DOCTYPE html>
+<html>...</html>
+
+--- FILE: css/styles.css ---
+/* shared styles */
+
+--- FILE: js/main.js ---
+// shared scripts
+
+## RULES
+- ALWAYS create at least: index.html and css/styles.css
+- Each HTML page must be COMPLETE (<!DOCTYPE html> to </html>)
+- Use a shared css/styles.css file linked in every HTML page: <link rel="stylesheet" href="css/styles.css">
+- Use Tailwind CSS via CDN AND your custom css/styles.css together
+- Add consistent navigation on every page linking to all other pages
 - Use placeholder images from https://picsum.photos/ when needed
-- Make it fully responsive (mobile-friendly)
-- Add subtle animations with CSS
+- Make everything fully responsive (mobile-friendly)
+- Add subtle CSS animations
 - Never use Lorem Ipsum — write real relevant content
-Return ONLY the HTML code, no explanations, no markdown — just raw HTML starting with <!DOCTYPE html>.`;
+- If the user asks for a single page, still create index.html + css/styles.css
+- Navigation links use relative paths: href="about.html" (not /about.html)
+
+## NAVIGATION RULE
+Every page MUST have the same navigation bar with links to ALL pages in the project. Keep nav consistent.
+
+## IMPORTANT
+Return ONLY the file contents in the format above. No explanations, no markdown code fences.`;
 
 function extractCode(response) {
   const htmlMatch = response.match(/```html\n?([\s\S]*?)```/i);
@@ -226,6 +252,31 @@ function extractCode(response) {
   const firstHtml = response.indexOf('<html');
   if (firstHtml >= 0) return response.substring(firstHtml).trim();
   return response.trim();
+}
+
+function extractMultiFile(response) {
+  // Try multi-file format: --- FILE: filename ---
+  const filePattern = /---\s*FILE:\s*(.+?)\s*---\n([\s\S]*?)(?=---\s*FILE:|$)/gi;
+  const files = {};
+  let match;
+  while ((match = filePattern.exec(response)) !== null) {
+    const filename = match[1].trim().toLowerCase();
+    const content = match[2].trim();
+    if (filename && content) files[filename] = content;
+  }
+  // If we found files, return them
+  if (Object.keys(files).length > 0) return files;
+  // Fallback: try to extract from markdown code fences
+  const fencePattern = /```(?:\w+)?\s*\n?\/\/\s*(\S+)\n([\s\S]*?)```/g;
+  while ((match = fencePattern.exec(response)) !== null) {
+    const filename = match[1].trim();
+    const content = match[2].trim();
+    if (filename && content) files[filename] = content;
+  }
+  if (Object.keys(files).length > 0) return files;
+  // Final fallback: single file
+  const html = extractCode(response);
+  return { 'index.html': html };
 }
 
 function callAI(messages, model) {
@@ -376,18 +427,20 @@ app.post('/api/generate-stream', async (req, res) => {
   const messages = [{ role: 'system', content: SYSTEM_PROMPT }];
 
   // Build user message — support image attachment
+  const isMultiFile = existingCode && existingCode.includes('--- FILE:');
   let userContent;
   if (image) {
-    // Vision: multimodal content array
     const textPart = existingCode
-      ? `Current HTML:\n${existingCode}\n\nModify based on the attached image and instruction: ${prompt}`
+      ? `Current project files:\n${existingCode}\n\nModify based on the attached image and instruction: ${prompt}`
       : `Create a website based on the attached image and instruction: ${prompt}`;
     userContent = [
       { type: 'text', text: textPart },
       { type: 'image_url', image_url: { url: `data:${imageMimeType || 'image/jpeg'};base64,${image}` } }
     ];
   } else if (existingCode) {
-    userContent = `Current HTML:\n${existingCode}\n\nModify: ${prompt}`;
+    userContent = isMultiFile
+      ? `Current project files:\n${existingCode}\n\nModify: ${prompt}\n\nReturn ALL files in the project (modified and unmodified) using the --- FILE: filename --- format.`
+      : `Current HTML:\n${existingCode}\n\nModify: ${prompt}`;
   } else {
     userContent = `Create a website: ${prompt}`;
   }
@@ -403,21 +456,28 @@ app.post('/api/generate-stream', async (req, res) => {
     },
     // onDone
     (fullContent) => {
-      const html = extractCode(fullContent);
+      const files = extractMultiFile(fullContent);
+      const html = files['index.html'] || extractCode(fullContent);
 
-      // Save build
+      // Save build (all files)
       const buildId = crypto.randomUUID();
       const buildPath = path.join(BUILDS_DIR, buildId);
-      fs.mkdirSync(buildPath);
-      fs.writeFileSync(path.join(buildPath, 'index.html'), html);
+      fs.mkdirSync(buildPath, { recursive: true });
+      for (const [filename, content] of Object.entries(files)) {
+        const filePath = path.join(buildPath, filename);
+        const dir = path.dirname(filePath);
+        if (dir !== buildPath) fs.mkdirSync(dir, { recursive: true });
+        fs.writeFileSync(filePath, content);
+      }
 
       // Log generation
       if (userId) logGeneration(userId, model, prompt);
 
       const duration = Date.now() - startTime;
-      console.log(`[stream] done ${html.length} chars in ${duration}ms`);
+      const fileCount = Object.keys(files).length;
+      console.log(`[stream] done ${fileCount} files, ${html.length} chars index.html in ${duration}ms`);
 
-      res.write(`data: ${JSON.stringify({ type: 'done', html, buildId, duration })}\n\n`);
+      res.write(`data: ${JSON.stringify({ type: 'done', html, files, buildId, duration })}\n\n`);
       res.end();
     },
     // onError
