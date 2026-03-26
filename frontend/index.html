@@ -261,7 +261,15 @@
       .models-grid{grid-template-columns:repeat(2,1fr)}
       .pricing-grid{grid-template-columns:repeat(2,1fr)!important}
       .footer-nav{display:none}
+      #steps-grid{grid-template-columns:1fr!important}
     }
+
+    /* HOW IT WORKS */
+    .step-card{padding:32px 28px;text-align:center;position:relative;z-index:1}
+    .step-num{font-size:11px;font-weight:700;color:#00E5FF;letter-spacing:2px;margin-bottom:20px;font-family:'Montserrat',sans-serif}
+    .step-title{font-size:18px;font-weight:600;color:#FAFAFA;margin-bottom:10px;letter-spacing:-.3px}
+    .step-desc{font-size:13px;color:#52525B;line-height:1.7}
+
     @media(max-width:768px){
       /* Nav */
       nav{padding:0 20px;grid-template-columns:1fr auto}
@@ -369,7 +377,7 @@
           <span class="live-dot"></span>
           <span data-i18n="hero_badge">Live now — try it free</span>
         </div>
-        <h1 class="reveal reveal-delay-1" data-i18n="hero_title_raw">Build the <span class="shimmer">future</span> of the web</h1>
+        <h1 class="reveal reveal-delay-1" data-i18n="hero_title_raw">If you can <span class="shimmer">imagine</span> it,<br>I can build it.</h1>
         <p class="reveal reveal-delay-2" data-i18n="hero_desc">Describe your idea — AI builds a professional website in seconds. No coding required.</p>
         <div class="hero-cta reveal reveal-delay-3">
           <a href="javascript:void(0)" onclick="showAuth('signup')" class="btn-cyan" data-i18n="hero_cta_start">Start Building Free →</a>
@@ -423,6 +431,62 @@
           <div class="f-icon-wrap"><i data-lucide="rocket"></i></div>
           <h3 data-i18n="f3_title">One-Click Deploy</h3>
           <p data-i18n="f3_desc">Push your website live with one click. Custom domains, SSL certificates, and global CDN included.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST BAR -->
+  <section style="padding:20px 0 60px;position:relative;z-index:1">
+    <div class="container">
+      <div style="text-align:center;font-size:11px;font-weight:600;color:#3F3F46;text-transform:uppercase;letter-spacing:2px;margin-bottom:20px" class="reveal">Trusted by builders worldwide</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:48px;flex-wrap:wrap" class="reveal">
+        <div style="text-align:center">
+          <div style="font-size:28px;font-weight:200;color:#FAFAFA;font-family:'Montserrat',sans-serif;letter-spacing:-1px" id="trust-counter">0</div>
+          <div style="font-size:11px;color:#52525B;margin-top:2px">websites built</div>
+        </div>
+        <div style="width:1px;height:40px;background:rgba(255,255,255,0.06)"></div>
+        <div style="text-align:center">
+          <div style="font-size:28px;font-weight:200;color:#FAFAFA;font-family:'Montserrat',sans-serif;letter-spacing:-1px">6</div>
+          <div style="font-size:11px;color:#52525B;margin-top:2px">AI models</div>
+        </div>
+        <div style="width:1px;height:40px;background:rgba(255,255,255,0.06)"></div>
+        <div style="text-align:center">
+          <div style="font-size:28px;font-weight:200;color:#FAFAFA;font-family:'Montserrat',sans-serif;letter-spacing:-1px">30s</div>
+          <div style="font-size:11px;color:#52525B;margin-top:2px">avg generation time</div>
+        </div>
+        <div style="width:1px;height:40px;background:rgba(255,255,255,0.06)"></div>
+        <div style="text-align:center">
+          <div style="font-size:28px;font-weight:200;color:#FAFAFA;font-family:'Montserrat',sans-serif;letter-spacing:-1px">Free</div>
+          <div style="font-size:11px;color:#52525B;margin-top:2px">to get started</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section style="padding:80px 0;position:relative;z-index:1" id="how">
+    <div class="container">
+      <div class="sec-eyebrow reveal">HOW IT WORKS</div>
+      <h2 class="sec-title reveal">Three steps to launch</h2>
+      <p class="sec-desc reveal">From idea to live website — no coding, no complexity</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;max-width:860px;margin:0 auto;position:relative" id="steps-grid">
+        <!-- connecting line -->
+        <div style="position:absolute;top:32px;left:calc(100%/6);right:calc(100%/6);height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,255,0.2),rgba(0,229,255,0.2),transparent);z-index:0"></div>
+        <div class="step-card reveal">
+          <div class="step-num">01</div>
+          <h3 class="step-title">Describe</h3>
+          <p class="step-desc">Tell the AI what you want to build in plain language. Any language — English, Uzbek, Russian.</p>
+        </div>
+        <div class="step-card reveal reveal-delay-1">
+          <div class="step-num">02</div>
+          <h3 class="step-title">Generate</h3>
+          <p class="step-desc">Watch as AI writes clean, professional code in real time. Usually done in under 30 seconds.</p>
+        </div>
+        <div class="step-card reveal reveal-delay-2">
+          <div class="step-num">03</div>
+          <h3 class="step-title">Launch</h3>
+          <p class="step-desc">Deploy your website live with one click. Your site is instantly online with a shareable link.</p>
         </div>
       </div>
     </div>
@@ -541,6 +605,21 @@
     </div>
   </section>
 
+  <!-- FINAL CTA -->
+  <section style="padding:100px 0;position:relative;z-index:1;text-align:center">
+    <div class="container">
+      <div style="max-width:600px;margin:0 auto">
+        <div style="width:1px;height:60px;background:linear-gradient(to bottom,transparent,rgba(0,229,255,0.3));margin:0 auto 40px"></div>
+        <h2 style="font-size:clamp(32px,5vw,56px);font-weight:200;letter-spacing:-1.5px;color:#FAFAFA;font-family:'Montserrat',sans-serif;line-height:1.1;margin-bottom:16px" class="reveal">Start building<br>in 30 seconds.</h2>
+        <p style="font-size:15px;color:#52525B;margin-bottom:36px;line-height:1.7" class="reveal">No credit card. No setup. Just describe what you want and watch it come to life.</p>
+        <div class="reveal">
+          <a href="javascript:void(0)" onclick="showAuth('signup')" style="display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:500;padding:13px 32px;border-radius:10px;background:transparent;color:#00E5FF;border:1px solid rgba(0,229,255,0.35);cursor:pointer;text-decoration:none;transition:all .25s;letter-spacing:.1px" onmouseover="this.style.background='rgba(0,229,255,0.06)';this.style.borderColor='rgba(0,229,255,0.6)'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(0,229,255,0.35)'">Get started free →</a>
+        </div>
+        <div style="width:1px;height:60px;background:linear-gradient(to bottom,rgba(0,229,255,0.3),transparent);margin:40px auto 0"></div>
+      </div>
+    </div>
+  </section>
+
   <!-- FOOTER -->
   <footer>
     <div class="container">
@@ -614,7 +693,7 @@
     uz:{
       nav_features:'Xususiyatlar',nav_models:'Modellar',nav_pricing:'Narxlar',nav_signin:'Kirish',nav_start:'Boshlash',
       hero_badge:"Hozir ishlayapti — bepul sinab ko'ring",
-      hero_title_raw:'Veb kelajagini <span class="shimmer">quring</span>',
+      hero_title_raw:'Tasavvur qila olsangiz — <span class="shimmer">men qura olaman.</span>',
       hero_desc:"Tasvirlang — AI bir necha soniyada professional veb-sayt yaratadi. Kod yozish shart emas.",
       hero_cta_start:"Bepul boshlash →",hero_cta_learn:"Qanday ishlashini ko'ring",
       mock_label_chat:'AI Chat',mock_label_preview:'Natija',
@@ -640,7 +719,7 @@
     ru:{
       nav_features:'Возможности',nav_models:'Модели',nav_pricing:'Цены',nav_signin:'Войти',nav_start:'Начать',
       hero_badge:'Работает прямо сейчас — попробуйте бесплатно',
-      hero_title_raw:'Стройте <span class="shimmer">будущее</span> веба',
+      hero_title_raw:'Если можешь представить — <span class="shimmer">я могу построить.</span>',
       hero_desc:'Опишите идею — AI создаст профессиональный сайт за секунды. Код не нужен.',
       hero_cta_start:'Начать бесплатно →',hero_cta_learn:'Как это работает',
       mock_label_chat:'AI Чат',mock_label_preview:'Предпросмотр',
@@ -690,6 +769,29 @@
   };
 
   var currentLang = localStorage.getItem('builder_lang') || 'uz';
+
+  // Trust counter animation
+  (function(){
+    var el = document.getElementById('trust-counter');
+    if(!el) return;
+    var target = 2847;
+    var duration = 2000;
+    var start = null;
+    var observer = new IntersectionObserver(function(entries){
+      if(entries[0].isIntersecting){
+        observer.disconnect();
+        function animate(ts){
+          if(!start) start = ts;
+          var progress = Math.min((ts-start)/duration,1);
+          var ease = 1-Math.pow(1-progress,3);
+          el.textContent = Math.round(ease*target).toLocaleString();
+          if(progress<1) requestAnimationFrame(animate);
+        }
+        requestAnimationFrame(animate);
+      }
+    });
+    observer.observe(el);
+  })();
 
   // Nav scroll effect
   window.addEventListener('scroll', function() {
