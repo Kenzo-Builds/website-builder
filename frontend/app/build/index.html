@@ -2389,6 +2389,30 @@
         }
       }
 
+      // Load template file directly (no AI generation)
+      const tplFile = sessionStorage.getItem('builder_template_file');
+      const tplName = sessionStorage.getItem('builder_template_name');
+      sessionStorage.removeItem('builder_template_file');
+      sessionStorage.removeItem('builder_template_name');
+
+      if (tplFile) {
+        try {
+          const res = await fetch(tplFile);
+          if (res.ok) {
+            const html = await res.text();
+            currentHtml = html;
+            initProjectFiles(currentHtml);
+            updatePreview(currentHtml);
+            updateEditor(currentHtml);
+            setMode('build');
+            addMessage('✦ Loaded template: <strong>' + (tplName||'Template') + '</strong>. Edit anything or tell me what to change.', 'ai');
+            document.getElementById('deploy-btn').style.display = 'flex';
+            if (tplName) document.getElementById('url-display').textContent = tplName.toLowerCase().replace(/\s+/g,'-');
+            return;
+          }
+        } catch(e) { console.warn('Template load failed:', e); }
+      }
+
       // New build from dashboard prompt
       if (prompt) {
         if (mode === 'build') setMode('build');

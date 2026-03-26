@@ -1723,6 +1723,10 @@ function openPreview(t){
   document.getElementById('pv-title').textContent=t.n;
   document.getElementById('preview-frame').src=t.file;
   document.getElementById('pv-use-btn').onclick=function(){
+    if(t.file){
+      sessionStorage.setItem('builder_template_file',t.file);
+      sessionStorage.setItem('builder_template_name',t.n);
+    }
     sessionStorage.setItem('builder_prompt',t.p);
     sessionStorage.setItem('builder_mode','build');
     sessionStorage.setItem('builder_model',curModel);
