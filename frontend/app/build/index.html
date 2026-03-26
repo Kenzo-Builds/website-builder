@@ -481,55 +481,59 @@
     .es-glow { position: absolute; inset: 0; z-index: 1; background: radial-gradient(ellipse 60% 50% at 50% 40%, rgba(0,229,255,0.06) 0%, transparent 70%); pointer-events: none; }
     /* Center card */
     .es-card {
-      position: relative; z-index: 2; width: 420px; max-width: 88%;
+      position: relative; z-index: 2; width: 560px; max-width: 92%;
       display: flex; flex-direction: column; align-items: center; text-align: center;
     }
     .es-sparkle { font-size: 28px; margin-bottom: 16px; opacity: 0.7; }
-    .es-title { font-family: 'Montserrat', sans-serif; font-weight: 300; font-size: 22px; color: var(--text); letter-spacing: -0.5px; margin-bottom: 8px; }
-    .es-sub { font-size: 13px; color: var(--text-3); line-height: 1.6; margin-bottom: 28px; }
+    .es-title { font-family: 'Montserrat', sans-serif; font-weight: 300; font-size: 26px; color: var(--text); letter-spacing: -0.5px; margin-bottom: 10px; }
+    .es-sub { font-size: 14px; color: var(--text-3); line-height: 1.6; margin-bottom: 32px; }
     /* Carousel */
-    .es-carousel { width: 100%; aspect-ratio: 16/10; border-radius: 14px; overflow: hidden; position: relative; background: var(--bg-card); border: 1px solid var(--border); box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
-    .es-slide { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; opacity: 0; transition: opacity 0.6s ease; }
+    .es-carousel { width: 100%; aspect-ratio: 16/9; border-radius: 14px; overflow: hidden; position: relative; background: var(--bg-card); border: 1px solid var(--border); box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+    .es-slide { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px; opacity: 0; transition: opacity 0.6s ease; }
     .es-slide.active { opacity: 1; }
-    .es-slide-num { font-size: 10px; font-weight: 700; color: rgba(0,229,255,0.5); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
-    .es-slide-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
-    .es-slide-desc { font-size: 12px; color: var(--text-3); line-height: 1.6; max-width: 300px; }
+    .es-slide-num { font-size: 11px; font-weight: 700; color: rgba(0,229,255,0.5); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
+    .es-slide-title { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .es-slide-desc { font-size: 13px; color: var(--text-3); line-height: 1.6; max-width: 360px; }
     /* Slide 1 — Dashboard mockup with typing */
-    .es-dash-mock { width: 300px; height: 140px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; margin-top: 12px; overflow: hidden; position: relative; }
-    .es-dash-header { height: 22px; background: rgba(255,255,255,0.03); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 8px; gap: 4px; }
-    .es-dash-dot { width: 5px; height: 5px; border-radius: 50%; }
-    .es-dash-body { padding: 10px; display: flex; flex-direction: column; gap: 6px; }
-    .es-dash-greeting { font-size: 9px; font-weight: 600; color: var(--text-2); }
-    .es-dash-input { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; display: flex; align-items: center; gap: 6px; }
-    .es-dash-typing { font-size: 9px; color: var(--text-2); overflow: hidden; white-space: nowrap; border-right: 1.5px solid var(--blue); width: 0; animation: esType 4s steps(35) infinite; max-width: 200px; }
+    .es-dash-mock { width: 420px; max-width: 100%; height: 170px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; margin-top: 14px; overflow: hidden; position: relative; }
+    .es-dash-header { height: 26px; background: rgba(255,255,255,0.03); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; gap: 5px; }
+    .es-dash-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .es-dash-body { padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+    .es-dash-greeting { font-size: 12px; font-weight: 600; color: var(--text-2); }
+    .es-dash-input { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; display: flex; align-items: center; gap: 8px; }
+    .es-dash-typing { font-size: 11px; color: var(--text-2); overflow: hidden; white-space: nowrap; border-right: 1.5px solid var(--blue); width: 0; animation: esType 4s steps(35) infinite; max-width: 280px; }
     @keyframes esType { 0%{width:0} 40%{width:200px} 75%{width:200px} 100%{width:0} }
     .es-dash-pills { display: flex; gap: 4px; margin-top: 2px; }
-    .es-dash-pill { font-size: 8px; padding: 2px 8px; border-radius: 10px; background: rgba(255,255,255,0.06); color: var(--text-3); }
+    .es-dash-pill { font-size: 10px; padding: 3px 12px; border-radius: 12px; background: rgba(255,255,255,0.06); color: var(--text-3); }
     .es-dash-pill.active { background: rgba(255,255,255,0.12); color: var(--text); }
     .es-dash-pill.highlight { animation: esPillFlash 4s ease infinite; }
     @keyframes esPillFlash { 0%,30%{background:rgba(255,255,255,0.06);color:var(--text-3)} 40%,60%{background:rgba(255,255,255,0.15);color:var(--text)} 70%,100%{background:rgba(255,255,255,0.06);color:var(--text-3)} }
-    .es-dash-send { width: 16px; height: 16px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; margin-left: auto; flex-shrink: 0; animation: esSendPulse 4s ease infinite; }
+    .es-dash-send { width: 22px; height: 22px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; margin-left: auto; flex-shrink: 0; animation: esSendPulse 4s ease infinite; }
     @keyframes esSendPulse { 0%,70%{transform:scale(1);opacity:0.5} 80%{transform:scale(1.15);opacity:1} 90%,100%{transform:scale(1);opacity:0.5} }
 
     /* Slide 2 — Split code + wireframe building */
-    .es-gen-wrap { display: flex; gap: 6px; margin-top: 12px; width: 300px; height: 120px; }
-    .es-gen-code { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; padding: 6px; font-family: monospace; font-size: 8px; line-height: 1.7; color: var(--text-3); overflow: hidden; position: relative; text-align: left; }
+    .es-gen-wrap { display: flex; gap: 8px; margin-top: 14px; width: 420px; max-width: 100%; height: 150px; }
+    .es-gen-code { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; padding: 8px; font-family: monospace; font-size: 10px; line-height: 1.8; color: var(--text-3); overflow: hidden; position: relative; text-align: left; }
     .es-gen-code .tag { color: #7DD3FC; }
     .es-gen-code .attr { color: #86EFAC; }
-    .es-gen-counter { position: absolute; bottom: 4px; right: 6px; font-size: 9px; font-weight: 700; color: var(--blue); font-variant-numeric: tabular-nums; }
+    .es-gen-counter { position: absolute; bottom: 6px; right: 8px; font-size: 11px; font-weight: 700; color: var(--blue); font-variant-numeric: tabular-nums; }
     .es-gen-preview { flex: 1; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
-    .es-gen-nav { height: 10px; background: rgba(255,255,255,0.05); border-bottom: 1px solid var(--border); animation: esBuildFade 0.5s ease 0.3s both; }
-    .es-gen-hero { height: 30px; margin: 4px; border-radius: 4px; background: linear-gradient(135deg,rgba(0,229,255,0.08),rgba(0,229,255,0.03)); animation: esBuildFade 0.5s ease 0.8s both; }
-    .es-gen-cards { display: flex; gap: 3px; padding: 0 4px; }
-    .es-gen-card { flex: 1; height: 20px; border-radius: 3px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+    .es-gen-nav { height: 14px; background: rgba(255,255,255,0.05); border-bottom: 1px solid var(--border); animation: esBuildFade 0.5s ease 0.3s both; display: flex; align-items: center; padding: 0 6px; gap: 8px; }
+    .es-gen-nav::before { content: ''; width: 30px; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; }
+    .es-gen-nav::after { content: ''; width: 20px; height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; }
+    .es-gen-hero { height: 40px; margin: 6px; border-radius: 6px; background: linear-gradient(135deg,rgba(0,229,255,0.08),rgba(0,229,255,0.03)); animation: esBuildFade 0.5s ease 0.8s both; display: flex; flex-direction: column; justify-content: center; padding: 0 10px; gap: 3px; }
+    .es-gen-hero::before { content: ''; width: 60%; height: 5px; background: rgba(255,255,255,0.1); border-radius: 3px; }
+    .es-gen-hero::after { content: ''; width: 35%; height: 3px; background: rgba(255,255,255,0.05); border-radius: 2px; }
+    .es-gen-cards { display: flex; gap: 4px; padding: 0 6px; }
+    .es-gen-card { flex: 1; height: 28px; border-radius: 4px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
     .es-gen-card:nth-child(1) { animation: esBuildFade 0.4s ease 1.4s both; }
     .es-gen-card:nth-child(2) { animation: esBuildFade 0.4s ease 1.8s both; }
     .es-gen-card:nth-child(3) { animation: esBuildFade 0.4s ease 2.2s both; }
-    .es-gen-footer { height: 8px; margin: 4px; border-radius: 2px; background: rgba(255,255,255,0.03); animation: esBuildFade 0.4s ease 2.8s both; }
+    .es-gen-footer { height: 12px; margin: 6px; border-radius: 3px; background: rgba(255,255,255,0.03); animation: esBuildFade 0.4s ease 2.8s both; }
     @keyframes esBuildFade { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
 
     /* Slide 3 — Real template preview */
-    .es-result-frame { width: 300px; height: 130px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); margin-top: 12px; position: relative; }
+    .es-result-frame { width: 440px; max-width: 100%; height: 170px; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); margin-top: 14px; position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
     .es-result-frame iframe { width: 400%; height: 400%; transform: scale(0.25); transform-origin: top left; border: none; pointer-events: none; }
 
     /* Dots */
@@ -963,7 +967,7 @@
                     <div class="es-dash-greeting">Good morning, Khumoyun</div>
                     <div class="es-dash-input">
                       <span class="es-dash-typing">Build a coffee shop website with menu and booking...</span>
-                      <div class="es-dash-send"><svg width="7" height="7" viewBox="0 0 24 24" fill="#0D0D0D" stroke="none"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></div>
+                      <div class="es-dash-send"><svg width="10" height="10" viewBox="0 0 24 24" fill="#0D0D0D" stroke="none"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></div>
                     </div>
                     <div class="es-dash-pills">
                       <div class="es-dash-pill highlight">Brainstorm</div>
