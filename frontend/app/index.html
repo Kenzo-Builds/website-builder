@@ -42,14 +42,14 @@
     /* SIDEBAR */
     .sidebar{width:230px;flex-shrink:0;background:#09090B;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;height:100vh;transition:width .2s ease;overflow:hidden}
     .sidebar.collapsed{width:56px}
-    /* Logo/header row — toggle left (same column as nav icons), logo pushed far right */
-    .sb-logo{display:flex;align-items:center;width:100%;padding:10px 16px;color:#fff;user-select:none;box-sizing:border-box;flex-shrink:0}
-    .sidebar.collapsed .sb-logo{justify-content:center;padding:10px 0}
+    /* Logo/header row — identical sizing to sb-item so toggle aligns in same column */
+    .sb-logo{display:flex;align-items:center;gap:10px;width:100%;padding:10px 16px;color:#fff;user-select:none;box-sizing:border-box;flex-shrink:0}
+    .sidebar.collapsed .sb-logo{justify-content:center;padding:10px;gap:0}
     .sb-logo-text{font-family:'Montserrat',sans-serif;font-weight:200;font-size:15px;letter-spacing:3px;text-transform:uppercase;white-space:nowrap;opacity:1;transition:opacity .2s,max-width .2s;max-width:200px;overflow:hidden;color:#fff;margin-left:auto}
     .sidebar.collapsed .sb-logo-text{opacity:0;max-width:0;pointer-events:none}
-    .sb-toggle{width:18px;height:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:0.45;transition:opacity .15s;background:none;border:none;cursor:pointer;padding:0}
+    .sb-toggle{width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:0.45;transition:opacity .15s;background:none;border:none;cursor:pointer;padding:0}
     .sb-toggle:hover{opacity:1}
-    .sb-toggle svg{width:18px;height:18px;stroke:#9CA3AF;stroke-width:1.75;fill:none}
+    .sb-toggle svg{width:20px;height:20px;stroke:#9CA3AF;stroke-width:1.75;fill:none}
     .sb-nav{flex:1;padding:4px 0;overflow-y:auto;overflow-x:hidden}
     .sb-item{display:flex;align-items:center;gap:10px;width:100%;padding:10px 16px;border-radius:8px;border:none;background:none;color:#9CA3AF;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;text-align:left;transition:all .15s;white-space:nowrap;box-sizing:border-box}
     .sidebar.collapsed .sb-item{justify-content:center;padding:10px;gap:0}
