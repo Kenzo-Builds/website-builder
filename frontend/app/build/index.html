@@ -476,7 +476,7 @@
       transition: opacity 0.4s ease; overflow: hidden;
     }
     /* Matrix rain canvas — background layer */
-    #matrix-canvas { position: absolute; inset: 0; z-index: 0; opacity: 0.06; }
+    #matrix-canvas { position: absolute; inset: 0; z-index: 0; opacity: 0.14; }
     /* Radial glow overlay */
     .es-glow { position: absolute; inset: 0; z-index: 1; background: radial-gradient(ellipse 60% 50% at 50% 40%, rgba(0,229,255,0.06) 0%, transparent 70%); pointer-events: none; }
     /* Center card */
@@ -932,35 +932,57 @@
               <div class="es-slide active" data-slide="0">
                 <div class="es-slide-num">Step 01</div>
                 <div class="es-slide-title">Describe your idea</div>
-                <div class="es-slide-desc">Just type what you want in plain language</div>
-                <div class="es-typing-line">
-                  <span style="color:var(--text-3);font-size:11px">💬</span>
-                  <span class="es-typing-text">Build a coffee shop website with menu...</span>
+                <div class="es-slide-desc">Type in any language — English, Uzbek, Russian</div>
+                <div style="display:flex;flex-direction:column;gap:6px;margin-top:14px;width:260px">
+                  <div class="es-typing-line">
+                    <span style="font-size:11px">💬</span>
+                    <span class="es-typing-text">Build a coffee shop website with menu...</span>
+                  </div>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:4px">
+                    <span style="font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text-3)">🏪 Restaurant</span>
+                    <span style="font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text-3)">💼 Portfolio</span>
+                    <span style="font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text-3)">🛒 E-commerce</span>
+                  </div>
                 </div>
               </div>
               <!-- Slide 2: Generate -->
               <div class="es-slide" data-slide="1">
                 <div class="es-slide-num">Step 02</div>
                 <div class="es-slide-title">AI writes the code</div>
-                <div class="es-slide-desc">Watch as your website comes to life in real time</div>
-                <div class="es-code-block" id="es-code-anim">
-                  <div class="es-code-line" style="animation-delay:0s"><span class="tag">&lt;section</span> class=<span class="attr">"hero"</span><span class="tag">&gt;</span></div>
-                  <div class="es-code-line" style="animation-delay:0.3s">&nbsp;&nbsp;<span class="tag">&lt;h1&gt;</span>Best Coffee<span class="tag">&lt;/h1&gt;</span></div>
-                  <div class="es-code-line" style="animation-delay:0.6s">&nbsp;&nbsp;<span class="tag">&lt;p&gt;</span>Tashkent<span class="tag">&lt;/p&gt;</span></div>
-                  <div class="es-code-line" style="animation-delay:0.9s">&nbsp;&nbsp;<span class="tag">&lt;a</span> href=<span class="attr">"#menu"</span><span class="tag">&gt;</span></div>
-                  <div class="es-code-line" style="animation-delay:1.2s">&nbsp;&nbsp;&nbsp;&nbsp;View Menu →</div>
-                  <div class="es-code-line" style="animation-delay:1.5s">&nbsp;&nbsp;<span class="tag">&lt;/a&gt;&lt;/section&gt;</span></div>
+                <div class="es-slide-desc">Real-time generation with live preview</div>
+                <div style="display:flex;gap:8px;margin-top:14px;width:280px">
+                  <div class="es-code-block" style="flex:1;height:90px">
+                    <div class="es-code-line" style="animation-delay:0s"><span class="tag">&lt;section</span> class=<span class="attr">"hero"</span><span class="tag">&gt;</span></div>
+                    <div class="es-code-line" style="animation-delay:0.4s">&nbsp;&nbsp;<span class="tag">&lt;h1&gt;</span>Best Coffee<span class="tag">&lt;/h1&gt;</span></div>
+                    <div class="es-code-line" style="animation-delay:0.8s">&nbsp;&nbsp;<span class="tag">&lt;p&gt;</span>Tashkent, UZ<span class="tag">&lt;/p&gt;</span></div>
+                    <div class="es-code-line" style="animation-delay:1.2s">&nbsp;&nbsp;<span class="tag">&lt;a&gt;</span>Menu →<span class="tag">&lt;/a&gt;</span></div>
+                    <div class="es-code-line" style="animation-delay:1.6s"><span class="tag">&lt;/section&gt;</span></div>
+                  </div>
+                  <div style="flex:1;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px">
+                    <div style="width:80%;height:12px;background:linear-gradient(90deg,rgba(0,229,255,0.15),rgba(0,229,255,0.05));border-radius:4px"></div>
+                    <div style="width:60%;height:6px;background:rgba(255,255,255,0.06);border-radius:3px"></div>
+                    <div style="width:70%;height:6px;background:rgba(255,255,255,0.04);border-radius:3px"></div>
+                    <div style="width:40%;height:16px;margin-top:4px;background:rgba(0,229,255,0.12);border:1px solid rgba(0,229,255,0.2);border-radius:4px"></div>
+                    <div style="font-size:8px;color:var(--text-3);margin-top:2px">Live Preview</div>
+                  </div>
                 </div>
               </div>
               <!-- Slide 3: Launch -->
               <div class="es-slide" data-slide="2">
                 <div class="es-slide-num">Step 03</div>
                 <div class="es-slide-title">Deploy in one click</div>
-                <div class="es-slide-desc">Your website goes live instantly with a shareable link</div>
+                <div class="es-slide-desc">Your site goes live with a shareable link</div>
                 <div class="es-deploy-mock">
-                  <div class="es-confetti">🚀</div>
-                  <div class="es-deploy-btn">Deploy</div>
-                  <div class="es-deploy-url">yoursite.kenzoagent.com</div>
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <div class="es-confetti">🚀</div>
+                    <div class="es-deploy-btn">Deploy</div>
+                  </div>
+                  <div class="es-deploy-url">☁ yoursite.kenzoagent.com</div>
+                  <div style="display:flex;gap:14px;margin-top:6px">
+                    <span style="font-size:10px;color:var(--green);display:flex;align-items:center;gap:3px">● SSL secured</span>
+                    <span style="font-size:10px;color:var(--text-3);display:flex;align-items:center;gap:3px">⚡ CDN global</span>
+                    <span style="font-size:10px;color:var(--text-3);display:flex;align-items:center;gap:3px">🔗 Custom domain</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -2633,8 +2655,8 @@
           var x=i*fontSize;
           var y=drops[i]*fontSize;
           ctx.fillText(ch,x,y);
-          if(y>canvas.height && Math.random()>0.975) drops[i]=0;
-          drops[i]+=0.5+Math.random()*0.3;
+          if(y>canvas.height && Math.random()>0.985) drops[i]=0;
+          drops[i]+=0.22+Math.random()*0.13;
         }
         requestAnimationFrame(draw);
       }
