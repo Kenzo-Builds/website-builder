@@ -476,7 +476,7 @@
       transition: opacity 0.4s ease; overflow: hidden;
     }
     /* Matrix rain canvas — background layer */
-    #matrix-canvas { position: absolute; inset: 0; z-index: 0; opacity: 0.14; }
+    #matrix-canvas { position: absolute; inset: 0; z-index: 0; opacity: 0.2; }
     /* Radial glow overlay */
     .es-glow { position: absolute; inset: 0; z-index: 1; background: radial-gradient(ellipse 60% 50% at 50% 40%, rgba(0,229,255,0.06) 0%, transparent 70%); pointer-events: none; }
     /* Center card */
@@ -509,8 +509,7 @@
     .es-deploy-btn { padding: 8px 24px; border-radius: 8px; background: #fff; color: #0D0D0D; font-size: 12px; font-weight: 700; border: none; animation: esPulse 2s ease-in-out infinite; }
     @keyframes esPulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0.3)} 50%{box-shadow:0 0 0 8px rgba(255,255,255,0)} }
     .es-deploy-url { font-size: 11px; color: var(--text-3); font-family: monospace; }
-    .es-confetti { font-size: 18px; animation: esConfetti 2s ease infinite; }
-    @keyframes esConfetti { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-6px) scale(1.1)} }
+
     /* Dots */
     .es-dots { display: flex; gap: 8px; margin-top: 20px; position: relative; z-index: 2; }
     .es-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-3); opacity: 0.3; cursor: pointer; border: none; padding: 0; transition: all 0.2s; }
@@ -924,7 +923,7 @@
           <canvas id="matrix-canvas"></canvas>
           <div class="es-glow"></div>
           <div class="es-card">
-            <div class="es-sparkle">✦</div>
+            <div class="es-sparkle" style="opacity:0.4">✦</div>
             <div class="es-title">Build anything you imagine</div>
             <div class="es-sub">Describe your idea in the chat — AI generates your website in seconds</div>
             <div class="es-carousel">
@@ -935,13 +934,12 @@
                 <div class="es-slide-desc">Type in any language — English, Uzbek, Russian</div>
                 <div style="display:flex;flex-direction:column;gap:6px;margin-top:14px;width:260px">
                   <div class="es-typing-line">
-                    <span style="font-size:11px">💬</span>
                     <span class="es-typing-text">Build a coffee shop website with menu...</span>
                   </div>
                   <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:4px">
-                    <span style="font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text-3)">🏪 Restaurant</span>
-                    <span style="font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text-3)">💼 Portfolio</span>
-                    <span style="font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text-3)">🛒 E-commerce</span>
+                    <span style="font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text-3)">Restaurant</span>
+                    <span style="font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text-3)">Portfolio</span>
+                    <span style="font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text-3)">E-commerce</span>
                   </div>
                 </div>
               </div>
@@ -973,15 +971,12 @@
                 <div class="es-slide-title">Deploy in one click</div>
                 <div class="es-slide-desc">Your site goes live with a shareable link</div>
                 <div class="es-deploy-mock">
-                  <div style="display:flex;align-items:center;gap:10px">
-                    <div class="es-confetti">🚀</div>
-                    <div class="es-deploy-btn">Deploy</div>
-                  </div>
-                  <div class="es-deploy-url">☁ yoursite.kenzoagent.com</div>
+                  <div class="es-deploy-btn">Deploy</div>
+                  <div class="es-deploy-url">yoursite.kenzoagent.com</div>
                   <div style="display:flex;gap:14px;margin-top:6px">
-                    <span style="font-size:10px;color:var(--green);display:flex;align-items:center;gap:3px">● SSL secured</span>
-                    <span style="font-size:10px;color:var(--text-3);display:flex;align-items:center;gap:3px">⚡ CDN global</span>
-                    <span style="font-size:10px;color:var(--text-3);display:flex;align-items:center;gap:3px">🔗 Custom domain</span>
+                    <span style="font-size:10px;color:var(--green);display:flex;align-items:center;gap:3px">● SSL</span>
+                    <span style="font-size:10px;color:var(--text-3)">CDN</span>
+                    <span style="font-size:10px;color:var(--text-3)">Custom domain</span>
                   </div>
                 </div>
               </div>
@@ -2630,7 +2625,7 @@
       var ctx=canvas.getContext('2d');
       var chars='01</>{}();:.#ABCDEFabcdef';
       var drops=[];
-      var fontSize=14;
+      var fontSize=20;
       var cols;
       var running=true;
 
@@ -2655,8 +2650,8 @@
           var x=i*fontSize;
           var y=drops[i]*fontSize;
           ctx.fillText(ch,x,y);
-          if(y>canvas.height && Math.random()>0.985) drops[i]=0;
-          drops[i]+=0.22+Math.random()*0.13;
+          if(y>canvas.height && Math.random()>0.99) drops[i]=0;
+          drops[i]+=0.11+Math.random()*0.06;
         }
         requestAnimationFrame(draw);
       }
