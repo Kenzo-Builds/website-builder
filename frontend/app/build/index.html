@@ -1450,11 +1450,11 @@
                   inp.style.height = 'auto';
                   inp.style.height = Math.min(inp.scrollHeight, 120) + 'px';
                 }
-              }).catch(function(e) { btn.classList.remove('transcribing'); btn.title = 'Voice input'; console.error('transcribe error', e); });
+              }).catch(function(e) { btn.classList.remove('transcribing'); btn.title = 'Voice input'; console.error('transcribe error', e); alert('Voice transcription failed: ' + e.message); });
             };
             fr.readAsDataURL(blob);
           };
-          _mediaRec.start(1000);
+          _mediaRec.start();
           btn.classList.add('recording');
           btn.title = 'Recording... (tap to stop)';
           // Start countdown
