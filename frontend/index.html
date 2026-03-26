@@ -168,14 +168,12 @@
     /* === PRICING === */
     .pricing{padding:100px 0}
     .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:900px;margin:0 auto}
-    .pr-card{background:rgba(255,255,255,0.03);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:32px 28px;text-align:left;transition:all .35s cubic-bezier(.2,0,.2,1);position:relative;animation:cardFloat 6s ease-in-out infinite alternate}
+    .pr-card{background:rgba(255,255,255,0.03);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:32px 28px;text-align:left;transition:border-color .25s ease,box-shadow .25s ease,transform .25s ease;position:relative;animation:cardFloat 6s ease-in-out infinite alternate}
     .pr-card:nth-child(2){animation-delay:-2s}
     .pr-card:nth-child(3){animation-delay:-4s}
-    .pr-card::before{content:'';position:absolute;inset:-1px;border-radius:25px;background:linear-gradient(135deg,rgba(0,229,255,0),rgba(0,229,255,0),rgba(0,229,255,0));transition:all .35s ease;z-index:-1;opacity:0}
-    .pr-card:hover{transform:scale(1.03) translateY(-4px)!important;border-color:rgba(0,229,255,0.4);box-shadow:0 0 40px rgba(0,229,255,0.12),0 16px 40px rgba(0,0,0,.4)}
-    .pr-card:hover::before{opacity:1;background:linear-gradient(135deg,rgba(0,229,255,0.5),rgba(103,232,249,0.3),rgba(0,229,255,0.5))}
-    .pr-card.popular{border-color:rgba(0,229,255,0.3);box-shadow:0 0 40px rgba(0,229,255,0.08)}
-    .pr-card.popular:hover{transform:scale(1.04) translateY(-6px)!important;box-shadow:0 0 60px rgba(0,229,255,0.2),0 20px 50px rgba(0,0,0,.5)}
+    .pr-card:hover{transform:translateY(-4px);border-color:rgba(0,229,255,0.3);box-shadow:0 0 28px rgba(0,229,255,0.07),0 12px 32px rgba(0,0,0,.3)}
+    .pr-card.popular{border-color:rgba(0,229,255,0.2)}
+    .pr-card.popular:hover{border-color:rgba(0,229,255,0.45);box-shadow:0 0 36px rgba(0,229,255,0.1),0 14px 36px rgba(0,0,0,.4)}
     .pr-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#00E5FF;color:#09090B;font-size:10px;font-weight:800;padding:4px 14px;border-radius:20px;letter-spacing:.5px;white-space:nowrap}
     .pr-card h4{font-size:14px;font-weight:700;color:#71717A;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px}
     .pr-price{font-size:48px;font-weight:900;color:#FAFAFA;letter-spacing:-2px;line-height:1}
@@ -188,10 +186,10 @@
     .pr-list li:last-child{border-bottom:none}
     .check-icon{width:16px;height:16px;border-radius:50%;background:transparent;border:1px solid rgba(0,229,255,0.35);display:flex;align-items:center;justify-content:center;flex-shrink:0}
     .check-icon svg{width:9px;height:9px;color:#00E5FF}
-    .pr-btn-cyan{width:100%;padding:12px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.8);transition:all .2s;font-family:inherit;background:#FFFFFF;color:#09090B;display:block;text-align:center;text-decoration:none}
-    .pr-btn-cyan:hover{background:#F0FEFF;transform:translateY(-1px);box-shadow:0 4px 24px rgba(0,229,255,.12),0 2px 12px rgba(0,0,0,.3)}
-    .pr-btn-outline{width:100%;padding:12px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#A1A1AA;display:block;text-align:center;text-decoration:none}
-    .pr-btn-outline:hover{border-color:rgba(255,255,255,0.2);color:#E4E4E7}
+    .pr-btn-cyan{width:100%;padding:12px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid rgba(0,229,255,0.35);transition:all .2s;font-family:inherit;background:transparent;color:#00E5FF;display:block;text-align:center;text-decoration:none;letter-spacing:.1px}
+    .pr-btn-cyan:hover{background:rgba(0,229,255,0.06);border-color:rgba(0,229,255,0.55)}
+    .pr-btn-outline{width:100%;padding:12px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;font-family:inherit;background:transparent;border:1px solid rgba(255,255,255,0.1);color:#71717A;display:block;text-align:center;text-decoration:none;letter-spacing:.1px}
+    .pr-btn-outline:hover{border-color:rgba(255,255,255,0.2);color:#A1A1AA}
 
     /* === FOOTER === */
     footer{padding:48px 0 32px;border-top:1px solid rgba(255,255,255,0.06);position:relative;z-index:1}
