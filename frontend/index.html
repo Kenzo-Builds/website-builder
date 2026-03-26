@@ -1245,7 +1245,7 @@
   if (new URLSearchParams(location.search).get('deleted') === '1') {
     var banner = document.createElement('div');
     banner.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#111113;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:20px 28px;max-width:460px;width:90%;z-index:999;box-shadow:0 8px 40px rgba(0,0,0,.7);text-align:center';
-    banner.innerHTML = '<div style="font-size:20px;margin-bottom:8px">👋 Sorry to see you go</div><div style="font-size:13px;color:#71717A;line-height:1.7">Your account is scheduled for deletion. We\'ll keep your data safe for <strong style="color:#E4E4E7">30 days</strong>.<br>If you change your mind, simply log back in and everything will be restored.</div><button onclick="this.parentElement.remove()" style="margin-top:16px;padding:9px 22px;border-radius:10px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);color:#A1A1AA;font-size:12px;cursor:pointer;font-family:inherit;transition:all .2s">Got it</button>';
+    banner.innerHTML = '<div style="font-size:15px;font-weight:600;color:#FAFAFA;margin-bottom:8px">Sorry to see you go</div><div style="font-size:13px;color:#71717A;line-height:1.7">Your account is scheduled for deletion. We\'ll keep your data safe for <strong style="color:#E4E4E7">30 days</strong>.<br>If you change your mind, simply log back in and everything will be restored.</div><button onclick="this.parentElement.remove()" style="margin-top:16px;padding:9px 22px;border-radius:10px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);color:#A1A1AA;font-size:12px;cursor:pointer;font-family:inherit;transition:all .2s">Got it</button>';
     document.body.appendChild(banner);
   }
 

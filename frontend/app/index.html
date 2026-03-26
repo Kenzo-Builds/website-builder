@@ -548,7 +548,7 @@
       <button class="sb-item" data-v="templates"><i data-lucide="layout-grid"></i><span class="sb-item-label">Templates</span></button>
 
     </div>
-    <div class="sb-upgrade" onclick="location.href='/#pricing'"><b>✨ Upgrade your plan</b><span>Get more builds & premium models</span></div>
+    <div class="sb-upgrade" onclick="location.href='/#pricing'"><b><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="2" style="display:inline;vertical-align:-2px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Upgrade your plan</b><span>Get more builds & premium models</span></div>
     <div class="sb-footer">
       <div class="profile-popup" id="pp"></div>
       <button class="sb-profile" id="prof-btn">
@@ -714,7 +714,7 @@
         <div class="pf-field">
           <div class="pf-label">Email</div>
           <input class="pf-input" type="email" id="pf-email" aria-label="Email address" readonly>
-          <div class="pf-hint">🔒 Email can be changed in Account Settings</div>
+          <div class="pf-hint">Email can be changed in Account Settings</div>
         </div>
         <div class="pf-field">
           <div class="pf-label">Phone Number</div>
@@ -809,8 +809,8 @@
                 <input class="pf-input" type="text" id="sp-pf-username" aria-label="Username" placeholder="your-username" oninput="checkUsernameField(this,'sp-pf-username-hint')">
                 <div class="pf-hint" id="sp-pf-username-hint">Lowercase letters, numbers, and hyphens only (3-20 chars)</div>
               </div>
-              <div class="pf-field"><div class="pf-label">Email</div><input class="pf-input" type="email" id="sp-pf-email" aria-label="Email address" readonly><div class="pf-hint">🔒 Change email in Account Settings</div></div>
-              <div class="pf-field"><div class="pf-label">Phone Number</div><input class="pf-input" type="tel" id="sp-pf-phone" aria-label="Phone number" readonly><div class="pf-hint">🔒 Change phone number in Account Settings</div></div>
+              <div class="pf-field"><div class="pf-label">Email</div><input class="pf-input" type="email" id="sp-pf-email" aria-label="Email address" readonly><div class="pf-hint">Change email in Account Settings</div></div>
+              <div class="pf-field"><div class="pf-label">Phone Number</div><input class="pf-input" type="tel" id="sp-pf-phone" aria-label="Phone number" readonly><div class="pf-hint">Change phone number in Account Settings</div></div>
               <div class="pf-field"><div class="pf-label">Bio</div><textarea class="pf-input pf-textarea" id="sp-pf-bio" aria-label="Bio" placeholder="Tell us about yourself" maxlength="220"></textarea></div>
               <div class="pf-row">
                 <div class="pf-field"><div class="pf-label">Location</div><input class="pf-input" type="text" id="sp-pf-location" aria-label="Location" placeholder="City, Country"></div>
@@ -1328,7 +1328,7 @@ function requireReauth(onSuccess){
   overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);z-index:99999;display:flex;align-items:center;justify-content:center;animation:ppIn .15s ease';
   overlay.innerHTML=`
     <div style="background:#0F0F12;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:28px;width:90%;max-width:380px;box-shadow:0 24px 64px rgba(0,0,0,.7);animation:cmIn .2s ease">
-      <div style="width:44px;height:44px;border-radius:12px;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.2);display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 16px">🔒</div>
+      <div style="width:44px;height:44px;border-radius:12px;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="1.75"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
       <div style="font-size:17px;font-weight:700;color:#F4F4F5;text-align:center;margin-bottom:6px">Confirm your identity</div>
       <div style="font-size:13px;color:#71717A;text-align:center;margin-bottom:20px">Enter your current password to continue</div>
       <input id="reauth-pw" type="password" placeholder="Current password" aria-label="Current password"
@@ -1436,7 +1436,7 @@ function deleteAccount(){
   overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);z-index:99999;display:flex;align-items:center;justify-content:center;animation:ppIn .15s ease';
   overlay.innerHTML=`
     <div style="background:#0F0F12;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:28px 28px 20px;width:90%;max-width:400px;box-shadow:0 24px 64px rgba(0,0,0,.7);animation:cmIn .2s ease">
-      <div style="width:44px;height:44px;border-radius:12px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.2);display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 16px">🗑️</div>
+      <div style="width:44px;height:44px;border-radius:12px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="1.75"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>
       <div style="font-size:17px;font-weight:700;color:#F4F4F5;text-align:center;margin-bottom:10px">Delete account?</div>
       <div style="font-size:13px;color:#71717A;text-align:center;line-height:1.7;margin-bottom:24px">Your data will be kept safe for <span style="color:#F4F4F5;font-weight:600">30 days</span>. If you change your mind, just log back in and everything will be restored.</div>
       <div style="display:flex;gap:10px">
@@ -1503,7 +1503,7 @@ async function checkAndRestoreAccount(token){
     var data=await res.json();
     if(data.status==='restored'){
       // Show welcome back toast
-      showToast('👋 Welcome back! Your account has been fully restored.','#22C55E');
+      showToast('Welcome back! Your account has been fully restored.','#22C55E');
     }
   }catch(e){}
 }
@@ -1677,7 +1677,7 @@ function updateAuth(){
 async function doLogout(){
   showCModal('delete',null);
   document.getElementById('cm-icon').className='cm-icon danger';
-  document.getElementById('cm-icon').textContent='👋';
+  document.getElementById('cm-icon').innerHTML='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="1.75"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>';
   document.getElementById('cm-title').textContent='Sign out?';
   document.getElementById('cm-sub').textContent='You will be redirected to the landing page.';
   document.getElementById('cm-confirm').className='cm-btn del';
@@ -1799,7 +1799,7 @@ function showCModal(action,id){
   var input=document.getElementById('cm-input');
   var btn=document.getElementById('cm-confirm');
   if(action==='delete'){
-    icon.className='cm-icon danger';icon.textContent='🗑️';
+    icon.className='cm-icon danger';icon.innerHTML='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="1.75"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
     title.textContent='Delete this project?';
     sub.textContent='This action cannot be undone.';
     input.style.display='none';
@@ -1977,7 +1977,7 @@ setTimeout(function(){
 <!-- Custom confirm modal -->
 <div class="cm-overlay" id="cm-overlay" onclick="if(event.target===this)closeCModal()">
   <div class="cm-box">
-    <div class="cm-icon" id="cm-icon">🗑️</div>
+    <div class="cm-icon" id="cm-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="1.75"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>
     <div class="cm-title" id="cm-title">Delete this project?</div>
     <div class="cm-sub" id="cm-sub">This action cannot be undone.</div>
     <input class="cm-input" id="cm-input" style="display:none" placeholder="Enter new name">
