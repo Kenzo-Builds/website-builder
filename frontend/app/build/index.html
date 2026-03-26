@@ -105,11 +105,7 @@
       position: relative; -webkit-overflow-scrolling: touch; padding-top: 4px;
     }
     #tab-bar::-webkit-scrollbar { display: none; }
-    /* Bottom border — runs across full bar, active tab will cover it */
-    #tab-bar::after {
-      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
-      background: var(--border); z-index: 0;
-    }
+    /* No explicit border — color difference between tab bar and content creates the visual separation */
     .tab-item {
       display: flex; align-items: center; gap: 10px; height: 100%; padding: 0 42px;
       font-size: 13px; font-weight: 500; color: var(--text-3);
@@ -121,12 +117,12 @@
     /* Active tab — blends into content below */
     .tab-item.active {
       background: var(--bg-2); color: var(--text);
-      border-radius: 16px 16px 0 0;
+      border-radius: 12px 12px 0 0;
       position: relative;
     }
-    /* Cover the bottom border under active tab */
+    /* Extend active tab color flush to content */
     .tab-item.active::after {
-      content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px;
+      content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
       background: var(--bg-2); z-index: 2;
     }
     /* Concave bottom-left corner */
