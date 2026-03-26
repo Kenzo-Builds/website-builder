@@ -260,9 +260,10 @@
     @media(max-width:900px){
       .features-grid{grid-template-columns:1fr}
       .models-grid{grid-template-columns:repeat(2,1fr)}
-      .pricing-grid{grid-template-columns:repeat(2,1fr)!important}
+      .pricing-grid{grid-template-columns:repeat(2,1fr)!important;max-width:100%!important}
       .footer-nav{display:none}
       #steps-grid{grid-template-columns:1fr!important}
+      #steps-grid .step-card::before{display:none}
     }
 
     /* EXAMPLES GALLERY */
@@ -330,9 +331,19 @@
       .sec-title{font-size:26px;letter-spacing:-.5px}
       .sec-desc{font-size:14px;margin-bottom:36px;padding:0 8px}
       .models-grid{grid-template-columns:1fr}
-      .pricing-grid{grid-template-columns:1fr;max-width:100%;padding:0 4px}
+      .pricing-grid{grid-template-columns:1fr!important;max-width:100%!important;padding:0 4px}
       .pr-card{padding:24px 20px}
       .f-card{padding:24px 20px}
+
+      /* Trust bar — stack vertically, hide dividers */
+      #trust-bar-inner{flex-direction:column!important;gap:20px!important}
+      #trust-bar-inner > div[style*="width:1px"]{display:none!important}
+
+      /* How it works connector line */
+      #steps-connector{display:none!important}
+
+      /* Final CTA */
+      .final-cta-title{font-size:32px!important}
 
       /* Footer */
       .footer-inner{flex-direction:column;text-align:center;gap:16px}
@@ -343,6 +354,10 @@
       nav{padding:0 16px}
       .container{padding:0 16px}
       .hero-mock{margin:0 8px}
+      .pr-card{padding:20px 16px}
+      .pricing-grid{padding:0!important}
+      .testi-card{padding:20px 16px}
+      .f-card{padding:20px 16px}
     }
   </style>
 </head>
@@ -470,7 +485,7 @@
   <section style="padding:20px 0 60px;position:relative;z-index:1">
     <div class="container">
       <div style="text-align:center;font-size:11px;font-weight:600;color:#3F3F46;text-transform:uppercase;letter-spacing:2px;margin-bottom:20px" class="reveal" data-i18n="trust_label">Trusted by builders worldwide</div>
-      <div style="display:flex;align-items:center;justify-content:center;gap:48px;flex-wrap:wrap" class="reveal">
+      <div id="trust-bar-inner" style="display:flex;align-items:center;justify-content:center;gap:48px;flex-wrap:wrap" class="reveal">
         <div style="text-align:center">
           <div style="font-size:28px;font-weight:200;color:#FAFAFA;font-family:'Montserrat',sans-serif;letter-spacing:-1px" id="trust-counter">0</div>
           <div style="font-size:11px;color:#52525B;margin-top:2px" data-i18n="trust_websites">websites built</div>
@@ -501,7 +516,7 @@
       <h2 class="sec-title reveal" data-i18n="how_title">Three steps to launch</h2>
       <p class="sec-desc reveal" data-i18n="how_desc">From idea to live website — no coding, no complexity</p>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;max-width:860px;margin:0 auto;position:relative" id="steps-grid">
-        <div style="position:absolute;top:32px;left:calc(100%/6);right:calc(100%/6);height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,255,0.2),rgba(0,229,255,0.2),transparent);z-index:0"></div>
+        <div id="steps-connector" style="position:absolute;top:32px;left:calc(100%/6);right:calc(100%/6);height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,255,0.2),rgba(0,229,255,0.2),transparent);z-index:0"></div>
         <div class="step-card reveal">
           <div class="step-num">01</div>
           <h3 class="step-title" data-i18n="step1_title">Describe</h3>
