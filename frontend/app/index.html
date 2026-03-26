@@ -94,7 +94,10 @@
     .pp-item.danger svg{color:#EF4444}
 
     /* MAIN */
-    .main{flex:1;overflow-y:auto}
+    .main{flex:1;overflow-y:auto;background:#09090B;position:relative}
+    .main::before{content:'';position:fixed;top:0;left:230px;right:0;height:100vh;background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(0,229,255,0.07) 0%,transparent 70%);pointer-events:none;z-index:0}
+    .sidebar.collapsed ~ .main::before{left:56px}
+    .page{position:relative;z-index:1}
 
     /* PAGES */
     .page{display:none;width:100%}
@@ -107,7 +110,7 @@
 
     /* PROMPT CARD */
     .prompt-wrap{max-width:820px;margin:0 auto}
-    .prompt-card{background:#0F0F12;border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+    .prompt-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.11);border-radius:14px;padding:16px;box-shadow:0 4px 24px rgba(0,0,0,.35);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
     .prompt-card:focus-within{border-color:rgba(99,102,241,0.18)}
     .attach-area{display:none;margin-bottom:8px;position:relative}
     .attach-area img{max-height:70px;border-radius:8px;border:1px solid rgba(255,255,255,0.08)}
@@ -171,7 +174,7 @@
     .more-btn:hover{background:rgba(255,255,255,0.08);color:#fff}
 
     /* RECENT SECTION */
-    .recent-section{max-width:880px;margin:32px auto 0;padding:0 32px 40px;width:100%}
+    .recent-section{max-width:880px;margin:32px auto 0;padding:0 32px 40px;width:100%;background:rgba(255,255,255,0.025);border-radius:20px 20px 0 0;border-top:1px solid rgba(255,255,255,0.07);border-left:1px solid rgba(255,255,255,0.05);border-right:1px solid rgba(255,255,255,0.05)}
     .rs-tabs{display:flex;gap:20px;border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:16px}
     .rs-tab{padding:8px 0;border:none;background:none;font-size:13px;font-weight:600;color:#6B7280;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit}
     .rs-tab:hover{color:#9CA3AF}
@@ -223,7 +226,7 @@
     .pcard-new span{font-size:11px;color:#6B7280}
 
     /* TEMPLATES — premium cards */
-    .tpl-section{max-width:820px;margin:40px auto 0;padding:0 32px 40px;width:100%}
+    .tpl-section{max-width:880px;margin:0 auto 0;padding:0 32px 40px;width:100%;background:rgba(255,255,255,0.025);border-left:1px solid rgba(255,255,255,0.05);border-right:1px solid rgba(255,255,255,0.05);border-bottom:1px solid rgba(255,255,255,0.05);border-radius:0 0 20px 20px}
     .tpl-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
     .tpl-header h3{font-size:15px;font-weight:600;color:#E5E7EB}
     .tpl-header a{font-size:12px;color:#6B7280;text-decoration:none;transition:color .15s}
@@ -397,7 +400,7 @@
     [data-theme="light"] .hero h1{background:linear-gradient(135deg,#0891B2,#06B6D4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
     [data-theme="light"] .hero p{color:var(--text-3)}
 
-    [data-theme="light"] .prompt-card{background:var(--bg-card);border-color:var(--border-2);box-shadow:0 2px 12px var(--shadow)}
+    [data-theme="light"] .prompt-card{background:rgba(255,255,255,0.85);border-color:var(--border-2);box-shadow:0 2px 12px var(--shadow);backdrop-filter:blur(12px)}
     [data-theme="light"] .prompt-card:focus-within{border-color:rgba(0,229,255,0.35)}
     [data-theme="light"] .prompt-textarea{color:var(--text-2)}
     [data-theme="light"] .prompt-textarea::placeholder{color:var(--text-5)}
