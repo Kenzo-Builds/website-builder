@@ -279,3 +279,34 @@ INTEGRATIONS
 
 *This document is the master blueprint. Every technology listed here is a Lego piece.
 Build them in order. Don't skip phases. Revenue from Phase 1 funds Phase 2, and so on.*
+
+---
+
+## WebContainer Architecture (Development → Deploy Flow)
+
+```
+DEVELOPMENT (user's browser, $0 cost to us):
+┌─────────────────────────────────────────────┐
+│              USER'S BROWSER                  │
+│  ┌──────────┐  ┌────────────────────────┐   │
+│  │ Chat +   │  │    WebContainer         │   │
+│  │ AI Code  │──│  Node.js + npm          │   │
+│  │ Editor   │  │  Express/Next.js        │   │
+│  │          │  │  SQLite database         │   │
+│  │          │  │  File system             │   │
+│  │          │  │  Live preview :3000      │   │
+│  └──────────┘  └────────────────────────┘   │
+│                        ↓ Deploy              │
+└────────────────────────┼────────────────────┘
+                         ↓
+PRODUCTION (our server, paid users only):
+┌─────────────────────────────────────────────┐
+│           HETZNER VPS                        │
+│  Nginx → booking.kenzoagent.com → port 4001 │
+│        → shop.kenzoagent.com    → port 4002 │
+│        → crm.kenzoagent.com     → port 4003 │
+│  Supabase → database per app                │
+└─────────────────────────────────────────────┘
+```
+
+Key insight: Development costs $0 (runs on user device). Only deployed apps cost server resources. Free users play without costing us anything. Paying users deploy and their subscription covers hosting.
