@@ -42,17 +42,17 @@
     /* SIDEBAR */
     .sidebar{width:230px;flex-shrink:0;background:#09090B;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;height:100vh;transition:width .2s ease;overflow:hidden}
     .sidebar.collapsed{width:56px}
-    .sb-logo{display:flex;align-items:center;gap:10px;padding:14px 12px;text-decoration:none;color:#fff;position:relative;cursor:pointer;user-select:none;transition:all .2s}
-    .sidebar.collapsed .sb-logo{padding:14px 0;justify-content:center;gap:0;cursor:pointer}
-    .sb-logo-icon{display:none}
-    .sb-logo-text{font-family:'Montserrat',sans-serif;font-weight:200;font-size:16px;letter-spacing:3px;text-transform:uppercase;white-space:nowrap;opacity:1;transition:opacity .15s;flex:1;color:#fff}
-    .sidebar.collapsed .sb-logo-text{opacity:0;width:0;overflow:hidden;flex:0}
-    .sb-toggle{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:0.5;transition:opacity .15s,background .15s;background:none}
+    .sb-logo{display:flex;align-items:center;gap:10px;padding:14px 12px;color:#fff;position:relative;user-select:none;transition:all .2s}
+    .sidebar.collapsed .sb-logo{padding:14px 0;justify-content:center;gap:0}
+    .sb-logo-text{font-family:'Montserrat',sans-serif;font-weight:200;font-size:16px;letter-spacing:3px;text-transform:uppercase;white-space:nowrap;opacity:1;transition:opacity .2s;flex:1;color:#fff}
+    .sidebar.collapsed .sb-logo-text{opacity:0;width:0;overflow:hidden;flex:0;pointer-events:none}
+    .sb-toggle{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:0.5;transition:opacity .15s,background .15s;background:none;border:none;cursor:pointer}
     .sb-toggle:hover{opacity:1;background:rgba(255,255,255,0.08)}
-    .sidebar.collapsed .sb-toggle{display:none}
-    .sb-toggle svg{width:13px;height:13px;color:#9CA3AF}
-    .sb-nav{flex:1;padding:4px 0;overflow-y:auto;overflow-x:hidden}
-    .sb-item{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-radius:8px;border:none;background:none;color:#9CA3AF;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;text-align:left;transition:all .15s;white-space:nowrap;box-sizing:border-box}
+    .sidebar.collapsed .sb-toggle{opacity:0.7;width:32px;height:32px;border-radius:8px}
+    .sidebar.collapsed .sb-toggle:hover{opacity:1;background:rgba(255,255,255,0.08)}
+    .sb-toggle i[data-lucide]{width:14px;height:14px;stroke:var(--text-3);stroke-width:1.75}
+    .sb-nav{flex:1;padding:4px 8px;overflow-y:auto;overflow-x:hidden}
+    .sb-item{display:flex;align-items:center;gap:10px;width:100%;padding:10px 16px;border-radius:8px;border:none;background:none;color:#9CA3AF;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;text-align:left;transition:all .15s;white-space:nowrap;box-sizing:border-box}
     .sidebar.collapsed .sb-item{justify-content:center;padding:10px;gap:0}
     .sb-item:hover{background:rgba(255,255,255,0.05);color:#D1D5DB}
     .sb-item.active{background:rgba(255,255,255,0.07);color:#fff}
@@ -564,9 +564,9 @@
 
   <!-- SIDEBAR -->
   <div class="sidebar" id="sidebar">
-    <div class="sb-logo" id="sb-logo-toggle" onclick="if(document.querySelector('.sidebar').classList.contains('collapsed'))toggleSidebar()">
+    <div class="sb-logo">
+      <button class="sb-toggle" onclick="toggleSidebar()" title="Toggle sidebar"><i data-lucide="panel-left"></i></button>
       <span class="sb-logo-text">AI Builder</span>
-      <div class="sb-toggle" onclick="event.stopPropagation();toggleSidebar()" style="cursor:pointer"><i data-lucide="panel-left" style="width:13px;height:13px"></i></div>
     </div>
     <div class="sb-nav">
       <button class="sb-item active" data-v="home"><i data-lucide="house"></i><span class="sb-item-label">Home</span></button>
