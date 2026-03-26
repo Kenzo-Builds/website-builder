@@ -776,15 +776,15 @@
       <h2 id="la-title">Create Account</h2>
       <p class="auth-sub" id="la-sub">Start building websites with AI — free</p>
       <div id="la-name-field" class="auth-field">
-        <label>Name</label>
+        <label id="la-name-label">Name</label>
         <input type="text" id="la-name" placeholder="Your name" />
       </div>
-      <div class="auth-field">
-        <label>Email</label>
+      <div class="auth-field" id="la-email-field">
+        <label id="la-email-label">Email</label>
         <input type="email" id="la-email" placeholder="you@example.com" onkeydown="if(event.key==='Enter')document.getElementById('la-password').focus()" />
       </div>
-      <div class="auth-field">
-        <label>Password</label>
+      <div class="auth-field" id="la-pw-field">
+        <label id="la-pw-label">Password</label>
         <div style="position:relative">
           <input type="password" id="la-password" placeholder="Min 6 characters" style="padding-right:44px" onkeydown="if(event.key==='Enter')handleLandingAuth()" />
           <div onclick="var p=document.getElementById('la-password'),e=this;if(p.type==='password'){p.type='text';e.textContent='🙈'}else{p.type='password';e.textContent='👁'}" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:#3F3F46;font-size:16px;user-select:none">👁</div>
@@ -1155,16 +1155,17 @@
     var err = document.getElementById('la-error');
     err.style.display = 'none';
     var L = T[currentLang] || T['en'];
-    // Update labels
-    document.querySelector('#la-name-field label').textContent = L.auth_name_label || 'Name';
+    // Update labels by ID — safe regardless of DOM order
+    document.getElementById('la-name-label').textContent = L.auth_name_label || 'Name';
     document.getElementById('la-name').placeholder = L.auth_name_ph || 'Your name';
-    document.querySelector('.auth-field:nth-child(3) label').textContent = L.auth_email_label || 'Email';
+    document.getElementById('la-email-label').textContent = L.auth_email_label || 'Email';
     document.getElementById('la-email').placeholder = L.auth_email_ph || 'you@example.com';
-    document.querySelector('.auth-field:nth-child(4) label').textContent = L.auth_pw_label || 'Password';
+    document.getElementById('la-pw-label').textContent = L.auth_pw_label || 'Password';
     document.getElementById('la-password').placeholder = L.auth_pw_ph || 'Min 6 characters';
     document.querySelector('.auth-guest-btn').textContent = L.auth_guest || 'Continue without account';
     document.querySelector('.auth-divider span').textContent = L.auth_or || 'or';
-    document.querySelector('#la-forgot a').textContent = L.auth_forgot || 'Forgot password?';
+    var forgotLink = document.querySelector('#la-forgot a');
+    if(forgotLink) forgotLink.textContent = L.auth_forgot || 'Forgot password?';
     if (mode === 'login') {
       document.getElementById('la-title').textContent = L.auth_login_title || 'Welcome Back';
       document.getElementById('la-sub').textContent = L.auth_login_sub || 'Sign in to your account';
