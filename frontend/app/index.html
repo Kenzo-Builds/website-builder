@@ -1971,10 +1971,12 @@ function setupVoice(){
 var _dashVoiceTimer=null,_dashVoiceSecs=0,_dashVoiceMax=60;
 function _dashShowCounter(secs){
   var el=document.getElementById('dash-voice-counter');
-  if(!el){el=document.createElement('div');el.id='dash-voice-counter';el.style.cssText='position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.7);color:#fff;font-size:13px;font-weight:600;padding:6px 16px;border-radius:20px;z-index:9999;font-family:inherit;font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:6px;backdrop-filter:blur(8px)';document.body.appendChild(el);}
+  var micBtn=document.getElementById('mic-btn');
+  if(!el&&micBtn){el=document.createElement('span');el.id='dash-voice-counter';el.style.cssText='font-size:11px;font-weight:600;color:#A1A1AA;font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;gap:4px';micBtn.parentNode.insertBefore(el,micBtn);}
+  if(!el)return;
   var m=Math.floor(secs/60),s=secs%60;var time=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
-  var color=secs>=45?'#EAB308':'#fff';
-  el.innerHTML='<span style="width:8px;height:8px;border-radius:50%;background:#EF4444;animation:mic-pulse 1s infinite"></span><span style="color:'+color+'">'+time+'</span><span style="color:#71717A;font-size:10px">/ 01:00</span>';
+  var color=secs>=45?'#EAB308':'#A1A1AA';
+  el.innerHTML='<span style="width:6px;height:6px;border-radius:50%;background:#EF4444;animation:mic-pulse 1s infinite;flex-shrink:0"></span><span style="color:'+color+'">'+time+'</span>';
 }
 function _dashShowWarning(secsLeft){
   var el=document.getElementById('dash-voice-warning');
