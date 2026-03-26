@@ -100,9 +100,9 @@
 
     /* ===== TAB BAR — Emergent style ===== */
     #tab-bar {
-      display: flex; align-items: stretch; height: 38px; background: var(--bg);
-      flex-shrink: 0; padding: 0; gap: 0; overflow-x: auto; z-index: 101;
-      position: relative; -webkit-overflow-scrolling: touch;
+      display: flex; align-items: stretch; height: 42px; background: var(--bg);
+      flex-shrink: 0; padding: 0 4px; gap: 2px; overflow-x: auto; z-index: 101;
+      position: relative; -webkit-overflow-scrolling: touch; padding-top: 4px;
     }
     #tab-bar::-webkit-scrollbar { display: none; }
     /* Bottom border — runs across full bar, active tab will cover it */
@@ -111,8 +111,8 @@
       background: var(--border); z-index: 0;
     }
     .tab-item {
-      display: flex; align-items: center; gap: 6px; height: 100%; padding: 0 14px;
-      font-size: 12px; font-weight: 500; color: var(--text-3);
+      display: flex; align-items: center; gap: 8px; height: 100%; padding: 0 22px;
+      font-size: 12.5px; font-weight: 500; color: var(--text-3);
       cursor: pointer; white-space: nowrap; flex-shrink: 0; border: none;
       background: transparent; font-family: inherit; transition: color 0.15s, background 0.15s;
       position: relative; z-index: 1; border-radius: 0;
@@ -121,20 +121,20 @@
     /* Active tab — blends into content below */
     .tab-item.active {
       background: var(--bg-2); color: var(--text);
-      border-top-left-radius: 8px; border-top-right-radius: 8px;
+      border-top-left-radius: 12px; border-top-right-radius: 12px;
     }
     /* Cover the bottom border under active tab */
     .tab-item.active::after {
       content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px;
       background: var(--bg-2); z-index: 2;
     }
-    .tab-item.home { padding: 0 12px; }
-    .tab-item.home svg { width: 15px; height: 15px; stroke-width: 1.75; }
+    .tab-item.home { padding: 0 18px; }
+    .tab-item.home svg { width: 16px; height: 16px; stroke-width: 1.75; }
     .tab-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
     .tab-dot.idle { background: var(--text-3); opacity: 0.5; }
     .tab-dot.ready { background: var(--green); }
     .tab-dot.generating { background: var(--blue); animation: pulse 1s infinite; }
-    .tab-name { max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
+    .tab-name { max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
     .tab-close {
       width: 16px; height: 16px; border-radius: 4px; border: none; background: transparent;
       color: var(--text-3); cursor: pointer; display: flex; align-items: center; justify-content: center;
@@ -222,7 +222,7 @@
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
     /* ===== MAIN LAYOUT ===== */
-    #app { display: flex; flex-direction: row; height: calc(100vh - 90px); overflow: hidden; background: var(--bg-2); }
+    #app { display: flex; flex-direction: row; height: calc(100vh - 94px); overflow: hidden; background: var(--bg-2); }
 
     /* ===== CHAT PANEL ===== */
     #chat-panel {
@@ -2545,7 +2545,7 @@
           currentProjectName: (typeof currentProjectName!=='undefined')?currentProjectName:'',
           lastPrompt: (typeof lastPrompt!=='undefined')?lastPrompt:'',
           chatHtml: document.getElementById('chat-history')?document.getElementById('chat-history').innerHTML:'',
-          previewSrc: (function(){ var f=document.getElementById('preview-frame'); return f?f.getAttribute('srcdoc')||'':''; })()
+          previewHtml: (typeof currentHtml!=='undefined')?currentHtml:''
         };
       }
 
@@ -2562,7 +2562,18 @@
         if(typeof currentProjectName!=='undefined') currentProjectName=s.currentProjectName||'';
         if(typeof lastPrompt!=='undefined') lastPrompt=s.lastPrompt||'';
         var ch=document.getElementById('chat-history'); if(ch&&s.chatHtml) ch.innerHTML=s.chatHtml;
-        var pf=document.getElementById('preview-frame'); if(pf&&s.previewSrc) pf.srcdoc=s.previewSrc;
+        // Restore preview using the proper updatePreview function
+        if(s.currentHtml && typeof updatePreview==='function'){
+          currentHtml=s.currentHtml;
+          updatePreview(currentHtml);
+        } else if(s.previewHtml && typeof updatePreview==='function'){
+          currentHtml=s.previewHtml;
+          updatePreview(currentHtml);
+        } else {
+          // No preview content — show empty state
+          var pf=document.getElementById('preview-frame'); if(pf){pf.style.display='none';pf.srcdoc='';}
+          var es=document.getElementById('empty-state'); if(es){es.style.display='flex';es.style.opacity='1';}
+        }
         // Refresh file tree if open
         if(typeof renderFileTree==='function') renderFileTree();
         if(typeof renderEditorTabs==='function') renderEditorTabs();
