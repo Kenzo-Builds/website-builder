@@ -1429,6 +1429,7 @@
           _mediaRec.onstop = function() {
             clearInterval(_voiceTimer); _voiceTimer = null;
             _removeVoiceNotice();
+            _removeVoiceCounter();
             stream.getTracks().forEach(function(t) { t.stop(); });
             btn.classList.remove('recording');
             btn.classList.add('transcribing');
@@ -1468,9 +1469,12 @@
           _mediaRec.start(500); // 500ms chunks for reliable data capture
           btn.classList.add('recording');
           btn.title = 'Recording... (tap to stop)';
+          // Show live counter
+          _showVoiceCounter(0);
           // Start countdown
           _voiceTimer = setInterval(function(){
             _voiceSeconds++;
+            _showVoiceCounter(_voiceSeconds);
             if (_voiceSeconds >= 45 && _voiceSeconds < _voiceMaxSec) {
               _showVoiceNotice(_voiceMaxSec - _voiceSeconds);
             }
@@ -1484,6 +1488,8 @@
     function _stopVoice() {
       if (_mediaRec && _mediaRec.state === 'recording') _mediaRec.stop();
       clearInterval(_voiceTimer); _voiceTimer = null;
+      _removeVoiceCounter();
+      _removeVoiceNotice();
       var btn = document.getElementById('mic-btn');
       if (btn) btn.classList.remove('recording');
     }
@@ -1499,6 +1505,24 @@
     }
     function _removeVoiceNotice() {
       var el = document.getElementById('voice-notice');
+      if (el) el.remove();
+    }
+    function _showVoiceCounter(secs) {
+      var el = document.getElementById('voice-counter');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'voice-counter';
+        el.style.cssText = 'position:fixed;bottom:140px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.7);color:#fff;font-size:13px;font-weight:600;padding:6px 16px;border-radius:20px;z-index:9999;font-family:inherit;font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:6px;backdrop-filter:blur(8px)';
+        document.body.appendChild(el);
+      }
+      var m = Math.floor(secs / 60);
+      var s = secs % 60;
+      var time = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+      var color = secs >= 45 ? '#EAB308' : '#fff';
+      el.innerHTML = '<span style="width:8px;height:8px;border-radius:50%;background:#EF4444;animation:pulse 1s infinite"></span><span style="color:' + color + '">' + time + '</span><span style="color:#71717A;font-size:10px">/ 01:00</span>';
+    }
+    function _removeVoiceCounter() {
+      var el = document.getElementById('voice-counter');
       if (el) el.remove();
     }
 

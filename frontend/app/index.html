@@ -1968,9 +1968,25 @@ function setupVoice(){
     langBtn.textContent=voiceLangLabels[voiceLang];
   });
 }
+var _dashVoiceTimer=null,_dashVoiceSecs=0,_dashVoiceMax=60;
+function _dashShowCounter(secs){
+  var el=document.getElementById('dash-voice-counter');
+  if(!el){el=document.createElement('div');el.id='dash-voice-counter';el.style.cssText='position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.7);color:#fff;font-size:13px;font-weight:600;padding:6px 16px;border-radius:20px;z-index:9999;font-family:inherit;font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:6px;backdrop-filter:blur(8px)';document.body.appendChild(el);}
+  var m=Math.floor(secs/60),s=secs%60;var time=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+  var color=secs>=45?'#EAB308':'#fff';
+  el.innerHTML='<span style="width:8px;height:8px;border-radius:50%;background:#EF4444;animation:mic-pulse 1s infinite"></span><span style="color:'+color+'">'+time+'</span><span style="color:#71717A;font-size:10px">/ 01:00</span>';
+}
+function _dashShowWarning(secsLeft){
+  var el=document.getElementById('dash-voice-warning');
+  if(!el){el=document.createElement('div');el.id='dash-voice-warning';el.style.cssText='position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:rgba(234,179,8,0.15);border:1px solid rgba(234,179,8,0.3);color:#EAB308;font-size:12px;font-weight:600;padding:6px 16px;border-radius:8px;z-index:9999;font-family:inherit';document.body.appendChild(el);}
+  el.textContent=secsLeft+'s remaining';
+}
+function _dashRemoveOverlays(){var c=document.getElementById('dash-voice-counter');if(c)c.remove();var w=document.getElementById('dash-voice-warning');if(w)w.remove();}
+
 function startRecording(){
   navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
     audioChunks=[];
+    _dashVoiceSecs=0;
     var options={mimeType:'audio/webm;codecs=opus'};
     try{mediaRecorder=new MediaRecorder(stream,options);}catch(e){
       try{mediaRecorder=new MediaRecorder(stream,{mimeType:'audio/mp4'});}catch(e2){
@@ -1979,21 +1995,32 @@ function startRecording(){
     }
     mediaRecorder.ondataavailable=function(e){if(e.data.size>0)audioChunks.push(e.data);};
     mediaRecorder.onstop=function(){
+      clearInterval(_dashVoiceTimer);_dashVoiceTimer=null;
+      _dashRemoveOverlays();
       stream.getTracks().forEach(function(t){t.stop();});
       var blob=new Blob(audioChunks,{type:mediaRecorder.mimeType});
       transcribeAudio(blob,mediaRecorder.mimeType);
     };
-    mediaRecorder.start(100); // collect data every 100ms
+    mediaRecorder.start(500);
     isRecording=true;
     window._recStart=Date.now();
     var btn=document.getElementById('mic-btn');
     btn.classList.add('recording');
     btn.title='Recording... click to stop';
+    _dashShowCounter(0);
+    _dashVoiceTimer=setInterval(function(){
+      _dashVoiceSecs++;
+      _dashShowCounter(_dashVoiceSecs);
+      if(_dashVoiceSecs>=45&&_dashVoiceSecs<_dashVoiceMax)_dashShowWarning(_dashVoiceMax-_dashVoiceSecs);
+      if(_dashVoiceSecs>=_dashVoiceMax)stopRecording();
+    },1000);
   }).catch(function(err){
     alert('Microphone access denied. Please allow microphone access.');
   });
 }
 function stopRecording(){
+  clearInterval(_dashVoiceTimer);_dashVoiceTimer=null;
+  _dashRemoveOverlays();
   var elapsed=Date.now()-(window._recStart||0);
   if(elapsed<500){console.warn('Recording too short:',elapsed,'ms');
     if(mediaRecorder&&mediaRecorder.state!=='inactive'){mediaRecorder.stream.getTracks().forEach(function(t){t.stop();});try{mediaRecorder.stop();}catch(e){}}
