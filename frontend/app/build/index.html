@@ -1425,7 +1425,7 @@
           _voiceChunks = [];
           _voiceSeconds = 0;
           _mediaRec = new MediaRecorder(stream);
-          _mediaRec.ondataavailable = function(e) { if (e.data.size > 0) _voiceChunks.push(e.data); };
+          _mediaRec.ondataavailable = function(e) { if (e.data && e.data.size > 0) _voiceChunks.push(e.data); };
           _mediaRec.onstop = function() {
             clearInterval(_voiceTimer); _voiceTimer = null;
             _removeVoiceNotice();
@@ -1433,28 +1433,39 @@
             btn.classList.remove('recording');
             btn.classList.add('transcribing');
             btn.title = 'Transcribing...';
-            var blob = new Blob(_voiceChunks, { type: 'audio/webm' });
+            console.log('[voice] chunks:', _voiceChunks.length, 'sizes:', _voiceChunks.map(function(c){return c.size;}));
+            if (_voiceChunks.length === 0) { btn.classList.remove('transcribing'); btn.title = 'Voice input'; alert('No audio recorded'); return; }
+            var blob = new Blob(_voiceChunks, { type: _mediaRec.mimeType || 'audio/webm' });
+            console.log('[voice] blob size:', blob.size, 'type:', blob.type);
+            if (blob.size < 1000) { btn.classList.remove('transcribing'); btn.title = 'Voice input'; alert('Recording too short'); return; }
             var fr = new FileReader();
+            fr.onerror = function() { btn.classList.remove('transcribing'); btn.title = 'Voice input'; alert('Failed to read audio data'); };
             fr.onload = function(e) {
               var b64 = e.target.result.split(',')[1];
+              console.log('[voice] base64 length:', b64.length, '(' + Math.round(b64.length/1024) + 'KB)');
               fetch('/api/transcribe', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ audio: b64, mimeType: 'audio/webm', language: _voiceLang })
-              }).then(function(r) { return r.json(); }).then(function(d) {
+                body: JSON.stringify({ audio: b64, mimeType: blob.type, language: _voiceLang })
+              }).then(function(r) {
+                console.log('[voice] API response status:', r.status);
+                if (!r.ok) throw new Error('API returned ' + r.status);
+                return r.json();
+              }).then(function(d) {
                 btn.classList.remove('transcribing');
                 btn.title = 'Voice input';
+                console.log('[voice] transcribed:', d.text);
                 if (d.text) {
                   var inp = document.getElementById('prompt-input');
                   inp.value = (inp.value ? inp.value + ' ' : '') + d.text;
                   inp.style.height = 'auto';
                   inp.style.height = Math.min(inp.scrollHeight, 120) + 'px';
                 }
-              }).catch(function(e) { btn.classList.remove('transcribing'); btn.title = 'Voice input'; console.error('transcribe error', e); alert('Voice transcription failed: ' + e.message); });
+              }).catch(function(e) { btn.classList.remove('transcribing'); btn.title = 'Voice input'; console.error('[voice] error:', e); alert('Voice error: ' + e.message); });
             };
             fr.readAsDataURL(blob);
           };
-          _mediaRec.start();
+          _mediaRec.start(500); // 500ms chunks for reliable data capture
           btn.classList.add('recording');
           btn.title = 'Recording... (tap to stop)';
           // Start countdown
