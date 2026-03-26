@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexus - Workflow Synchronization</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body {
+background-color: #030712;
+color: #e5e7eb;
+}
+.glass-panel {
+background: rgba(255, 255, 255, 0.03);
+backdrop-filter: blur(10px);
+border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.glass-nav {
+background: rgba(3, 7, 18, 0.7);
+backdrop-filter: blur(12px);
+border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.text-gradient {
+background: linear-gradient(to right, #fff, #9ca3af);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+}
+/* Custom toggle switch */
+.toggle-checkbox:checked {
+right: 0;
+border-color: #6366f1;
+}
+.toggle-checkbox:checked + .toggle-label {
+background-color: #6366f1;
+}
+</style>
+<link id="all-fonts-link-font-geist" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-geist">.font-geist { font-family: 'Geist', sans-serif !important; }</style><link id="all-fonts-link-font-roboto" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-roboto">.font-roboto { font-family: 'Roboto', sans-serif !important; }</style><link id="all-fonts-link-font-montserrat" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-montserrat">.font-montserrat { font-family: 'Montserrat', sans-serif !important; }</style><link id="all-fonts-link-font-poppins" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-poppins">.font-poppins { font-family: 'Poppins', sans-serif !important; }</style><link id="all-fonts-link-font-playfair" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;900&amp;display=swap"><style id="all-fonts-style-font-playfair">.font-playfair { font-family: 'Playfair Display', serif !important; }</style><link id="all-fonts-link-font-instrument-serif" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:wght@400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-instrument-serif">.font-instrument-serif { font-family: 'Instrument Serif', serif !important; }</style><link id="all-fonts-link-font-merriweather" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&amp;display=swap"><style id="all-fonts-style-font-merriweather">.font-merriweather { font-family: 'Merriweather', serif !important; }</style><link id="all-fonts-link-font-bricolage" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-bricolage">.font-bricolage { font-family: 'Bricolage Grotesque', sans-serif !important; }</style><link id="all-fonts-link-font-jakarta" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-jakarta">.font-jakarta { font-family: 'Plus Jakarta Sans', sans-serif !important; }</style><link id="all-fonts-link-font-manrope" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-manrope">.font-manrope { font-family: 'Manrope', sans-serif !important; }</style><link id="all-fonts-link-font-space-grotesk" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-space-grotesk">.font-space-grotesk { font-family: 'Space Grotesk', sans-serif !important; }</style><link id="all-fonts-link-font-work-sans" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-work-sans">.font-work-sans { font-family: 'Work Sans', sans-serif !important; }</style><link id="all-fonts-link-font-pt-serif" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&amp;display=swap"><style id="all-fonts-style-font-pt-serif">.font-pt-serif { font-family: 'PT Serif', serif !important; }</style><link id="all-fonts-link-font-geist-mono" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-geist-mono">.font-geist-mono { font-family: 'Geist Mono', monospace !important; }</style><link id="all-fonts-link-font-space-mono" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&amp;display=swap"><style id="all-fonts-style-font-space-mono">.font-space-mono { font-family: 'Space Mono', monospace !important; }</style><link id="all-fonts-link-font-quicksand" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-quicksand">.font-quicksand { font-family: 'Quicksand', sans-serif !important; }</style><link id="all-fonts-link-font-nunito" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-nunito">.font-nunito { font-family: 'Nunito', sans-serif !important; }</style><link id="all-fonts-link-font-newsreader" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..800&amp;display=swap"><style id="all-fonts-style-font-newsreader">.font-newsreader { font-family: 'Newsreader', serif !important; }</style><link id="all-fonts-link-font-google-sans-flex" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-google-sans-flex">.font-google-sans-flex { font-family: 'Google Sans Flex', sans-serif !important; }</style><link id="all-fonts-link-font-oswald" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-oswald">.font-oswald { font-family: 'Oswald', sans-serif !important; }</style><link id="all-fonts-link-font-dm-sans" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-dm-sans">.font-dm-sans { font-family: 'DM Sans', sans-serif !important; }</style><link id="all-fonts-link-font-cormorant" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-cormorant">.font-cormorant { font-family: 'Cormorant Garamond', serif !important; }</style></head>
+<body class="antialiased selection:bg-indigo-500/30 selection:text-indigo-200">
+
+
+
+
+
+
+
+
+
+
+<!-- Background (component) added by Aura -->
+<div class="aura-background-component fixed top-0 w-full h-screen -z-10" data-alpha-mask="80" style="; mask-image: linear-gradient(to bottom, transparent, black 0%, black 80%, transparent); -webkit-mask-image: linear-gradient(to bottom, transparent, black 0%, black 80%, transparent)"><div class="w-full h-full">
+  <div class="w-full h-full relative">
+    <div class="aura-background-component top-0 w-full absolute h-full">
+      <div data-us-project="bKN5upvoulAmWvInmHza" class="absolute w-full h-full left-0 top-0"></div>
+      <script type="text/javascript">!function(){if(!window.UnicornStudio){window.UnicornStudio={isInitialized:!1};var i=document.createElement("script");i.src="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v1.4.29/dist/unicornStudio.umd.js",i.onload=function(){window.UnicornStudio.isInitialized||(UnicornStudio.init(),window.UnicornStudio.isInitialized=!0)},(document.head || document.body).appendChild(i)}}();</script>
+    </div>
+  </div>
+</div></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-nav transition-all duration-300">
+        <div class="flex h-16 max-w-7xl mr-auto ml-auto pr-6 pl-6 items-center justify-between">
+            <a href="#" class="flex items-center gap-2 group">
+                <div class="w-6 h-6 rounded bg-gradient-to-tr to-stone-500 flex items-center justify-center from-white">
+                    <div class="w-2 h-2 rounded-full bg-black"></div>
+                </div>
+                <span class="text-sm font-semibold tracking-tight group-hover:opacity-80 transition-opacity text-white">NEXUS</span>
+            </a>
+            
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#features" class="text-sm transition-colors text-stone-400 hover:text-white">Features</a>
+                <a href="#testimonials" class="text-sm transition-colors text-stone-400 hover:text-white">Customers</a>
+                <a href="#pricing" class="text-sm transition-colors text-stone-400 hover:text-white">Pricing</a>
+                <a href="#" class="text-sm transition-colors text-stone-400 hover:text-white">Changelog</a>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <a href="#" class="hidden md:block text-sm transition-colors text-stone-300 hover:text-white">Log in</a>
+                <a href="#" class="text-xs font-medium px-4 py-2 rounded-full transition-colors bg-white text-black hover:bg-stone-200">Sign up</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="md:pt-48 md:pb-32 overflow-hidden pt-32 pb-20 relative" id="hero">
+        <!-- Background Effects -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-orange-500/10 rounded-[100%] blur-[100px] pointer-events-none"></div>
+        <div class="absolute top-20 right-0 w-[500px] h-[500px] bg-red-500/5 rounded-[100%] blur-[120px] pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10 text-center">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs mb-8 transition-colors cursor-pointer bg-white/5 border-white/10 text-orange-300 hover:bg-white/10">
+                <span class="flex h-2 w-2 relative">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-orange-400"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+                </span>
+                Nexus v2.0 is now available
+                <iconify-icon icon="lucide:arrow-right" width="12" stroke-width="1.5"></iconify-icon>
+            </div>
+
+            <h1 class="md:text-7xl lg:text-8xl leading-[1.1] text-5xl font-medium text-white tracking-tight max-w-4xl mr-auto mb-6 ml-auto">Sync your reality <br class=""> <span class="text-stone-500">with the digital edge.</span></h1>
+            
+            <p class="text-lg md:text-xl max-w-2xl mx-auto mb-10 font-light leading-relaxed text-stone-400">
+                Orchestrate workflows across your entire stack with a single, unified interface. Built for teams who ship at the speed of thought.
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
+                <button class="h-10 px-6 rounded-full text-sm font-medium transition-colors flex items-center gap-2 group bg-white text-black hover:bg-stone-200">
+                    Start Building
+                    <iconify-icon icon="lucide:chevron-right" width="16" class="group-hover:translate-x-0.5 transition-transform" stroke-width="1.5"></iconify-icon>
+                </button>
+                <button class="h-10 px-6 rounded-full border text-sm font-medium transition-colors flex items-center gap-2 bg-white/5 border-white/10 text-white hover:bg-white/10">
+                    <iconify-icon icon="lucide:command" width="16" stroke-width="1.5"></iconify-icon>
+                    Read Documentation
+                </button>
+            </div>
+
+            <!-- Hero Visual -->
+            <div class="relative max-w-5xl mx-auto">
+                <div class="absolute -inset-1 bg-gradient-to-r from-orange-500 rounded-xl blur opacity-20 to-red-600"></div>
+                <div class="relative rounded-xl border bg-[#0A0A0A] overflow-hidden shadow-2xl border-white/10">
+                    <div class="flex items-center gap-2 px-4 py-3 border-b bg-white/[0.02] border-white/5">
+                        <div class="flex gap-1.5">
+                            <div class="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50"></div>
+                            <div class="w-3 h-3 rounded-full bg-pink-500/20 border border-pink-500/50"></div>
+                        </div>
+                        <div class="flex-1 text-center text-xs font-mono text-stone-500">nexus_dashboard.tsx</div>
+                    </div>
+                    <div class="md:p-8 grid grid-cols-1 md:grid-cols-3 gap-6 pt-0 pr-0 pb-0 pl-0 gap-x-6 gap-y-6">
+                        <!-- Left Panel -->
+                        <div class="hidden md:block col-span-1 space-y-4">
+                            <div class="h-8 w-24 rounded bg-white/5"></div>
+                            <div class="space-y-2">
+                                <div class="h-4 w-full rounded bg-white/5"></div>
+                                <div class="h-4 w-3/4 rounded bg-white/5"></div>
+                                <div class="h-4 w-5/6 rounded bg-white/5"></div>
+                            </div>
+                        </div>
+                        <!-- Main Content -->
+                        <div class="col-span-2 rounded-lg border p-6 relative overflow-hidden bg-white/5 border-white/5">
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-orange-500/20 blur-[60px]"></div>
+                            <div class="flex justify-between items-center mb-6">
+                                <div>
+                                    <div class="text-sm mb-1 text-stone-400">Total Revenue</div>
+                                    <div class="text-2xl font-medium text-white">$124,592.00</div>
+                                </div>
+                                <div class="h-8 w-8 rounded-full bg-pink-500/10 flex items-center justify-center text-pink-400">
+                                    <iconify-icon icon="lucide:trending-up" width="16" stroke-width="1.5"></iconify-icon>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded bg-orange-500/20 flex items-center justify-center text-orange-400">
+                                        <iconify-icon icon="lucide:zap" width="16" stroke-width="1.5"></iconify-icon>
+                                    </div>
+                                    <div class="flex-1 h-2 rounded-full overflow-hidden bg-white/10">
+                                        <div class="h-full w-3/4 bg-orange-500 rounded-full"></div>
+                                    </div>
+                                </div>
+                                <div class="flex gap-3 gap-x-3 gap-y-3 items-center">
+                                    <div class="w-8 h-8 rounded bg-red-500/20 flex items-center justify-center text-red-400">
+                                        <iconify-icon icon="lucide:activity" width="16" stroke-width="1.5"></iconify-icon>
+                                    </div>
+                                    <div class="flex-1 h-2 rounded-full overflow-hidden bg-white/10">
+                                        <div class="h-full w-1/2 bg-red-500 rounded-full"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Brands -->
+            <div class="mt-20 pt-10 border-t border-white/5">
+                <p class="text-xs text-stone-500 mb-6 uppercase tracking-widest font-medium">Trusted by engineering teams at</p>
+                <div class="flex flex-wrap opacity-40 grayscale gap-x-12 gap-y-8 justify-center">
+                    <!-- Simple Text Logos for compliance -->
+                    <span class="text-lg font-bold tracking-tight">ACME</span>
+                    <span class="text-lg font-bold tracking-tight font-serif">Globex</span>
+                    <span class="text-lg font-bold tracking-tight italic">Soylent</span>
+                    <span class="text-lg font-bold tracking-tight font-mono">Umbrella</span>
+                    <span class="text-lg font-bold tracking-tight">Initech</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feature Section -->
+    <section id="features" class="py-24 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="mb-16">
+                <h2 class="text-3xl md:text-4xl font-medium tracking-tight mb-4 text-white">Engineered for perfection.</h2>
+                <p class="max-w-xl text-lg font-light text-stone-400">Every detail has been meticulously crafted to provide the best developer experience possible.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Feature 1 -->
+                <div class="glass-panel p-8 rounded-xl group hover:bg-white/[0.06] transition-colors">
+                    <div class="w-10 h-10 rounded-lg border flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 bg-white/5 border-white/10 text-white">
+                        <iconify-icon icon="lucide:zap" width="20" stroke-width="1.5"></iconify-icon>
+                    </div>
+                    <h3 class="text-lg font-medium mb-2 text-white">Real-time Sync</h3>
+                    <p class="leading-relaxed text-sm text-stone-400">Changes propagate instantly across all connected clients via our edge network. No polling required.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="glass-panel p-8 rounded-xl group hover:bg-white/[0.06] transition-colors">
+                    <div class="w-10 h-10 rounded-lg border flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 bg-white/5 border-white/10 text-white">
+                        <iconify-icon icon="lucide:shield-check" width="20" stroke-width="1.5"></iconify-icon>
+                    </div>
+                    <h3 class="text-lg font-medium mb-2 text-white">End-to-End Encrypted</h3>
+                    <p class="text-sm leading-relaxed text-stone-400">Your data is encrypted on the device before it ever touches our servers. Your keys, your data.</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="glass-panel p-8 rounded-xl group hover:bg-white/[0.06] transition-colors">
+                    <div class="w-10 h-10 rounded-lg border flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 bg-white/5 border-white/10 text-white">
+                        <iconify-icon icon="lucide:globe" width="20" stroke-width="1.5"></iconify-icon>
+                    </div>
+                    <h3 class="text-lg font-medium mb-2 text-white">Global Edge</h3>
+                    <p class="leading-relaxed text-sm text-stone-400">Deployed to 35+ regions worldwide, ensuring low latency regardless of where your users are located.</p>
+                </div>
+                
+                <!-- Large Feature -->
+                <div class="md:col-span-2 glass-panel p-8 rounded-xl relative overflow-hidden group">
+                    <div class="z-10 relative">
+                        <div class="w-10 h-10 rounded-lg border flex items-center justify-center mb-6 bg-white/5 border-white/10 text-white">
+                            <iconify-icon icon="lucide:layers" width="20" stroke-width="1.5"></iconify-icon>
+                        </div>
+                        <h3 class="text-lg font-medium text-white mb-2">Deep Integrations</h3>
+                        <p class="text-sm max-w-sm leading-relaxed text-stone-400">Connect with your favorite tools seamlessly. From GitHub to Slack, we've got you covered with over 100+ native integrations.</p>
+                    </div>
+                    <!-- Decorative Graphic -->
+                    <div class="absolute right-0 top-1/2 -translate-y-1/2 w-1/3 h-full opacity-50 group-hover:opacity-80 transition-opacity">
+                        <div class="bg-stone-900/50 w-full border-white/10 border rounded-l-xl pt-4 pr-4 pb-4 pl-4 absolute top-4 right-4 bottom-4 backdrop-blur-sm">
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3 p-2 rounded transition-colors cursor-default hover:bg-white/5">
+                                    <iconify-icon icon="lucide:github" class="text-white" width="16"></iconify-icon>
+                                    <div class="h-2 w-16 rounded bg-white/20"></div>
+                                </div>
+                                <div class="flex items-center gap-3 p-2 rounded transition-colors cursor-default hover:bg-white/5">
+                                    <iconify-icon icon="lucide:slack" class="text-white" width="16"></iconify-icon>
+                                    <div class="h-2 w-20 rounded bg-white/20"></div>
+                                </div>
+                                <div class="flex items-center gap-3 p-2 rounded transition-colors cursor-default hover:bg-white/5">
+                                    <iconify-icon icon="lucide:figma" class="text-white" width="16"></iconify-icon>
+                                    <div class="h-2 w-12 rounded bg-white/20"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="glass-panel p-8 rounded-xl group hover:bg-white/[0.06] transition-colors md:col-span-1">
+                    <div class="w-10 h-10 rounded-lg border flex items-center justify-center mb-6 bg-white/5 border-white/10 text-white">
+                        <iconify-icon icon="lucide:terminal" width="20" stroke-width="1.5"></iconify-icon>
+                    </div>
+                    <h3 class="text-lg font-medium mb-2 text-white">CLI First</h3>
+                    <p class="text-sm leading-relaxed text-stone-400">Control everything from your terminal. Automate your workflows with our powerful CLI tool.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonial Section -->
+    <section id="testimonials" class="py-24 border-t bg-white/[0.005] border-white/5">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-3xl md:text-4xl font-medium tracking-tight text-center mb-16 text-white"> loved by builders.</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Review 1 -->
+                <div class="glass-panel p-6 rounded-xl flex flex-col justify-between">
+                    <div class="">
+                        <div class="mb-4 text-orange-400">
+                            <iconify-icon icon="lucide:quote" width="20" stroke-width="1.5"></iconify-icon>
+                        </div>
+                        <p class="leading-relaxed text-sm text-stone-300 mb-6">"Nexus has completely transformed how our distributed team stays in sync. The latency is practically non-existent, and the UI is a joy to use."</p>
+                    </div>
+                    <div class="flex gap-3 gap-x-3 gap-y-3 items-center">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br border from-stone-700 to-stone-900 border-white/10"></div>
+                        <div class="">
+                            <div class="text-xs font-medium text-white">Sarah Jenkins</div>
+                            <div class="text-[10px] text-stone-500 uppercase tracking-wide">CTO at Vertex</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review 2 -->
+                <div class="glass-panel p-6 rounded-xl flex flex-col justify-between">
+                    <div>
+                        <div class="mb-4 text-orange-400">
+                            <iconify-icon icon="lucide:quote" width="20" stroke-width="1.5"></iconify-icon>
+                        </div>
+                        <p class="text-sm leading-relaxed mb-6 text-stone-300">"The attention to detail in the design is stunning. It's rare to find a developer tool that feels this polished and robust."</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br border from-stone-700 to-stone-900 border-white/10"></div>
+                        <div>
+                            <div class="text-xs font-medium text-white">David Chen</div>
+                            <div class="text-[10px] text-stone-500 uppercase tracking-wide">Lead Engineer at Flow</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review 3 -->
+                <div class="glass-panel p-6 rounded-xl flex flex-col justify-between">
+                    <div class="">
+                        <div class="mb-4 text-orange-400">
+                            <iconify-icon icon="lucide:quote" width="20" stroke-width="1.5"></iconify-icon>
+                        </div>
+                        <p class="text-sm leading-relaxed mb-6 text-stone-300">"We moved our entire project management workflow to Nexus in a weekend. The API is incredibly well documented."</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br border from-stone-700 to-stone-900 border-white/10"></div>
+                        <div class="">
+                            <div class="text-xs font-medium text-white">Elena Rodriguez</div>
+                            <div class="text-[10px] text-stone-500 uppercase tracking-wide">Product Manager</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-24 relative overflow-hidden">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full blur-[100px] pointer-events-none bg-orange-900/10"></div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-medium tracking-tight mb-4 text-white">Simple pricing.</h2>
+                <p class="text-lg font-light mb-8 text-stone-400">Start for free, scale as you grow.</p>
+                
+                <!-- Custom Toggle -->
+                <div class="flex items-center justify-center gap-3">
+                    <span class="text-sm text-stone-300">Monthly</span>
+                    <label for="toggle" class="flex items-center cursor-pointer relative">
+                        <input type="checkbox" id="toggle" class="sr-only toggle-checkbox">
+                        <div class="w-11 h-6 rounded-full border toggle-label transition-colors bg-stone-800 border-stone-700"></div>
+                        <div class="absolute left-1 top-1 w-4 h-4 rounded-full transition-all duration-300 transform bg-white" style="box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>
+                    </label>
+                    <span class="text-sm text-stone-300">Yearly <span class="text-xs ml-1 text-orange-400">-20%</span></span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <!-- Free Tier -->
+                <div class="glass-panel p-8 rounded-2xl flex flex-col">
+                    <div class="mb-4">
+                        <h3 class="text-lg font-medium text-white">Starter</h3>
+                        <div class="mt-2 flex items-baseline gap-1">
+                            <span class="text-3xl font-medium text-white">$0</span>
+                            <span class="text-sm text-stone-500">/month</span>
+                        </div>
+                        <p class="text-xs mt-2 text-stone-400">Perfect for side projects.</p>
+                    </div>
+                    <div class="my-6 border-t border-white/5"></div>
+                    <ul class="space-y-3 flex-1">
+                        <li class="flex items-start gap-3 text-sm text-stone-300">
+                            <iconify-icon icon="lucide:check" class="text-stone-500 mt-0.5" width="16"></iconify-icon>
+                            <span>Up to 3 projects</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-sm text-stone-300">
+                            <iconify-icon icon="lucide:check" class="text-stone-500 mt-0.5" width="16"></iconify-icon>
+                            <span>Basic analytics</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-sm text-stone-300">
+                            <iconify-icon icon="lucide:check" class="text-stone-500 mt-0.5" width="16"></iconify-icon>
+                            <span>48h support response</span>
+                        </li>
+                    </ul>
+                    <button class="mt-8 w-full py-2 rounded-lg border text-sm font-medium transition-colors bg-white/5 border-white/10 text-white hover:bg-white/10">Get Started</button>
+                </div>
+
+                <!-- Pro Tier (Highlighted) -->
+                <div class="p-8 rounded-2xl flex flex-col bg-white/[0.03] border border-orange-500/30 relative">
+                    <div class="absolute inset-0 bg-gradient-to-b from-orange-500/5 to-transparent rounded-2xl pointer-events-none"></div>
+                    <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-orange-500 text-[10px] uppercase font-bold tracking-widest px-3 py-1 rounded-full shadow-[0_0_15px_rgba(99,102,241,0.5)] text-white">Popular</div>
+                    
+                    <div class="mb-4 relative z-10">
+                        <h3 class="text-lg font-medium text-white">Pro</h3>
+                        <div class="mt-2 flex items-baseline gap-1">
+                            <span class="text-3xl font-medium text-white">$29</span>
+                            <span class="text-sm text-stone-500">/month</span>
+                        </div>
+                        <p class="text-xs mt-2 text-stone-400">For growing teams.</p>
+                    </div>
+                    <div class="my-6 border-t relative z-10 border-white/5"></div>
+                    <ul class="space-y-3 flex-1 relative z-10">
+                        <li class="flex items-start gap-3 text-sm text-stone-300">
+                            <iconify-icon icon="lucide:check" class="mt-0.5 text-orange-400" width="16"></iconify-icon>
+                            <span>Unlimited projects</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-sm text-stone-300">
+                            <iconify-icon icon="lucide:check" class="mt-0.5 text-orange-400" width="16"></iconify-icon>
+                            <span>Advanced analytics</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-sm text-stone-300">
+                            <iconify-icon icon="lucide:check" class="mt-0.5 text-orange-400" width="16"></iconify-icon>
+                            <span>Priority support</span>
+                        </li>
+                         
+                    </ul>
+                    <button class="mt-8 w-full py-2 rounded-lg text-sm font-medium transition-colors relative z-10 shadow-[0_0_20px_rgba(255,255,255,0.1)] bg-white text-black hover:bg-stone-200">Start Free Trial</button>
+                </div>
+
+                <!-- Enterprise Tier -->
+                <div class="glass-panel p-8 rounded-2xl flex flex-col">
+                    <div class="mb-4">
+                        <h3 class="text-lg font-medium text-white">Enterprise</h3>
+                        <div class="mt-2 flex items-baseline gap-1">
+                            <span class="text-3xl font-medium text-white">Custom</span>
+                        </div>
+                        <p class="text-xs mt-2 text-stone-400">For large organizations.</p>
+                    </div>
+                    <div class="my-6 border-t border-white/5"></div>
+                    <ul class="space-y-3 flex-1">
+                        <li class="flex items-start gap-3 text-sm text-stone-300">
+                            <iconify-icon icon="lucide:check" class="text-stone-500 mt-0.5" width="16"></iconify-icon>
+                            <span>SSO &amp; SAML</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-sm text-stone-300">
+                            <iconify-icon icon="lucide:check" class="text-stone-500 mt-0.5" width="16"></iconify-icon>
+                            <span>Dedicated success manager</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-sm text-stone-300">
+                            <iconify-icon icon="lucide:check" class="text-stone-500 mt-0.5" width="16"></iconify-icon>
+                            <span>99.99% Uptime SLA</span>
+                        </li>
+                        
+                    </ul>
+                    <button class="mt-8 w-full py-2 rounded-lg border text-sm font-medium transition-colors bg-white/5 border-white/10 text-white hover:bg-white/10">Contact Sales</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="footer" class="border-t bg-[#050505] pt-16 pb-8 border-white/5">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 mb-16">
+                <div class="col-span-2 lg:col-span-2">
+                    <a href="#" class="flex items-center gap-2 mb-4">
+                        <div class="w-5 h-5 rounded flex items-center justify-center bg-white/10">
+                             <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
+                        </div>
+                        <span class="text-sm font-semibold tracking-tight text-white">NEXUS</span>
+                    </a>
+                    <p class="text-sm text-stone-500 mb-6 max-w-xs">
+                        Designing the future of workflow automation. Built by developers, for developers.
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="#" class="text-stone-500 transition-colors hover:text-white">
+                            <iconify-icon icon="lucide:twitter" width="18"></iconify-icon>
+                        </a>
+                        <a href="#" class="text-stone-500 transition-colors hover:text-white">
+                            <iconify-icon icon="lucide:github" width="18"></iconify-icon>
+                        </a>
+                        <a href="#" class="text-stone-500 transition-colors hover:text-white">
+                            <iconify-icon icon="lucide:linkedin" width="18"></iconify-icon>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-xs font-semibold uppercase tracking-wider mb-4 text-white">Product</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-sm text-stone-500 transition-colors hover:text-white">Features</a></li>
+                        <li><a href="#" class="text-sm text-stone-500 transition-colors hover:text-white">Integrations</a></li>
+                        <li><a href="#" class="text-sm text-stone-500 transition-colors hover:text-white">Pricing</a></li>
+                        
+                        
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-semibold uppercase tracking-wider mb-4 text-white">Company</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-sm text-stone-500 transition-colors hover:text-white">About</a></li>
+                        <li><a href="#" class="text-sm text-stone-500 transition-colors hover:text-white">Blog</a></li>
+                        <li><a href="#" class="text-sm text-stone-500 transition-colors hover:text-white">Careers</a></li>
+                        
+                        
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-semibold uppercase tracking-wider mb-4 text-white">Resources</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-sm text-stone-500 transition-colors hover:text-white">Community</a></li>
+                        <li><a href="#" class="text-sm text-stone-500 transition-colors hover:text-white">Contact</a></li>
+                        <li><a href="#" class="text-sm text-stone-500 transition-colors hover:text-white">DPA</a></li>
+                        
+                    </ul>
+                </div>
+
+                 <div>
+                    <h4 class="text-xs font-semibold uppercase tracking-wider mb-4 text-white">Legal</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-sm text-stone-500 transition-colors hover:text-white">Privacy</a></li>
+                        <li><a href="#" class="text-sm text-stone-500 transition-colors hover:text-white">Terms</a></li>
+                        <li><a href="#" class="text-sm text-stone-500 transition-colors hover:text-white">Security</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4 border-white/5">
+                <p class="text-xs text-stone-600">© 2023 Nexus Inc. All rights reserved.</p>
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-pink-500"></div>
+                    <span class="text-xs text-stone-500">All systems operational</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body></html>
