@@ -1449,7 +1449,7 @@
             };
             fr.readAsDataURL(blob);
           };
-          _mediaRec.start();
+          _mediaRec.start(1000); // emit chunks every 1s to avoid buffer overflow on long recordings
           btn.classList.add('recording');
         }).catch(function(e) { alert('Microphone access denied'); });
       }
