@@ -95,9 +95,33 @@
 
     /* MAIN */
     .main{flex:1;overflow-y:auto;background:#09090B;position:relative}
-    .main::before{content:'';position:fixed;top:0;left:230px;right:0;height:100vh;background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(0,229,255,0.07) 0%,transparent 70%);pointer-events:none;z-index:0}
-    .sidebar.collapsed ~ .main::before{left:56px}
     .page{position:relative;z-index:1}
+
+    /* ── BACKGROUND LAYERS ───────────────────────────────────── */
+    .main-bg{position:fixed;top:0;left:230px;right:0;bottom:0;pointer-events:none;z-index:0;overflow:hidden}
+    .sidebar.collapsed ~ .main .main-bg{left:56px}
+
+    /* Fine dot grid */
+    .main-bg-dots{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,0.045) 1px,transparent 1px);background-size:24px 24px}
+
+    /* Top-center cyan radial glow — big and soft */
+    .main-bg-glow1{position:absolute;top:-20%;left:50%;transform:translateX(-50%);width:min(900px,120%);height:min(700px,100vh);background:radial-gradient(ellipse,rgba(0,229,255,0.1) 0%,rgba(0,229,255,0.04) 40%,transparent 70%);border-radius:50%}
+
+    /* Bottom-right accent blob */
+    .main-bg-glow2{position:absolute;bottom:-15%;right:-10%;width:min(600px,80%);height:min(600px,80%);background:radial-gradient(ellipse,rgba(0,229,255,0.06) 0%,transparent 65%);border-radius:50%;animation:dashBlobFloat 18s ease-in-out infinite}
+
+    /* Top-left subtle purple tint for depth */
+    .main-bg-glow3{position:absolute;top:-10%;left:-5%;width:min(500px,60%);height:min(500px,60%);background:radial-gradient(ellipse,rgba(99,102,241,0.04) 0%,transparent 65%);border-radius:50%;animation:dashBlobFloat 24s ease-in-out infinite reverse}
+
+    /* Animated floating orbs */
+    .main-bg-orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:0.045;animation:dashBlobFloat 20s ease-in-out infinite}
+    .main-bg-orb-1{width:min(500px,60vw);height:min(500px,60vw);background:#00E5FF;top:5%;left:20%;animation-delay:0s}
+    .main-bg-orb-2{width:min(400px,50vw);height:min(400px,50vw);background:#00E5FF;bottom:10%;right:15%;animation-delay:-8s;opacity:.03}
+
+    /* Subtle horizontal scanline texture */
+    .main-bg-scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,0.006) 2px,rgba(255,255,255,0.006) 4px)}
+
+    @keyframes dashBlobFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-40px) scale(1.04)}66%{transform:translate(-20px,30px) scale(0.97)}}
 
     /* PAGES */
     .page{display:none;width:100%}
@@ -561,6 +585,17 @@
 
   <!-- MAIN -->
   <div class="main">
+
+    <!-- Background layers -->
+    <div class="main-bg" aria-hidden="true">
+      <div class="main-bg-dots"></div>
+      <div class="main-bg-glow1"></div>
+      <div class="main-bg-glow2"></div>
+      <div class="main-bg-glow3"></div>
+      <div class="main-bg-orb main-bg-orb-1"></div>
+      <div class="main-bg-orb main-bg-orb-2"></div>
+      <div class="main-bg-scan"></div>
+    </div>
 
     <!-- HOME -->
     <div class="page active" id="page-home">
