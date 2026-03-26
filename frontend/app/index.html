@@ -42,14 +42,15 @@
     /* SIDEBAR */
     .sidebar{width:230px;flex-shrink:0;background:#09090B;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;height:100vh;transition:width .2s ease;overflow:hidden}
     .sidebar.collapsed{width:56px}
-    .sb-logo{display:flex;align-items:center;justify-content:flex-start;gap:8px;padding:14px 10px 14px 12px;color:#fff;user-select:none;width:100%}
-    .sidebar.collapsed .sb-logo{padding:14px 0;justify-content:center}
-    .sb-logo-text{font-family:'Montserrat',sans-serif;font-weight:200;font-size:16px;letter-spacing:3px;text-transform:uppercase;white-space:nowrap;opacity:1;transition:opacity .2s,max-width .2s;max-width:200px;overflow:hidden;color:#fff}
-    .sidebar.collapsed .sb-logo-text{opacity:0;max-width:0;pointer-events:none}
-    .sb-toggle{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:0.55;transition:opacity .15s,background .15s;background:none;border:none;cursor:pointer;padding:0}
-    .sb-toggle:hover{opacity:1;background:rgba(255,255,255,0.08)}
-    .sb-toggle svg{width:15px;height:15px;stroke:#9CA3AF;stroke-width:1.75;fill:none}
-    .sb-nav{flex:1;padding:4px 8px;overflow-y:auto;overflow-x:hidden}
+    /* sb-logo row — same layout as sb-item so toggle aligns perfectly */
+    .sb-logo{display:flex;align-items:center;gap:10px;width:100%;padding:10px 16px;color:#fff;user-select:none;box-sizing:border-box}
+    .sidebar.collapsed .sb-logo{justify-content:center;padding:10px}
+    .sb-logo-text{font-family:'Montserrat',sans-serif;font-weight:200;font-size:15px;letter-spacing:3px;text-transform:uppercase;white-space:nowrap;opacity:1;transition:opacity .2s,max-width .2s;max-width:200px;overflow:hidden;color:#fff;flex:1}
+    .sidebar.collapsed .sb-logo-text{opacity:0;max-width:0;flex:0;pointer-events:none}
+    .sb-toggle{width:18px;height:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:0.5;transition:opacity .15s,background .15s;background:none;border:none;cursor:pointer;padding:0}
+    .sb-toggle:hover{opacity:1}
+    .sb-toggle svg{width:18px;height:18px;stroke:#9CA3AF;stroke-width:1.75;fill:none}
+    .sb-nav{flex:1;padding:4px 0;overflow-y:auto;overflow-x:hidden}
     .sb-item{display:flex;align-items:center;gap:10px;width:100%;padding:10px 16px;border-radius:8px;border:none;background:none;color:#9CA3AF;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;text-align:left;transition:all .15s;white-space:nowrap;box-sizing:border-box}
     .sidebar.collapsed .sb-item{justify-content:center;padding:10px;gap:0}
     .sb-item:hover{background:rgba(255,255,255,0.05);color:#D1D5DB}
