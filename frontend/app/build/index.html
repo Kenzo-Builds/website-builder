@@ -98,6 +98,42 @@
     /* Pill toggle — smooth switch */
     .pill-btn { transition: all 0.2s ease; }
 
+    /* ===== TAB BAR ===== */
+    #tab-bar {
+      display: flex; align-items: center; height: 40px; background: var(--bg);
+      border-bottom: 1px solid var(--border); flex-shrink: 0; padding: 0 8px;
+      gap: 2px; overflow-x: auto; z-index: 101;
+      -webkit-overflow-scrolling: touch;
+    }
+    #tab-bar::-webkit-scrollbar { display: none; }
+    .tab-item {
+      display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px;
+      border-radius: 7px; font-size: 12px; font-weight: 500; color: var(--text-3);
+      cursor: pointer; white-space: nowrap; flex-shrink: 0; border: none;
+      background: transparent; font-family: inherit; transition: all 0.15s; position: relative;
+    }
+    .tab-item:hover { background: var(--bg-hover); color: var(--text-2); }
+    .tab-item.active { background: var(--bg-card); color: var(--text); border: 1px solid var(--border); }
+    .tab-item.home { padding: 0 10px; }
+    .tab-item.home svg { width: 15px; height: 15px; stroke-width: 1.75; }
+    .tab-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .tab-dot.idle { background: var(--text-3); }
+    .tab-dot.ready { background: var(--green); }
+    .tab-dot.generating { background: var(--blue); animation: pulse 1s infinite; }
+    .tab-close {
+      width: 16px; height: 16px; border-radius: 4px; border: none; background: transparent;
+      color: var(--text-3); cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 12px; line-height: 1; padding: 0; opacity: 0; transition: all 0.1s; margin-left: 2px;
+    }
+    .tab-item:hover .tab-close { opacity: 1; }
+    .tab-close:hover { background: rgba(239,68,68,0.15); color: var(--red); }
+    .tab-add {
+      width: 26px; height: 26px; border-radius: 6px; border: none; background: transparent;
+      color: var(--text-3); cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0; transition: all 0.15s; font-family: inherit;
+    }
+    .tab-add:hover { background: var(--bg-hover); color: var(--text-2); }
+
     /* ===== HEADER ===== */
     #header {
       display: flex; align-items: center; justify-content: space-between;
@@ -170,7 +206,7 @@
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
     /* ===== MAIN LAYOUT ===== */
-    #app { display: flex; flex-direction: row; height: calc(100vh - 52px); overflow: hidden; background: var(--bg-2); }
+    #app { display: flex; flex-direction: row; height: calc(100vh - 92px); overflow: hidden; background: var(--bg-2); }
 
     /* ===== CHAT PANEL ===== */
     #chat-panel {
@@ -645,6 +681,15 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
+
+  <!-- Tab Bar -->
+  <div id="tab-bar">
+    <button class="tab-item home active" onclick="location.href='/app/'" title="Home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </button>
+    <!-- Project tabs injected here by TabManager -->
+    <button class="tab-add" onclick="location.href='/app/'" title="New project">+</button>
+  </div>
 
   <!-- Header -->
   <div id="header">
@@ -1422,6 +1467,8 @@
     function setStatus(state) {
       const dot = document.getElementById('status-dot');
       dot.className = state;
+      // Sync with tab bar
+      if(typeof TabMgr!=='undefined' && TabMgr.updateActiveTab) TabMgr.updateActiveTab({status:state});
     }
 
     function addMessage(text, role) {
@@ -2190,7 +2237,10 @@
       let name = prompt.replace(/^(create|build|make|generate|design)\s+(a|an|the|me)?\s*/i, '').trim();
       name = name.charAt(0).toUpperCase() + name.slice(1);
       if (name.length > 50) name = name.substring(0, 47) + '...';
-      return name || 'Untitled Project';
+      name = name || 'Untitled Project';
+      // Sync with tab bar
+      if(typeof TabMgr!=='undefined' && TabMgr.updateActiveTab) TabMgr.updateActiveTab({name:name});
+      return name;
     }
 
     async function saveProject(prompt, html, model, buildId) {
@@ -2451,6 +2501,159 @@
   <style>#builder-prompt-overlay.show{display:flex!important}</style>
 
   <script>
+    // ===== TAB MANAGER =====
+    var TabMgr = (function(){
+      var MAX_TABS = 3;
+      var KEY = 'builder_tabs';
+      var ACTIVE_KEY = 'builder_active_tab';
+      var tabs = []; // [{id, name, status, state}]
+      var activeTabId = null;
+
+      function save(){ sessionStorage.setItem(KEY, JSON.stringify(tabs.map(function(t){ return {id:t.id, name:t.name, status:t.status, state:t.state}; }))); sessionStorage.setItem(ACTIVE_KEY, activeTabId||''); }
+
+      function load(){
+        try { var d=sessionStorage.getItem(KEY); if(d) tabs=JSON.parse(d); } catch(e){ tabs=[]; }
+        activeTabId = sessionStorage.getItem(ACTIVE_KEY)||'';
+      }
+
+      function captureState(){
+        return {
+          currentHtml: (typeof currentHtml!=='undefined')?currentHtml:'',
+          currentBuildId: (typeof currentBuildId!=='undefined')?currentBuildId:'',
+          projectFiles: (typeof projectFiles!=='undefined')?JSON.parse(JSON.stringify(projectFiles)):{},
+          activeFile: (typeof activeFile!=='undefined')?activeFile:null,
+          openTabs: (typeof openTabs!=='undefined')?openTabs.slice():[],
+          brainstormHistory: (typeof brainstormHistory!=='undefined')?brainstormHistory.slice():[],
+          appMode: (typeof appMode!=='undefined')?appMode:'brainstorm',
+          currentProjectId: (typeof currentProjectId!=='undefined')?currentProjectId:null,
+          currentProjectName: (typeof currentProjectName!=='undefined')?currentProjectName:'',
+          lastPrompt: (typeof lastPrompt!=='undefined')?lastPrompt:'',
+          chatHtml: document.getElementById('chat-history')?document.getElementById('chat-history').innerHTML:'',
+          previewSrc: (function(){ var f=document.getElementById('preview-frame'); return f?f.getAttribute('srcdoc')||'':''; })()
+        };
+      }
+
+      function restoreState(s){
+        if(!s) return;
+        if(typeof currentHtml!=='undefined') currentHtml=s.currentHtml||'';
+        if(typeof currentBuildId!=='undefined') currentBuildId=s.currentBuildId||'';
+        if(typeof projectFiles!=='undefined') projectFiles=s.projectFiles||{};
+        if(typeof activeFile!=='undefined') activeFile=s.activeFile||null;
+        if(typeof openTabs!=='undefined') openTabs=s.openTabs||[];
+        if(typeof brainstormHistory!=='undefined') brainstormHistory=s.brainstormHistory||[];
+        if(typeof appMode!=='undefined'){ appMode=s.appMode||'brainstorm'; if(typeof setMode==='function') setMode(appMode); }
+        if(typeof currentProjectId!=='undefined') currentProjectId=s.currentProjectId||null;
+        if(typeof currentProjectName!=='undefined') currentProjectName=s.currentProjectName||'';
+        if(typeof lastPrompt!=='undefined') lastPrompt=s.lastPrompt||'';
+        var ch=document.getElementById('chat-history'); if(ch&&s.chatHtml) ch.innerHTML=s.chatHtml;
+        var pf=document.getElementById('preview-frame'); if(pf&&s.previewSrc) pf.srcdoc=s.previewSrc;
+        // Refresh file tree if open
+        if(typeof renderFileTree==='function') renderFileTree();
+        if(typeof renderEditorTabs==='function') renderEditorTabs();
+      }
+
+      function render(){
+        var bar=document.getElementById('tab-bar'); if(!bar) return;
+        // Remove existing project tabs (keep home + add button)
+        var existing=bar.querySelectorAll('.tab-item.project'); existing.forEach(function(e){e.remove();});
+        var addBtn=bar.querySelector('.tab-add');
+        tabs.forEach(function(t){
+          var el=document.createElement('button');
+          el.className='tab-item project'+(t.id===activeTabId?' active':'');
+          el.setAttribute('data-tab-id',t.id);
+          // Status dot
+          var dot=document.createElement('span');
+          dot.className='tab-dot '+(t.status||'idle');
+          el.appendChild(dot);
+          // Name
+          var name=document.createElement('span');
+          name.textContent=t.name||'Untitled';
+          name.style.maxWidth='120px';name.style.overflow='hidden';name.style.textOverflow='ellipsis';
+          el.appendChild(name);
+          // Close button
+          var close=document.createElement('button');
+          close.className='tab-close';
+          close.textContent='×';
+          close.onclick=function(e){ e.stopPropagation(); closeTab(t.id); };
+          el.appendChild(close);
+          // Click to switch
+          el.onclick=function(){ switchTo(t.id); };
+          bar.insertBefore(el, addBtn);
+        });
+        // Update home tab active state
+        var homeTab=bar.querySelector('.tab-item.home');
+        if(homeTab){ homeTab.classList.toggle('active', !activeTabId || tabs.length===0); }
+        // Hide add button if at max
+        if(addBtn) addBtn.style.display=tabs.length>=MAX_TABS?'none':'flex';
+      }
+
+      function createTab(name, projectId){
+        if(tabs.length>=MAX_TABS) return null;
+        var id='tab-'+Date.now()+'-'+Math.random().toString(36).substr(2,6);
+        var t={id:id, name:name||'Untitled', status:'idle', state:captureState()};
+        tabs.push(t);
+        activeTabId=id;
+        save(); render();
+        return id;
+      }
+
+      function switchTo(id){
+        if(id===activeTabId) return;
+        // Save current tab state
+        var cur=tabs.find(function(t){return t.id===activeTabId;});
+        if(cur) cur.state=captureState();
+        // Load target
+        var target=tabs.find(function(t){return t.id===id;});
+        if(!target) return;
+        activeTabId=id;
+        restoreState(target.state);
+        save(); render();
+      }
+
+      function closeTab(id){
+        var idx=tabs.findIndex(function(t){return t.id===id;});
+        if(idx<0) return;
+        tabs.splice(idx,1);
+        if(activeTabId===id){
+          if(tabs.length>0){ activeTabId=tabs[Math.max(0,idx-1)].id; restoreState(tabs.find(function(t){return t.id===activeTabId;}).state); }
+          else { activeTabId=null; location.href='/app/'; return; }
+        }
+        save(); render();
+      }
+
+      function updateActiveTab(props){
+        var t=tabs.find(function(t){return t.id===activeTabId;});
+        if(!t) return;
+        if(props.name) t.name=props.name;
+        if(props.status) t.status=props.status;
+        save(); render();
+      }
+
+      function getActiveTabId(){ return activeTabId; }
+      function getTabs(){ return tabs; }
+
+      // Init on load
+      load();
+
+      return { render:render, createTab:createTab, switchTo:switchTo, closeTab:closeTab, updateActiveTab:updateActiveTab, captureState:captureState, save:save, getActiveTabId:getActiveTabId, getTabs:getTabs, load:load };
+    })();
+
+    // Auto-create tab for current build if none exists
+    (function(){
+      TabMgr.render();
+      // If we arrived with a build intent, create a tab
+      var hasIntent = sessionStorage.getItem('builder_prompt') || sessionStorage.getItem('builder_template_file') || sessionStorage.getItem('builder_project_id');
+      if(hasIntent && !TabMgr.getActiveTabId()){
+        var name = sessionStorage.getItem('builder_template_name') || 'New Build';
+        TabMgr.createTab(name);
+      } else if(TabMgr.getActiveTabId()){
+        TabMgr.render();
+      } else if(TabMgr.getTabs().length===0){
+        // No tabs, no intent — create a default tab
+        TabMgr.createTab('New Build');
+      }
+    })();
+
     // Initialize Lucide icons
     if(window.lucide) lucide.createIcons();
   </script>
