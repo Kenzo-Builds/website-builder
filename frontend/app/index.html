@@ -1728,7 +1728,7 @@ function renderTpl(id){
     var tagHtml=t.tag?'<div class="tcard-tag">'+t.tag+'</div>':'';
     var grad='linear-gradient(135deg,'+t.colors[0]+','+t.colors[1]+','+t.colors[2]+')';
     c.style.background=grad;
-    c.innerHTML='<div class="tcard-bg" style="background:'+grad+';position:absolute;inset:0"><iframe src="'+t.file+'" style="width:400%;height:400%;transform:scale(0.25);transform-origin:top left;pointer-events:none;border:none;position:absolute;top:0;left:0"></iframe></div><div class="tcard-overlay">'+tagHtml+'<div class="tcard-name">'+t.n+'</div><div class="tcard-desc">'+t.d+'</div></div>';
+    c.innerHTML='<div class="tcard-bg" style="background:'+grad+';position:absolute;inset:0"><iframe loading="lazy" src="'+t.file+'" style="width:400%;height:400%;transform:scale(0.25);transform-origin:top left;pointer-events:none;border:none;position:absolute;top:0;left:0"></iframe></div><div class="tcard-overlay">'+tagHtml+'<div class="tcard-name">'+t.n+'</div><div class="tcard-desc">'+t.d+'</div></div>';
     g.appendChild(c);
   });
 }
@@ -1761,7 +1761,7 @@ function renderTplHome(){
       var tagHtml=t.tag?'<div class="tcard-tag">'+t.tag+'</div>':'';
       var grad2='linear-gradient(135deg,'+t.colors[0]+','+t.colors[1]+','+t.colors[2]+')';
       c.style.background=grad2;
-      c.innerHTML='<div class="tcard-bg" style="background:'+grad2+';position:absolute;inset:0"><iframe src="'+t.file+'" style="width:400%;height:400%;transform:scale(0.25);transform-origin:top left;pointer-events:none;border:none;position:absolute;top:0;left:0"></iframe></div><div class="tcard-overlay">'+tagHtml+'<div class="tcard-name">'+t.n+'</div><div class="tcard-desc">'+t.d+'</div></div>';
+      c.innerHTML='<div class="tcard-bg" style="background:'+grad2+';position:absolute;inset:0"><iframe loading="lazy" src="'+t.file+'" style="width:400%;height:400%;transform:scale(0.25);transform-origin:top left;pointer-events:none;border:none;position:absolute;top:0;left:0"></iframe></div><div class="tcard-overlay">'+tagHtml+'<div class="tcard-name">'+t.n+'</div><div class="tcard-desc">'+t.d+'</div></div>';
       allTpl.appendChild(c);
     });
   }
