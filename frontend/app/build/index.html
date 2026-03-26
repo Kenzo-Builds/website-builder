@@ -494,21 +494,43 @@
     .es-slide-num { font-size: 10px; font-weight: 700; color: rgba(0,229,255,0.5); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
     .es-slide-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
     .es-slide-desc { font-size: 12px; color: var(--text-3); line-height: 1.6; max-width: 300px; }
-    /* Slide 1 — typing animation */
-    .es-typing-line { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; margin-top: 14px; max-width: 280px; }
-    .es-typing-text { font-size: 12px; color: var(--text-2); overflow: hidden; white-space: nowrap; border-right: 2px solid var(--blue); animation: esType 3s steps(40) infinite; width: 0; max-width: 220px; }
-    @keyframes esType { 0%{width:0} 50%{width:220px} 80%{width:220px} 100%{width:0} }
-    /* Slide 2 — code streaming */
-    .es-code-block { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-top: 14px; width: 260px; font-family: monospace; font-size: 10px; line-height: 1.8; text-align: left; overflow: hidden; height: 80px; }
-    .es-code-line { opacity: 0; animation: esCodeFade 0.3s ease forwards; color: var(--text-3); }
-    .es-code-line .tag { color: #7DD3FC; }
-    .es-code-line .attr { color: #86EFAC; }
-    @keyframes esCodeFade { to { opacity: 1; } }
-    /* Slide 3 — deploy */
-    .es-deploy-mock { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 14px; }
-    .es-deploy-btn { padding: 8px 24px; border-radius: 8px; background: #fff; color: #0D0D0D; font-size: 12px; font-weight: 700; border: none; animation: esPulse 2s ease-in-out infinite; }
-    @keyframes esPulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0.3)} 50%{box-shadow:0 0 0 8px rgba(255,255,255,0)} }
-    .es-deploy-url { font-size: 11px; color: var(--text-3); font-family: monospace; }
+    /* Slide 1 — Dashboard mockup with typing */
+    .es-dash-mock { width: 300px; height: 140px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; margin-top: 12px; overflow: hidden; position: relative; }
+    .es-dash-header { height: 22px; background: rgba(255,255,255,0.03); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 8px; gap: 4px; }
+    .es-dash-dot { width: 5px; height: 5px; border-radius: 50%; }
+    .es-dash-body { padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+    .es-dash-greeting { font-size: 9px; font-weight: 600; color: var(--text-2); }
+    .es-dash-input { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; display: flex; align-items: center; gap: 6px; }
+    .es-dash-typing { font-size: 9px; color: var(--text-2); overflow: hidden; white-space: nowrap; border-right: 1.5px solid var(--blue); width: 0; animation: esType 4s steps(35) infinite; max-width: 200px; }
+    @keyframes esType { 0%{width:0} 40%{width:200px} 75%{width:200px} 100%{width:0} }
+    .es-dash-pills { display: flex; gap: 4px; margin-top: 2px; }
+    .es-dash-pill { font-size: 8px; padding: 2px 8px; border-radius: 10px; background: rgba(255,255,255,0.06); color: var(--text-3); }
+    .es-dash-pill.active { background: rgba(255,255,255,0.12); color: var(--text); }
+    .es-dash-pill.highlight { animation: esPillFlash 4s ease infinite; }
+    @keyframes esPillFlash { 0%,30%{background:rgba(255,255,255,0.06);color:var(--text-3)} 40%,60%{background:rgba(255,255,255,0.15);color:var(--text)} 70%,100%{background:rgba(255,255,255,0.06);color:var(--text-3)} }
+    .es-dash-send { width: 16px; height: 16px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; margin-left: auto; flex-shrink: 0; animation: esSendPulse 4s ease infinite; }
+    @keyframes esSendPulse { 0%,70%{transform:scale(1);opacity:0.5} 80%{transform:scale(1.15);opacity:1} 90%,100%{transform:scale(1);opacity:0.5} }
+
+    /* Slide 2 — Split code + wireframe building */
+    .es-gen-wrap { display: flex; gap: 6px; margin-top: 12px; width: 300px; height: 120px; }
+    .es-gen-code { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; padding: 6px; font-family: monospace; font-size: 8px; line-height: 1.7; color: var(--text-3); overflow: hidden; position: relative; text-align: left; }
+    .es-gen-code .tag { color: #7DD3FC; }
+    .es-gen-code .attr { color: #86EFAC; }
+    .es-gen-counter { position: absolute; bottom: 4px; right: 6px; font-size: 9px; font-weight: 700; color: var(--blue); font-variant-numeric: tabular-nums; }
+    .es-gen-preview { flex: 1; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
+    .es-gen-nav { height: 10px; background: rgba(255,255,255,0.05); border-bottom: 1px solid var(--border); animation: esBuildFade 0.5s ease 0.3s both; }
+    .es-gen-hero { height: 30px; margin: 4px; border-radius: 4px; background: linear-gradient(135deg,rgba(0,229,255,0.08),rgba(0,229,255,0.03)); animation: esBuildFade 0.5s ease 0.8s both; }
+    .es-gen-cards { display: flex; gap: 3px; padding: 0 4px; }
+    .es-gen-card { flex: 1; height: 20px; border-radius: 3px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+    .es-gen-card:nth-child(1) { animation: esBuildFade 0.4s ease 1.4s both; }
+    .es-gen-card:nth-child(2) { animation: esBuildFade 0.4s ease 1.8s both; }
+    .es-gen-card:nth-child(3) { animation: esBuildFade 0.4s ease 2.2s both; }
+    .es-gen-footer { height: 8px; margin: 4px; border-radius: 2px; background: rgba(255,255,255,0.03); animation: esBuildFade 0.4s ease 2.8s both; }
+    @keyframes esBuildFade { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+
+    /* Slide 3 — Real template preview */
+    .es-result-frame { width: 300px; height: 130px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); margin-top: 12px; position: relative; }
+    .es-result-frame iframe { width: 400%; height: 400%; transform: scale(0.25); transform-origin: top left; border: none; pointer-events: none; }
 
     /* Dots */
     .es-dots { display: flex; gap: 8px; margin-top: 20px; position: relative; z-index: 2; }
@@ -927,57 +949,65 @@
             <div class="es-title">Build anything you imagine</div>
             <div class="es-sub">Describe your idea in the chat — AI generates your website in seconds</div>
             <div class="es-carousel">
-              <!-- Slide 1: Describe -->
+              <!-- Slide 1: Dashboard mockup with typing -->
               <div class="es-slide active" data-slide="0">
                 <div class="es-slide-num">Step 01</div>
                 <div class="es-slide-title">Describe your idea</div>
-                <div class="es-slide-desc">Type in any language — English, Uzbek, Russian</div>
-                <div style="display:flex;flex-direction:column;gap:6px;margin-top:14px;width:260px">
-                  <div class="es-typing-line">
-                    <span class="es-typing-text">Build a coffee shop website with menu...</span>
+                <div class="es-dash-mock">
+                  <div class="es-dash-header">
+                    <div class="es-dash-dot" style="background:#FF5F57"></div>
+                    <div class="es-dash-dot" style="background:#FEBC2E"></div>
+                    <div class="es-dash-dot" style="background:#28C840"></div>
                   </div>
-                  <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:4px">
-                    <span style="font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text-3)">Restaurant</span>
-                    <span style="font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text-3)">Portfolio</span>
-                    <span style="font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text-3)">E-commerce</span>
+                  <div class="es-dash-body">
+                    <div class="es-dash-greeting">Good morning, Khumoyun</div>
+                    <div class="es-dash-input">
+                      <span class="es-dash-typing">Build a coffee shop website with menu and booking...</span>
+                      <div class="es-dash-send"><svg width="7" height="7" viewBox="0 0 24 24" fill="#0D0D0D" stroke="none"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></div>
+                    </div>
+                    <div class="es-dash-pills">
+                      <div class="es-dash-pill highlight">Brainstorm</div>
+                      <div class="es-dash-pill active">Build</div>
+                    </div>
                   </div>
                 </div>
               </div>
-              <!-- Slide 2: Generate -->
+              <!-- Slide 2: Split code + wireframe building -->
               <div class="es-slide" data-slide="1">
                 <div class="es-slide-num">Step 02</div>
-                <div class="es-slide-title">AI writes the code</div>
-                <div class="es-slide-desc">Real-time generation with live preview</div>
-                <div style="display:flex;gap:8px;margin-top:14px;width:280px">
-                  <div class="es-code-block" style="flex:1;height:90px">
-                    <div class="es-code-line" style="animation-delay:0s"><span class="tag">&lt;section</span> class=<span class="attr">"hero"</span><span class="tag">&gt;</span></div>
-                    <div class="es-code-line" style="animation-delay:0.4s">&nbsp;&nbsp;<span class="tag">&lt;h1&gt;</span>Best Coffee<span class="tag">&lt;/h1&gt;</span></div>
-                    <div class="es-code-line" style="animation-delay:0.8s">&nbsp;&nbsp;<span class="tag">&lt;p&gt;</span>Tashkent, UZ<span class="tag">&lt;/p&gt;</span></div>
-                    <div class="es-code-line" style="animation-delay:1.2s">&nbsp;&nbsp;<span class="tag">&lt;a&gt;</span>Menu →<span class="tag">&lt;/a&gt;</span></div>
-                    <div class="es-code-line" style="animation-delay:1.6s"><span class="tag">&lt;/section&gt;</span></div>
+                <div class="es-slide-title">AI generates your website</div>
+                <div class="es-gen-wrap">
+                  <div class="es-gen-code">
+                    <div><span class="tag">&lt;!DOCTYPE html&gt;</span></div>
+                    <div><span class="tag">&lt;html&gt;&lt;head&gt;</span></div>
+                    <div>&nbsp;<span class="tag">&lt;title&gt;</span>Coffee<span class="tag">&lt;/title&gt;</span></div>
+                    <div>&nbsp;<span class="tag">&lt;style&gt;</span></div>
+                    <div>&nbsp;&nbsp;<span class="attr">.hero</span>{padding:80px}</div>
+                    <div>&nbsp;&nbsp;<span class="attr">h1</span>{font-size:48px}</div>
+                    <div>&nbsp;<span class="tag">&lt;/style&gt;</span></div>
+                    <div><span class="tag">&lt;/head&gt;&lt;body&gt;</span></div>
+                    <div>&nbsp;<span class="tag">&lt;nav&gt;</span>...<span class="tag">&lt;/nav&gt;</span></div>
+                    <div>&nbsp;<span class="tag">&lt;section</span> <span class="attr">class</span>="hero"<span class="tag">&gt;</span></div>
+                    <div class="es-gen-counter" id="es-line-counter">0 lines</div>
                   </div>
-                  <div style="flex:1;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px">
-                    <div style="width:80%;height:12px;background:linear-gradient(90deg,rgba(0,229,255,0.15),rgba(0,229,255,0.05));border-radius:4px"></div>
-                    <div style="width:60%;height:6px;background:rgba(255,255,255,0.06);border-radius:3px"></div>
-                    <div style="width:70%;height:6px;background:rgba(255,255,255,0.04);border-radius:3px"></div>
-                    <div style="width:40%;height:16px;margin-top:4px;background:rgba(0,229,255,0.12);border:1px solid rgba(0,229,255,0.2);border-radius:4px"></div>
-                    <div style="font-size:8px;color:var(--text-3);margin-top:2px">Live Preview</div>
+                  <div class="es-gen-preview">
+                    <div class="es-gen-nav"></div>
+                    <div class="es-gen-hero"></div>
+                    <div class="es-gen-cards">
+                      <div class="es-gen-card"></div>
+                      <div class="es-gen-card"></div>
+                      <div class="es-gen-card"></div>
+                    </div>
+                    <div class="es-gen-footer"></div>
                   </div>
                 </div>
               </div>
-              <!-- Slide 3: Launch -->
+              <!-- Slide 3: Real template preview -->
               <div class="es-slide" data-slide="2">
                 <div class="es-slide-num">Step 03</div>
-                <div class="es-slide-title">Deploy in one click</div>
-                <div class="es-slide-desc">Your site goes live with a shareable link</div>
-                <div class="es-deploy-mock">
-                  <div class="es-deploy-btn">Deploy</div>
-                  <div class="es-deploy-url">yoursite.kenzoagent.com</div>
-                  <div style="display:flex;gap:14px;margin-top:6px">
-                    <span style="font-size:10px;color:var(--green);display:flex;align-items:center;gap:3px">● SSL</span>
-                    <span style="font-size:10px;color:var(--text-3)">CDN</span>
-                    <span style="font-size:10px;color:var(--text-3)">Custom domain</span>
-                  </div>
+                <div class="es-slide-title">Your website is ready</div>
+                <div class="es-result-frame">
+                  <iframe loading="lazy" src="/templates/quantum-saas.html?v=1"></iframe>
                 </div>
               </div>
             </div>
@@ -2679,13 +2709,25 @@
       slides.forEach(function(s,i){s.classList.toggle('active',i===n);});
       dots.forEach(function(d,i){d.classList.toggle('active',i===n);});
     }
-    function esNext(){_esSlide=(_esSlide+1)%3;esGoSlide(_esSlide);}
-    _esTimer=setInterval(esNext,4000);
+    function esNext(){_esSlide=(_esSlide+1)%3;esGoSlide(_esSlide);if(_esSlide===1)startLineCounter();}
+    _esTimer=setInterval(esNext,5000);
+
+    // Line counter animation for slide 2
+    var _lcInterval;
+    function startLineCounter(){
+      var el=document.getElementById('es-line-counter');if(!el)return;
+      var count=0;clearInterval(_lcInterval);
+      _lcInterval=setInterval(function(){
+        count+=Math.floor(800+Math.random()*1200);
+        if(count>32000){count=32000;clearInterval(_lcInterval);}
+        el.textContent=count.toLocaleString()+' lines';
+      },120);
+    }
     // Pause on hover
     var esCar=document.querySelector('.es-carousel');
     if(esCar){
       esCar.addEventListener('mouseenter',function(){clearInterval(_esTimer);});
-      esCar.addEventListener('mouseleave',function(){_esTimer=setInterval(esNext,4000);});
+      esCar.addEventListener('mouseleave',function(){_esTimer=setInterval(esNext,5000);});
     }
 
     // ===== TAB MANAGER =====
