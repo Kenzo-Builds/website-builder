@@ -472,17 +472,49 @@
 
     #empty-state {
       position: absolute; inset: 0; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 16px; background: var(--bg);
-      transition: opacity 0.3s ease;
+      align-items: center; justify-content: center; gap: 0; background: var(--bg);
+      transition: opacity 0.4s ease; overflow: hidden;
     }
-    .empty-icon {
-      width: 64px; height: 64px; border-radius: 16px;
-      display: flex; align-items: center; justify-content: center;
-      background: var(--bg-card); border: 1px solid var(--border);
+    /* Matrix rain canvas — background layer */
+    #matrix-canvas { position: absolute; inset: 0; z-index: 0; opacity: 0.06; }
+    /* Radial glow overlay */
+    .es-glow { position: absolute; inset: 0; z-index: 1; background: radial-gradient(ellipse 60% 50% at 50% 40%, rgba(0,229,255,0.06) 0%, transparent 70%); pointer-events: none; }
+    /* Center card */
+    .es-card {
+      position: relative; z-index: 2; width: 420px; max-width: 88%;
+      display: flex; flex-direction: column; align-items: center; text-align: center;
     }
-    .empty-text { text-align: center; }
-    .empty-text div:first-child { color: var(--text); font-weight: 600; font-size: 15px; }
-    .empty-text div:last-child { color: var(--text-3); font-size: 13px; margin-top: 6px; }
+    .es-sparkle { font-size: 28px; margin-bottom: 16px; opacity: 0.7; }
+    .es-title { font-family: 'Montserrat', sans-serif; font-weight: 300; font-size: 22px; color: var(--text); letter-spacing: -0.5px; margin-bottom: 8px; }
+    .es-sub { font-size: 13px; color: var(--text-3); line-height: 1.6; margin-bottom: 28px; }
+    /* Carousel */
+    .es-carousel { width: 100%; aspect-ratio: 16/10; border-radius: 14px; overflow: hidden; position: relative; background: var(--bg-card); border: 1px solid var(--border); box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+    .es-slide { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; opacity: 0; transition: opacity 0.6s ease; }
+    .es-slide.active { opacity: 1; }
+    .es-slide-num { font-size: 10px; font-weight: 700; color: rgba(0,229,255,0.5); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
+    .es-slide-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .es-slide-desc { font-size: 12px; color: var(--text-3); line-height: 1.6; max-width: 300px; }
+    /* Slide 1 — typing animation */
+    .es-typing-line { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; margin-top: 14px; max-width: 280px; }
+    .es-typing-text { font-size: 12px; color: var(--text-2); overflow: hidden; white-space: nowrap; border-right: 2px solid var(--blue); animation: esType 3s steps(40) infinite; width: 0; max-width: 220px; }
+    @keyframes esType { 0%{width:0} 50%{width:220px} 80%{width:220px} 100%{width:0} }
+    /* Slide 2 — code streaming */
+    .es-code-block { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-top: 14px; width: 260px; font-family: monospace; font-size: 10px; line-height: 1.8; text-align: left; overflow: hidden; height: 80px; }
+    .es-code-line { opacity: 0; animation: esCodeFade 0.3s ease forwards; color: var(--text-3); }
+    .es-code-line .tag { color: #7DD3FC; }
+    .es-code-line .attr { color: #86EFAC; }
+    @keyframes esCodeFade { to { opacity: 1; } }
+    /* Slide 3 — deploy */
+    .es-deploy-mock { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 14px; }
+    .es-deploy-btn { padding: 8px 24px; border-radius: 8px; background: #fff; color: #0D0D0D; font-size: 12px; font-weight: 700; border: none; animation: esPulse 2s ease-in-out infinite; }
+    @keyframes esPulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0.3)} 50%{box-shadow:0 0 0 8px rgba(255,255,255,0)} }
+    .es-deploy-url { font-size: 11px; color: var(--text-3); font-family: monospace; }
+    .es-confetti { font-size: 18px; animation: esConfetti 2s ease infinite; }
+    @keyframes esConfetti { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-6px) scale(1.1)} }
+    /* Dots */
+    .es-dots { display: flex; gap: 8px; margin-top: 20px; position: relative; z-index: 2; }
+    .es-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-3); opacity: 0.3; cursor: pointer; border: none; padding: 0; transition: all 0.2s; }
+    .es-dot.active { opacity: 1; background: var(--blue); }
 
     /* Preview iframe wrapper — handles device frames */
     #preview-container {
@@ -889,12 +921,54 @@
       <!-- Preview -->
       <div id="pane-preview">
         <div id="empty-state">
-          <div class="empty-icon">
-            <i data-lucide="panel-left" style="width:20px;height:20px;stroke:var(--text-3);stroke-width:1.5"></i>
-          </div>
-          <div class="empty-text">
-            <div>Your website will appear here</div>
-            <div>Describe what you want and hit send</div>
+          <canvas id="matrix-canvas"></canvas>
+          <div class="es-glow"></div>
+          <div class="es-card">
+            <div class="es-sparkle">✦</div>
+            <div class="es-title">Build anything you imagine</div>
+            <div class="es-sub">Describe your idea in the chat — AI generates your website in seconds</div>
+            <div class="es-carousel">
+              <!-- Slide 1: Describe -->
+              <div class="es-slide active" data-slide="0">
+                <div class="es-slide-num">Step 01</div>
+                <div class="es-slide-title">Describe your idea</div>
+                <div class="es-slide-desc">Just type what you want in plain language</div>
+                <div class="es-typing-line">
+                  <span style="color:var(--text-3);font-size:11px">💬</span>
+                  <span class="es-typing-text">Build a coffee shop website with menu...</span>
+                </div>
+              </div>
+              <!-- Slide 2: Generate -->
+              <div class="es-slide" data-slide="1">
+                <div class="es-slide-num">Step 02</div>
+                <div class="es-slide-title">AI writes the code</div>
+                <div class="es-slide-desc">Watch as your website comes to life in real time</div>
+                <div class="es-code-block" id="es-code-anim">
+                  <div class="es-code-line" style="animation-delay:0s"><span class="tag">&lt;section</span> class=<span class="attr">"hero"</span><span class="tag">&gt;</span></div>
+                  <div class="es-code-line" style="animation-delay:0.3s">&nbsp;&nbsp;<span class="tag">&lt;h1&gt;</span>Best Coffee<span class="tag">&lt;/h1&gt;</span></div>
+                  <div class="es-code-line" style="animation-delay:0.6s">&nbsp;&nbsp;<span class="tag">&lt;p&gt;</span>Tashkent<span class="tag">&lt;/p&gt;</span></div>
+                  <div class="es-code-line" style="animation-delay:0.9s">&nbsp;&nbsp;<span class="tag">&lt;a</span> href=<span class="attr">"#menu"</span><span class="tag">&gt;</span></div>
+                  <div class="es-code-line" style="animation-delay:1.2s">&nbsp;&nbsp;&nbsp;&nbsp;View Menu →</div>
+                  <div class="es-code-line" style="animation-delay:1.5s">&nbsp;&nbsp;<span class="tag">&lt;/a&gt;&lt;/section&gt;</span></div>
+                </div>
+              </div>
+              <!-- Slide 3: Launch -->
+              <div class="es-slide" data-slide="2">
+                <div class="es-slide-num">Step 03</div>
+                <div class="es-slide-title">Deploy in one click</div>
+                <div class="es-slide-desc">Your website goes live instantly with a shareable link</div>
+                <div class="es-deploy-mock">
+                  <div class="es-confetti">🚀</div>
+                  <div class="es-deploy-btn">Deploy</div>
+                  <div class="es-deploy-url">yoursite.kenzoagent.com</div>
+                </div>
+              </div>
+            </div>
+            <div class="es-dots">
+              <button class="es-dot active" onclick="esGoSlide(0)"></button>
+              <button class="es-dot" onclick="esGoSlide(1)"></button>
+              <button class="es-dot" onclick="esGoSlide(2)"></button>
+            </div>
           </div>
         </div>
         <div id="preview-container">
@@ -2527,6 +2601,76 @@
   <style>#builder-prompt-overlay.show{display:flex!important}</style>
 
   <script>
+    // ===== MATRIX RAIN =====
+    (function(){
+      var canvas=document.getElementById('matrix-canvas');
+      if(!canvas) return;
+      var ctx=canvas.getContext('2d');
+      var chars='01</>{}();:.#ABCDEFabcdef';
+      var drops=[];
+      var fontSize=14;
+      var cols;
+      var running=true;
+
+      function resize(){
+        canvas.width=canvas.parentElement.offsetWidth;
+        canvas.height=canvas.parentElement.offsetHeight;
+        cols=Math.floor(canvas.width/fontSize);
+        drops=[];
+        for(var i=0;i<cols;i++) drops[i]=Math.random()*-100;
+      }
+      resize();
+      window.addEventListener('resize',resize);
+
+      function draw(){
+        if(!running) return;
+        ctx.fillStyle='rgba(13,13,13,0.08)';
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.fillStyle='rgba(0,229,255,0.35)';
+        ctx.font=fontSize+'px monospace';
+        for(var i=0;i<cols;i++){
+          var ch=chars[Math.floor(Math.random()*chars.length)];
+          var x=i*fontSize;
+          var y=drops[i]*fontSize;
+          ctx.fillText(ch,x,y);
+          if(y>canvas.height && Math.random()>0.975) drops[i]=0;
+          drops[i]+=0.5+Math.random()*0.3;
+        }
+        requestAnimationFrame(draw);
+      }
+      draw();
+
+      // Pause when hidden
+      var es=document.getElementById('empty-state');
+      var obs=new MutationObserver(function(){
+        if(es.style.display==='none'){running=false;}
+        else{running=true;requestAnimationFrame(draw);}
+      });
+      obs.observe(es,{attributes:true,attributeFilter:['style']});
+
+      // Expose stop for cleanup
+      window._matrixStop=function(){running=false;};
+    })();
+
+    // ===== CAROUSEL AUTO-PLAY =====
+    var _esSlide=0;
+    var _esTimer;
+    function esGoSlide(n){
+      _esSlide=n;
+      var slides=document.querySelectorAll('.es-slide');
+      var dots=document.querySelectorAll('.es-dot');
+      slides.forEach(function(s,i){s.classList.toggle('active',i===n);});
+      dots.forEach(function(d,i){d.classList.toggle('active',i===n);});
+    }
+    function esNext(){_esSlide=(_esSlide+1)%3;esGoSlide(_esSlide);}
+    _esTimer=setInterval(esNext,4000);
+    // Pause on hover
+    var esCar=document.querySelector('.es-carousel');
+    if(esCar){
+      esCar.addEventListener('mouseenter',function(){clearInterval(_esTimer);});
+      esCar.addEventListener('mouseleave',function(){_esTimer=setInterval(esNext,4000);});
+    }
+
     // ===== TAB MANAGER =====
     var TabMgr = (function(){
       var MAX_TABS = 3;
