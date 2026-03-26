@@ -10,9 +10,7 @@ const crypto = require('crypto');
 const app = express();
 app.use(cors({
   origin: [
-    'https://builder.kenzoagent.com',
-    'http://localhost:3000',
-    'http://localhost:3500'
+    'https://builder.kenzoagent.com'
   ]
 }));
 app.use(express.json({ limit: '10mb' }));
@@ -421,7 +419,7 @@ app.post('/api/generate-stream', async (req, res) => {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
     'Connection': 'keep-alive',
-    'Access-Control-Allow-Origin': '*'
+    'Access-Control-Allow-Origin': 'https://builder.kenzoagent.com'
   });
 
   // Choose system prompt based on whether we're modifying existing code
@@ -660,6 +658,9 @@ app.post('/api/restore-account', async (req, res) => {
 
 // ── Deploy ──────────────────────────────────────────────────────────────────
 app.post('/api/deploy', async (req, res) => {
+  const user = await verifyUser(req.headers.authorization);
+  if (!user?.id) return res.status(401).json({ error: 'Login required to deploy' });
+
   const { buildId, subdomain } = req.body;
   if (!buildId || !subdomain) return res.status(400).json({ error: 'buildId and subdomain required' });
 
@@ -837,6 +838,14 @@ function cleanBuilds() {
       } catch(e) {}
     });
     if (cleaned > 0) console.log(`🧹 Cleaned ${cleaned} old builds`);
+    // Hard cap: if >100 builds, delete oldest regardless of age
+    const remaining = fs.readdirSync(BUILDS_DIR);
+    if (remaining.length > 100) {
+      const sorted = remaining.map(d => ({name:d, time:fs.statSync(path.join(BUILDS_DIR,d)).mtimeMs})).sort((a,b)=>a.time-b.time);
+      const toDelete = sorted.slice(0, remaining.length - 50);
+      toDelete.forEach(d => { try{fs.rmSync(path.join(BUILDS_DIR,d.name),{recursive:true,force:true})}catch(e){} });
+      if (toDelete.length > 0) console.log(`🧹 Hard cap: removed ${toDelete.length} oldest builds`);
+    }
   } catch(e) { console.warn('Build cleanup error:', e.message); }
 }
 
