@@ -98,41 +98,57 @@
     /* Pill toggle — smooth switch */
     .pill-btn { transition: all 0.2s ease; }
 
-    /* ===== TAB BAR ===== */
+    /* ===== TAB BAR — Emergent style ===== */
     #tab-bar {
-      display: flex; align-items: center; height: 40px; background: var(--bg);
-      border-bottom: 1px solid var(--border); flex-shrink: 0; padding: 0 8px;
-      gap: 2px; overflow-x: auto; z-index: 101;
-      -webkit-overflow-scrolling: touch;
+      display: flex; align-items: stretch; height: 38px; background: var(--bg);
+      flex-shrink: 0; padding: 0; gap: 0; overflow-x: auto; z-index: 101;
+      position: relative; -webkit-overflow-scrolling: touch;
     }
     #tab-bar::-webkit-scrollbar { display: none; }
-    .tab-item {
-      display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px;
-      border-radius: 7px; font-size: 12px; font-weight: 500; color: var(--text-3);
-      cursor: pointer; white-space: nowrap; flex-shrink: 0; border: none;
-      background: transparent; font-family: inherit; transition: all 0.15s; position: relative;
+    /* Bottom border — runs across full bar, active tab will cover it */
+    #tab-bar::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+      background: var(--border); z-index: 0;
     }
-    .tab-item:hover { background: var(--bg-hover); color: var(--text-2); }
-    .tab-item.active { background: var(--bg-card); color: var(--text); border: 1px solid var(--border); }
-    .tab-item.home { padding: 0 10px; }
+    .tab-item {
+      display: flex; align-items: center; gap: 6px; height: 100%; padding: 0 14px;
+      font-size: 12px; font-weight: 500; color: var(--text-3);
+      cursor: pointer; white-space: nowrap; flex-shrink: 0; border: none;
+      background: transparent; font-family: inherit; transition: color 0.15s, background 0.15s;
+      position: relative; z-index: 1; border-radius: 0;
+    }
+    .tab-item:hover { color: var(--text-2); background: rgba(255,255,255,0.03); }
+    /* Active tab — blends into content below */
+    .tab-item.active {
+      background: var(--bg-2); color: var(--text);
+      border-top-left-radius: 8px; border-top-right-radius: 8px;
+    }
+    /* Cover the bottom border under active tab */
+    .tab-item.active::after {
+      content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px;
+      background: var(--bg-2); z-index: 2;
+    }
+    .tab-item.home { padding: 0 12px; }
     .tab-item.home svg { width: 15px; height: 15px; stroke-width: 1.75; }
     .tab-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-    .tab-dot.idle { background: var(--text-3); }
+    .tab-dot.idle { background: var(--text-3); opacity: 0.5; }
     .tab-dot.ready { background: var(--green); }
     .tab-dot.generating { background: var(--blue); animation: pulse 1s infinite; }
+    .tab-name { max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
     .tab-close {
       width: 16px; height: 16px; border-radius: 4px; border: none; background: transparent;
       color: var(--text-3); cursor: pointer; display: flex; align-items: center; justify-content: center;
       font-size: 12px; line-height: 1; padding: 0; opacity: 0; transition: all 0.1s; margin-left: 2px;
     }
-    .tab-item:hover .tab-close { opacity: 1; }
-    .tab-close:hover { background: rgba(239,68,68,0.15); color: var(--red); }
+    .tab-item:hover .tab-close { opacity: 0.7; }
+    .tab-close:hover { background: rgba(239,68,68,0.15); color: var(--red); opacity: 1 !important; }
     .tab-add {
-      width: 26px; height: 26px; border-radius: 6px; border: none; background: transparent;
+      width: 32px; height: 100%; border: none; background: transparent;
       color: var(--text-3); cursor: pointer; display: flex; align-items: center; justify-content: center;
       font-size: 16px; flex-shrink: 0; transition: all 0.15s; font-family: inherit;
+      position: relative; z-index: 1;
     }
-    .tab-add:hover { background: var(--bg-hover); color: var(--text-2); }
+    .tab-add:hover { color: var(--text-2); background: rgba(255,255,255,0.03); }
 
     /* ===== HEADER ===== */
     #header {
@@ -206,7 +222,7 @@
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
     /* ===== MAIN LAYOUT ===== */
-    #app { display: flex; flex-direction: row; height: calc(100vh - 52px); overflow: hidden; background: var(--bg-2); }
+    #app { display: flex; flex-direction: row; height: calc(100vh - 90px); overflow: hidden; background: var(--bg-2); }
 
     /* ===== CHAT PANEL ===== */
     #chat-panel {
@@ -681,6 +697,15 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
+
+  <!-- Tab Bar -->
+  <div id="tab-bar">
+    <button class="tab-item home" onclick="location.href='/app/'" title="Home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </button>
+    <!-- Project tabs injected by TabManager -->
+    <button class="tab-add" id="tab-add-btn" onclick="TabMgr.createNewTab()" title="New tab">+</button>
+  </div>
 
   <!-- Header -->
   <div id="header">
@@ -2558,8 +2583,8 @@
           el.appendChild(dot);
           // Name
           var name=document.createElement('span');
-          name.textContent=t.name||'Untitled';
-          name.style.maxWidth='120px';name.style.overflow='hidden';name.style.textOverflow='ellipsis';
+          name.className='tab-name';
+          name.textContent=t.name||'New Build';
           el.appendChild(name);
           // Close button
           var close=document.createElement('button');
@@ -2581,11 +2606,44 @@
       function createTab(name, projectId){
         if(tabs.length>=MAX_TABS) return null;
         var id='tab-'+Date.now()+'-'+Math.random().toString(36).substr(2,6);
-        var t={id:id, name:name||'Untitled', status:'idle', state:captureState()};
+        var t={id:id, name:name||'New Build', status:'idle', state:null};
         tabs.push(t);
         activeTabId=id;
         save(); render();
         return id;
+      }
+
+      function createNewTab(){
+        if(tabs.length>=MAX_TABS) return;
+        // Save current tab state first
+        var cur=tabs.find(function(t){return t.id===activeTabId;});
+        if(cur) cur.state=captureState();
+        // Create fresh tab
+        var id=createTab('New Build');
+        if(!id) return;
+        // Reset builder to fresh state
+        resetBuilderState();
+        save();
+      }
+
+      function resetBuilderState(){
+        if(typeof currentHtml!=='undefined') currentHtml='';
+        if(typeof currentBuildId!=='undefined') currentBuildId='';
+        if(typeof projectFiles!=='undefined') projectFiles={};
+        if(typeof activeFile!=='undefined') activeFile=null;
+        if(typeof openTabs!=='undefined') openTabs=[];
+        if(typeof brainstormHistory!=='undefined') brainstormHistory=[];
+        if(typeof appMode!=='undefined'){ appMode='brainstorm'; if(typeof setMode==='function') setMode('brainstorm'); }
+        if(typeof currentProjectId!=='undefined') currentProjectId=null;
+        if(typeof currentProjectName!=='undefined') currentProjectName='';
+        if(typeof lastPrompt!=='undefined') lastPrompt='';
+        var ch=document.getElementById('chat-history');
+        if(ch) ch.innerHTML='<div class="msg"><div class="msg-avatar ai">✦</div><div class="msg-body"><div class="msg-name">AI Builder</div><div class="msg-text">I\'m in <strong>Brainstorm</strong> mode — tell me what you want to build and I\'ll help you plan it before writing any code.<br><br><span style="color:var(--text-3);font-size:12px">Try: "a website for my coffee shop" · "portfolio for freelance clients" · "landing page for my SaaS"</span></div></div></div>';
+        var pf=document.getElementById('preview-frame'); if(pf) pf.srcdoc='';
+        var es=document.getElementById('empty-state'); if(es) es.style.display='flex';
+        var pp=document.getElementById('pane-preview'); if(pp){var pfc=pp.querySelector('#preview-frame');if(pfc)pfc.style.display='none';}
+        if(typeof setStatus==='function') setStatus('');
+        var ta=document.getElementById('prompt-input'); if(ta) ta.value='';
       }
 
       function switchTo(id){
@@ -2626,7 +2684,7 @@
       // Init on load
       load();
 
-      return { render:render, createTab:createTab, switchTo:switchTo, closeTab:closeTab, updateActiveTab:updateActiveTab, captureState:captureState, save:save, getActiveTabId:getActiveTabId, getTabs:getTabs, load:load };
+      return { render:render, createTab:createTab, createNewTab:createNewTab, switchTo:switchTo, closeTab:closeTab, updateActiveTab:updateActiveTab, captureState:captureState, save:save, getActiveTabId:getActiveTabId, getTabs:getTabs, load:load, resetBuilderState:resetBuilderState };
     })();
 
     // Auto-create tab for current build if none exists

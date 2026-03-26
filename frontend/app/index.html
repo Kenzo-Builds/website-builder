@@ -573,6 +573,7 @@
       <button class="sb-item active" data-v="home"><i data-lucide="house"></i><span class="sb-item-label" id="nav-home">Home</span></button>
       <button class="sb-item" data-v="projects"><i data-lucide="folder"></i><span class="sb-item-label" id="nav-projects">My Projects</span></button>
       <button class="sb-item" data-v="templates"><i data-lucide="layout-grid"></i><span class="sb-item-label" id="nav-templates">Templates</span></button>
+      <button class="sb-item" onclick="location.href='/app/build/'"><i data-lucide="code-2"></i><span class="sb-item-label" id="nav-builder">Builder</span></button>
 
     </div>
     <div class="sb-upgrade" onclick="location.href='/#pricing'"><b><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="2" style="display:inline;vertical-align:-2px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Upgrade your plan</b><span>Get more builds & premium models</span></div>
@@ -2050,7 +2051,7 @@ var DASH_T={
     greeting_morning:"Xayrli tong",greeting_afternoon:"Xayrli kun",greeting_evening:"Xayrli kech",
     hero_sub:"G'oyangizni tasvirlang — AI bir necha soniyada sayt yaratadi",
     prompt_ph:"Nima qurmoqchi ekanligingizni tasvirlang...",
-    nav_home:"Bosh sahifa",nav_projects:"Loyihalarim",nav_templates:"Shablonlar",
+    nav_home:"Bosh sahifa",nav_projects:"Loyihalarim",nav_templates:"Shablonlar",nav_builder:"Quruvchi",
     tab_templates:"Shablonlar",tab_recent:"So'nggi loyihalar",
     no_projects:"Hali loyihalar yo'q.",
     more_ideas:"Ko'proq g'oyalar",
@@ -2073,7 +2074,7 @@ var DASH_T={
     greeting_morning:"Доброе утро",greeting_afternoon:"Добрый день",greeting_evening:"Добрый вечер",
     hero_sub:"Опишите идею — AI создаст сайт за несколько секунд",
     prompt_ph:"Опишите что хотите создать...",
-    nav_home:"Главная",nav_projects:"Мои проекты",nav_templates:"Шаблоны",
+    nav_home:"Главная",nav_projects:"Мои проекты",nav_templates:"Шаблоны",nav_builder:"Конструктор",
     tab_templates:"Шаблоны",tab_recent:"Последние проекты",
     no_projects:"Проектов пока нет.",
     more_ideas:"Больше идей",
@@ -2096,7 +2097,7 @@ var DASH_T={
     greeting_morning:"Good morning",greeting_afternoon:"Good afternoon",greeting_evening:"Good evening",
     hero_sub:"Describe your idea and AI will build it in seconds",
     prompt_ph:"Describe what you want to build...",
-    nav_home:"Home",nav_projects:"My Projects",nav_templates:"Templates",
+    nav_home:"Home",nav_projects:"My Projects",nav_templates:"Templates",nav_builder:"Builder",
     tab_templates:"Templates",tab_recent:"Recent projects",
     no_projects:"No projects yet.",
     more_ideas:"More ideas",
@@ -2132,6 +2133,7 @@ function applyDashLang(){
   var nh=document.getElementById('nav-home');if(nh)nh.textContent=T.nav_home;
   var np=document.getElementById('nav-projects');if(np)np.textContent=T.nav_projects;
   var nt=document.getElementById('nav-templates');if(nt)nt.textContent=T.nav_templates;
+  var nb=document.getElementById('nav-builder');if(nb)nb.textContent=T.nav_builder||'Builder';
 
   // Tabs
   var tt=document.getElementById('rtab-tpl');if(tt)tt.textContent=T.tab_templates;
