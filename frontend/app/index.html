@@ -988,43 +988,66 @@
               <p style="color:#71717A;font-size:13px;margin-bottom:28px">Manage your plan and billing.</p>
 
               <!-- Current plan banner -->
-              <div id="sp-plan-banner" class="set-section" style="background:linear-gradient(135deg,rgba(0,229,255,0.08),rgba(0,229,255,0.08));border-color:rgba(0,229,255,0.2)">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+              <div id="sp-plan-banner" class="set-section" style="border-color:rgba(255,255,255,0.1);background:rgba(255,255,255,0.03)">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
                   <div>
-                    <div style="font-size:12px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Current Plan</div>
-                    <div style="font-size:22px;font-weight:800;color:#F4F4F5" id="sp-plan-name">Free</div>
+                    <div style="font-size:11px;font-weight:700;color:#71717A;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Current Plan</div>
+                    <div style="font-size:28px;font-weight:300;color:#FAFAFA;font-family:'Montserrat',sans-serif;letter-spacing:-0.5px" id="sp-plan-name">Free</div>
                   </div>
-                  <div style="padding:6px 14px;border-radius:8px;background:#0ea5b0;color:#fff;font-size:12px;font-weight:600;cursor:pointer" onclick="location.href='/#pricing'">Upgrade</div>
+                  <div style="padding:8px 20px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);color:#E4E4E7;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,0.06)';this.style.borderColor='rgba(255,255,255,0.25)'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(255,255,255,0.15)'" onclick="location.href='/#pricing'">Upgrade</div>
                 </div>
-                <div style="font-size:12px;color:#6B7280">
+                <div style="font-size:12px;color:#71717A;margin-bottom:8px">
                   <span id="sp-plan-used">0</span> / <span id="sp-plan-limit">5</span> generations used this month
                 </div>
                 <div class="usage-bar-wrap"><div class="usage-bar-fill" id="sp-plan-bar" style="width:0%"></div></div>
-                <div style="font-size:11px;color:#52525B" id="sp-plan-reset">Resets monthly</div>
+                <div style="font-size:11px;color:#52525B;margin-top:4px" id="sp-plan-reset">Resets monthly</div>
               </div>
 
-              <!-- Plan cards -->
-              <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:0">
-                <div class="set-section" style="margin-bottom:0">
-                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-                    <div><div class="set-section-title">Starter</div><div style="font-size:13px;color:#0ea5b0;font-weight:700">$9.99 / month</div></div>
-                    <div style="padding:6px 14px;border-radius:8px;border:1px solid rgba(0,229,255,0.3);color:#0ea5b0;font-size:12px;font-weight:600;cursor:pointer">Upgrade</div>
+              <!-- Plan cards — matching landing page style -->
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:0">
+                <!-- Starter -->
+                <div class="set-section" style="margin-bottom:0;padding:24px;display:flex;flex-direction:column">
+                  <div style="font-size:11px;font-weight:700;color:#71717A;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Starter</div>
+                  <div style="font-size:32px;font-weight:300;color:#FAFAFA;font-family:'Montserrat',sans-serif;letter-spacing:-1px;margin-bottom:4px"><sup style="font-size:16px;vertical-align:top;margin-top:4px;display:inline-block">$</sup>9<span style="font-size:20px">.99</span><span style="font-size:13px;font-weight:400;color:#52525B">/mo</span></div>
+                  <div style="font-size:11px;color:#52525B;margin-bottom:16px">For individuals & freelancers</div>
+                  <div style="height:1px;background:rgba(255,255,255,0.06);margin-bottom:16px"></div>
+                  <div style="font-size:12px;color:#A1A1AA;line-height:2.2;flex:1">
+                    <div>✓ 100 generations / month</div>
+                    <div>✓ 10 deploys</div>
+                    <div>✓ All models</div>
+                    <div>✓ Download code</div>
                   </div>
-                  <div style="font-size:12px;color:#71717A;line-height:1.7">✓ 100 generations/month &nbsp;·&nbsp; ✓ 10 deploys &nbsp;·&nbsp; ✓ All models &nbsp;·&nbsp; ✓ Download code</div>
+                  <div style="padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);color:#A1A1AA;font-size:12px;font-weight:500;cursor:pointer;text-align:center;margin-top:16px;transition:all .2s" onmouseover="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='#E4E4E7'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='#A1A1AA'">Get Starter</div>
                 </div>
-                <div class="set-section" style="margin-bottom:0;border-color:rgba(0,229,255,0.2);background:rgba(0,229,255,0.03)">
-                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-                    <div><div class="set-section-title">Pro</div><div style="font-size:13px;color:#0ea5b0;font-weight:700">$19.99 / month</div></div>
-                    <div style="padding:6px 14px;border-radius:8px;background:#0ea5b0;color:#09090B;font-size:12px;font-weight:700;cursor:pointer">Upgrade</div>
+                <!-- Pro -->
+                <div class="set-section" style="margin-bottom:0;padding:24px;display:flex;flex-direction:column;border-color:rgba(255,255,255,0.12)">
+                  <div style="font-size:11px;font-weight:700;color:#71717A;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Pro <span style="font-size:9px;background:rgba(255,255,255,0.08);padding:2px 8px;border-radius:10px;margin-left:6px;color:#D1D5DB;letter-spacing:0.5px">POPULAR</span></div>
+                  <div style="font-size:32px;font-weight:300;color:#FAFAFA;font-family:'Montserrat',sans-serif;letter-spacing:-1px;margin-bottom:4px"><sup style="font-size:16px;vertical-align:top;margin-top:4px;display:inline-block">$</sup>19<span style="font-size:20px">.99</span><span style="font-size:13px;font-weight:400;color:#52525B">/mo</span></div>
+                  <div style="font-size:11px;color:#52525B;margin-bottom:16px">For professionals & creators</div>
+                  <div style="height:1px;background:rgba(255,255,255,0.06);margin-bottom:16px"></div>
+                  <div style="font-size:12px;color:#A1A1AA;line-height:2.2;flex:1">
+                    <div>✓ 300 generations / month</div>
+                    <div>✓ 30 deploys</div>
+                    <div>✓ All premium models</div>
+                    <div>✓ Custom domains</div>
+                    <div>✓ Remove badge</div>
                   </div>
-                  <div style="font-size:12px;color:#71717A;line-height:1.7">✓ 300 generations/month &nbsp;·&nbsp; ✓ 30 deploys &nbsp;·&nbsp; ✓ Premium models &nbsp;·&nbsp; ✓ Custom domains &nbsp;·&nbsp; ✓ Remove badge</div>
+                  <div style="padding:10px;border-radius:10px;background:#fff;color:#0D0D0D;font-size:12px;font-weight:600;cursor:pointer;text-align:center;margin-top:16px;transition:opacity .2s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Upgrade to Pro</div>
                 </div>
-                <div class="set-section" style="margin-bottom:0">
-                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-                    <div><div class="set-section-title">Expert</div><div style="font-size:13px;color:#F4F4F5;font-weight:700">$69.99 / month</div></div>
-                    <div style="padding:6px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);color:#D1D5DB;font-size:12px;font-weight:600;cursor:pointer">Contact us</div>
+                <!-- Expert -->
+                <div class="set-section" style="margin-bottom:0;padding:24px;display:flex;flex-direction:column">
+                  <div style="font-size:11px;font-weight:700;color:#71717A;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Expert</div>
+                  <div style="font-size:32px;font-weight:300;color:#FAFAFA;font-family:'Montserrat',sans-serif;letter-spacing:-1px;margin-bottom:4px"><sup style="font-size:16px;vertical-align:top;margin-top:4px;display:inline-block">$</sup>69<span style="font-size:20px">.99</span><span style="font-size:13px;font-weight:400;color:#52525B">/mo</span></div>
+                  <div style="font-size:11px;color:#52525B;margin-bottom:16px">For agencies & teams</div>
+                  <div style="height:1px;background:rgba(255,255,255,0.06);margin-bottom:16px"></div>
+                  <div style="font-size:12px;color:#A1A1AA;line-height:2.2;flex:1">
+                    <div>✓ 1,000 generations / month</div>
+                    <div>✓ Unlimited deploys</div>
+                    <div>✓ API access</div>
+                    <div>✓ White label branding</div>
+                    <div>✓ 24/7 support</div>
                   </div>
-                  <div style="font-size:12px;color:#71717A;line-height:1.7">✓ 1,000 generations/month &nbsp;·&nbsp; ✓ Unlimited deploys &nbsp;·&nbsp; ✓ API access &nbsp;·&nbsp; ✓ White label</div>
+                  <div style="padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);color:#A1A1AA;font-size:12px;font-weight:500;cursor:pointer;text-align:center;margin-top:16px;transition:all .2s" onmouseover="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='#E4E4E7'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='#A1A1AA'">Contact Us</div>
                 </div>
               </div>
             </div>
