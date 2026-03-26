@@ -199,10 +199,9 @@
     /* === FOOTER === */
     footer{padding:48px 0 32px;border-top:1px solid rgba(255,255,255,0.06);position:relative;z-index:1}
     .footer-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px}
-    .footer-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:#FAFAFA}
-    .footer-logo-icon{width:28px;height:28px;border-radius:7px;background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.2);display:flex;align-items:center;justify-content:center}
-    .footer-logo-icon svg{width:14px;height:14px;color:#00E5FF}
-    .footer-logo span{font-weight:800;font-size:14px}
+    .footer-logo{display:flex;align-items:center;text-decoration:none;color:#FAFAFA}
+    .footer-logo span{font-family:'Montserrat',sans-serif;font-weight:200;font-size:16px;letter-spacing:3px;text-transform:uppercase;color:#FAFAFA;transition:color .2s}
+    .footer-logo:hover span{color:#A1A1AA}
     .footer-nav{display:flex;gap:24px}
     .footer-nav a{color:#52525B;text-decoration:none;font-size:13px;transition:color .2s}
     .footer-nav a:hover{color:#A1A1AA}
@@ -756,14 +755,7 @@
   <footer>
     <div class="container">
       <div class="footer-inner">
-        <a href="/" class="footer-logo">
-          <div class="footer-logo-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
-            </svg>
-          </div>
-          <span>AI Builder</span>
-        </a>
+        <a href="/" class="footer-logo"><span>AI Builder</span></a>
         <div class="footer-nav">
           <a href="#features" data-i18n="nav_features">Features</a>
           <a href="#examples" data-i18n="nav_examples">Examples</a>
