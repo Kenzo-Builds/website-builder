@@ -570,9 +570,9 @@
       <span class="sb-logo-text">AI Builder</span>
     </div>
     <div class="sb-nav">
-      <button class="sb-item active" data-v="home"><i data-lucide="house"></i><span class="sb-item-label">Home</span></button>
-      <button class="sb-item" data-v="projects"><i data-lucide="folder"></i><span class="sb-item-label">My Projects</span></button>
-      <button class="sb-item" data-v="templates"><i data-lucide="layout-grid"></i><span class="sb-item-label">Templates</span></button>
+      <button class="sb-item active" data-v="home"><i data-lucide="house"></i><span class="sb-item-label" id="nav-home">Home</span></button>
+      <button class="sb-item" data-v="projects"><i data-lucide="folder"></i><span class="sb-item-label" id="nav-projects">My Projects</span></button>
+      <button class="sb-item" data-v="templates"><i data-lucide="layout-grid"></i><span class="sb-item-label" id="nav-templates">Templates</span></button>
 
     </div>
     <div class="sb-upgrade" onclick="location.href='/#pricing'"><b><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="2" style="display:inline;vertical-align:-2px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Upgrade your plan</b><span>Get more builds & premium models</span></div>
@@ -602,7 +602,7 @@
     <div class="page active" id="page-home">
       <div class="hero">
         <h1 id="greeting">Where ideas become reality</h1>
-        <p>Describe your idea and AI will build it in seconds</p>
+        <p id="hero-sub">Describe your idea and AI will build it in seconds</p>
 
         <div class="prompt-wrap">
           <div class="prompt-card">
@@ -1721,9 +1721,10 @@ function updateAuth(){
     var n=(user.user_metadata&&user.user_metadata.full_name)||(user.email&&user.email.split('@')[0])||'User';
     av.textContent=n[0].toUpperCase();
     var h=new Date().getHours();var fn=n.split(' ')[0];
-    if(h<12)gr.textContent='Good morning, '+fn+' ☀️';
-    else if(h<18)gr.textContent='Good afternoon, '+fn;
-    else gr.textContent='Good evening, '+fn+' 🌙';
+    var _DT=DASH_T[localStorage.getItem('builder_lang')||'en']||DASH_T['en'];
+    if(h<12)gr.textContent=_DT.greeting_morning+', '+fn+' ☀️';
+    else if(h<18)gr.textContent=_DT.greeting_afternoon+', '+fn;
+    else gr.textContent=_DT.greeting_evening+', '+fn+' 🌙';
   }else{av.textContent='?';}
 }
 async function doLogout(){
@@ -2017,6 +2018,133 @@ setTimeout(function(){
   var g=document.getElementById('rs-tpl');
   if(g&&g.children.length===0)renderTplHome();
 },2000);
+
+// ── DASHBOARD i18n ──────────────────────────────────────────
+var DASH_T={
+  uz:{
+    greeting_default:"G'oyalaringiz ro'yobga chiqsin",
+    greeting_morning:"Xayrli tong",greeting_afternoon:"Xayrli kun",greeting_evening:"Xayrli kech",
+    hero_sub:"G'oyangizni tasvirlang — AI bir necha soniyada sayt yaratadi",
+    prompt_ph:"Nima qurmoqchi ekanligingizni tasvirlang...",
+    nav_home:"Bosh sahifa",nav_projects:"Loyihalarim",nav_templates:"Shablonlar",
+    tab_templates:"Shablonlar",tab_recent:"So'nggi loyihalar",
+    no_projects:"Hali loyihalar yo'q.",
+    more_ideas:"Ko'proq g'oyalar",
+    upgrade_title:"Rejangizni yangilang",upgrade_sub:"Ko'proq qurishlar va premium modellar",
+    chips:[
+      {t:"SaaS Landing",p:"SaaS landing page: hero, xususiyatlar, narxlar, sharhlar"},
+      {t:"Do'kon",p:"Mahsulot galereyasi va savat bilan onlayn do'kon"},
+      {t:"Restoran",p:"Menyu va bron formasi bilan restoran sayti"},
+      {t:"Portfolio",p:"Grid galereya bilan kreativ portfolio"},
+      {t:"Fitnes Treneri",p:"Fitnes trener uchun landing page"},
+      {t:"Blog",p:"Maqolalar va yangiliklar bilan blog"},
+      {t:"Stomatologiya",p:"Bron qilish imkoniyati bilan stomatologiya klinikasi"},
+      {t:"Avtomobil Ijarasi",p:"Qidiruv bilan avtomobil ijarasi sayti"},
+      {t:"Onlayn Kurs",p:"Onlayn kurs landing page"},
+      {t:"Konsalting",p:"Jamoa va xizmatlar bilan konsalting firması"},
+    ]
+  },
+  ru:{
+    greeting_default:"Воплощайте идеи в реальность",
+    greeting_morning:"Доброе утро",greeting_afternoon:"Добрый день",greeting_evening:"Добрый вечер",
+    hero_sub:"Опишите идею — AI создаст сайт за несколько секунд",
+    prompt_ph:"Опишите что хотите создать...",
+    nav_home:"Главная",nav_projects:"Мои проекты",nav_templates:"Шаблоны",
+    tab_templates:"Шаблоны",tab_recent:"Последние проекты",
+    no_projects:"Проектов пока нет.",
+    more_ideas:"Больше идей",
+    upgrade_title:"Улучшите план",upgrade_sub:"Больше сборок и премиум моделей",
+    chips:[
+      {t:"SaaS Landing",p:"Лендинг SaaS с hero, функциями, ценами и отзывами"},
+      {t:"Магазин",p:"Интернет-магазин с галереей товаров и корзиной"},
+      {t:"Ресторан",p:"Сайт ресторана с меню и формой бронирования"},
+      {t:"Портфолио",p:"Креативное портфолио с сеткой галереи"},
+      {t:"Фитнес тренер",p:"Лендинг для фитнес тренера"},
+      {t:"Блог",p:"Блог со статьями и рассылкой"},
+      {t:"Стоматология",p:"Сайт стоматологии с онлайн записью"},
+      {t:"Аренда авто",p:"Сайт аренды авто с поиском"},
+      {t:"Онлайн курс",p:"Лендинг для онлайн курса"},
+      {t:"Консалтинг",p:"Сайт консалтинговой фирмы с командой"},
+    ]
+  },
+  en:{
+    greeting_default:"Where ideas become reality",
+    greeting_morning:"Good morning",greeting_afternoon:"Good afternoon",greeting_evening:"Good evening",
+    hero_sub:"Describe your idea and AI will build it in seconds",
+    prompt_ph:"Describe what you want to build...",
+    nav_home:"Home",nav_projects:"My Projects",nav_templates:"Templates",
+    tab_templates:"Templates",tab_recent:"Recent projects",
+    no_projects:"No projects yet.",
+    more_ideas:"More ideas",
+    upgrade_title:"Upgrade your plan",upgrade_sub:"Get more builds & premium models",
+    chips:[
+      {t:'SaaS Landing',p:'Modern SaaS landing page with hero, features, pricing, testimonials'},
+      {t:'E-Commerce',p:'E-commerce store with product gallery and cart'},
+      {t:'Restaurant',p:'Restaurant website with menu and reservation form'},
+      {t:'Portfolio',p:'Creative portfolio with grid gallery'},
+      {t:'Fitness Trainer',p:'Fitness trainer landing page'},
+      {t:'Blog',p:'Blog with articles and newsletter'},
+      {t:'Dental Clinic',p:'Dental clinic website with booking'},
+      {t:'Car Rental',p:'Car rental website with search'},
+      {t:'Online Course',p:'Online course landing page'},
+      {t:'Consulting',p:'Consulting firm website with team and services'},
+    ]
+  }
+};
+
+function applyDashLang(){
+  var lang=localStorage.getItem('builder_lang')||'en';
+  var T=DASH_T[lang]||DASH_T['en'];
+
+  // Hero subtitle
+  var sub=document.getElementById('hero-sub');
+  if(sub)sub.textContent=T.hero_sub;
+
+  // Prompt placeholder
+  var ta=document.getElementById('prompt');
+  if(ta)ta.placeholder=T.prompt_ph;
+
+  // Sidebar nav labels
+  var nh=document.getElementById('nav-home');if(nh)nh.textContent=T.nav_home;
+  var np=document.getElementById('nav-projects');if(np)np.textContent=T.nav_projects;
+  var nt=document.getElementById('nav-templates');if(nt)nt.textContent=T.nav_templates;
+
+  // Tabs
+  var tt=document.getElementById('rtab-tpl');if(tt)tt.textContent=T.tab_templates;
+  var tr=document.getElementById('rtab-recent');if(tr)tr.textContent=T.tab_recent;
+
+  // No projects empty state
+  var np2=document.getElementById('no-proj');if(np2)np2.textContent=T.no_projects;
+
+  // Upgrade box
+  var ub=document.querySelector('.sb-upgrade b');
+  var us=document.querySelector('.sb-upgrade span');
+  if(ub)ub.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="2" style="display:inline;vertical-align:-2px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> '+T.upgrade_title;
+  if(us)us.textContent=T.upgrade_sub;
+
+  // Chips — swap global CHIPS array and re-render
+  CHIPS=T.chips;
+  chipIdx=0;
+  renderChips();
+
+  // Update greeting text if already set (logged in)
+  var gr=document.getElementById('greeting');
+  if(gr){
+    var h=new Date().getHours();
+    var fn=gr.textContent.split(',')[1]||'';
+    fn=fn.trim();
+    if(fn){
+      if(h<12)gr.textContent=T.greeting_morning+', '+fn+' ☀️';
+      else if(h<18)gr.textContent=T.greeting_afternoon+', '+fn;
+      else gr.textContent=T.greeting_evening+', '+fn+' 🌙';
+    }else{
+      gr.textContent=T.greeting_default;
+    }
+  }
+}
+
+// Run on load
+applyDashLang();
 </script>
 <!-- PREVIEW MODAL -->
 <div class="preview-modal" id="preview-modal">
