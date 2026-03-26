@@ -1,0 +1,1057 @@
+<html lang="pt-BR" class="dark" style="scroll-behavior: smooth;"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Locus - Controle de Alojamentos Corporativos</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap');
+body {
+font-family: 'Inter', sans-serif;
+background-color: #05080A;
+}
+.font-geist { font-family: 'Geist', sans-serif !important; }
+/* Custom scrollbar */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+/* Reveal Animation */
+@keyframes reveal { from { opacity: 0; transform: translateY(20px); filter: blur(8px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
+.reveal-on-scroll { animation: reveal 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-play-state: paused; }
+.reveal-on-scroll.is-visible { animation-play-state: running; }
+/* 3D Map Animation Styles */
+.scene-3d {
+perspective: 1200px;
+transform-style: preserve-3d;
+}
+.map-plane {
+transform: rotateX(60deg) rotateZ(-15deg);
+transform-style: preserve-3d;
+box-shadow: 0 0 50px rgba(74, 222, 128, 0.05);
+animation: float-map 10s ease-in-out infinite;
+transition: box-shadow 0.5s ease, border-color 0.5s ease, transform 0.5s ease;
+}
+/* Enhanced hover state in CSS to ensure 3D transform isn't overridden by tailwind transform utilities incorrectly */
+.group\/hero-visual:hover .map-plane {
+transform: rotateX(60deg) rotateZ(-15deg) translateY(-20px) scale(1.05);
+}
+@keyframes float-map {
+0%, 100% { transform: rotateX(60deg) rotateZ(-15deg) translateY(0); }
+50% { transform: rotateX(55deg) rotateZ(-10deg) translateY(-20px); }
+}
+/* User Dot Animation */
+@keyframes move-user {
+0% { transform: translate(-80px, 80px); opacity: 0; }
+20% { opacity: 1; }
+60% { transform: translate(0, 0); }
+90% { transform: translate(0, 0); opacity: 1; }
+100% { transform: translate(0, 0); opacity: 0; }
+}
+.user-dot {
+animation: move-user 6s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* Pulse Ring */
+@keyframes pulse-ring {
+0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
+100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+}
+.pulse-circle {
+animation: pulse-ring 3s infinite ease-out;
+}
+/* Bip Notification Pop */
+@keyframes pop-up {
+0%, 50% { transform: translate(-50%, -20px) scale(0); opacity: 0; }
+60% { transform: translate(-50%, -40px) scale(1.1); opacity: 1; }
+70% { transform: translate(-50%, -40px) scale(1); opacity: 1; }
+90% { transform: translate(-50%, -40px) scale(1); opacity: 1; }
+100% { transform: translate(-50%, -50px) scale(0.9); opacity: 0; }
+}
+.bip-badge {
+animation: pop-up 6s infinite;
+}
+</style></head>
+<body class="bg-[#05080A] min-h-screen flex flex-col overflow-x-hidden selection:bg-[#4ade80]/30 selection:text-[#4ade80] text-white/70">
+    
+    <!-- Navigation -->
+    <header class="border-dashed sticky bg-[#000000] w-full z-50 top-0 backdrop-blur-md">
+      <div class="grid grid-cols-12 h-16 sm:h-20">
+        <!-- Left Links -->
+        <div class="col-span-4 hidden md:flex items-center">
+          <a href="#solucoes" class="flex items-center justify-center hover:text-white transition-colors border-dashed text-xs font-medium tracking-wide h-full border-white/10 border-r pr-8 pl-8 font-geist">
+            SOLUÇÕES
+          </a>
+          <a href="#beneficios" class="h-full px-8 flex items-center justify-center text-xs font-medium tracking-wide hover:text-white transition-colors border-r border-dashed border-white/10 font-geist">
+            BENEFÍCIOS
+          </a>
+          <a href="#sobre" class="h-full px-8 flex items-center justify-center text-xs font-medium tracking-wide hover:text-white transition-colors border-r border-dashed border-white/10 font-geist">
+            SOBRE
+          </a>
+        </div>
+
+        <!-- Mobile Menu Trigger -->
+        <div class="col-span-2 md:hidden flex items-center pl-6 border-r border-dashed border-white/10">
+          <iconify-icon icon="solar:hamburger-menu-linear" width="24" height="24" class="text-white"></iconify-icon>
+        </div>
+
+        <!-- Logo Center -->
+        <div class="col-span-8 md:col-span-4 flex relative items-center justify-center">
+             <div class="flex items-center gap-3">
+                <!-- SVG Logo Replication -->
+                <div class="relative w-11 h-11 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#4ade80] w-full h-full">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="m9 11 3-3 3 3"></path>
+                    <path d="M9 11v5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-5"></path>
+                    <circle cx="12" cy="14" r="1.5" fill="currentColor" stroke="none"></circle>
+                  </svg>
+                </div>
+                <!-- Title & Subtitle Stack -->
+                <div class="flex flex-col justify-center">
+                    <span class="font-geist font-bold text-white tracking-[0.1em] text-3xl leading-none">LOCUS</span>
+                    <span class="font-geist font-medium text-white/50 text-[0.45rem] uppercase tracking-normal leading-none mt-1 w-full text-justify flex justify-between">
+                        <span>C</span><span>o</span><span>n</span><span>t</span><span>r</span><span>o</span><span>l</span><span>e</span>
+                        <span class="w-1"></span>
+                        <span>d</span><span>e</span>
+                        <span class="w-1"></span>
+                        <span>A</span><span>l</span><span>o</span><span>j</span><span>a</span><span>m</span><span>e</span><span>n</span><span>t</span><span>o</span><span>s</span>
+                    </span>
+                </div>
+             </div>
+        </div>
+
+        <!-- Right Links -->
+        <div class="col-span-2 md:col-span-4 flex items-center justify-end">
+          <a href="#" class="h-full px-8 hidden md:flex items-center justify-center text-xs font-medium tracking-wide hover:text-white transition-colors border-r border-dashed border-white/10 border-l font-geist">
+            LOGIN
+          </a>
+          <a href="#contato" class="h-full w-full md:w-auto px-8 flex items-center justify-center text-xs font-medium tracking-wide text-white hover:text-[#4ade80] transition-colors gap-2 font-geist">
+            CONTATO
+            <iconify-icon icon="solar:arrow-right-linear" width="16" height="16"></iconify-icon>
+          </a>
+        </div>
+      </div>
+      <div class="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+    </header>
+
+    <!-- Main Content Wrapper -->
+    <main class="flex-grow flex flex-col">
+      
+      <!-- Hero Section -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 border-dashed border-white/10 border-b overflow-hidden">
+        <!-- Left Section: Hero Text -->
+        <div class="relative flex flex-col lg:px-20 lg:py-24 pt-16 pr-6 pb-16 pl-6 justify-center border-dashed border-white/10 border-r bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-green-900/10 via-[#05080A] to-[#05080A] reveal-on-scroll">
+          
+          <div class="relative z-10 max-w-2xl">
+            <div class="flex items-center gap-2 mb-6">
+              <span class="flex h-2 w-2 rounded-full bg-[#4ade80]"></span>
+              <p class="text-[#4ade80] font-mono text-xs tracking-widest uppercase font-geist text-white/70 reveal-on-scroll">
+                Plataforma Web Locus v1.0
+              </p>
+            </div>
+
+            <h1 class="text-5xl sm:text-6xl lg:text-7xl text-white leading-[1.1] mb-8 font-geist font-light tracking-tighter reveal-on-scroll">
+              Gestão inteligente
+              <br>
+              de alojamentos
+              <br>
+              <span class="font-geist font-light tracking-tighter text-white/70">
+                corporativos.
+              </span>
+            </h1>
+
+            <p class="text-lg sm:text-xl leading-relaxed max-w-lg mb-12 font-light font-geist text-white/80 reveal-on-scroll">
+              Um "relógio de ponto" para hospedagem. Validação de presença via geolocalização web para sua empresa pagar apenas pelo uso real.
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 border border-dashed border-white/10 max-w-lg rounded-sm overflow-hidden">
+              <button class="group flex items-center justify-center gap-3 px-8 py-5 hover:bg-[#4ade80]/5 transition-all duration-300 border-b sm:border-b-0 sm:border-r border-dashed border-white/10 reveal-on-scroll">
+                <span class="text-[#4ade80] font-medium tracking-wide text-xs uppercase font-geist">
+                  Agendar Demo
+                </span>
+              </button>
+
+              <button class="group flex items-center justify-center gap-3 px-8 py-5 hover:bg-white/5 transition-all duration-300 reveal-on-scroll">
+                <span class="text-white font-medium tracking-wide text-xs uppercase font-geist">
+                  Como Funciona
+                </span>
+                <iconify-icon icon="solar:arrow-right-down-linear" width="16" height="16" class="text-white group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform"></iconify-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Section: 3D Animation Location Visual -->
+        <!-- Added group/hero-visual and hover effects -->
+        <div class="group/hero-visual overflow-hidden reveal-on-scroll bg-[#05080A] z-10 relative flex items-center justify-center min-h-[500px] lg:min-h-auto transition-colors duration-700 hover:bg-[#4ade80]/[0.02]">
+          <!-- Ambient Glow (Enhanced on Hover) -->
+          <div class="absolute inset-0 bg-gradient-to-br from-[#4ade80]/5 via-[#05080A] to-[#05080A] opacity-40 group-hover/hero-visual:opacity-100 group-hover/hero-visual:from-[#4ade80]/20 transition-all duration-700"></div>
+          
+          <!-- 3D Scene Container -->
+          <div class="scene-3d w-full h-full flex items-center justify-center relative">
+            
+            <!-- Floating Map Plane (Enhanced on Hover with Green Tones) -->
+            <div class="map-plane w-80 h-80 sm:w-96 sm:h-96 bg-[#0E1216]/90 border border-white/10 rounded-xl relative overflow-hidden backdrop-blur-sm transition-all duration-500 group-hover/hero-visual:border-[#4ade80]/40 group-hover/hero-visual:shadow-[0_0_100px_rgba(74,222,128,0.15)]">
+               <!-- Grid Lines (Green on Hover) -->
+               <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] group-hover/hero-visual:bg-[linear-gradient(rgba(74,222,128,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(74,222,128,0.1)_1px,transparent_1px)] transition-all duration-500"></div>
+               
+               <!-- Street/Map Abstract Lines (Glowing on Hover) -->
+               <div class="absolute top-1/2 left-0 w-full h-[2px] bg-white/5 transform -translate-y-10 group-hover/hero-visual:bg-[#4ade80]/20 transition-colors duration-500"></div>
+               <div class="absolute top-0 left-1/2 h-full w-[2px] bg-white/5 transform translate-x-4 group-hover/hero-visual:bg-[#4ade80]/20 transition-colors duration-500"></div>
+               <div class="absolute top-1/4 right-0 w-2/3 h-[2px] bg-white/5 transform rotate-45 group-hover/hero-visual:bg-[#4ade80]/20 transition-colors duration-500"></div>
+
+               <!-- Center Point (The Address) -->
+               <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
+                  <!-- Radar/Fence Pulse -->
+                  <div class="absolute w-32 h-32 rounded-full border border-[#4ade80]/20 bg-[#4ade80]/5 pulse-circle group-hover/hero-visual:bg-[#4ade80]/10 transition-colors duration-500"></div>
+                  <div class="absolute w-32 h-32 rounded-full border border-[#4ade80]/10 group-hover/hero-visual:border-[#4ade80]/30 transition-colors duration-500"></div>
+                  
+                  <!-- Pin -->
+                  <div class="relative z-20 transform -translate-y-4">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="#4ade80" stroke="#05080A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="drop-shadow-[0_10px_10px_rgba(74,222,128,0.3)]"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3" fill="#05080A"></circle></svg>
+                  </div>
+                  
+                  <!-- Success Tooltip -->
+                  <div class="absolute z-30 bip-badge">
+                     <div class="bg-white text-black px-3 py-1 rounded text-[10px] font-bold tracking-wider uppercase shadow-lg flex items-center gap-1 whitespace-nowrap">
+                        <span class="w-1.5 h-1.5 bg-[#4ade80] rounded-full"></span>
+                        Bip Confirmado
+                     </div>
+                     <div class="w-2 h-2 bg-white rotate-45 absolute bottom-[-4px] left-1/2 -translate-x-1/2"></div>
+                  </div>
+               </div>
+
+               <!-- Moving User Dot -->
+               <div class="absolute top-1/2 left-1/2 z-10 user-dot">
+                  <div class="w-3 h-3 bg-white rounded-full shadow-[0_0_15px_rgba(255,255,255,0.5)] border-2 border-[#05080A]"></div>
+                  <div class="absolute top-4 left-1/2 -translate-x-1/2 text-[8px] text-white/50 font-mono whitespace-nowrap">Colaborador</div>
+               </div>
+            </div>
+            
+            <!-- Floating Elements Details -->
+            <div class="absolute bottom-20 right-20 bg-[#0E1216] border border-white/10 p-3 rounded-lg shadow-xl backdrop-blur-md hidden sm:block animate-bounce group-hover/hero-visual:border-[#4ade80]/30 transition-colors duration-500" style="animation-duration: 3s;">
+               <div class="flex items-center gap-2 mb-1">
+                  <div class="w-2 h-2 rounded-full bg-[#4ade80]"></div>
+                  <span class="text-[10px] text-white font-medium uppercase group-hover/hero-visual:text-[#4ade80] transition-colors duration-500">Endereço Ativo</span>
+               </div>
+               <div class="text-[10px] text-white/50 font-mono">Lat: -23.5505<br>Lng: -46.6333</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      
+      <!-- Logo Marquee -->
+      <div class="border-dashed bg-[#05080A] border-white/10 border-b group/footer">
+        <div class="max-w-screen-2xl mr-auto ml-auto">
+          <div class="grid grid-cols-1 md:grid-cols-12">
+            <!-- Label -->
+            <div class="col-span-12 md:col-span-2 py-8 px-6 md:px-10 border-b md:border-b-0 md:border-r border-dashed border-white/10 flex items-center bg-[#05080A] relative z-20 reveal-on-scroll">
+              <span class="text-xs font-medium tracking-widest text-slate-500 uppercase font-geist">
+                CLIENTES PARCEIROS
+              </span>
+            </div>
+
+            <!-- Marquee -->
+            <div class="col-span-12 md:col-span-10 relative overflow-hidden h-20 flex items-center reveal-on-scroll" style="mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);">
+              <div class="animate-marquee">
+                <!-- Set 1 -->
+                <div class="w-56 h-20 flex-shrink-0 flex items-center justify-center border-r border-dashed border-white/10 opacity-40 hover:opacity-100 transition-opacity">
+                  <span class="text-lg font-semibold text-white tracking-tighter font-geist">
+                    CONSTRUTORA ALFA
+                  </span>
+                </div>
+                <div class="w-56 h-20 flex-shrink-0 flex items-center justify-center border-r border-dashed border-white/10 opacity-40 hover:opacity-100 transition-opacity">
+                  <span class="text-white font-medium tracking-tighter text-lg font-geist">
+                    GRUPO ENGENHARIA
+                  </span>
+                </div>
+                <div class="w-56 h-20 flex-shrink-0 flex items-center justify-center border-r border-dashed border-white/10 opacity-40 hover:opacity-100 transition-opacity">
+                  <span class="text-white font-medium tracking-tighter text-lg font-geist">
+                    LOGÍSTICA BRASIL
+                  </span>
+                </div>
+                <div class="w-56 h-20 flex-shrink-0 flex items-center justify-center border-r border-dashed border-white/10 opacity-40 hover:opacity-100 transition-opacity">
+                   <span class="text-white font-medium tracking-tighter text-lg font-geist">
+                    INFRA CORP
+                  </span>
+                </div>
+                <div class="w-56 h-20 flex-shrink-0 flex items-center justify-center border-r border-dashed border-white/10 opacity-40 hover:opacity-100 transition-opacity">
+                  <span class="text-white font-semibold tracking-tighter text-lg font-geist">
+                    PETROSERV
+                  </span>
+                </div>
+
+                 <!-- Set 2 (Duplicate) -->
+                <div class="w-56 h-20 flex-shrink-0 flex items-center justify-center border-r border-dashed border-white/10 opacity-40 hover:opacity-100 transition-opacity">
+                  <span class="text-lg font-semibold text-white tracking-tighter font-geist">
+                    CONSTRUTORA ALFA
+                  </span>
+                </div>
+                <div class="w-56 h-20 flex-shrink-0 flex items-center justify-center border-r border-dashed border-white/10 opacity-40 hover:opacity-100 transition-opacity">
+                  <span class="text-white font-medium tracking-tighter text-lg font-geist">
+                    GRUPO ENGENHARIA
+                  </span>
+                </div>
+                <div class="w-56 h-20 flex-shrink-0 flex items-center justify-center border-r border-dashed border-white/10 opacity-40 hover:opacity-100 transition-opacity">
+                  <span class="text-white font-medium tracking-tighter text-lg font-geist">
+                    LOGÍSTICA BRASIL
+                  </span>
+                </div>
+                <div class="w-56 h-20 flex-shrink-0 flex items-center justify-center border-r border-dashed border-white/10 opacity-40 hover:opacity-100 transition-opacity">
+                   <span class="text-white font-medium tracking-tighter text-lg font-geist">
+                    INFRA CORP
+                  </span>
+                </div>
+                <div class="w-56 h-20 flex-shrink-0 flex items-center justify-center border-r border-dashed border-white/10 opacity-40 hover:opacity-100 transition-opacity">
+                  <span class="text-white font-semibold tracking-tighter text-lg font-geist">
+                    PETROSERV
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <style>
+          @keyframes marquee-scroll {
+              0% { transform: translateX(0); }
+              100% { transform: translateX(-50%); }
+          }
+          .animate-marquee {
+              display: flex;
+              width: fit-content;
+              animation: marquee-scroll 40s linear infinite;
+          }
+          .group\/footer:hover .animate-marquee {
+              animation-play-state: paused;
+          }
+        </style>
+      </div>
+
+      <!-- Solucoes Section -->
+      <section id="solucoes" class="border-dashed bg-[#05080A] border-white/10 border-b pt-24 pb-24">
+        <div class="max-w-6xl mr-auto ml-auto pr-6 pl-6">
+          <div class="mb-16 relative">
+            <div class="absolute -top-12 -left-12 w-32 h-32 bg-green-500/10 rounded-full blur-3xl" aria-hidden="true"></div>
+
+            <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8 z-10 relative">
+              <div class="max-w-2xl">
+                <div class="flex items-center gap-3 mb-4">
+                  <span class="uppercase text-xs font-semibold text-[#4ade80] tracking-widest font-geist">
+                    01. Soluções
+                  </span>
+                </div>
+
+                <h2 class="text-4xl md:text-5xl lg:text-6xl text-white font-light tracking-tighter mb-4 font-geist leading-[1.1] reveal-on-scroll">
+                  Controle total da
+                  <span class="">hospedagem.</span>
+                </h2>
+
+                <p class="text-lg font-geist max-w-md text-white/70 reveal-on-scroll">
+                  Da entrada do colaborador à saída, garantimos transparência e economia no alojamento da sua equipe.
+                </p>
+              </div>
+
+              <div class="flex flex-col sm:flex-row items-center gap-4">
+                <a href="#contato" class="sm:w-auto hover:bg-slate-200 transition-colors font-medium text-black font-geist text-center bg-white w-full rounded-none pt-3 pr-6 pb-3 pl-6">
+                  Falar com Consultor
+                </a>
+              </div>
+            </div>
+
+            <div class="mt-12 h-[1px] w-full bg-gradient-to-r from-slate-800 via-slate-700 to-transparent"></div>
+          </div>
+          <section class="border-dashed z-10 bg-[#05080A] border-white/10 border-b relative">
+
+            <div class="grid grid-cols-1 md:grid-cols-12 border-dashed border-white/10 border-b">
+              <div class="col-span-12 md:col-span-4 md:p-12 md:border-b-0 md:border-r border-dashed flex flex-col border-white/10 border-b pt-8 pr-8 pb-8 pl-8 justify-center reveal-on-scroll">
+                <div class="flex items-center gap-2 mb-4">
+                  <iconify-icon icon="solar:star-fall-linear" width="16" height="16" class="text-[#4ade80]"></iconify-icon>
+                  <span class="text-[#4ade80] font-mono text-xs tracking-widest uppercase font-geist">
+                    Filosofia Core
+                  </span>
+                </div>
+                <h2 class="text-3xl md:text-4xl text-white font-light tracking-tighter mb-4 font-geist reveal-on-scroll">
+                  Pague pelo uso real.
+                </h2>
+                <p class="text-sm leading-relaxed font-geist text-white/70 reveal-on-scroll">
+                  Elimine custos com diárias não utilizadas. Nosso sistema valida a presença física através do Bip para confirmar a hospedagem.
+                </p>
+              </div>
+
+              <div class="col-span-12 md:col-span-8 grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-dashed divide-white/10 reveal-on-scroll">
+                <!-- Feature 1 -->
+                <div class="p-8 group hover:bg-white/[0.02] transition-colors relative overflow-hidden reveal-on-scroll">
+                  <div class="mb-6 relative h-24 w-full bg-slate-900/50 rounded border border-white/5 flex flex-col p-3 overflow-hidden">
+                     <!-- Abstract Map Lines -->
+                     <svg class="w-full h-full text-slate-600" viewBox="0 0 100 40" preserveAspectRatio="none">
+                         <path d="M10 20 H90" stroke="currentColor" stroke-width="0.5" stroke-dasharray="2 2"></path>
+                         <circle cx="20" cy="20" r="2" fill="#4ade80"></circle>
+                         <circle cx="50" cy="20" r="2" fill="#4ade80"></circle>
+                         <circle cx="80" cy="20" r="2" fill="#4ade80"></circle>
+                         <path d="M20 20 Q 35 5 50 20 T 80 20" fill="none" stroke="#4ade80" stroke-width="1" opacity="0.5"></path>
+                     </svg>
+                    <!-- Glow -->
+                    <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-[#4ade80]/10 blur-[40px] rounded-full group-hover:bg-[#4ade80]/20 transition-colors"></div>
+                  </div>
+                  <h3 class="text-white font-medium mb-2 flex items-center gap-2 font-geist reveal-on-scroll">
+                    Geolocalização Ativa
+                  </h3>
+                  <p class="text-xs leading-relaxed font-geist reveal-on-scroll">
+                    O Bip é realizado via navegador do colaborador, validando se ele está no endereço cadastrado pelo administrador.
+                  </p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="p-8 group hover:bg-white/[0.02] transition-colors relative overflow-hidden reveal-on-scroll">
+                  <div class="mb-6 relative h-24 w-full flex items-center justify-center">
+                    <!-- Visual Nodes -->
+                    <div class="relative w-full h-full flex items-center justify-center">
+                      <div class="w-8 h-8 rounded bg-[#0E1216] border border-white/10 flex items-center justify-center relative z-10 shadow-[0_0_15px_rgba(74,222,128,0.1)]">
+                        <iconify-icon icon="solar:user-check-linear" width="16" height="16" class="text-white"></iconify-icon>
+                      </div>
+                      <div class="absolute top-4 right-10 w-2 h-2 bg-[#4ade80] rounded-full animate-pulse"></div>
+                    </div>
+                  </div>
+                  <h3 class="text-white font-medium mb-2 flex items-center gap-2 font-geist reveal-on-scroll">
+                    Controle de Presença
+                  </h3>
+                  <p class="text-xs leading-relaxed font-geist text-white/70 reveal-on-scroll">
+                    Confirmação automática de estadia baseada nos Bips, eliminando processos manuais e erros de contagem.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-dashed divide-white/10 border-dashed border-white/10 border-b">
+              <!-- Mini Feature 1 -->
+              <div class="flex flex-col gap-3 group hover:bg-white/[0.02] transition-colors pt-6 pr-6 pb-6 pl-6 gap-x-3 gap-y-3 reveal-on-scroll">
+                <iconify-icon icon="solar:users-group-rounded-linear" width="20" height="20" class="text-slate-400 group-hover:text-[#4ade80] transition-colors"></iconify-icon>
+                <div class="">
+                  <h4 class="text-white text-sm font-medium font-geist">
+                    Gestão de Pessoal
+                  </h4>
+                  <p class="text-[10px] text-slate-500 mt-1 font-geist reveal-on-scroll">
+                    Controle individualizado.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Mini Feature 2 -->
+              <div class="p-6 flex flex-col gap-3 group hover:bg-white/[0.02] transition-colors reveal-on-scroll">
+                <iconify-icon icon="solar:verified-check-linear" width="20" height="20" class="text-slate-400 group-hover:text-[#4ade80] transition-colors"></iconify-icon>
+                <div class="">
+                  <h4 class="text-white text-sm font-medium font-geist">
+                    Qualidade
+                  </h4>
+                  <p class="text-[10px] text-slate-500 mt-1 font-geist reveal-on-scroll">
+                    Avaliação das instalações.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Mini Feature 3 -->
+              <div class="p-6 flex flex-col gap-3 group hover:bg-white/[0.02] transition-colors reveal-on-scroll">
+                 <iconify-icon icon="solar:clock-circle-linear" width="20" height="20" class="text-slate-400 group-hover:text-[#4ade80] transition-colors"></iconify-icon>
+                <div class="">
+                  <h4 class="text-white text-sm font-medium font-geist">
+                    Tempo Real
+                  </h4>
+                  <p class="text-[10px] text-slate-500 mt-1 font-geist reveal-on-scroll">
+                    Dashboards ao vivo.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Mini Feature 4 -->
+              <div class="p-6 flex flex-col gap-3 group hover:bg-white/[0.02] transition-colors reveal-on-scroll">
+                 <iconify-icon icon="solar:wallet-money-linear" width="20" height="20" class="text-slate-400 group-hover:text-[#4ade80] transition-colors"></iconify-icon>
+                <div class="">
+                  <h4 class="text-white text-sm font-medium font-geist">
+                    Redução de Custos
+                  </h4>
+                  <p class="text-[10px] text-slate-500 mt-1 font-geist reveal-on-scroll">
+                    Economia comprovada.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+      
+      <!-- Beneficios Section -->
+      <section id="beneficios" class="border-dashed bg-[#05080A] border-white/10 border-b pt-24 pb-24">
+        <div class="max-w-6xl mr-auto ml-auto pr-6 pl-6">
+          <div class="mb-16 relative">
+            <div class="absolute -top-12 -left-12 w-32 h-32 bg-green-500/10 rounded-full blur-3xl" aria-hidden="true"></div>
+
+            <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8 z-10 relative">
+              <div class="max-w-2xl">
+                <div class="flex items-center gap-3 mb-4">
+                  <span class="uppercase text-xs font-semibold text-[#4ade80] tracking-widest font-geist">
+                    02. Diferenciais
+                  </span>
+                </div>
+
+                <h2 class="text-4xl md:text-5xl lg:text-6xl text-white font-light tracking-tighter mb-4 font-geist leading-[1.1] reveal-on-scroll">
+                  Precisão em
+                  <span class="">cada Bip.</span>
+                </h2>
+
+                <p class="text-lg font-geist max-w-md text-white/70 reveal-on-scroll">
+                  Tecnologia que transforma alojamentos em ativos gerenciáveis, não apenas custos.
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-12 h-[1px] w-full bg-gradient-to-r from-slate-800 via-slate-700 to-transparent"></div>
+          </div>
+          <section class="border-dashed z-10 bg-[#05080A] border-white/10 border-b relative">
+            <!-- Top Row Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-12 border-b border-dashed border-white/10">
+              <!-- Top Left: Radar -->
+              <div class="col-span-12 md:col-span-4 border-b md:border-b-0 md:border-r border-white/10 relative h-[360px] overflow-hidden group border-dashed reveal-on-scroll">
+                <!-- Radar Background -->
+                <div class="absolute inset-0 flex items-center justify-center -translate-y-16 opacity-80">
+                  <!-- Radar Rings -->
+                  <div class="absolute w-[280px] h-[280px] rounded-full border border-white/5"></div>
+                  <div class="absolute w-[200px] h-[200px] rounded-full border border-white/5"></div>
+                  <div class="absolute w-[120px] h-[120px] rounded-full border border-white/5"></div>
+
+                  <!-- Radar Sweep -->
+                  <div class="absolute w-[280px] h-[280px] rounded-full bg-[conic-gradient(from_0deg,transparent_0deg_240deg,rgba(74,222,128,0.2)_360deg)] animate-[spin_4s_linear_infinite]"></div>
+
+                  <!-- Activity Dot -->
+                  <div class="absolute top-10 left-10 flex items-center gap-2 z-10">
+                    <div class="w-1.5 h-1.5 rounded-full bg-[#4ade80] shadow-[0_0_10px_#4ade80]"></div>
+                    <span class="text-[10px] text-[#4ade80] uppercase tracking-widest font-geist font-medium">
+                      Monitoramento Web
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Content Bottom -->
+                <div class="absolute bottom-0 left-0 w-full p-8 z-10 bg-gradient-to-t from-[#05080A] via-[#05080A]/80 to-transparent pt-20">
+                  <h3 class="text-white font-medium text-lg mb-2 font-geist reveal-on-scroll">
+                    CONTROLE DE ENDEREÇOS
+                  </h3>
+                  <p class="text-xs leading-relaxed font-geist pr-4 text-white/70 reveal-on-scroll">
+                    O administrador cadastra os endereços dos alojamentos. O sistema valida se o Bip foi feito no local correto.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Top Middle: Alerts -->
+              <div class="col-span-12 md:col-span-4 border-b md:border-b-0 md:border-r border-dashed border-white/10 p-8 flex flex-col h-[360px] reveal-on-scroll">
+                <div class="mb-6">
+                  <h3 class="text-white font-medium text-lg mb-2 font-geist reveal-on-scroll">
+                    ALERTAS
+                  </h3>
+                  <p class="text-xs leading-relaxed font-geist text-white/70 reveal-on-scroll">
+                    Fique atualizado com notificações instantâneas sobre Bips, lotação e problemas.
+                  </p>
+                </div>
+
+                <div class="flex-1 space-y-4">
+                  <!-- Alert Item 1 -->
+                  <div class="group cursor-pointer reveal-on-scroll">
+                    <div class="flex items-center justify-between mb-2">
+                      <div class="flex items-center gap-3">
+                        <div class="w-7 h-7 rounded bg-[#4ade80]/10 border border-[#4ade80]/20 flex items-center justify-center text-[#4ade80]">
+                          <iconify-icon icon="solar:check-circle-linear" width="14" height="14"></iconify-icon>
+                        </div>
+                        <span class="text-[10px] font-semibold text-[#4ade80] uppercase tracking-wide font-geist">
+                          Bip Confirmado
+                        </span>
+                      </div>
+                      <span class="text-[10px] text-slate-600 font-mono">
+                        AGORA
+                      </span>
+                    </div>
+                    <div class="h-[2px] w-full bg-white/5 rounded-full overflow-hidden">
+                      <div class="h-full w-2/3 bg-[#4ade80] shadow-[0_0_10px_#4ade80]"></div>
+                    </div>
+                  </div>
+
+                  <!-- Alert Item 2 -->
+                  <div class="group cursor-pointer reveal-on-scroll">
+                    <div class="flex items-center justify-between mb-2">
+                      <div class="flex items-center gap-3">
+                        <div class="w-7 h-7 rounded bg-white/5 border border-white/10 flex items-center justify-center text-slate-500 group-hover:text-white group-hover:border-white/20 transition-colors">
+                           <iconify-icon icon="solar:danger-triangle-linear" width="14" height="14"></iconify-icon>
+                        </div>
+                        <span class="text-[10px] font-semibold text-slate-500 group-hover:text-white uppercase tracking-wide font-geist transition-colors">
+                          Capacidade Máxima
+                        </span>
+                      </div>
+                      <span class="text-[10px] text-slate-600 font-mono">
+                        2H ATRÁS
+                      </span>
+                    </div>
+                    <div class="h-[2px] w-full bg-white/5 rounded-full overflow-hidden">
+                      <div class="h-full w-1/2 bg-slate-700 group-hover:bg-slate-500 transition-colors"></div>
+                    </div>
+                  </div>
+                  
+                  <!-- Alert Item 3 -->
+                  <div class="group cursor-pointer reveal-on-scroll">
+                    <div class="flex items-center justify-between mb-2">
+                      <div class="flex items-center gap-3">
+                        <div class="w-7 h-7 rounded bg-white/5 border border-white/10 flex items-center justify-center text-slate-500 group-hover:text-white group-hover:border-white/20 transition-colors">
+                           <iconify-icon icon="solar:map-point-linear" width="14" height="14"></iconify-icon>
+                        </div>
+                        <span class="text-[10px] font-semibold text-slate-500 group-hover:text-white uppercase tracking-wide font-geist transition-colors">
+                          Presença Confirmada
+                        </span>
+                      </div>
+                      <span class="text-[10px] text-slate-600 font-mono">
+                        1D ATRÁS
+                      </span>
+                    </div>
+                    <div class="h-[2px] w-full bg-white/5 rounded-full overflow-hidden">
+                      <div class="h-full w-1/4 bg-slate-700 group-hover:bg-slate-500 transition-colors"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Top Right: Icon Grid -->
+              <div class="col-span-12 md:col-span-4 h-[360px] relative bg-[#05080A] reveal-on-scroll">
+                <!-- Grid Pattern -->
+                <div class="absolute inset-0 grid grid-cols-4 grid-rows-4 divide-x divide-y divide-white/5 border-b border-white/5">
+                  <div class="bg-white/[0.01] reveal-on-scroll"></div>
+                  <div class="bg-white/[0.01] reveal-on-scroll"></div>
+                   <!-- Asset Icon 1 -->
+                  <div class="flex items-center justify-center bg-white/[0.01] reveal-on-scroll">
+                    <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-600">
+                      <iconify-icon icon="solar:map-point-linear" width="18" height="18"></iconify-icon>
+                    </div>
+                  </div>
+                   <!-- Asset Icon 2 -->
+                  <div class="flex items-center justify-center bg-white/[0.01] reveal-on-scroll">
+                    <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-600">
+                      <iconify-icon icon="solar:home-linear" width="18" height="18"></iconify-icon>
+                    </div>
+                  </div>
+                  <!-- Row 2 -->
+                  <div class="bg-white/[0.01] reveal-on-scroll"></div>
+                  <div class="flex items-center justify-center bg-white/[0.01] reveal-on-scroll">
+                    <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-600">
+                      <iconify-icon icon="solar:users-group-rounded-linear" width="18" height="18"></iconify-icon>
+                    </div>
+                  </div>
+                  <div class="flex items-center justify-center relative reveal-on-scroll">
+                    <!-- Main Glowing Icon -->
+                    <div class="absolute inset-0 bg-[#4ade80]/20 blur-[30px]"></div>
+                    <div class="relative z-10 text-[#4ade80]">
+                      <iconify-icon icon="solar:widget-linear" width="48" height="48"></iconify-icon>
+                    </div>
+                  </div>
+                  <div class="flex items-center justify-center bg-white/[0.01] reveal-on-scroll">
+                     <div class="w-10 h-10 rounded bg-[#15191E] flex items-center justify-center text-[8px] font-bold text-slate-600 tracking-wider">
+                      Locus
+                    </div>
+                  </div>
+                  <!-- Row 3 -->
+                  <div class="flex items-center justify-center bg-white/[0.01] reveal-on-scroll">
+                    <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-600">
+                      <iconify-icon icon="solar:file-text-linear" width="18" height="18"></iconify-icon>
+                    </div>
+                  </div>
+                  <div class="flex items-center justify-center bg-white/[0.01] reveal-on-scroll">
+                    <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-600">
+                      <iconify-icon icon="solar:globe-linear" width="18" height="18"></iconify-icon>
+                    </div>
+                  </div>
+                  <div class="flex items-center justify-center bg-white/[0.01] reveal-on-scroll">
+                    <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-600">
+                       <iconify-icon icon="solar:dollar-linear" width="18" height="18"></iconify-icon>
+                    </div>
+                  </div>
+                  <div class="flex items-center justify-center bg-white/[0.01] reveal-on-scroll">
+                  </div>
+                  <!-- Row 4 -->
+                  <div class="flex items-center justify-center bg-white/[0.01] reveal-on-scroll">
+                  </div>
+                  <div class="bg-white/[0.01] reveal-on-scroll"></div>
+                  <div class="flex items-center justify-center bg-white/[0.01] reveal-on-scroll">
+                  </div>
+                  <div class="flex items-center justify-center bg-white/[0.01] reveal-on-scroll">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bottom Row Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-12">
+              <!-- Growth Section -->
+              <div class="col-span-12 md:col-span-8 md:border-b-0 md:border-r border-dashed overflow-hidden border-white/10 border-b pt-16 pr-8 pb-8 pl-8 relative reveal-on-scroll">
+                <!-- Background Chart Visual -->
+                <div class="absolute bottom-0 right-0 w-full h-full flex items-end justify-end gap-[1px] opacity-100 pointer-events-none pr-8">
+                  <div class="w-24 h-[20%] bg-white/[0.02] border-t border-l border-r border-dashed border-white/10"></div>
+                  <div class="w-24 h-[40%] bg-white/[0.02] border-t border-l border-r border-dashed border-white/10"></div>
+                  <div class="w-24 h-[60%] bg-white/[0.02] border-t border-l border-r border-dashed border-white/10"></div>
+                  <div class="w-24 h-[80%] bg-[#4ade80]/5 border-t border-l border-r border-dashed border-[#4ade80]/30 relative">
+                    <div class="absolute -top-8 left-1/2 -translate-x-1/2 text-[#4ade80]">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="relative z-10 mt-12">
+                  <div class="text-[64px] leading-none font-light text-[#4ade80] tracking-tighter font-geist mb-2">
+                    25%
+                  </div>
+                  <h3 class="text-white font-medium text-lg mb-2 uppercase tracking-wide font-geist reveal-on-scroll">
+                    Redução de Custos
+                  </h3>
+                  <p class="text-sm leading-relaxed font-geist max-w-md text-white/70 reveal-on-scroll">
+                    Nossos clientes experimentam uma redução média de 25% nos custos de alojamento nos primeiros 6 meses de uso do Locus.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Partners Section -->
+              <div class="col-span-12 md:col-span-4 p-8 flex flex-col justify-end pt-16 h-full min-h-[300px] reveal-on-scroll">
+                <div class="mt-auto">
+                  <h3 class="text-white font-medium text-lg mb-2 uppercase tracking-wide font-geist reveal-on-scroll">
+                    Alcance Nacional
+                  </h3>
+                  <p class="text-sm leading-relaxed font-geist text-white/70 reveal-on-scroll">
+                    Presente em grandes obras e centros corporativos em todo o Brasil. Gestão centralizada, independente da localização.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <!-- Insights / Reports Section -->
+      <section id="sobre" class="border-dashed bg-[#05080A] border-white/10 border-b pt-24 pb-24">
+        <div class="max-w-6xl mr-auto ml-auto pr-6 pl-6">
+          <div class="mb-16 relative">
+            <div class="absolute -top-12 -left-12 w-32 h-32 bg-green-500/10 rounded-full blur-3xl" aria-hidden="true"></div>
+
+            <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8 z-10 relative">
+              <div class="max-w-2xl">
+                <div class="flex items-center gap-3 mb-4">
+                  <span class="uppercase text-xs font-semibold text-[#4ade80] tracking-widest font-geist">
+                    03. Relatórios
+                  </span>
+                </div>
+
+                <h2 class="text-4xl md:text-5xl lg:text-6xl text-white font-light tracking-tighter mb-4 font-geist leading-[1.1] reveal-on-scroll">
+                  Gestão baseada em
+                  <span class="">dados.</span>
+                </h2>
+
+                <p class="text-lg font-geist max-w-md text-white/70 reveal-on-scroll">
+                   Informações detalhadas sobre a utilização dos alojamentos e comportamento das equipes.
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-12 h-[1px] w-full bg-gradient-to-r from-slate-800 via-slate-700 to-transparent"></div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/10 border border-white/10 font-geist items-stretch">
+            <!-- Report Card 1 -->
+            <div class="group relative flex h-full flex-col bg-[#05080A] reveal-on-scroll">
+              <div class="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div class="absolute inset-0 bg-gradient-to-b from-white/[0.06] via-transparent to-transparent"></div>
+              </div>
+              <div class="relative flex-1 flex flex-col p-10">
+                <div class="flex items-center gap-2 text-[#4ade80] mb-6">
+                  <iconify-icon icon="solar:graph-down-linear" width="18" height="18"></iconify-icon>
+                  <span class="text-xs font-semibold tracking-wide uppercase">
+                    Otimização
+                  </span>
+                </div>
+                
+                <h3 class="text-2xl font-semibold text-white mb-4">Redução de Despesas</h3>
+                
+                <p class="text-sm leading-relaxed text-white/70 min-h-[100px] reveal-on-scroll">
+                  Com o controle de Bip, identifique diárias pagas sem utilização real e ajuste seus custos.
+                </p>
+              </div>
+            </div>
+            <!-- Report Card 2 -->
+             <div class="group relative flex h-full flex-col bg-[#05080A] reveal-on-scroll">
+              <div class="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div class="absolute inset-0 bg-gradient-to-b from-white/[0.06] via-transparent to-transparent"></div>
+              </div>
+              <div class="relative flex-1 flex flex-col p-10">
+                <div class="flex items-center gap-2 text-[#4ade80] mb-6">
+                  <iconify-icon icon="solar:shield-check-linear" width="18" height="18"></iconify-icon>
+                  <span class="text-xs font-semibold tracking-wide uppercase">
+                    Compliance
+                  </span>
+                </div>
+                
+                <h3 class="text-2xl font-semibold text-white mb-4">Auditoria de Presença</h3>
+                
+                <p class="text-sm leading-relaxed text-white/70 min-h-[100px] reveal-on-scroll">
+                   Garantia de que o colaborador está hospedado no local correto definido pela empresa.
+                </p>
+              </div>
+            </div>
+            <!-- Report Card 3 -->
+             <div class="group relative flex h-full flex-col bg-[#05080A] reveal-on-scroll">
+              <div class="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div class="absolute inset-0 bg-gradient-to-b from-white/[0.06] via-transparent to-transparent"></div>
+              </div>
+              <div class="relative flex-1 flex flex-col p-10">
+                <div class="flex items-center gap-2 text-[#4ade80] mb-6">
+                   <iconify-icon icon="solar:globe-linear" width="18" height="18"></iconify-icon>
+                  <span class="text-xs font-semibold tracking-wide uppercase">
+                    Tecnologia
+                  </span>
+                </div>
+                
+                <h3 class="text-2xl font-semibold text-white mb-4">Web &amp; GPS</h3>
+                
+                <p class="text-sm leading-relaxed text-white/70 min-h-[100px] reveal-on-scroll">
+                  Uso da geolocalização do navegador para validar acessos sem necessidade de instalação de apps.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA / Contact Section -->
+      <section id="contato" class="border-dashed bg-[#05080A] border-white/10 border-b pt-24 pb-24">
+        <div class="max-w-6xl mx-auto px-6">
+          <div class="mb-16 relative">
+            <div class="absolute -top-12 -left-12 w-32 h-32 bg-green-500/10 rounded-full blur-3xl" aria-hidden="true"></div>
+
+            <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8 z-10 relative">
+              <div class="max-w-2xl">
+                <div class="flex items-center gap-3 mb-4">
+                  <span class="uppercase text-xs font-semibold text-[#4ade80] tracking-widest font-geist">
+                    04. Contato
+                  </span>
+                </div>
+
+                <h2 class="text-4xl md:text-5xl lg:text-6xl text-white font-light tracking-tighter mb-4 font-geist leading-[1.1] reveal-on-scroll">
+                  Pronto para otimizar
+                  <span class="">seus custos?</span>
+                </h2>
+
+                <p class="text-lg font-geist max-w-md text-white/70 reveal-on-scroll">
+                   Fale com nossa equipe e agende uma demonstração gratuita.
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-12 h-[1px] w-full bg-gradient-to-r from-slate-800 via-slate-700 to-transparent"></div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            <!-- Card 1: Empresas -->
+            <div class="flex flex-col group hover:bg-white/[0.04] transition-colors duration-300 h-full border-white/10 border rounded-none p-10 relative reveal-on-scroll">
+              <div class="absolute -top-px -left-px w-4 h-4 border-t-2 border-l-2 border-[#4ade80] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div class="absolute -top-px -right-px w-4 h-4 border-t-2 border-r-2 border-[#4ade80] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div class="absolute -bottom-px -left-px w-4 h-4 border-b-2 border-l-2 border-[#4ade80] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div class="absolute -bottom-px -right-px w-4 h-4 border-b-2 border-r-2 border-[#4ade80] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+              <div class="mb-8">
+                <span class="inline-block px-3 py-1 text-xs font-medium text-slate-300 border border-white/10 rounded bg-white/5 group-hover:text-[#4ade80] group-hover:border-[#4ade80] group-hover:bg-[#4ade80]/10 transition-colors duration-300 font-geist">
+                  Corporativo
+                </span>
+              </div>
+              <div class="mb-2 flex items-baseline gap-1">
+                <span class="text-3xl font-medium text-white tracking-tight font-geist">
+                  Empresas
+                </span>
+              </div>
+              <p class="text-white/70 text-sm mb-8 font-geist font-light reveal-on-scroll">
+                Para construtoras e grandes empresas que precisam gerir alojamentos de colaboradores.
+              </p>
+              <button class="w-full py-4 mb-10 rounded-lg border border-white/10 bg-transparent text-white group-hover:bg-[#4ade80] group-hover:text-black group-hover:border-[#4ade80] transition-all duration-300 text-sm font-medium font-geist reveal-on-scroll">
+                Falar com Vendas
+              </button>
+              <div class="mt-auto">
+                <ul class="space-y-4">
+                  <li class="flex items-start gap-3">
+                     <iconify-icon icon="solar:check-read-linear" width="18" height="18" class="text-white/70"></iconify-icon>
+                    <span class="text-white/70 text-sm font-light font-geist">Relatórios de Presença</span>
+                  </li>
+                  <li class="flex items-start gap-3">
+                     <iconify-icon icon="solar:history-linear" width="18" height="18" class="text-white/70"></iconify-icon>
+                    <span class="text-white/70 text-sm font-light font-geist">Histórico de Ocupação</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Card 2: Admin -->
+            <div class="flex flex-col group hover:bg-white/[0.04] transition-colors duration-300 h-full border-white/10 border rounded-none p-10 relative reveal-on-scroll">
+              <div class="absolute -top-px -left-px w-4 h-4 border-t-2 border-l-2 border-[#4ade80] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div class="absolute -top-px -right-px w-4 h-4 border-t-2 border-r-2 border-[#4ade80] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div class="absolute -bottom-px -left-px w-4 h-4 border-b-2 border-l-2 border-[#4ade80] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div class="absolute -bottom-px -right-px w-4 h-4 border-b-2 border-r-2 border-[#4ade80] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+              <div class="mb-8">
+                <span class="inline-block px-3 py-1 text-xs font-medium text-slate-300 border border-white/10 rounded bg-white/5 group-hover:text-[#4ade80] group-hover:border-[#4ade80] group-hover:bg-[#4ade80]/10 transition-colors duration-300 font-geist">
+                  Gestão
+                </span>
+              </div>
+              <div class="mb-2 flex items-baseline gap-1">
+                <span class="text-3xl font-medium text-white tracking-tight font-geist">
+                  Administradores
+                </span>
+              </div>
+              <p class="text-white/70 text-sm mb-8 font-geist font-light reveal-on-scroll">
+                Cadastre os endereços dos alojamentos permitidos e gerencie o raio de validação do Bip.
+              </p>
+              <button class="w-full py-4 mb-10 rounded-lg border border-white/10 bg-transparent text-white group-hover:bg-[#4ade80] group-hover:text-black group-hover:border-[#4ade80] transition-all duration-300 text-sm font-medium font-geist reveal-on-scroll">
+                Cadastrar Endereços
+              </button>
+              <div class="mt-auto">
+                <ul class="space-y-4">
+                  <li class="flex items-start gap-3">
+                    <iconify-icon icon="solar:map-point-linear" width="18" height="18" class="text-white/70"></iconify-icon>
+                    <span class="text-white/70 text-sm font-light font-geist">Gestão de Locais</span>
+                  </li>
+                  <li class="flex items-start gap-3">
+                    <iconify-icon icon="solar:radar-linear" width="18" height="18" class="text-white/70"></iconify-icon>
+                    <span class="text-white/70 text-sm font-light font-geist">Definição de Raio (GPS)</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="border-dashed bg-[#05080A] border-white/10 border-t pt-20 pb-10">
+      <div class="max-w-6xl mx-auto w-full flex flex-col font-geist">
+        <!-- Top Section: Green -->
+        <div class="relative bg-[#4ade80] text-black w-full overflow-hidden border-x border-t border-dashed border-white/10">
+          <!-- Grid Pattern Overlay -->
+          <div class="absolute inset-0 grid grid-cols-4 w-full h-full pointer-events-none">
+            <div class="border-r border-dashed border-black/10 h-full"></div>
+            <div class="border-r border-dashed border-black/10 h-full"></div>
+            <div class="border-r border-dashed border-black/10 h-full"></div>
+            <div class="h-full"></div>
+          </div>
+
+          <div class="relative z-10 px-6 py-16 md:px-12 md:py-20 flex flex-col justify-between min-h-[400px]">
+            <!-- Large Email Header -->
+            <a href="mailto:contato@locus.app" class="group flex items-start justify-between w-full mb-24 md:mb-32 reveal-on-scroll">
+              <span class="text-4xl sm:text-6xl md:text-7xl lg:text-[7rem] leading-none font-semibold tracking-tighter break-all reveal-on-scroll">
+                CONTATO@LOCUS.APP
+              </span>
+              <div class="pt-2 md:pt-6">
+                <iconify-icon icon="solar:arrow-right-up-linear" width="48" height="48" class="md:w-20 md:h-20 transform group-hover:-translate-y-2 group-hover:translate-x-2 transition-transform duration-300"></iconify-icon>
+              </div>
+            </a>
+
+            <!-- Info Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8 md:text-base leading-relaxed z-20 text-sm font-medium relative gap-x-12 gap-y-12">
+              <!-- Col 1: Contact -->
+              <div class="flex flex-col gap-x-4 gap-y-4">
+                <p class="font-semibold reveal-on-scroll">+55 (11) 9999-9999</p>
+                <p class="max-w-[200px] text-black/80 reveal-on-scroll">
+                  Av. Paulista, 1000 - Bela Vista, São Paulo - SP
+                </p>
+              </div>
+
+              <!-- Col 2: Services -->
+              <div class="flex flex-col gap-4">
+                <span class="block text-black/50 font-semibold tracking-tight reveal-on-scroll">
+                  Produto
+                </span>
+                <div class="flex flex-col gap-2">
+                  <a href="#" class="hover:text-black/60 transition-colors reveal-on-scroll">
+                    Funcionalidades
+                  </a>
+                  <a href="#" class="hover:text-black/60 transition-colors reveal-on-scroll">
+                    Para Empresas
+                  </a>
+                  <a href="#" class="hover:text-black/60 transition-colors reveal-on-scroll">
+                    Para Alojamentos
+                  </a>
+                </div>
+              </div>
+
+              <!-- Col 3: Legal -->
+              <div class="flex flex-col gap-4">
+                <span class="block text-black/50 font-semibold tracking-tight reveal-on-scroll">
+                  Legal
+                </span>
+                <div class="flex flex-col gap-2">
+                  <a href="#" class="hover:text-black/60 transition-colors reveal-on-scroll">
+                    Termos de Uso
+                  </a>
+                  <a href="#" class="hover:text-black/60 transition-colors reveal-on-scroll">
+                    Privacidade
+                  </a>
+                </div>
+              </div>
+
+              <!-- Col 4: Social -->
+              <div class="flex flex-col gap-4">
+                <span class="block text-black/50 font-semibold tracking-tight reveal-on-scroll">
+                  Social
+                </span>
+                <div class="flex flex-col gap-2">
+                  <a href="#" class="hover:text-black/60 transition-colors reveal-on-scroll">
+                    LinkedIn
+                  </a>
+                  <a href="#" class="hover:text-black/60 transition-colors reveal-on-scroll">
+                    Instagram
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Section: Black -->
+        <div class="relative bg-[#05080A] text-white w-full overflow-hidden border-x border-b border-dashed border-white/10">
+          <!-- Grid Pattern Overlay -->
+          <div class="absolute inset-0 grid grid-cols-4 w-full h-full pointer-events-none opacity-20">
+            <div class="border-r border-dashed border-white/20 h-full"></div>
+            <div class="border-r border-dashed border-white/20 h-full"></div>
+            <div class="border-r border-dashed border-white/20 h-full"></div>
+            <div class="h-full"></div>
+          </div>
+
+          <!-- Massive Brand Text -->
+          <div class="relative z-10 w-full flex justify-center items-end leading-none select-none pt-12">
+            <h1 class="text-[24vw] md:text-[20rem] font-semibold tracking-tighter text-center leading-[0.75] mb-[-0.08em] mix-blend-screen text-white reveal-on-scroll">
+              LOCUS
+            </h1>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry, i) => {
+            if (entry.isIntersecting) {
+              setTimeout(() => {
+                entry.target.classList.add('is-visible');
+              }, i * 100);
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.05, rootMargin: '0px 0px -50px 0px' });
+
+        document.querySelectorAll('main h1, main h2, main h3, main p, main button, main a.btn, main .group, main .grid > div, footer h1, footer a, footer p, footer span').forEach(el => {
+          if (!el.closest('.animate-marquee') && !el.closest('script') && !el.closest('style')) {
+            el.classList.add('reveal-on-scroll');
+            observer.observe(el);
+          }
+        });
+      });
+    </script>
+  
+
+</body></html>

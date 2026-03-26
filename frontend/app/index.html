@@ -229,8 +229,8 @@
     .tpl-header h3{font-size:15px;font-weight:600;color:#E5E7EB}
     .tpl-header a{font-size:12px;color:#6B7280;text-decoration:none;transition:color .15s}
     .tpl-header a:hover{color:#fff}
-    .tpl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-    .tcard{position:relative;border-radius:14px;overflow:hidden;cursor:pointer;transition:all .3s;border:1px solid rgba(255,255,255,0.06);aspect-ratio:16/10;min-height:60px}
+    .tpl-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .tcard{position:relative;border-radius:14px;overflow:hidden;cursor:pointer;transition:all .3s;border:1px solid rgba(255,255,255,0.06);aspect-ratio:3/4;min-height:60px}
     .tcard:hover{transform:translateY(-3px);border-color:rgba(255,255,255,0.15);box-shadow:0 12px 40px rgba(0,0,0,.4)}
     .tcard-bg{position:absolute;inset:0;z-index:0;width:100%;height:100%}
     .tcard-bg canvas{width:100%;height:100%}
@@ -239,8 +239,8 @@
     .tcard-desc{font-size:11px;color:rgba(255,255,255,0.6);margin-top:3px}
     .tcard-tag{position:absolute;top:10px;right:10px;font-size:9px;font-weight:600;padding:3px 8px;border-radius:6px;background:rgba(0,0,0,0.4);backdrop-filter:blur(8px);color:rgba(255,255,255,0.8);letter-spacing:0.5px;text-transform:uppercase}
     @media(max-width:768px){
-      .tpl-grid{grid-template-columns:1fr 1fr;gap:10px}
-      .tcard{position:relative;height:130px;aspect-ratio:unset;border-radius:12px;overflow:hidden}
+      .tpl-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+      .tcard{position:relative;aspect-ratio:3/4;border-radius:12px;overflow:hidden}
       .tcard-bg{position:absolute;inset:0;display:block}
       .tcard-bg iframe{width:400%;height:400%;transform:scale(0.25);transform-origin:top left;pointer-events:none;border:none;position:absolute;top:0;left:0}
       .tcard-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,transparent 20%,rgba(0,0,0,0.8) 100%);padding:12px;display:flex;flex-direction:column;justify-content:flex-end}
@@ -319,7 +319,8 @@
     .settings-content{flex:1;overflow-y:auto;height:100vh}
     /* 2-column grid for settings boxes */
     .set-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    @media(max-width:900px){.set-grid{grid-template-columns:1fr}}
+    @media(max-width:1100px){.tpl-grid{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:900px){.set-grid{grid-template-columns:1fr}.tpl-grid{grid-template-columns:repeat(2,1fr)}}
 
     /* SETTINGS SUBPAGES */
     .spage{display:none}
@@ -1077,14 +1078,24 @@ var sb;try{sb=window.supabase.createClient(SUPA_URL,SUPA_KEY)}catch(e){}
 var user=null,curModel='anthropic/claude-sonnet-4.6',curMode='brainstorm',attachB64=null;
 
 var TPLS=[
-  {n:'Digital Agency',d:'Services, portfolio & testimonials',p:'Professional digital agency landing page with gradient hero text, floating shapes, services grid, portfolio showcase, testimonials, and CTA. Dark theme with purple accents.',tag:'Popular',colors:['#6366F1','#00E5FF','#0A0A0F'],file:'/templates/digital-agency.html?v=2'},
-  {n:'AI SaaS Platform',d:'Dashboard, pricing & features',p:'AI monitoring SaaS platform with dashboard hero, trusted by section, features grid, pricing with toggle, FAQ accordion, and CTA. Dark theme with blue accents.',tag:'Trending',colors:['#00E5FF','#67E8F9','#0A0A1A'],file:'/templates/ai-saas.html?v=2'},
-  {n:'Creative Studio',d:'Portfolio, team & contact',p:'Creative studio website with bold typography hero, portfolio grid, services, team section, and contact form. Dark theme with pink-orange gradient accents.',tag:'New',colors:['#F43F5E','#F97316','#0A0A0F'],file:'/templates/creative-studio.html?v=2'},
-  {n:'AI Telemetry Platform',d:'Dashboard, monitoring & pricing',p:'AI telemetry SaaS platform with live dashboard mockup, threat signals, activity log, feature cards, stats, and pricing tiers. Deep navy theme with blue/cyan accents.',tag:'',colors:['#00E5FF','#06B6D4','#050510'],file:'/templates/ai-telemetry.html?v=2'},
-  {n:'Quantum SaaS',d:'Enterprise platform with glass UI',p:'Quantum Shard Field — enterprise SaaS platform with glassmorphism hero, interactive constellation testimonials, split-section features, animated pricing grid, and cyan accent glow effects. Dark theme.',tag:'New',colors:['#00E5FF','#0EA5E9','#09090B'],file:'/templates/quantum-saas.html?v=1'},
-  {n:'Horizon Radar',d:'Trend monitoring & analytics',p:'Horizon Radar — trend intelligence platform with dark radar-style hero, signal tracking dashboard mockup, feature grid, animated data cards, and pricing tiers. Minimal dark theme with green/indigo accents.',tag:'',colors:['#22C55E','#6366F1','#0A0A0A'],file:'/templates/horizon-radar.html?v=1'},
-  {n:'Cybersecurity SaaS',d:'Security platform & threat detection',p:'SENTRY — intelligent cybersecurity platform with real-time threat detection dashboard, security features grid, animated scan effects, trust badges, and tiered pricing. Dark theme with cyan/emerald accents.',tag:'New',colors:['#00E5FF','#10B981','#0A0A0F'],file:'/templates/cybersecurity-saas.html?v=2'},
-  {n:'Nexus Workflow',d:'Team sync & project management',p:'Nexus — workflow synchronization platform with animated connection nodes, team collaboration features, real-time sync dashboard, and modern pricing. Dark minimal theme with indigo accents.',tag:'',colors:['#6366F1','#818CF8','#0A0A0A'],file:'/templates/nexus-workflow.html?v=1'},
+  // ── New templates (most recent first) ──
+  {n:'FlowForge Systems',d:'Automation platform',p:'FlowForge — automate everything platform with workflow builder hero, integration cards, automation features, and enterprise pricing. Dark theme.',tag:'New',colors:['#00E5FF','#06B6D4','#0A0A0A'],file:'/templates/flowforge-automation.html?v=1'},
+  {n:'Aether Synthesis',d:'Digital matter platform',p:'Aether — digital matter synthesis platform with particle hero, glassmorphism cards, abstract 3D effects, and tiered pricing. Dark futuristic theme.',tag:'New',colors:['#A855F7','#EC4899','#09090B'],file:'/templates/aether-synthesis.html?v=1'},
+  {n:'GTMlab Outbound',d:'AI co-pilot for sales',p:'GTMlab — the 1st AI co-pilot for strategic outbound with dashboard mockup, pipeline features, ROI calculator, and enterprise pricing. Dark theme with cyan accents.',tag:'New',colors:['#00E5FF','#10B981','#0A0A0F'],file:'/templates/gtmlab-outbound.html?v=1'},
+  {n:'Raw Architecture',d:'Next-gen app framework',p:'Raw — architecture for next-gen apps with minimal hero, code-first features, performance benchmarks, and developer pricing. Ultra-minimal dark theme.',tag:'New',colors:['#F4F4F5','#71717A','#0A0A0A'],file:'/templates/raw-architecture.html?v=1'},
+  {n:'Core Infrastructure',d:'High-performance hosting',p:'Core — high-performance infrastructure platform with server dashboard hero, uptime stats, global network map, and tiered pricing. Dark theme with cyan accents.',tag:'New',colors:['#00E5FF','#22C55E','#050505'],file:'/templates/core-infrastructure.html?v=1'},
+  {n:'Holmes AI QA',d:'AI testing detective',p:'Holmes — AI QA detective with investigation-style hero, bug detection features, testing pipeline, and team pricing. Dark noir theme.',tag:'New',colors:['#F59E0B','#D97706','#0A0A0A'],file:'/templates/holmes-ai-qa.html?v=1'},
+  {n:'Sigmal Intelligence',d:'Competitive radar & analytics',p:'Sigmal — competitive intelligence radar with live signal dashboard, market analysis features, competitor tracking, and enterprise pricing. Dark theme with cyan accents.',tag:'New',colors:['#00E5FF','#3B82F6','#0A0A0F'],file:'/templates/sigmal-intelligence.html?v=1'},
+  {n:'Locus Corporate',d:'Corporate housing management',p:'Locus — corporate housing control platform with property dashboard, booking features, occupancy analytics, and business pricing. Professional dark theme.',tag:'New',colors:['#10B981','#06B6D4','#0A0A0A'],file:'/templates/locus-corporate.html?v=1'},
+  // ── Original templates ──
+  {n:'Quantum SaaS',d:'Enterprise glass UI',p:'Quantum Shard Field — enterprise SaaS with glassmorphism, constellation testimonials, animated pricing. Dark theme.',tag:'',colors:['#00E5FF','#0EA5E9','#09090B'],file:'/templates/quantum-saas.html?v=1'},
+  {n:'Cybersecurity SaaS',d:'Security & threat detection',p:'SENTRY — cybersecurity platform with threat detection dashboard, security features, and tiered pricing. Dark theme with cyan/emerald.',tag:'',colors:['#00E5FF','#10B981','#0A0A0F'],file:'/templates/cybersecurity-saas.html?v=2'},
+  {n:'Nexus Workflow',d:'Team sync & management',p:'Nexus — workflow sync with animated nodes, team features, and modern pricing. Dark minimal with indigo.',tag:'',colors:['#6366F1','#818CF8','#0A0A0A'],file:'/templates/nexus-workflow.html?v=1'},
+  {n:'Horizon Radar',d:'Trend monitoring',p:'Horizon Radar — trend intelligence with radar hero, signal tracking, and animated data cards. Dark with green/indigo.',tag:'',colors:['#22C55E','#6366F1','#0A0A0A'],file:'/templates/horizon-radar.html?v=1'},
+  {n:'Digital Agency',d:'Services & portfolio',p:'Professional agency landing with gradient hero, services grid, portfolio, testimonials. Dark with purple.',tag:'Popular',colors:['#6366F1','#00E5FF','#0A0A0F'],file:'/templates/digital-agency.html?v=2'},
+  {n:'AI SaaS Platform',d:'Dashboard & pricing',p:'AI monitoring SaaS with dashboard hero, features grid, pricing toggle. Dark with blue.',tag:'Trending',colors:['#00E5FF','#67E8F9','#0A0A1A'],file:'/templates/ai-saas.html?v=2'},
+  {n:'Creative Studio',d:'Portfolio & team',p:'Creative studio with bold typography, portfolio grid, team section. Dark with pink-orange.',tag:'',colors:['#F43F5E','#F97316','#0A0A0F'],file:'/templates/creative-studio.html?v=2'},
+  {n:'AI Telemetry',d:'Dashboard & monitoring',p:'AI telemetry with live dashboard, threat signals, activity log. Deep navy with cyan.',tag:'',colors:['#00E5FF','#06B6D4','#050510'],file:'/templates/ai-telemetry.html?v=2'},
 ];
 var CHIPS=[
   {t:'SaaS Landing',p:'Modern SaaS landing page with hero, features, pricing, testimonials'},
@@ -1717,7 +1728,7 @@ function renderTpl(id){
     var tagHtml=t.tag?'<div class="tcard-tag">'+t.tag+'</div>':'';
     var grad='linear-gradient(135deg,'+t.colors[0]+','+t.colors[1]+','+t.colors[2]+')';
     c.style.background=grad;
-    c.innerHTML='<div class="tcard-bg" style="background:'+grad+';position:absolute;inset:0"><iframe src="'+t.file+'" style="width:300%;height:300%;transform:scale(0.333);transform-origin:top left;pointer-events:none;border:none;position:absolute;top:0;left:0"></iframe></div><div class="tcard-overlay">'+tagHtml+'<div class="tcard-name">'+t.n+'</div><div class="tcard-desc">'+t.d+'</div></div>';
+    c.innerHTML='<div class="tcard-bg" style="background:'+grad+';position:absolute;inset:0"><iframe src="'+t.file+'" style="width:400%;height:400%;transform:scale(0.25);transform-origin:top left;pointer-events:none;border:none;position:absolute;top:0;left:0"></iframe></div><div class="tcard-overlay">'+tagHtml+'<div class="tcard-name">'+t.n+'</div><div class="tcard-desc">'+t.d+'</div></div>';
     g.appendChild(c);
   });
 }
@@ -1750,7 +1761,7 @@ function renderTplHome(){
       var tagHtml=t.tag?'<div class="tcard-tag">'+t.tag+'</div>':'';
       var grad2='linear-gradient(135deg,'+t.colors[0]+','+t.colors[1]+','+t.colors[2]+')';
       c.style.background=grad2;
-      c.innerHTML='<div class="tcard-bg" style="background:'+grad2+';position:absolute;inset:0"><iframe src="'+t.file+'" style="width:300%;height:300%;transform:scale(0.333);transform-origin:top left;pointer-events:none;border:none;position:absolute;top:0;left:0"></iframe></div><div class="tcard-overlay">'+tagHtml+'<div class="tcard-name">'+t.n+'</div><div class="tcard-desc">'+t.d+'</div></div>';
+      c.innerHTML='<div class="tcard-bg" style="background:'+grad2+';position:absolute;inset:0"><iframe src="'+t.file+'" style="width:400%;height:400%;transform:scale(0.25);transform-origin:top left;pointer-events:none;border:none;position:absolute;top:0;left:0"></iframe></div><div class="tcard-overlay">'+tagHtml+'<div class="tcard-name">'+t.n+'</div><div class="tcard-desc">'+t.d+'</div></div>';
       allTpl.appendChild(c);
     });
   }

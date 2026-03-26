@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Holmes - AI QA Detective</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Iconify Script -->
+<script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.7/dist/iconify-icon.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body {
+font-family: 'Inter', sans-serif;
+background-color: #020408;
+color: #e2e8f0;
+}
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+width: 6px;
+}
+::-webkit-scrollbar-track {
+background: #020408;
+}
+::-webkit-scrollbar-thumb {
+background: #1e293b;
+border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+background: #334155;
+}
+/* Improved Plaid/Grid Background */
+.bg-plaid {
+background-color: #020408;
+background-image:
+linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+background-size: 40px 40px;
+}
+/* Electric Lime Accent */
+.text-lime-electric {
+color: #ccff00;
+}
+.bg-lime-electric {
+background-color: #ccff00;
+}
+.border-lime-electric {
+border-color: #ccff00;
+}
+/* Underline Highlight */
+.underline-highlight {
+box-shadow: inset 0 -4px 0 0 #ccff00;
+text-decoration: none;
+}
+/* Animations */
+@keyframes fadeIn {
+from { opacity: 0; transform: translateY(10px); }
+to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+animation: fadeIn 0.8s ease-out forwards;
+}
+/* Icon styling to match 1.5 stroke width visually */
+iconify-icon {
+display: inline-block;
+vertical-align: middle;
+}
+</style>
+<link id="all-fonts-link-font-geist" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-geist">.font-geist { font-family: 'Geist', sans-serif !important; }</style><link id="all-fonts-link-font-roboto" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-roboto">.font-roboto { font-family: 'Roboto', sans-serif !important; }</style><link id="all-fonts-link-font-montserrat" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-montserrat">.font-montserrat { font-family: 'Montserrat', sans-serif !important; }</style><link id="all-fonts-link-font-poppins" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-poppins">.font-poppins { font-family: 'Poppins', sans-serif !important; }</style><link id="all-fonts-link-font-playfair" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;900&amp;display=swap"><style id="all-fonts-style-font-playfair">.font-playfair { font-family: 'Playfair Display', serif !important; }</style><link id="all-fonts-link-font-instrument-serif" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:wght@400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-instrument-serif">.font-instrument-serif { font-family: 'Instrument Serif', serif !important; }</style><link id="all-fonts-link-font-merriweather" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&amp;display=swap"><style id="all-fonts-style-font-merriweather">.font-merriweather { font-family: 'Merriweather', serif !important; }</style><link id="all-fonts-link-font-bricolage" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-bricolage">.font-bricolage { font-family: 'Bricolage Grotesque', sans-serif !important; }</style><link id="all-fonts-link-font-jakarta" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-jakarta">.font-jakarta { font-family: 'Plus Jakarta Sans', sans-serif !important; }</style><link id="all-fonts-link-font-manrope" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-manrope">.font-manrope { font-family: 'Manrope', sans-serif !important; }</style><link id="all-fonts-link-font-space-grotesk" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-space-grotesk">.font-space-grotesk { font-family: 'Space Grotesk', sans-serif !important; }</style><link id="all-fonts-link-font-work-sans" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-work-sans">.font-work-sans { font-family: 'Work Sans', sans-serif !important; }</style><link id="all-fonts-link-font-pt-serif" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&amp;display=swap"><style id="all-fonts-style-font-pt-serif">.font-pt-serif { font-family: 'PT Serif', serif !important; }</style><link id="all-fonts-link-font-geist-mono" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-geist-mono">.font-geist-mono { font-family: 'Geist Mono', monospace !important; }</style><link id="all-fonts-link-font-space-mono" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&amp;display=swap"><style id="all-fonts-style-font-space-mono">.font-space-mono { font-family: 'Space Mono', monospace !important; }</style><link id="all-fonts-link-font-quicksand" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-quicksand">.font-quicksand { font-family: 'Quicksand', sans-serif !important; }</style><link id="all-fonts-link-font-nunito" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-nunito">.font-nunito { font-family: 'Nunito', sans-serif !important; }</style><link id="all-fonts-link-font-newsreader" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..800&amp;display=swap"><style id="all-fonts-style-font-newsreader">.font-newsreader { font-family: 'Newsreader', serif !important; }</style><link id="all-fonts-link-font-google-sans-flex" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-google-sans-flex">.font-google-sans-flex { font-family: 'Google Sans Flex', sans-serif !important; }</style><link id="all-fonts-link-font-oswald" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-oswald">.font-oswald { font-family: 'Oswald', sans-serif !important; }</style><link id="all-fonts-link-font-dm-sans" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-dm-sans">.font-dm-sans { font-family: 'DM Sans', sans-serif !important; }</style><link id="all-fonts-link-font-cormorant" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-cormorant">.font-cormorant { font-family: 'Cormorant Garamond', serif !important; }</style></head>
+<body class="bg-[#020408] text-slate-400 antialiased selection:bg-[#ccff00] selection:text-black overflow-x-hidden">
+
+    <!-- Navbar -->
+    <nav class="fixed top-0 w-full z-50 border-b border-white/5 bg-[#020408]/80 backdrop-blur-xl">
+        <div class="flex h-16 max-w-7xl mr-auto ml-auto pr-6 pl-6 items-center justify-between">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-2 group">
+                <div class="w-8 h-8 rounded bg-lime-electric flex items-center justify-center text-black text-sm font-bold tracking-tighter">
+                    H
+                </div>
+                <span class="text-white font-semibold tracking-tight text-sm group-hover:text-lime-electric transition-colors">HOLMES</span>
+            </a>
+
+            <!-- Desktop Links -->
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#features" class="text-xs font-medium hover:text-white transition-colors">Investigations</a>
+                <a href="#solutions" class="text-xs font-medium hover:text-white transition-colors">Solutions</a>
+                <a href="#customers" class="text-xs font-medium hover:text-white transition-colors">Evidence</a>
+                <a href="#pricing" class="text-xs font-medium hover:text-white transition-colors">Pricing</a>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-6">
+                <a href="#" class="hidden md:block text-xs font-medium hover:text-white transition-colors">Log in</a>
+                <a href="https://calendly.com/robbrechtdelrue-uur/30-min-call-with-robbrecht" class="inline-flex items-center justify-center overflow-hidden transition-all duration-300 hover:bg-white/10 hover:border-lime-electric/50 hover:text-lime-electric focus:outline-none focus:ring-2 focus:ring-lime-electric focus:ring-offset-2 focus:ring-offset-black font-semibold text-white bg-white/5 h-8 border-white/10 border rounded pr-4 pl-4 relative">
+    <span class="text-xs">Request Demo</span>
+</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-plaid min-h-screen flex items-center">
+    <!-- Vignette -->
+    <div class="absolute inset-0 bg-gradient-to-t from-[#020408] via-transparent to-transparent pointer-events-none">
+    </div>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#020408_100%)] pointer-events-none opacity-80">
+    </div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
+
+    <!-- Content Left -->
+    <div class="text-left animate-fade-in max-w-2xl">
+        <!-- Badge -->
+        <div class="inline-block px-3 py-1 bg-lime-electric rounded-sm mb-8">
+            <span class="text-[10px] uppercase tracking-widest font-bold text-black block leading-none pt-[1px]">AI QA Detective</span>
+        </div>
+
+        <!-- Heading -->
+        <h1 class="text-7xl sm:text-8xl lg:text-9xl font-bold tracking-tighter text-lime-electric mb-6 leading-[0.85]">
+            Holmes
+        </h1>
+
+        <!-- Subheadline -->
+        <h2 class="text-4xl sm:text-5xl lg:text-6xl text-white font-medium tracking-tight mb-8 leading-[1.1]">
+            <span class="underline-highlight pb-1">Every</span> Release<br>
+                    Investigated.
+        </h2>
+
+        <!-- Description -->
+        <p class="text-lg text-slate-400 font-light mb-10 max-w-lg leading-relaxed">
+            Automate your quality assurance with a detective that never sleeps. Holmes integrates with your GitHub
+            workflow, analyzes regressions, and reports issues directly to Slack.
+        </p>
+
+        <!-- Divider Line -->
+        <div class="w-12 h-0.5 bg-white/20 mb-10"></div>
+
+        <!-- CTA Buttons -->
+        <div class="flex flex-col sm:flex-row items-start gap-4 mb-16">
+            <a href="#" class="h-12 px-8 rounded bg-lime-electric text-black hover:bg-[#b3e600] transition-all duration-300 text-sm font-bold flex items-center gap-2 shadow-[0_0_20px_rgba(204,255,0,0.2)]">
+                Start Investigation
+            </a>
+            <a href="#" class="h-12 px-8 rounded bg-transparent border border-white/20 text-white text-sm font-medium hover:bg-white/5 transition-colors flex items-center gap-2">
+                <iconify-icon icon="solar:play-circle-linear" width="18" height="18"></iconify-icon>
+                Watch Demo
+            </a>
+        </div>
+    </div>
+
+    <!-- Visual Right: Platform Dashboard -->
+    <div class="relative animate-fade-in hidden lg:block" style="animation-delay: 0.2s;">
+        <div class="rounded-xl bg-[#0b1221] border border-white/10 p-1 shadow-2xl relative">
+            <!-- Glow effect behind -->
+            <div class="absolute -inset-4 bg-lime-electric/5 rounded-full blur-3xl -z-10"></div>
+
+            <div class="rounded-lg overflow-hidden bg-[#020408] min-h-[450px] flex flex-col relative border border-white/5">
+
+                <!-- Top Navigation Bar -->
+                <div class="h-12 border-b border-white/5 flex items-center justify-between px-4 bg-[#050a14]">
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2 text-white text-xs font-medium">
+                            <div class="w-5 h-5 rounded bg-indigo-500/20 flex items-center justify-center text-indigo-400">
+                                <iconify-icon icon="ri:github-fill" width="12" height="12"></iconify-icon>
+                            </div>
+                            <span>acme/checkout-service</span>
+                        </div>
+                        <span class="text-slate-700 text-lg font-light">/</span>
+                        <span class="text-slate-400 text-xs">Pull Requests</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]">
+                        </div>
+                        <span class="text-[10px] uppercase tracking-wider font-bold text-slate-500">Live</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-1">
+                    <!-- Sidebar -->
+                    <div class="w-14 border-r border-white/5 bg-[#03060d] flex flex-col items-center py-4 gap-4">
+                        <div class="w-8 h-8 rounded-md bg-white/5 text-white flex items-center justify-center border border-white/10 hover:border-lime-electric/50 hover:text-lime-electric transition-colors cursor-pointer">
+                            <iconify-icon icon="solar:widget-2-linear" width="18" height="18"></iconify-icon>
+                        </div>
+                        <div class="w-8 h-8 rounded-md bg-transparent text-slate-500 flex items-center justify-center hover:bg-white/5 hover:text-white transition-colors cursor-pointer">
+                            <iconify-icon icon="solar:bell-bing-linear" width="18" height="18"></iconify-icon>
+                        </div>
+                        <div class="w-8 h-8 rounded-md bg-transparent text-slate-500 flex items-center justify-center hover:bg-white/5 hover:text-white transition-colors cursor-pointer">
+                            <iconify-icon icon="solar:settings-linear" width="18" height="18"></iconify-icon>
+                        </div>
+                        <div class="mt-auto w-8 h-8 rounded-full bg-gradient-to-tr from-lime-electric to-emerald-400">
+                        </div>
+                    </div>
+
+                    <!-- Main Content Area -->
+                    <div class="flex-1 bg-[#020408] p-6">
+                        <h3 class="text-sm font-medium text-white mb-4 flex items-center gap-2">
+                            <iconify-icon icon="solar:list-check-linear" class="text-lime-electric"></iconify-icon>
+                            Recent Investigations
+                        </h3>
+
+                        <!-- List Item 1: High Risk -->
+                        <div class="bg-[#050a14] border border-red-500/20 rounded-lg p-4 mb-3 hover:border-red-500/40 transition-colors group cursor-pointer relative overflow-hidden">
+                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-red-500"></div>
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-semibold text-white group-hover:text-red-400 transition-colors">Stripe Integration Update</span>
+                                    <span class="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-slate-400 font-mono">#PR-842</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 text-red-400 bg-red-950/20 px-2 py-0.5 rounded border border-red-900/30">
+                                    <iconify-icon icon="solar:danger-triangle-linear" width="10" height="10"></iconify-icon>
+                                    <span class="text-[10px] font-bold uppercase tracking-wide">Regression</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-400 mb-3">Detected latency spike in payment webhook
+                                handler.</p>
+
+                            <!-- Integration Badges -->
+                            <div class="flex items-center gap-2 pt-2 border-t border-white/5">
+                                <div class="flex items-center gap-1 text-[10px] text-slate-500 bg-white/5 px-2 py-1 rounded">
+                                    <iconify-icon icon="ri:github-fill"></iconify-icon> acme/core
+                                </div>
+                                <div class="flex items-center gap-1 text-[10px] text-indigo-300 bg-indigo-500/10 px-2 py-1 rounded border border-indigo-500/20">
+                                    <iconify-icon icon="ri:slack-fill"></iconify-icon> Alert sent to #dev-ops
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- List Item 2: Passed -->
+                        <div class="bg-[#050a14] border border-white/5 rounded-lg p-4 mb-3 hover:border-lime-electric/30 transition-colors group cursor-pointer relative overflow-hidden">
+                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500"></div>
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-semibold text-white group-hover:text-lime-electric transition-colors">Frontend Component Refactor</span>
+                                    <span class="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-slate-400 font-mono">#PR-841</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 text-emerald-400 bg-emerald-950/20 px-2 py-0.5 rounded border border-emerald-900/30">
+                                    <iconify-icon icon="solar:check-circle-linear" width="10" height="10"></iconify-icon>
+                                    <span class="text-[10px] font-bold uppercase tracking-wide">Clean</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-400 mb-3">Visual regression tests passed. No UI anomalies
+                                detected.</p>
+
+                            <!-- Integration Badges -->
+                            <div class="flex items-center gap-2 pt-2 border-t border-white/5">
+                                <div class="flex items-center gap-1 text-[10px] text-slate-500 bg-white/5 px-2 py-1 rounded">
+                                    <iconify-icon icon="ri:github-fill"></iconify-icon> acme/frontend
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+
+    <!-- Social Proof -->
+    <section class="py-12 border-y border-white/5 bg-[#020408]">
+        <div class="max-w-7xl mx-auto px-6">
+            <p class="text-center text-xs font-semibold text-slate-500 mb-10 uppercase tracking-widest">Trusted by Engineering Teams</p>
+            <div class="flex flex-wrap justify-center items-center gap-x-12 lg:gap-x-20 gap-y-8 opacity-60">
+                
+                <!-- UseBackbone.ai -->
+                <a href="https://www.usebackbone.ai/" target="_blank" class="group transition-opacity hover:opacity-100">
+                    <span class="text-xl font-bold tracking-tight text-white group-hover:text-lime-electric transition-colors">backbone.</span>
+                </a>
+
+                <!-- Amplr.be -->
+                <a href="https://en.amplr.be/" target="_blank" class="group transition-opacity hover:opacity-100">
+                    <div class="flex items-center gap-1">
+                        <span class="text-xl font-light tracking-widest text-white uppercase group-hover:text-lime-electric transition-colors">AMPLR</span>
+                    </div>
+                </a>
+
+                <!-- Feedelity.io -->
+                <a href="https://feedelity.io/" target="_blank" class="group transition-opacity hover:opacity-100">
+                    <span class="text-xl font-medium text-white italic group-hover:text-lime-electric transition-colors">Feedelity</span>
+                </a>
+
+                <!-- Aikido.dev -->
+                <a href="https://www.aikido.dev/" target="_blank" class="group transition-opacity hover:opacity-100">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl font-black tracking-tighter text-white group-hover:text-lime-electric transition-colors">AIKIDO</span>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Bento Grid Features -->
+    <section id="features" class="py-24 relative bg-[#020408]">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="mb-16 text-center max-w-2xl mx-auto">
+                <h2 class="text-3xl lg:text-4xl font-semibold tracking-tight text-white mb-4">The Deduction Engine</h2>
+                <p class="text-slate-400">From discovery to validation, Holmes handles your entire QA workflow with the precision of a master detective.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Large Card Left: Natural Language Prompts -->
+                <div class="md:col-span-2 rounded border border-white/10 bg-white/[0.02] p-8 relative overflow-hidden group hover:border-lime-electric/30 transition-all duration-300">
+                    <div class="absolute top-0 right-0 p-12 opacity-5 group-hover:opacity-10 transition-opacity">
+                         <div class="w-64 h-64 bg-lime-electric rounded-full blur-[100px]"></div>
+                    </div>
+                    
+                    <div class="relative z-10">
+                        <div class="w-10 h-10 rounded bg-lime-electric/10 flex items-center justify-center text-lime-electric mb-6 border border-lime-electric/20">
+                            <iconify-icon icon="solar:chat-line-linear" width="20" height="20"></iconify-icon>
+                        </div>
+                        <h3 class="text-xl font-semibold text-white mb-2 tracking-tight">Natural Language Investigation</h3>
+                        <p class="text-sm text-slate-400 mb-8 max-w-sm">Define your test cases in plain English. Holmes translates your intent into comprehensive validation steps automatically.</p>
+                        
+                        <!-- Visual representation -->
+                        <div class="w-full bg-[#050a14] border border-white/10 rounded p-4 relative overflow-hidden flex flex-col gap-3">
+                             <div class="flex items-center gap-3">
+                                 <div class="w-6 h-6 rounded bg-slate-800 flex items-center justify-center text-[10px] text-slate-500 font-bold">U</div>
+                                 <div class="bg-white/5 border border-white/10 text-slate-300 text-xs px-3 py-2 rounded rounded-tl-none">
+                                     Verify that the user cannot proceed without a valid email.
+                                 </div>
+                             </div>
+                             <div class="flex items-center gap-3 flex-row-reverse">
+                                 <div class="w-6 h-6 rounded bg-lime-electric flex items-center justify-center text-[10px] text-black font-bold">H</div>
+                                 <div class="bg-lime-electric/5 border border-lime-electric/20 text-lime-electric text-xs px-3 py-2 rounded rounded-tr-none w-full">
+                                     <div class="flex items-center gap-2 mb-2 text-[10px] opacity-70 uppercase tracking-wider">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-lime-electric animate-pulse"></span> Analyzing Flow
+                                     </div>
+                                     <div class="space-y-1 font-mono text-[10px] text-white/70">
+                                         <div>&gt; Identify input[type="email"]</div>
+                                         <div>&gt; Attempt submit with invalid string</div>
+                                         <div>&gt; Expect validation error message</div>
+                                     </div>
+                                 </div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tall Card Right: Issue Tracking -->
+                <div class="md:col-span-1 md:row-span-2 rounded border border-white/10 bg-white/[0.02] p-8 relative overflow-hidden group hover:border-red-500/30 transition-all duration-300">
+                     <div class="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-red-900/10 to-transparent z-0"></div>
+                     <div class="relative z-10 h-full flex flex-col">
+                        <div class="w-10 h-10 rounded bg-red-500/10 flex items-center justify-center text-red-500 mb-6 border border-red-500/20">
+                            <iconify-icon icon="solar:bug-linear" width="20" height="20"></iconify-icon>
+                        </div>
+                        <h3 class="text-xl font-semibold text-white mb-2 tracking-tight">Evidence Locker</h3>
+                        <p class="text-sm text-slate-400 mb-8">Detailed bug reports generated instantly.</p>
+                        
+                        <div class="mt-auto space-y-3">
+                            <!-- Bug Card -->
+                            <div class="p-3 rounded bg-[#0a0a0a] border border-white/10 shadow-lg relative overflow-hidden group-hover:border-red-500/30 transition-colors">
+                                <div class="absolute left-0 top-0 bottom-0 w-0.5 bg-red-500"></div>
+                                <div class="flex justify-between items-start mb-2">
+                                    <span class="text-xs font-semibold text-white">Crash on Payment</span>
+                                    <span class="text-[9px] bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded uppercase font-bold">Critical</span>
+                                </div>
+                                <div class="flex gap-2 mb-2">
+                                    <div class="h-10 w-16 bg-slate-800 rounded border border-white/5 flex items-center justify-center">
+                                        <iconify-icon icon="solar:gallery-wide-linear" class="text-slate-600" width="16" height="16"></iconify-icon>
+                                    </div>
+                                    <div class="flex-1 space-y-1.5 py-1">
+                                        <div class="h-1.5 w-full bg-slate-800 rounded"></div>
+                                        <div class="h-1.5 w-2/3 bg-slate-800 rounded"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                     </div>
+                </div>
+
+                <!-- Small Card Bottom Left: Real-time Dashboard -->
+                <div class="rounded border border-white/10 bg-white/[0.02] p-8 relative overflow-hidden group hover:border-lime-electric/30 transition-all duration-300">
+                    <div class="w-10 h-10 rounded bg-lime-electric/10 flex items-center justify-center text-lime-electric mb-6 border border-lime-electric/20">
+                        <iconify-icon icon="solar:graph-new-linear" width="20" height="20"></iconify-icon>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2 tracking-tight">Case Status</h3>
+                    <p class="text-sm text-slate-400 mb-4">Track coverage, pass rates, and impact at a glance.</p>
+                    
+                    <div class="flex items-center gap-4 mt-auto">
+                        <div class="flex-1">
+                            <div class="flex justify-between text-[10px] text-slate-400 mb-1">
+                                <span>Coverage</span>
+                                <span class="text-lime-electric">94%</span>
+                            </div>
+                            <div class="h-1 bg-slate-800 w-full overflow-hidden">
+                                <div class="h-full bg-lime-electric w-[94%] shadow-[0_0_10px_rgba(204,255,0,0.5)]"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Small Card Bottom Middle: Integrations -->
+                <div class="rounded border border-white/10 bg-white/[0.02] p-8 relative overflow-hidden group hover:border-white/20 transition-all duration-300">
+                    <div class="w-10 h-10 rounded bg-white/5 flex items-center justify-center text-white mb-6 border border-white/10">
+                        <iconify-icon icon="solar:link-circle-linear" width="20" height="20"></iconify-icon>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2 tracking-tight">Scotland Yard Sync</h3>
+                    <p class="text-sm text-slate-400 mb-6">Seamless integration with your ecosystem.</p>
+                    
+                    <div class="flex items-center gap-3 text-slate-400">
+                        <iconify-icon icon="ri:github-fill" width="20" height="20" class="hover:text-white transition-colors"></iconify-icon>
+                        <iconify-icon icon="ri:slack-fill" width="20" height="20" class="hover:text-white transition-colors"></iconify-icon>
+                        <iconify-icon icon="ri:trello-fill" width="20" height="20" class="hover:text-white transition-colors"></iconify-icon>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing (Compact) -->
+    <section id="pricing" class="py-24 border-t border-white/5 bg-[#020408]">
+    <div class="max-w-7xl mx-auto px-6">
+        <h2 class="text-3xl font-semibold text-white tracking-tight text-center mb-12">Pricing</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <!-- Detective -->
+            <div class="p-8 rounded border border-white/10 bg-transparent hover:bg-white/[0.02] transition-colors flex flex-col items-start">
+                <h3 class="text-white font-medium mb-2">Amateur</h3>
+                <p class="text-3xl font-bold text-white mb-6">$0
+                    <span class="text-sm text-slate-500 font-normal">/ mo</span>
+                </p>
+                <ul class="space-y-3 mb-8 w-full">
+                    <li class="flex items-center gap-3 text-xs text-slate-300">
+                        <iconify-icon icon="solar:check-circle-linear" class="text-slate-500" width="14" height="14"></iconify-icon> 50 Cases / mo
+                    </li>
+                    <li class="flex items-center gap-3 text-xs text-slate-300">
+                        <iconify-icon icon="solar:check-circle-linear" class="text-slate-500" width="14" height="14"></iconify-icon> 1 Investigator
+                    </li>
+                </ul>
+                <a href="#" class="w-full py-2 rounded border border-white/10 text-white text-xs font-medium hover:bg-white/5 transition-colors mt-auto text-center">Start
+                    Free</a>
+            </div>
+
+            <!-- Inspector -->
+            <div class="p-8 rounded border border-lime-electric bg-lime-electric/[0.02] transition-colors flex flex-col items-start relative shadow-[0_0_30px_rgba(204,255,0,0.05)]">
+                <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-lime-electric text-black text-[10px] font-bold px-2 py-0.5 tracking-wide uppercase">
+                    Recommended</div>
+                <h3 class="text-lime-electric font-medium mb-2">Inspector</h3>
+                <p class="text-3xl font-bold text-white mb-6">$49
+                    <span class="text-sm text-slate-500 font-normal">/ mo</span>
+                </p>
+                <ul class="space-y-3 mb-8 w-full">
+                    <li class="flex gap-3 text-xs text-slate-300 gap-x-3 gap-y-3 items-center">
+                        <iconify-icon icon="solar:check-circle-linear" class="text-lime-electric" width="14" height="14"></iconify-icon>
+                        500 Cases
+                    </li>
+                    <li class="flex items-center gap-3 text-xs text-slate-300">
+                        <iconify-icon icon="solar:check-circle-linear" class="text-lime-electric" width="14" height="14"></iconify-icon> GitHub Sync
+                    </li>
+                </ul>
+                <a href="#" class="w-full py-2 rounded bg-lime-electric text-black text-xs font-bold hover:bg-lime-300 transition-colors mt-auto text-center">Get
+                    Started</a>
+            </div>
+
+            <!-- Scotland Yard -->
+            <div class="p-8 rounded border border-white/10 bg-transparent hover:bg-white/[0.02] transition-colors flex flex-col items-start">
+                <h3 class="text-white font-medium mb-2">Chief</h3>
+                <p class="text-3xl font-bold text-white mb-6">Custom</p>
+                <ul class="space-y-3 mb-8 w-full">
+                    <li class="flex items-center gap-3 text-xs text-slate-300">
+                        <iconify-icon icon="solar:check-circle-linear" class="text-slate-500" width="14" height="14"></iconify-icon> Unlimited Cases
+                    </li>
+                    <li class="flex items-center gap-3 text-xs text-slate-300">
+                        <iconify-icon icon="solar:check-circle-linear" class="text-slate-500" width="14" height="14"></iconify-icon> Dedicated Support
+                    </li>
+                </ul>
+                <a href="#" class="w-full py-2 rounded border border-white/10 text-white text-xs font-medium hover:bg-white/5 transition-colors mt-auto text-center">Contact
+                    Sales</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/5 bg-[#010205] pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-16">
+                <div class="col-span-2 lg:col-span-2">
+                    <a href="#" class="flex items-center gap-2 mb-4">
+                        <div class="w-6 h-6 rounded bg-lime-electric flex items-center justify-center text-black text-xs font-bold">H</div>
+                        <span class="text-white font-semibold text-sm tracking-tight">HOLMES</span>
+                    </a>
+                    <p class="text-xs text-slate-500 max-w-xs leading-relaxed">
+                        221B Baker Street<br>
+                        London, NW1 6XE<br><br>
+                        Employee Equity Opportunity
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="text-white text-xs font-semibold mb-4">Platform</h4>
+                    <ul class="space-y-2 text-xs text-slate-500">
+                        <li><a href="#" class="hover:text-lime-electric transition-colors">Deduction Engine</a></li>
+                        <li><a href="#" class="hover:text-lime-electric transition-colors">Integrations</a></li>
+                        
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white text-xs font-semibold mb-4">Company</h4>
+                    <ul class="space-y-2 text-xs text-slate-500">
+                        <li><a href="#" class="hover:text-lime-electric transition-colors">About</a></li>
+                        <li><a href="#" class="hover:text-lime-electric transition-colors">Careers</a></li>
+                        
+                    </ul>
+                </div>
+                
+                <!-- Added Legal Section -->
+                <div>
+                    <h4 class="text-white text-xs font-semibold mb-4">Legal</h4>
+                    <ul class="space-y-2 text-xs text-slate-500">
+                        <li><a href="#" class="hover:text-lime-electric transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-lime-electric transition-colors">Cookie Policy</a></li>
+                        
+                    </ul>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-white/5">
+                <p class="text-[10px] text-slate-600">© 2026 Holmes Inc.</p>
+                <div class="flex items-center gap-4 mt-4 md:mt-0">
+                    <a href="#" class="text-slate-600 hover:text-lime-electric transition-colors"><iconify-icon icon="ri:twitter-x-line" width="16" height="16"></iconify-icon></a>
+                    <a href="#" class="text-slate-600 hover:text-lime-electric transition-colors"><iconify-icon icon="ri:github-fill" width="16" height="16"></iconify-icon></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body></html>

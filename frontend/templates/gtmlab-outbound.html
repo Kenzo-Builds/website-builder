@@ -1,0 +1,1042 @@
+<html lang="fr" class="scroll-smooth"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- SEO & Meta Tags Core -->
+<title>GTMlab | The 1st AI co-pilot for Strategic Outbound</title>
+<meta name="description" content="GTMlab remplace l'outbound générique par une suite d'agents IA pilotés par des experts pour l'outbound stratégique B2B.">
+<meta name="keywords" content="GTM, Go-To-Market, Intent Data, Prospection IA, Automation B2B, AI Agents, Strategic Outbound">
+<meta name="author" content="GTMlab">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<!-- Theme & Icons -->
+<meta name="theme-color" content="#ea580c">
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Iconify -->
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body {
+font-family: 'Inter', sans-serif;
+background-color: #000000;
+color: #e4e4e7;
+overflow-x: hidden;
+}
+.bg-grid-pattern {
+background-size: 50px 50px;
+background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+}
+.sc-card {
+background: #09090b;
+border: 1px solid rgba(255, 255, 255, 0.08);
+box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+transition: all 0.3s ease;
+}
+.sc-card:hover {
+border-color: rgba(255, 255, 255, 0.15);
+background: #0f0f11;
+}
+.spotlight-card {
+position: relative;
+overflow: hidden;
+}
+.spotlight-card::before {
+content: '';
+position: absolute;
+top: 0; left: 0; right: 0; bottom: 0;
+background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.06), transparent 40%);
+opacity: 0;
+transition: opacity 0.3s;
+pointer-events: none;
+z-index: 1;
+}
+.spotlight-card:hover::before {
+opacity: 1;
+}
+@keyframes scroll {
+0% { transform: translateX(0); }
+100% { transform: translateX(-50%); }
+}
+.animate-scroll {
+animation: scroll 30s linear infinite;
+}
+@keyframes signal-pulse {
+0% { transform: scale(0.95); opacity: 0.5; box-shadow: 0 0 0 0 rgba(234, 88, 12, 0.4); }
+70% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 10px rgba(234, 88, 12, 0); }
+100% { transform: scale(0.95); opacity: 0.5; box-shadow: 0 0 0 0 rgba(234, 88, 12, 0); }
+}
+.animate-signal {
+animation: signal-pulse 2s infinite;
+}
+.cube-scene {
+perspective: 1000px;
+position: relative;
+display: flex;
+justify-content: center;
+align-items: center;
+padding: 40px 0;
+width: 100%;
+height: 500px;
+cursor: grab;
+}
+.cube-scene:active {
+cursor: grabbing;
+}
+.ai-cube {
+position: relative;
+width: 140px;
+height: 140px;
+transform-style: preserve-3d;
+animation: spinCube 20s infinite linear;
+z-index: 10;
+transition: transform 0.1s ease-out;
+}
+.cube-face {
+position: absolute;
+width: 140px;
+height: 140px;
+background-color: #000;
+border: 1px solid rgba(249, 115, 22, 0.5);
+background-image: radial-gradient(rgba(249, 115, 22, 0.8) 1.5px, transparent 1.5px);
+background-size: 14px 14px;
+box-shadow: inset 0 0 40px rgba(249, 115, 22, 0.2);
+backface-visibility: hidden;
+opacity: 0.95;
+display: flex;
+align-items: center;
+justify-content: center;
+flex-direction: column;
+}
+.face-front  { transform: rotateY(0deg) translateZ(70px); }
+.face-back   { transform: rotateY(180deg) translateZ(70px); }
+.face-right  { transform: rotateY(90deg) translateZ(70px); }
+.face-left   { transform: rotateY(-90deg) translateZ(70px); }
+.face-top    { transform: rotateX(90deg) translateZ(70px); }
+.face-bottom { transform: rotateX(-90deg) translateZ(70px); }
+@keyframes spinCube {
+0% { transform: rotateX(-10deg) rotateY(0deg); }
+100% { transform: rotateX(-10deg) rotateY(360deg); }
+}
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #000; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #555; }
+@media (max-width: 768px) {
+.cube-scene { transform: scale(0.70); height: 400px; }
+}
+</head>
+<body class="antialiased selection:bg-orange-500/30 selection:text-white">
+
+    <!-- Fixed Navbar -->
+    <header class="fixed top-6 left-0 right-0 z-50 flex justify-center px-4 md:px-6" bis_size="{&quot;x&quot;:0,&quot;y&quot;:24,&quot;w&quot;:1490,&quot;h&quot;:54,&quot;abs_x&quot;:480,&quot;abs_y&quot;:67}">
+        <nav class="border-white/[0.08] flex shadow-black/80 bg-[#0A0A0A]/90 w-full max-w-4xl border rounded-full p-1.5 pl-3 shadow-2xl backdrop-blur-md items-center justify-between" aria-label="Menu principal" bis_size="{&quot;x&quot;:297,&quot;y&quot;:24,&quot;w&quot;:896,&quot;h&quot;:54,&quot;abs_x&quot;:777,&quot;abs_y&quot;:67}">
+            
+            <a href="/" class="flex items-center gap-3 pr-4 group shrink-0" aria-label="Retour à l'accueil GTMlab" bis_size="{&quot;x&quot;:310,&quot;y&quot;:33,&quot;w&quot;:114,&quot;h&quot;:36,&quot;abs_x&quot;:790,&quot;abs_y&quot;:76}">
+                <div class="flex shadow-lg shadow-orange-500/10 overflow-hidden group-hover:bg-orange-500/20 group-hover:border-orange-500/30 transition-all duration-300 bg-orange-500/10 w-9 h-9 border-orange-500/20 border rounded-xl relative items-center justify-center" bis_size="{&quot;x&quot;:310,&quot;y&quot;:33,&quot;w&quot;:36,&quot;h&quot;:36,&quot;abs_x&quot;:790,&quot;abs_y&quot;:76}">
+                    <iconify-icon icon="solar:box-linear" width="20" height="20" stroke-width="1.5" class="text-orange-500 transition-transform duration-300 group-hover:scale-110" aria-hidden="true" bis_size="{&quot;x&quot;:318,&quot;y&quot;:41,&quot;w&quot;:20,&quot;h&quot;:20,&quot;abs_x&quot;:798,&quot;abs_y&quot;:84}"></iconify-icon>
+                </div>
+                <span class="text-white font-semibold tracking-tight text-sm" bis_size="{&quot;x&quot;:358,&quot;y&quot;:41,&quot;w&quot;:50,&quot;h&quot;:20,&quot;abs_x&quot;:838,&quot;abs_y&quot;:84}">GTMlab</span>
+            </a>
+            
+            <div class="hidden md:flex gap-6 items-center flex-1 justify-center" bis_size="{&quot;x&quot;:424,&quot;y&quot;:41,&quot;w&quot;:532,&quot;h&quot;:20,&quot;abs_x&quot;:904,&quot;abs_y&quot;:84}">
+                <a href="#problem" class="text-sm font-medium text-zinc-400 hover:text-white transition-colors whitespace-nowrap" bis_size="{&quot;x&quot;:514,&quot;y&quot;:41,&quot;w&quot;:41,&quot;h&quot;:20,&quot;abs_x&quot;:994,&quot;abs_y&quot;:84}">Vision</a>
+                <a href="#agents" class="text-sm font-medium text-zinc-400 hover:text-white transition-colors whitespace-nowrap" bis_size="{&quot;x&quot;:579,&quot;y&quot;:41,&quot;w&quot;:102,&quot;h&quot;:20,&quot;abs_x&quot;:1059,&quot;abs_y&quot;:84}">Suite Agents IA</a>
+                <a href="#solutions" class="text-sm font-medium text-zinc-400 hover:text-white transition-colors whitespace-nowrap" bis_size="{&quot;x&quot;:706,&quot;y&quot;:41,&quot;w&quot;:62,&quot;h&quot;:20,&quot;abs_x&quot;:1186,&quot;abs_y&quot;:84}">Solutions</a>
+                <a href="#use-cases" class="text-sm font-medium text-zinc-400 hover:text-white transition-colors whitespace-nowrap" bis_size="{&quot;x&quot;:792,&quot;y&quot;:41,&quot;w&quot;:75,&quot;h&quot;:20,&quot;abs_x&quot;:1272,&quot;abs_y&quot;:84}">Cas Clients</a>
+            </div>
+
+            <div class="flex shrink-0 border-white/10 border-l ml-2 pl-4 items-center" bis_size="{&quot;x&quot;:965,&quot;y&quot;:31,&quot;w&quot;:220,&quot;h&quot;:40,&quot;abs_x&quot;:1445,&quot;abs_y&quot;:74}">
+                <a href="#demo" class="text-sm hover:bg-zinc-200 transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center gap-1.5 whitespace-nowrap font-medium text-black bg-white rounded-full pt-2.5 pr-5 pb-2.5 pl-5" bis_size="{&quot;x&quot;:982,&quot;y&quot;:31,&quot;w&quot;:203,&quot;h&quot;:40,&quot;abs_x&quot;:1462,&quot;abs_y&quot;:74}">
+                    Prendre rendez-vous
+                    <iconify-icon icon="solar:arrow-right-linear" width="16" height="16" stroke-width="1.5" aria-hidden="true" bis_size="{&quot;x&quot;:1150,&quot;y&quot;:43,&quot;w&quot;:16,&quot;h&quot;:16,&quot;abs_x&quot;:1630,&quot;abs_y&quot;:86}"></iconify-icon>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main bis_size="{&quot;x&quot;:0,&quot;y&quot;:0,&quot;w&quot;:1490,&quot;h&quot;:8068,&quot;abs_x&quot;:480,&quot;abs_y&quot;:43}" class="">
+        <!-- Hero Section -->
+        <section class="overflow-hidden min-h-[90vh] pt-44 pb-20 relative" bis_size="{&quot;x&quot;:0,&quot;y&quot;:0,&quot;w&quot;:1490,&quot;h&quot;:1465,&quot;abs_x&quot;:480,&quot;abs_y&quot;:43}">
+            
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-orange-600/10 blur-[120px] rounded-full pointer-events-none opacity-50 mix-blend-screen z-0" bis_size="{&quot;x&quot;:245,&quot;y&quot;:0,&quot;w&quot;:1000,&quot;h&quot;:500,&quot;abs_x&quot;:725,&quot;abs_y&quot;:43}"></div>
+            <div class="absolute inset-0 bg-grid-pattern z-0 pointer-events-none" bis_size="{&quot;x&quot;:0,&quot;y&quot;:0,&quot;w&quot;:1490,&quot;h&quot;:1465,&quot;abs_x&quot;:480,&quot;abs_y&quot;:43}"></div>
+
+            <div class="z-10 text-center max-w-7xl mr-auto ml-auto pr-6 pl-6 relative" bis_size="{&quot;x&quot;:105,&quot;y&quot;:176,&quot;w&quot;:1280,&quot;h&quot;:1209,&quot;abs_x&quot;:585,&quot;abs_y&quot;:219}">
+                
+                <!-- Badge -->
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-orange-500/20 bg-orange-500/5 text-orange-300 text-xs uppercase font-medium tracking-wide mb-8 hover:border-orange-500/40 transition-colors cursor-default shadow-[0_0_20px_rgba(234,88,12,0.1)] backdrop-blur-sm" bis_size="{&quot;x&quot;:575,&quot;y&quot;:178,&quot;w&quot;:338,&quot;h&quot;:26,&quot;abs_x&quot;:1055,&quot;abs_y&quot;:221}">
+                    <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-signal" bis_size="{&quot;x&quot;:588,&quot;y&quot;:188,&quot;w&quot;:6,&quot;h&quot;:6,&quot;abs_x&quot;:1068,&quot;abs_y&quot;:231}"></span>
+                    50+ Agents IA B2B · Pilotés par des experts
+                </div>
+
+                <h1 class="md:text-7xl lg:text-8xl leading-[1.05] text-5xl font-semibold text-white tracking-tight mb-8" bis_size="{&quot;x&quot;:129,&quot;y&quot;:236,&quot;w&quot;:1232,&quot;h&quot;:288,&quot;abs_x&quot;:609,&quot;abs_y&quot;:279}">
+    Propulsez votre Go-To-Market avec<br bis_size="{&quot;x&quot;:1017,&quot;y&quot;:322,&quot;w&quot;:0,&quot;h&quot;:116,&quot;abs_x&quot;:1497,&quot;abs_y&quot;:365}"> <span class="bg-clip-text text-transparent bg-gradient-to-br from-white via-white to-zinc-500 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]" bis_size="{&quot;x&quot;:182,&quot;y&quot;:418,&quot;w&quot;:1124,&quot;h&quot;:116,&quot;abs_x&quot;:662,&quot;abs_y&quot;:461}">l'Outbound Piloté par l'IA.</span>
+</h1>
+
+                <p class="leading-relaxed text-lg font-light text-zinc-400 max-w-2xl mr-auto mb-10 ml-auto" bis_size="{&quot;x&quot;:409,&quot;y&quot;:556,&quot;w&quot;:672,&quot;h&quot;:87,&quot;abs_x&quot;:889,&quot;abs_y&quot;:599}">
+                    GTMlab remplace l'outbound générique par une suite d'agents IA pilotés par des experts, conçus pour s'adapter à la complexité des cycles de vente B2B avancés et générer du revenu prévisible, à grande échelle.
+                </p>
+
+                <div class="flex flex-col mb-20 items-center justify-center" bis_size="{&quot;x&quot;:129,&quot;y&quot;:683,&quot;w&quot;:1232,&quot;h&quot;:72,&quot;abs_x&quot;:609,&quot;abs_y&quot;:726}">
+                    <div class="flex w-full max-w-lg mb-6 pr-4 pl-4 items-center justify-center" bis_size="{&quot;x&quot;:489,&quot;y&quot;:683,&quot;w&quot;:512,&quot;h&quot;:48,&quot;abs_x&quot;:969,&quot;abs_y&quot;:726}">
+                        <a href="#agents" class="group relative inline-flex h-12 items-center justify-center gap-2.5 rounded-full bg-white px-8 text-base font-medium text-black transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_40px_rgba(255,255,255,0.15)] hover:shadow-[0_0_60px_rgba(255,255,255,0.25)] ring-1 ring-black/5" bis_size="{&quot;x&quot;:596,&quot;y&quot;:683,&quot;w&quot;:297,&quot;h&quot;:48,&quot;abs_x&quot;:1076,&quot;abs_y&quot;:726}">
+                            <span class="cursor-pointer mix-blend-overlay border-black/5 border rounded-full absolute top-0 right-0 bottom-0 left-0" role="button" bis_size="{&quot;x&quot;:596,&quot;y&quot;:683,&quot;w&quot;:297,&quot;h&quot;:48,&quot;abs_x&quot;:1076,&quot;abs_y&quot;:726}">qsdqsd</span>
+                            Découvrir la suite d'Agents
+                            <iconify-icon icon="solar:arrow-down-linear" width="18" height="18" stroke-width="1.5" class="transition-transform duration-300 group-hover:translate-y-1" bis_size="{&quot;x&quot;:843,&quot;y&quot;:698,&quot;w&quot;:18,&quot;h&quot;:18,&quot;abs_x&quot;:1323,&quot;abs_y&quot;:741}"></iconify-icon>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- DATA FLOW VISUALIZATION -->
+                <div class="cube-scene hidden md:flex flex-row items-center justify-between w-full z-10 max-w-5xl mx-auto relative" aria-hidden="true" id="interactive-scene" style="min-height: 550px; padding: 2rem 0;" bis_size="{&quot;x&quot;:233,&quot;y&quot;:835,&quot;w&quot;:1024,&quot;h&quot;:550,&quot;abs_x&quot;:713,&quot;abs_y&quot;:878}">
+
+                    <style>
+                        @keyframes pulseLine {
+                            0% { left: -10%; opacity: 0; }
+                            10% { opacity: 1; }
+                            90% { opacity: 1; }
+                            100% { left: 100%; opacity: 0; }
+                        }
+                        @keyframes floatGentle {
+                            0%, 100% { transform: translateY(0); }
+                            50% { transform: translateY(-4px); }
+                        }
+                        @keyframes pulseGlow {
+                            0%, 100% { box-shadow: 0 0 30px rgba(249, 115, 22, 0.05); border-color: rgba(249, 115, 22, 0.2); }
+                            50% { box-shadow: 0 0 50px rgba(249, 115, 22, 0.2); border-color: rgba(249, 115, 22, 0.4); }
+                        }
+                    </style>
+
+                    <!-- Pipeline Animated Connection Line -->
+                    <div class="absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-y-1/2 z-0 pointer-events-none" bis_size="{&quot;x&quot;:233,&quot;y&quot;:1110,&quot;w&quot;:1024,&quot;h&quot;:1,&quot;abs_x&quot;:713,&quot;abs_y&quot;:1153}"></div>
+                    <div class="absolute top-1/2 left-0 h-[2px] w-1/3 bg-gradient-to-r from-transparent via-orange-500 to-transparent -translate-y-1/2 z-0 pointer-events-none" style="animation: pulseLine 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;" bis_size="{&quot;x&quot;:233,&quot;y&quot;:1109,&quot;w&quot;:341,&quot;h&quot;:2,&quot;abs_x&quot;:713,&quot;abs_y&quot;:1152}"></div>
+
+                    <!-- Left Column: Inputs -->
+                    <div class="w-[280px] flex flex-col gap-3 z-10" bis_size="{&quot;x&quot;:233,&quot;y&quot;:978,&quot;w&quot;:280,&quot;h&quot;:264,&quot;abs_x&quot;:713,&quot;abs_y&quot;:1021}">
+                        <div class="text-xs font-mono text-zinc-500 uppercase tracking-wide pl-1 mb-2" bis_size="{&quot;x&quot;:233,&quot;y&quot;:978,&quot;w&quot;:280,&quot;h&quot;:16,&quot;abs_x&quot;:713,&quot;abs_y&quot;:1021}">1. Inputs complexes</div>
+                        
+                        <div class="flex items-center gap-3 p-3.5 rounded-xl bg-[#09090b]/90 backdrop-blur-md border border-white/5 shadow-lg relative group transition-all hover:border-white/10" style="animation: floatGentle 6s ease-in-out infinite;" bis_size="{&quot;x&quot;:233,&quot;y&quot;:1014,&quot;w&quot;:280,&quot;h&quot;:68,&quot;abs_x&quot;:713,&quot;abs_y&quot;:1057}">
+                            <div class="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl" bis_size="{&quot;x&quot;:234,&quot;y&quot;:1015,&quot;w&quot;:278,&quot;h&quot;:66,&quot;abs_x&quot;:714,&quot;abs_y&quot;:1058}"></div>
+                            <div class="w-9 h-9 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center text-blue-400 z-10 shrink-0" bis_size="{&quot;x&quot;:248,&quot;y&quot;:1030,&quot;w&quot;:36,&quot;h&quot;:36,&quot;abs_x&quot;:728,&quot;abs_y&quot;:1073}">
+                                <iconify-icon icon="solar:server-linear" width="18" stroke-width="1.5" bis_size="{&quot;x&quot;:257,&quot;y&quot;:1039,&quot;w&quot;:18,&quot;h&quot;:18,&quot;abs_x&quot;:737,&quot;abs_y&quot;:1082}"></iconify-icon>
+                            </div>
+                            <div class="flex flex-col z-10 min-w-0" bis_size="{&quot;x&quot;:296,&quot;y&quot;:1029,&quot;w&quot;:140,&quot;h&quot;:38,&quot;abs_x&quot;:776,&quot;abs_y&quot;:1072}">
+                                <span class="text-sm font-normal text-zinc-200 truncate" bis_size="{&quot;x&quot;:296,&quot;y&quot;:1029,&quot;w&quot;:140,&quot;h&quot;:20,&quot;abs_x&quot;:776,&quot;abs_y&quot;:1072}">Données CRM</span>
+                                <span class="text-xs text-zinc-500 truncate mt-0.5" bis_size="{&quot;x&quot;:296,&quot;y&quot;:1051,&quot;w&quot;:140,&quot;h&quot;:16,&quot;abs_x&quot;:776,&quot;abs_y&quot;:1094}">Historique, deals gagnés</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-3 p-3.5 rounded-xl bg-[#09090b]/90 backdrop-blur-md border border-white/5 shadow-lg relative group transition-all hover:border-white/10" style="animation: floatGentle 6s ease-in-out 1.5s infinite;" bis_size="{&quot;x&quot;:233,&quot;y&quot;:1094,&quot;w&quot;:280,&quot;h&quot;:68,&quot;abs_x&quot;:713,&quot;abs_y&quot;:1137}">
+                            <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl" bis_size="{&quot;x&quot;:234,&quot;y&quot;:1095,&quot;w&quot;:278,&quot;h&quot;:66,&quot;abs_x&quot;:714,&quot;abs_y&quot;:1138}"></div>
+                            <div class="w-9 h-9 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center text-indigo-400 z-10 shrink-0" bis_size="{&quot;x&quot;:248,&quot;y&quot;:1110,&quot;w&quot;:36,&quot;h&quot;:36,&quot;abs_x&quot;:728,&quot;abs_y&quot;:1153}">
+                                <iconify-icon icon="solar:radar-linear" width="18" stroke-width="1.5" bis_size="{&quot;x&quot;:257,&quot;y&quot;:1119,&quot;w&quot;:18,&quot;h&quot;:18,&quot;abs_x&quot;:737,&quot;abs_y&quot;:1162}"></iconify-icon>
+                            </div>
+                            <div class="flex flex-col z-10 min-w-0" bis_size="{&quot;x&quot;:296,&quot;y&quot;:1109,&quot;w&quot;:116,&quot;h&quot;:38,&quot;abs_x&quot;:776,&quot;abs_y&quot;:1152}">
+                                <span class="text-sm font-normal text-zinc-200 truncate" bis_size="{&quot;x&quot;:296,&quot;y&quot;:1109,&quot;w&quot;:116,&quot;h&quot;:20,&quot;abs_x&quot;:776,&quot;abs_y&quot;:1152}">Signaux Multiples</span>
+                                <span class="text-xs text-zinc-500 truncate mt-0.5" bis_size="{&quot;x&quot;:296,&quot;y&quot;:1131,&quot;w&quot;:116,&quot;h&quot;:16,&quot;abs_x&quot;:776,&quot;abs_y&quot;:1174}">Web, actus, technos</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-3 p-3.5 rounded-xl bg-[#09090b]/90 backdrop-blur-md border border-white/5 shadow-lg relative group transition-all hover:border-white/10" style="animation: floatGentle 6s ease-in-out 3s infinite;" bis_size="{&quot;x&quot;:233,&quot;y&quot;:1174,&quot;w&quot;:280,&quot;h&quot;:68,&quot;abs_x&quot;:713,&quot;abs_y&quot;:1217}">
+                            <div class="absolute inset-0 bg-gradient-to-r from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl" bis_size="{&quot;x&quot;:234,&quot;y&quot;:1175,&quot;w&quot;:278,&quot;h&quot;:66,&quot;abs_x&quot;:714,&quot;abs_y&quot;:1218}"></div>
+                            <div class="w-9 h-9 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center text-green-400 z-10 shrink-0" bis_size="{&quot;x&quot;:248,&quot;y&quot;:1190,&quot;w&quot;:36,&quot;h&quot;:36,&quot;abs_x&quot;:728,&quot;abs_y&quot;:1233}">
+                                <iconify-icon icon="solar:graph-new-linear" width="18" stroke-width="1.5" bis_size="{&quot;x&quot;:257,&quot;y&quot;:1199,&quot;w&quot;:18,&quot;h&quot;:18,&quot;abs_x&quot;:737,&quot;abs_y&quot;:1242}"></iconify-icon>
+                            </div>
+                            <div class="flex flex-col z-10 min-w-0" bis_size="{&quot;x&quot;:296,&quot;y&quot;:1189,&quot;w&quot;:137,&quot;h&quot;:38,&quot;abs_x&quot;:776,&quot;abs_y&quot;:1232}">
+                                <span class="text-sm font-normal text-zinc-200 truncate" bis_size="{&quot;x&quot;:296,&quot;y&quot;:1189,&quot;w&quot;:137,&quot;h&quot;:20,&quot;abs_x&quot;:776,&quot;abs_y&quot;:1232}">Benchmarks Secteur</span>
+                                <span class="text-xs text-zinc-500 truncate mt-0.5" bis_size="{&quot;x&quot;:296,&quot;y&quot;:1211,&quot;w&quot;:137,&quot;h&quot;:16,&quot;abs_x&quot;:776,&quot;abs_y&quot;:1254}">Performances ICP</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Center Column: Processing Engine -->
+                    <div class="flex-1 flex flex-col items-center justify-center relative min-w-[320px] z-10 px-4" bis_size="{&quot;x&quot;:513,&quot;y&quot;:909,&quot;w&quot;:464,&quot;h&quot;:403,&quot;abs_x&quot;:993,&quot;abs_y&quot;:952}">
+                        
+                        <div class="text-xs font-mono text-orange-500 uppercase tracking-wide mb-6 bg-orange-500/10 px-4 py-1.5 rounded-full border border-orange-500/20 shadow-[0_0_15px_rgba(249,115,22,0.1)]" bis_size="{&quot;x&quot;:665,&quot;y&quot;:909,&quot;w&quot;:158,&quot;h&quot;:30,&quot;abs_x&quot;:1145,&quot;abs_y&quot;:952}">
+                            2. Suite Agents IA
+                        </div>
+                        
+                        <div class="relative bg-black/90 backdrop-blur-xl border border-orange-500/30 rounded-3xl p-6 w-full max-w-[340px] z-10" style="animation: pulseGlow 4s ease-in-out infinite;" bis_size="{&quot;x&quot;:575,&quot;y&quot;:963,&quot;w&quot;:340,&quot;h&quot;:349,&quot;abs_x&quot;:1055,&quot;abs_y&quot;:1006}">
+                            
+                            <div class="absolute -inset-4 bg-gradient-to-b from-orange-500/20 to-transparent opacity-30 blur-2xl pointer-events-none rounded-[3rem] z-[-1]" bis_size="{&quot;x&quot;:560,&quot;y&quot;:948,&quot;w&quot;:370,&quot;h&quot;:379,&quot;abs_x&quot;:1040,&quot;abs_y&quot;:991}"></div>
+
+                            <div class="flex items-center gap-4 mb-6 pb-6 border-b border-white/5" bis_size="{&quot;x&quot;:600,&quot;y&quot;:988,&quot;w&quot;:290,&quot;h&quot;:75,&quot;abs_x&quot;:1080,&quot;abs_y&quot;:1031}">
+                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white shadow-[0_0_20px_rgba(249,115,22,0.4)] shrink-0" bis_size="{&quot;x&quot;:600,&quot;y&quot;:989,&quot;w&quot;:48,&quot;h&quot;:48,&quot;abs_x&quot;:1080,&quot;abs_y&quot;:1032}">
+                                    <iconify-icon icon="solar:cpu-linear" width="24" stroke-width="1.5" bis_size="{&quot;x&quot;:612,&quot;y&quot;:1001,&quot;w&quot;:24,&quot;h&quot;:24,&quot;abs_x&quot;:1092,&quot;abs_y&quot;:1044}"></iconify-icon>
+                                </div>
+                                <div class="min-w-0" bis_size="{&quot;x&quot;:664,&quot;y&quot;:988,&quot;w&quot;:140,&quot;h&quot;:50,&quot;abs_x&quot;:1144,&quot;abs_y&quot;:1031}">
+                                    <div class="text-xl font-medium text-white tracking-tight truncate" bis_size="{&quot;x&quot;:664,&quot;y&quot;:988,&quot;w&quot;:140,&quot;h&quot;:28,&quot;abs_x&quot;:1144,&quot;abs_y&quot;:1031}">GTMlab Copilot</div>
+                                    <div class="text-xs text-orange-400 font-mono flex items-center gap-1.5 mt-1.5" bis_size="{&quot;x&quot;:664,&quot;y&quot;:1022,&quot;w&quot;:140,&quot;h&quot;:16,&quot;abs_x&quot;:1144,&quot;abs_y&quot;:1065}">
+                                        <span class="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(249,115,22,0.8)]" bis_size="{&quot;x&quot;:664,&quot;y&quot;:1027,&quot;w&quot;:6,&quot;h&quot;:6,&quot;abs_x&quot;:1144,&quot;abs_y&quot;:1070}"></span> Piloté par experts
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-2.5" bis_size="{&quot;x&quot;:600,&quot;y&quot;:1087,&quot;w&quot;:290,&quot;h&quot;:200,&quot;abs_x&quot;:1080,&quot;abs_y&quot;:1130}">
+                                <div class="flex items-center gap-3 p-2.5 rounded-xl bg-zinc-900/40 border border-white/5 transition-colors hover:bg-zinc-900 hover:border-white/10" bis_size="{&quot;x&quot;:600,&quot;y&quot;:1087,&quot;w&quot;:290,&quot;h&quot;:60,&quot;abs_x&quot;:1080,&quot;abs_y&quot;:1130}">
+                                    <div class="w-6 h-6 rounded-md bg-zinc-800 flex items-center justify-center text-xs font-mono text-zinc-400 border border-white/5 shrink-0" bis_size="{&quot;x&quot;:611,&quot;y&quot;:1105,&quot;w&quot;:24,&quot;h&quot;:24,&quot;abs_x&quot;:1091,&quot;abs_y&quot;:1148}">01</div>
+                                    <div class="flex-1 min-w-0" bis_size="{&quot;x&quot;:647,&quot;y&quot;:1098,&quot;w&quot;:206,&quot;h&quot;:38,&quot;abs_x&quot;:1127,&quot;abs_y&quot;:1141}">
+                                        <div class="text-sm font-normal text-zinc-200 truncate" bis_size="{&quot;x&quot;:647,&quot;y&quot;:1098,&quot;w&quot;:206,&quot;h&quot;:20,&quot;abs_x&quot;:1127,&quot;abs_y&quot;:1141}">ICP Refinement</div>
+                                        <div class="text-xs text-zinc-500 font-mono mt-0.5 truncate" bis_size="{&quot;x&quot;:647,&quot;y&quot;:1120,&quot;w&quot;:206,&quot;h&quot;:16,&quot;abs_x&quot;:1127,&quot;abs_y&quot;:1163}">Data-driven targeting</div>
+                                    </div>
+                                    <iconify-icon icon="solar:target-linear" width="14" class="text-orange-500 shrink-0" bis_size="{&quot;x&quot;:865,&quot;y&quot;:1110,&quot;w&quot;:14,&quot;h&quot;:14,&quot;abs_x&quot;:1345,&quot;abs_y&quot;:1153}"></iconify-icon>
+                                </div>
+                                
+                                <div class="flex items-center gap-3 p-2.5 rounded-xl bg-zinc-900/40 border border-white/5 transition-colors hover:bg-zinc-900 hover:border-white/10" bis_size="{&quot;x&quot;:600,&quot;y&quot;:1157,&quot;w&quot;:290,&quot;h&quot;:60,&quot;abs_x&quot;:1080,&quot;abs_y&quot;:1200}">
+                                    <div class="w-6 h-6 rounded-md bg-zinc-800 flex items-center justify-center text-xs font-mono text-zinc-400 border border-white/5 shrink-0" bis_size="{&quot;x&quot;:611,&quot;y&quot;:1175,&quot;w&quot;:24,&quot;h&quot;:24,&quot;abs_x&quot;:1091,&quot;abs_y&quot;:1218}">02</div>
+                                    <div class="flex-1 min-w-0" bis_size="{&quot;x&quot;:647,&quot;y&quot;:1168,&quot;w&quot;:206,&quot;h&quot;:38,&quot;abs_x&quot;:1127,&quot;abs_y&quot;:1211}">
+                                        <div class="text-sm font-normal text-zinc-200 truncate" bis_size="{&quot;x&quot;:647,&quot;y&quot;:1168,&quot;w&quot;:206,&quot;h&quot;:20,&quot;abs_x&quot;:1127,&quot;abs_y&quot;:1211}">Account Research</div>
+                                        <div class="text-xs text-zinc-500 font-mono mt-0.5 truncate" bis_size="{&quot;x&quot;:647,&quot;y&quot;:1190,&quot;w&quot;:206,&quot;h&quot;:16,&quot;abs_x&quot;:1127,&quot;abs_y&quot;:1233}">Listes enrichies</div>
+                                    </div>
+                                    <iconify-icon icon="solar:database-linear" width="14" class="text-orange-500 shrink-0" bis_size="{&quot;x&quot;:865,&quot;y&quot;:1180,&quot;w&quot;:14,&quot;h&quot;:14,&quot;abs_x&quot;:1345,&quot;abs_y&quot;:1223}"></iconify-icon>
+                                </div>
+
+                                <div class="flex items-center gap-3 p-2.5 rounded-xl bg-zinc-900/40 border border-white/5 transition-colors hover:bg-zinc-900 hover:border-white/10" bis_size="{&quot;x&quot;:600,&quot;y&quot;:1227,&quot;w&quot;:290,&quot;h&quot;:60,&quot;abs_x&quot;:1080,&quot;abs_y&quot;:1270}">
+                                    <div class="w-6 h-6 rounded-md bg-zinc-800 flex items-center justify-center text-xs font-mono text-zinc-400 border border-white/5 shrink-0" bis_size="{&quot;x&quot;:611,&quot;y&quot;:1245,&quot;w&quot;:24,&quot;h&quot;:24,&quot;abs_x&quot;:1091,&quot;abs_y&quot;:1288}">03</div>
+                                    <div class="flex-1 min-w-0" bis_size="{&quot;x&quot;:647,&quot;y&quot;:1238,&quot;w&quot;:206,&quot;h&quot;:38,&quot;abs_x&quot;:1127,&quot;abs_y&quot;:1281}">
+                                        <div class="text-sm font-normal text-zinc-200 truncate" bis_size="{&quot;x&quot;:647,&quot;y&quot;:1238,&quot;w&quot;:206,&quot;h&quot;:20,&quot;abs_x&quot;:1127,&quot;abs_y&quot;:1281}">Warm Outreach</div>
+                                        <div class="text-xs text-zinc-500 font-mono mt-0.5 truncate" bis_size="{&quot;x&quot;:647,&quot;y&quot;:1260,&quot;w&quot;:206,&quot;h&quot;:16,&quot;abs_x&quot;:1127,&quot;abs_y&quot;:1303}">Copywriting IA B2B</div>
+                                    </div>
+                                    <iconify-icon icon="solar:pen-new-square-linear" width="14" class="text-orange-500 shrink-0" bis_size="{&quot;x&quot;:865,&quot;y&quot;:1250,&quot;w&quot;:14,&quot;h&quot;:14,&quot;abs_x&quot;:1345,&quot;abs_y&quot;:1293}"></iconify-icon>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Outputs -->
+                    <div class="w-[280px] flex flex-col gap-3 z-10" bis_size="{&quot;x&quot;:977,&quot;y&quot;:978,&quot;w&quot;:280,&quot;h&quot;:264,&quot;abs_x&quot;:1457,&quot;abs_y&quot;:1021}">
+                        <div class="text-xs font-mono text-zinc-500 uppercase tracking-wide text-right pr-1 mb-2" bis_size="{&quot;x&quot;:977,&quot;y&quot;:978,&quot;w&quot;:280,&quot;h&quot;:16,&quot;abs_x&quot;:1457,&quot;abs_y&quot;:1021}">3. Scalable Results</div>
+                        
+                        <div class="flex items-center gap-3 p-3.5 rounded-xl bg-[#09090b]/90 backdrop-blur-md border border-white/5 shadow-lg relative group transition-all hover:border-white/10" style="animation: floatGentle 6s ease-in-out 0.5s infinite;" bis_size="{&quot;x&quot;:977,&quot;y&quot;:1014,&quot;w&quot;:280,&quot;h&quot;:68,&quot;abs_x&quot;:1457,&quot;abs_y&quot;:1057}">
+                            <div class="absolute inset-0 bg-gradient-to-l from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl" bis_size="{&quot;x&quot;:978,&quot;y&quot;:1015,&quot;w&quot;:278,&quot;h&quot;:66,&quot;abs_x&quot;:1458,&quot;abs_y&quot;:1058}"></div>
+                            <div class="flex flex-col text-right flex-1 min-w-0 z-10" bis_size="{&quot;x&quot;:992,&quot;y&quot;:1029,&quot;w&quot;:202,&quot;h&quot;:38,&quot;abs_x&quot;:1472,&quot;abs_y&quot;:1072}">
+                                <span class="text-sm font-normal text-zinc-200 truncate" bis_size="{&quot;x&quot;:992,&quot;y&quot;:1029,&quot;w&quot;:202,&quot;h&quot;:20,&quot;abs_x&quot;:1472,&quot;abs_y&quot;:1072}">Sales Allocation</span>
+                                <span class="text-xs text-zinc-500 truncate mt-0.5" bis_size="{&quot;x&quot;:992,&quot;y&quot;:1051,&quot;w&quot;:202,&quot;h&quot;:16,&quot;abs_x&quot;:1472,&quot;abs_y&quot;:1094}">Routing &amp; Tiering</span>
+                            </div>
+                            <div class="w-9 h-9 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center text-orange-400 z-10 shrink-0" bis_size="{&quot;x&quot;:1206,&quot;y&quot;:1030,&quot;w&quot;:36,&quot;h&quot;:36,&quot;abs_x&quot;:1686,&quot;abs_y&quot;:1073}">
+                                <iconify-icon icon="solar:routing-2-linear" width="18" stroke-width="1.5" bis_size="{&quot;x&quot;:1215,&quot;y&quot;:1039,&quot;w&quot;:18,&quot;h&quot;:18,&quot;abs_x&quot;:1695,&quot;abs_y&quot;:1082}"></iconify-icon>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-3 p-3.5 rounded-xl bg-[#09090b]/90 backdrop-blur-md border border-white/5 shadow-lg relative group transition-all hover:border-white/10" style="animation: floatGentle 6s ease-in-out 2s infinite;" bis_size="{&quot;x&quot;:977,&quot;y&quot;:1094,&quot;w&quot;:280,&quot;h&quot;:68,&quot;abs_x&quot;:1457,&quot;abs_y&quot;:1137}">
+                            <div class="absolute inset-0 bg-gradient-to-l from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl" bis_size="{&quot;x&quot;:978,&quot;y&quot;:1095,&quot;w&quot;:278,&quot;h&quot;:66,&quot;abs_x&quot;:1458,&quot;abs_y&quot;:1138}"></div>
+                            <div class="flex flex-col text-right flex-1 min-w-0 z-10" bis_size="{&quot;x&quot;:992,&quot;y&quot;:1109,&quot;w&quot;:202,&quot;h&quot;:38,&quot;abs_x&quot;:1472,&quot;abs_y&quot;:1152}">
+                                <span class="text-sm font-normal text-zinc-200 truncate" bis_size="{&quot;x&quot;:992,&quot;y&quot;:1109,&quot;w&quot;:202,&quot;h&quot;:20,&quot;abs_x&quot;:1472,&quot;abs_y&quot;:1152}">RevOps Insights</span>
+                                <span class="text-xs text-zinc-500 truncate mt-0.5" bis_size="{&quot;x&quot;:992,&quot;y&quot;:1131,&quot;w&quot;:202,&quot;h&quot;:16,&quot;abs_x&quot;:1472,&quot;abs_y&quot;:1174}">Tableaux de bord IA</span>
+                            </div>
+                            <div class="w-9 h-9 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center text-blue-400 z-10 shrink-0" bis_size="{&quot;x&quot;:1206,&quot;y&quot;:1110,&quot;w&quot;:36,&quot;h&quot;:36,&quot;abs_x&quot;:1686,&quot;abs_y&quot;:1153}">
+                                <iconify-icon icon="solar:chart-square-linear" width="18" stroke-width="1.5" bis_size="{&quot;x&quot;:1215,&quot;y&quot;:1119,&quot;w&quot;:18,&quot;h&quot;:18,&quot;abs_x&quot;:1695,&quot;abs_y&quot;:1162}"></iconify-icon>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-3 p-3.5 rounded-xl bg-[#09090b]/90 backdrop-blur-md border border-white/5 shadow-lg relative group transition-all hover:border-white/10" style="animation: floatGentle 6s ease-in-out 3.5s infinite;" bis_size="{&quot;x&quot;:977,&quot;y&quot;:1174,&quot;w&quot;:280,&quot;h&quot;:68,&quot;abs_x&quot;:1457,&quot;abs_y&quot;:1217}">
+                            <div class="absolute inset-0 bg-gradient-to-l from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl" bis_size="{&quot;x&quot;:978,&quot;y&quot;:1175,&quot;w&quot;:278,&quot;h&quot;:66,&quot;abs_x&quot;:1458,&quot;abs_y&quot;:1218}"></div>
+                            <div class="flex flex-col text-right flex-1 min-w-0 z-10" bis_size="{&quot;x&quot;:992,&quot;y&quot;:1189,&quot;w&quot;:202,&quot;h&quot;:38,&quot;abs_x&quot;:1472,&quot;abs_y&quot;:1232}">
+                                <span class="text-sm font-normal text-zinc-200 truncate" bis_size="{&quot;x&quot;:992,&quot;y&quot;:1189,&quot;w&quot;:202,&quot;h&quot;:20,&quot;abs_x&quot;:1472,&quot;abs_y&quot;:1232}">Revenu Prévisible</span>
+                                <span class="text-xs text-zinc-500 truncate mt-0.5" bis_size="{&quot;x&quot;:992,&quot;y&quot;:1211,&quot;w&quot;:202,&quot;h&quot;:16,&quot;abs_x&quot;:1472,&quot;abs_y&quot;:1254}">Croissance scalable</span>
+                            </div>
+                            <div class="w-9 h-9 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center text-green-400 z-10 shrink-0" bis_size="{&quot;x&quot;:1206,&quot;y&quot;:1190,&quot;w&quot;:36,&quot;h&quot;:36,&quot;abs_x&quot;:1686,&quot;abs_y&quot;:1233}">
+                                <iconify-icon icon="solar:wad-of-money-linear" width="18" stroke-width="1.5" bis_size="{&quot;x&quot;:1215,&quot;y&quot;:1199,&quot;w&quot;:18,&quot;h&quot;:18,&quot;abs_x&quot;:1695,&quot;abs_y&quot;:1242}"></iconify-icon>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Problem Section -->
+        <section id="problem" class="py-32 border-t border-white/5 bg-[#020202] relative z-20" bis_size="{&quot;x&quot;:0,&quot;y&quot;:1465,&quot;w&quot;:1490,&quot;h&quot;:630,&quot;abs_x&quot;:480,&quot;abs_y&quot;:1508}">
+            <div class="max-w-4xl mx-auto px-6 text-center" bis_size="{&quot;x&quot;:297,&quot;y&quot;:1594,&quot;w&quot;:896,&quot;h&quot;:373,&quot;abs_x&quot;:777,&quot;abs_y&quot;:1637}">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-500/10 text-red-500 mb-8 border border-red-500/20" bis_size="{&quot;x&quot;:721,&quot;y&quot;:1594,&quot;w&quot;:48,&quot;h&quot;:48,&quot;abs_x&quot;:1201,&quot;abs_y&quot;:1637}">
+                    <iconify-icon icon="solar:close-circle-linear" width="24" stroke-width="1.5" bis_size="{&quot;x&quot;:733,&quot;y&quot;:1606,&quot;w&quot;:24,&quot;h&quot;:24,&quot;abs_x&quot;:1213,&quot;abs_y&quot;:1649}"></iconify-icon>
+                </div>
+                <h2 class="md:text-5xl leading-tight text-4xl font-semibold text-white tracking-tight mb-8" bis_size="{&quot;x&quot;:321,&quot;y&quot;:1674,&quot;w&quot;:848,&quot;h&quot;:144,&quot;abs_x&quot;:801,&quot;abs_y&quot;:1717}">
+    L'outbound traditionnel est obsolète pour <br class="hidden md:block" bis_size="{&quot;x&quot;:796,&quot;y&quot;:1716,&quot;w&quot;:0,&quot;h&quot;:59,&quot;abs_x&quot;:1276,&quot;abs_y&quot;:1759}">les ventes B2B complexes.
+</h2>
+                <p class="text-lg text-zinc-400 leading-relaxed max-w-2xl mx-auto" bis_size="{&quot;x&quot;:409,&quot;y&quot;:1850,&quot;w&quot;:672,&quot;h&quot;:117,&quot;abs_x&quot;:889,&quot;abs_y&quot;:1893}">
+                    Les outils basiques (plateformes d'outbound, AI SDRs) échouent parce qu'ils utilisent une approche <span class="text-white font-medium" bis_size="{&quot;x&quot;:617,&quot;y&quot;:1884,&quot;w&quot;:169,&quot;h&quot;:21,&quot;abs_x&quot;:1097,&quot;abs_y&quot;:1927}">« one-size-fits-all »</span> qui ne capte pas les nuances de l'ICP, ne s'alignent pas avec l'organisation commerciale, et ne s'intègrent pas correctement au CRM, empêchant le suivi des résultats.
+                </p>
+            </div>
+        </section>
+
+        <!-- THE MACHINE: 5 Pillars / Agents Suite -->
+        <section id="agents" class="py-32 bg-[#050505] border-y border-white/5" bis_size="{&quot;x&quot;:0,&quot;y&quot;:2095,&quot;w&quot;:1490,&quot;h&quot;:2470,&quot;abs_x&quot;:480,&quot;abs_y&quot;:2138}">
+            <div class="max-w-6xl mx-auto px-6" bis_size="{&quot;x&quot;:169,&quot;y&quot;:2224,&quot;w&quot;:1152,&quot;h&quot;:2212,&quot;abs_x&quot;:649,&quot;abs_y&quot;:2267}">
+                <div class="text-center mb-24" bis_size="{&quot;x&quot;:193,&quot;y&quot;:2224,&quot;w&quot;:1104,&quot;h&quot;:178,&quot;abs_x&quot;:673,&quot;abs_y&quot;:2267}">
+                    <h2 class="text-3xl md:text-5xl font-semibold text-white tracking-tight mb-6" bis_size="{&quot;x&quot;:193,&quot;y&quot;:2224,&quot;w&quot;:1104,&quot;h&quot;:96,&quot;abs_x&quot;:673,&quot;abs_y&quot;:2267}">
+                        Une suite de <span class="text-orange-500" bis_size="{&quot;x&quot;:733,&quot;y&quot;:2218,&quot;w&quot;:308,&quot;h&quot;:59,&quot;abs_x&quot;:1213,&quot;abs_y&quot;:2261}">50+ agents IA</span><br bis_size="{&quot;x&quot;:1041,&quot;y&quot;:2218,&quot;w&quot;:0,&quot;h&quot;:59,&quot;abs_x&quot;:1521,&quot;abs_y&quot;:2261}">pilotés par des experts
+                    </h2>
+                    <p class="text-zinc-400 text-lg max-w-2xl mx-auto leading-relaxed" bis_size="{&quot;x&quot;:409,&quot;y&quot;:2344,&quot;w&quot;:672,&quot;h&quot;:58,&quot;abs_x&quot;:889,&quot;abs_y&quot;:2387}">
+                        Construite par des stratèges B2B seniors, la suite GTMlab fonctionne sous supervision experte pour maximiser la performance outbound à chaque étape.
+                    </p>
+                </div>
+
+                <!-- Step 1: ICP Refinement AI -->
+                <div class="relative pl-8 md:pl-16 pb-24 border-l border-zinc-800 last:border-0 group scroll-mt-32" bis_size="{&quot;x&quot;:193,&quot;y&quot;:2499,&quot;w&quot;:1104,&quot;h&quot;:401,&quot;abs_x&quot;:673,&quot;abs_y&quot;:2542}">
+                    <div class="absolute left-0 top-0 -translate-x-1/2 w-12 h-12 rounded-full bg-[#111] border border-zinc-700 flex items-center justify-center text-white z-10 shadow-[0_0_0_8px_#050505] group-hover:border-orange-500 transition-colors" bis_size="{&quot;x&quot;:170,&quot;y&quot;:2499,&quot;w&quot;:48,&quot;h&quot;:48,&quot;abs_x&quot;:650,&quot;abs_y&quot;:2542}">
+                        <iconify-icon icon="solar:target-linear" width="24" stroke-width="1.5" bis_size="{&quot;x&quot;:182,&quot;y&quot;:2511,&quot;w&quot;:24,&quot;h&quot;:24,&quot;abs_x&quot;:662,&quot;abs_y&quot;:2554}"></iconify-icon>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start" bis_size="{&quot;x&quot;:258,&quot;y&quot;:2499,&quot;w&quot;:1039,&quot;h&quot;:305,&quot;abs_x&quot;:738,&quot;abs_y&quot;:2542}">
+                        <div class="lg:col-span-5 pt-1" bis_size="{&quot;x&quot;:258,&quot;y&quot;:2499,&quot;w&quot;:404,&quot;h&quot;:162,&quot;abs_x&quot;:738,&quot;abs_y&quot;:2542}">
+                            <span class="text-orange-400 font-mono text-xs uppercase tracking-wide mb-3 block" bis_size="{&quot;x&quot;:258,&quot;y&quot;:2503,&quot;w&quot;:404,&quot;h&quot;:16,&quot;abs_x&quot;:738,&quot;abs_y&quot;:2546}">Pilier 01</span>
+                            <h3 class="text-3xl text-white font-semibold mb-4 tracking-tight" bis_size="{&quot;x&quot;:258,&quot;y&quot;:2531,&quot;w&quot;:404,&quot;h&quot;:36,&quot;abs_x&quot;:738,&quot;abs_y&quot;:2574}">ICP Refinement AI</h3>
+                            <p class="text-zinc-400 text-base leading-relaxed" bis_size="{&quot;x&quot;:258,&quot;y&quot;:2583,&quot;w&quot;:404,&quot;h&quot;:78,&quot;abs_x&quot;:738,&quot;abs_y&quot;:2626}">
+                                Affûte l'ICP grâce aux données clients réelles et à l'expertise sectorielle. Nous remplaçons les suppositions par des certitudes data-driven.
+                            </p>
+                        </div>
+                        <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4" bis_size="{&quot;x&quot;:710,&quot;y&quot;:2499,&quot;w&quot;:586,&quot;h&quot;:305,&quot;abs_x&quot;:1190,&quot;abs_y&quot;:2542}">
+                            <!-- Agent -->
+                            <div class="bg-zinc-900/40 border border-white/5 rounded-2xl p-5 hover:bg-zinc-900/80 hover:border-white/10 transition-colors" bis_size="{&quot;x&quot;:710,&quot;y&quot;:2499,&quot;w&quot;:285,&quot;h&quot;:144,&quot;abs_x&quot;:1190,&quot;abs_y&quot;:2542}">
+                                <div class="flex items-center gap-3 mb-3" bis_size="{&quot;x&quot;:731,&quot;y&quot;:2520,&quot;w&quot;:243,&quot;h&quot;:32,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:2563}">
+                                    <div class="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-400" bis_size="{&quot;x&quot;:731,&quot;y&quot;:2520,&quot;w&quot;:32,&quot;h&quot;:32,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:2563}">
+                                        <iconify-icon icon="solar:shield-warning-linear" width="18" bis_size="{&quot;x&quot;:738,&quot;y&quot;:2527,&quot;w&quot;:18,&quot;h&quot;:18,&quot;abs_x&quot;:1218,&quot;abs_y&quot;:2570}"></iconify-icon>
+                                    </div>
+                                    <h4 class="text-white text-sm font-medium" bis_size="{&quot;x&quot;:775,&quot;y&quot;:2526,&quot;w&quot;:99,&quot;h&quot;:20,&quot;abs_x&quot;:1255,&quot;abs_y&quot;:2569}">ICP Challenger</h4>
+                                </div>
+                                <p class="text-zinc-500 text-xs leading-relaxed" bis_size="{&quot;x&quot;:731,&quot;y&quot;:2564,&quot;w&quot;:243,&quot;h&quot;:39,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:2607}">Confronte les hypothèses ICP avec les données CRM et benchmarks sectoriels.</p>
+                            </div>
+                            <!-- Agent -->
+                            <div class="bg-zinc-900/40 border border-white/5 rounded-2xl p-5 hover:bg-zinc-900/80 hover:border-white/10 transition-colors" bis_size="{&quot;x&quot;:1011,&quot;y&quot;:2499,&quot;w&quot;:285,&quot;h&quot;:144,&quot;abs_x&quot;:1491,&quot;abs_y&quot;:2542}">
+                                <div class="flex items-center gap-3 mb-3" bis_size="{&quot;x&quot;:1032,&quot;y&quot;:2520,&quot;w&quot;:243,&quot;h&quot;:32,&quot;abs_x&quot;:1512,&quot;abs_y&quot;:2563}">
+                                    <div class="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-400" bis_size="{&quot;x&quot;:1032,&quot;y&quot;:2520,&quot;w&quot;:32,&quot;h&quot;:32,&quot;abs_x&quot;:1512,&quot;abs_y&quot;:2563}">
+                                        <iconify-icon icon="solar:users-group-two-rounded-linear" width="18" bis_size="{&quot;x&quot;:1039,&quot;y&quot;:2527,&quot;w&quot;:18,&quot;h&quot;:18,&quot;abs_x&quot;:1519,&quot;abs_y&quot;:2570}"></iconify-icon>
+                                    </div>
+                                    <h4 class="text-white text-sm font-medium" bis_size="{&quot;x&quot;:1076,&quot;y&quot;:2526,&quot;w&quot;:99,&quot;h&quot;:20,&quot;abs_x&quot;:1556,&quot;abs_y&quot;:2569}">CRM Lookalike</h4>
+                                </div>
+                                <p class="text-zinc-500 text-xs leading-relaxed" bis_size="{&quot;x&quot;:1032,&quot;y&quot;:2564,&quot;w&quot;:243,&quot;h&quot;:58,&quot;abs_x&quot;:1512,&quot;abs_y&quot;:2607}">Analyse la performance CRM pour identifier les comptes à fort potentiel de conversion.</p>
+                            </div>
+                            <!-- Agent -->
+                            <div class="bg-zinc-900/40 border border-white/5 rounded-2xl p-5 hover:bg-zinc-900/80 hover:border-white/10 transition-colors" bis_size="{&quot;x&quot;:710,&quot;y&quot;:2659,&quot;w&quot;:285,&quot;h&quot;:144,&quot;abs_x&quot;:1190,&quot;abs_y&quot;:2702}">
+                                <div class="flex items-center gap-3 mb-3" bis_size="{&quot;x&quot;:731,&quot;y&quot;:2680,&quot;w&quot;:243,&quot;h&quot;:32,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:2723}">
+                                    <div class="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-400" bis_size="{&quot;x&quot;:731,&quot;y&quot;:2680,&quot;w&quot;:32,&quot;h&quot;:32,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:2723}">
+                                        <iconify-icon icon="solar:rocket-linear" width="18" bis_size="{&quot;x&quot;:738,&quot;y&quot;:2687,&quot;w&quot;:18,&quot;h&quot;:18,&quot;abs_x&quot;:1218,&quot;abs_y&quot;:2730}"></iconify-icon>
+                                    </div>
+                                    <h4 class="text-white text-sm font-medium" bis_size="{&quot;x&quot;:775,&quot;y&quot;:2686,&quot;w&quot;:92,&quot;h&quot;:20,&quot;abs_x&quot;:1255,&quot;abs_y&quot;:2729}">GTM Strategy</h4>
+                                </div>
+                                <p class="text-zinc-500 text-xs leading-relaxed" bis_size="{&quot;x&quot;:731,&quot;y&quot;:2724,&quot;w&quot;:243,&quot;h&quot;:58,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:2767}">Construit une stratégie Go-To-Market multi-canal millimétrée, basée sur l'ICP final.</p>
+                            </div>
+                            <!-- Agent -->
+                            <div class="bg-zinc-900/40 border border-white/5 rounded-2xl p-5 hover:bg-zinc-900/80 hover:border-white/10 transition-colors" bis_size="{&quot;x&quot;:1011,&quot;y&quot;:2659,&quot;w&quot;:285,&quot;h&quot;:144,&quot;abs_x&quot;:1491,&quot;abs_y&quot;:2702}">
+                                <div class="flex items-center gap-3 mb-3" bis_size="{&quot;x&quot;:1032,&quot;y&quot;:2680,&quot;w&quot;:243,&quot;h&quot;:32,&quot;abs_x&quot;:1512,&quot;abs_y&quot;:2723}">
+                                    <div class="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-400" bis_size="{&quot;x&quot;:1032,&quot;y&quot;:2680,&quot;w&quot;:32,&quot;h&quot;:32,&quot;abs_x&quot;:1512,&quot;abs_y&quot;:2723}">
+                                        <iconify-icon icon="solar:book-bookmark-linear" width="18" bis_size="{&quot;x&quot;:1039,&quot;y&quot;:2687,&quot;w&quot;:18,&quot;h&quot;:18,&quot;abs_x&quot;:1519,&quot;abs_y&quot;:2730}"></iconify-icon>
+                                    </div>
+                                    <h4 class="text-white text-sm font-medium" bis_size="{&quot;x&quot;:1076,&quot;y&quot;:2686,&quot;w&quot;:101,&quot;h&quot;:20,&quot;abs_x&quot;:1556,&quot;abs_y&quot;:2729}">ICP Knowledge</h4>
+                                </div>
+                                <p class="text-zinc-500 text-xs leading-relaxed" bis_size="{&quot;x&quot;:1032,&quot;y&quot;:2724,&quot;w&quot;:243,&quot;h&quot;:39,&quot;abs_x&quot;:1512,&quot;abs_y&quot;:2767}">Apprend en continu de chaque interaction pour affiner et adapter le ciblage.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Account Research AI -->
+                <div class="relative pl-8 md:pl-16 pb-24 border-l border-zinc-800 last:border-0 group scroll-mt-32" bis_size="{&quot;x&quot;:193,&quot;y&quot;:2900,&quot;w&quot;:1104,&quot;h&quot;:401,&quot;abs_x&quot;:673,&quot;abs_y&quot;:2943}">
+                    <div class="absolute left-0 top-0 -translate-x-1/2 w-12 h-12 rounded-full bg-[#111] border border-zinc-700 flex items-center justify-center text-white z-10 shadow-[0_0_0_8px_#050505] group-hover:border-blue-500 transition-colors" bis_size="{&quot;x&quot;:170,&quot;y&quot;:2900,&quot;w&quot;:48,&quot;h&quot;:48,&quot;abs_x&quot;:650,&quot;abs_y&quot;:2943}">
+                        <iconify-icon icon="solar:database-linear" width="24" stroke-width="1.5" bis_size="{&quot;x&quot;:182,&quot;y&quot;:2912,&quot;w&quot;:24,&quot;h&quot;:24,&quot;abs_x&quot;:662,&quot;abs_y&quot;:2955}"></iconify-icon>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start" bis_size="{&quot;x&quot;:258,&quot;y&quot;:2900,&quot;w&quot;:1039,&quot;h&quot;:305,&quot;abs_x&quot;:738,&quot;abs_y&quot;:2943}">
+                        <div class="lg:col-span-5 pt-1" bis_size="{&quot;x&quot;:258,&quot;y&quot;:2900,&quot;w&quot;:404,&quot;h&quot;:162,&quot;abs_x&quot;:738,&quot;abs_y&quot;:2943}">
+                            <span class="text-blue-400 font-mono text-xs uppercase tracking-wide mb-3 block" bis_size="{&quot;x&quot;:258,&quot;y&quot;:2904,&quot;w&quot;:404,&quot;h&quot;:16,&quot;abs_x&quot;:738,&quot;abs_y&quot;:2947}">Pilier 02</span>
+                            <h3 class="text-3xl text-white font-semibold mb-4 tracking-tight" bis_size="{&quot;x&quot;:258,&quot;y&quot;:2932,&quot;w&quot;:404,&quot;h&quot;:36,&quot;abs_x&quot;:738,&quot;abs_y&quot;:2975}">Account Research AI</h3>
+                            <p class="text-zinc-400 text-base leading-relaxed" bis_size="{&quot;x&quot;:258,&quot;y&quot;:2984,&quot;w&quot;:404,&quot;h&quot;:78,&quot;abs_x&quot;:738,&quot;abs_y&quot;:3027}">
+                                Construit des listes hyper-ciblées avec des données enrichies et à jour, et détecte les signaux émergents avant la concurrence.
+                            </p>
+                        </div>
+                        <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4" bis_size="{&quot;x&quot;:710,&quot;y&quot;:2900,&quot;w&quot;:586,&quot;h&quot;:305,&quot;abs_x&quot;:1190,&quot;abs_y&quot;:2943}">
+                            <div class="bg-zinc-900/40 border border-white/5 rounded-2xl p-5 hover:bg-zinc-900/80 hover:border-white/10 transition-colors" bis_size="{&quot;x&quot;:710,&quot;y&quot;:2900,&quot;w&quot;:285,&quot;h&quot;:144,&quot;abs_x&quot;:1190,&quot;abs_y&quot;:2943}">
+                                <div class="flex items-center gap-3 mb-3" bis_size="{&quot;x&quot;:731,&quot;y&quot;:2921,&quot;w&quot;:243,&quot;h&quot;:32,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:2964}">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400" bis_size="{&quot;x&quot;:731,&quot;y&quot;:2921,&quot;w&quot;:32,&quot;h&quot;:32,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:2964}">
+                                        <iconify-icon icon="solar:user-plus-linear" width="18" bis_size="{&quot;x&quot;:738,&quot;y&quot;:2928,&quot;w&quot;:18,&quot;h&quot;:18,&quot;abs_x&quot;:1218,&quot;abs_y&quot;:2971}"></iconify-icon>
+                                    </div>
+                                    <h4 class="text-white text-sm font-medium" bis_size="{&quot;x&quot;:775,&quot;y&quot;:2927,&quot;w&quot;:114,&quot;h&quot;:20,&quot;abs_x&quot;:1255,&quot;abs_y&quot;:2970}">Audience Builder</h4>
+                                </div>
+                                <p class="text-zinc-500 text-xs leading-relaxed" bis_size="{&quot;x&quot;:731,&quot;y&quot;:2965,&quot;w&quot;:243,&quot;h&quot;:39,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:3008}">Génère des listes d'audiences exhaustives et parfaitement alignées sur l'ICP validé.</p>
+                            </div>
+                            <div class="bg-zinc-900/40 border border-white/5 rounded-2xl p-5 hover:bg-zinc-900/80 hover:border-white/10 transition-colors" bis_size="{&quot;x&quot;:1011,&quot;y&quot;:2900,&quot;w&quot;:285,&quot;h&quot;:144,&quot;abs_x&quot;:1491,&quot;abs_y&quot;:2943}">
+                                <div class="flex items-center gap-3 mb-3" bis_size="{&quot;x&quot;:1032,&quot;y&quot;:2921,&quot;w&quot;:243,&quot;h&quot;:32,&quot;abs_x&quot;:1512,&quot;abs_y&quot;:2964}">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400" bis_size="{&quot;x&quot;:1032,&quot;y&quot;:2921,&quot;w&quot;:32,&quot;h&quot;:32,&quot;abs_x&quot;:1512,&quot;abs_y&quot;:2964}">
+                                        <iconify-icon icon="solar:magic-stick-3-linear" width="18" bis_size="{&quot;x&quot;:1039,&quot;y&quot;:2928,&quot;w&quot;:18,&quot;h&quot;:18,&quot;abs_x&quot;:1519,&quot;abs_y&quot;:2971}"></iconify-icon>
+                                    </div>
+                                    <h4 class="text-white text-sm font-medium" bis_size="{&quot;x&quot;:1076,&quot;y&quot;:2927,&quot;w&quot;:131,&quot;h&quot;:20,&quot;abs_x&quot;:1556,&quot;abs_y&quot;:2970}">Custom Enrichment</h4>
+                                </div>
+                                <p class="text-zinc-500 text-xs leading-relaxed" bis_size="{&quot;x&quot;:1032,&quot;y&quot;:2965,&quot;w&quot;:243,&quot;h&quot;:58,&quot;abs_x&quot;:1512,&quot;abs_y&quot;:3008}">Enrichit les données de contact et de compte avec des informations personnalisées complexes.</p>
+                            </div>
+                            <div class="bg-zinc-900/40 border border-white/5 rounded-2xl p-5 hover:bg-zinc-900/80 hover:border-white/10 transition-colors" bis_size="{&quot;x&quot;:710,&quot;y&quot;:3060,&quot;w&quot;:285,&quot;h&quot;:144,&quot;abs_x&quot;:1190,&quot;abs_y&quot;:3103}">
+                                <div class="flex items-center gap-3 mb-3" bis_size="{&quot;x&quot;:731,&quot;y&quot;:3081,&quot;w&quot;:243,&quot;h&quot;:32,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:3124}">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400" bis_size="{&quot;x&quot;:731,&quot;y&quot;:3081,&quot;w&quot;:32,&quot;h&quot;:32,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:3124}">
+                                        <iconify-icon icon="solar:broom-linear" width="18" bis_size="{&quot;x&quot;:738,&quot;y&quot;:3088,&quot;w&quot;:18,&quot;h&quot;:18,&quot;abs_x&quot;:1218,&quot;abs_y&quot;:3131}"></iconify-icon>
+                                    </div>
+                                    <h4 class="text-white text-sm font-medium" bis_size="{&quot;x&quot;:775,&quot;y&quot;:3087,&quot;w&quot;:91,&quot;h&quot;:20,&quot;abs_x&quot;:1255,&quot;abs_y&quot;:3130}">CRM Hygiene</h4>
+                                </div>
+                                <p class="text-zinc-500 text-xs leading-relaxed" bis_size="{&quot;x&quot;:731,&quot;y&quot;:3125,&quot;w&quot;:243,&quot;h&quot;:58,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:3168}">Nettoie, met à jour et enrichit votre CRM en temps réel, évitant la dégradation des données.</p>
+                            </div>
+                            <div class="bg-zinc-900/40 border border-white/5 rounded-2xl p-5 hover:bg-zinc-900/80 hover:border-white/10 transition-colors" bis_size="{&quot;x&quot;:1011,&quot;y&quot;:3060,&quot;w&quot;:285,&quot;h&quot;:144,&quot;abs_x&quot;:1491,&quot;abs_y&quot;:3103}">
+                                <div class="flex items-center gap-3 mb-3" bis_size="{&quot;x&quot;:1032,&quot;y&quot;:3081,&quot;w&quot;:243,&quot;h&quot;:32,&quot;abs_x&quot;:1512,&quot;abs_y&quot;:3124}">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400" bis_size="{&quot;x&quot;:1032,&quot;y&quot;:3081,&quot;w&quot;:32,&quot;h&quot;:32,&quot;abs_x&quot;:1512,&quot;abs_y&quot;:3124}">
+                                        <iconify-icon icon="solar:radar-linear" width="18" bis_size="{&quot;x&quot;:1039,&quot;y&quot;:3088,&quot;w&quot;:18,&quot;h&quot;:18,&quot;abs_x&quot;:1519,&quot;abs_y&quot;:3131}"></iconify-icon>
+                                    </div>
+                                    <h4 class="text-white text-sm font-medium" bis_size="{&quot;x&quot;:1076,&quot;y&quot;:3087,&quot;w&quot;:104,&quot;h&quot;:20,&quot;abs_x&quot;:1556,&quot;abs_y&quot;:3130}">Signal Identifier</h4>
+                                </div>
+                                <p class="text-zinc-500 text-xs leading-relaxed" bis_size="{&quot;x&quot;:1032,&quot;y&quot;:3125,&quot;w&quot;:243,&quot;h&quot;:58,&quot;abs_x&quot;:1512,&quot;abs_y&quot;:3168}">Détecte les signaux d'achat précoces (levées, recrutements) à partir de 50+ sources externes.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Sales Allocation AI -->
+                <div class="relative pl-8 md:pl-16 pb-24 border-l border-zinc-800 last:border-0 group scroll-mt-32" bis_size="{&quot;x&quot;:193,&quot;y&quot;:3301,&quot;w&quot;:1104,&quot;h&quot;:401,&quot;abs_x&quot;:673,&quot;abs_y&quot;:3344}">
+                    <div class="absolute left-0 top-0 -translate-x-1/2 w-12 h-12 rounded-full bg-[#111] border border-zinc-700 flex items-center justify-center text-white z-10 shadow-[0_0_0_8px_#050505] group-hover:border-purple-500 transition-colors" bis_size="{&quot;x&quot;:170,&quot;y&quot;:3301,&quot;w&quot;:48,&quot;h&quot;:48,&quot;abs_x&quot;:650,&quot;abs_y&quot;:3344}">
+                        <iconify-icon icon="solar:routing-2-linear" width="24" stroke-width="1.5" bis_size="{&quot;x&quot;:182,&quot;y&quot;:3313,&quot;w&quot;:24,&quot;h&quot;:24,&quot;abs_x&quot;:662,&quot;abs_y&quot;:3356}"></iconify-icon>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start" bis_size="{&quot;x&quot;:258,&quot;y&quot;:3301,&quot;w&quot;:1039,&quot;h&quot;:305,&quot;abs_x&quot;:738,&quot;abs_y&quot;:3344}">
+                        <div class="lg:col-span-5 pt-1" bis_size="{&quot;x&quot;:258,&quot;y&quot;:3301,&quot;w&quot;:404,&quot;h&quot;:162,&quot;abs_x&quot;:738,&quot;abs_y&quot;:3344}">
+                            <span class="text-purple-400 font-mono text-xs uppercase tracking-wide mb-3 block" bis_size="{&quot;x&quot;:258,&quot;y&quot;:3305,&quot;w&quot;:404,&quot;h&quot;:16,&quot;abs_x&quot;:738,&quot;abs_y&quot;:3348}">Pilier 03</span>
+                            <h3 class="text-3xl text-white font-semibold mb-4 tracking-tight" bis_size="{&quot;x&quot;:258,&quot;y&quot;:3333,&quot;w&quot;:404,&quot;h&quot;:36,&quot;abs_x&quot;:738,&quot;abs_y&quot;:3376}">Sales Allocation AI</h3>
+                            <p class="text-zinc-400 text-base leading-relaxed" bis_size="{&quot;x&quot;:258,&quot;y&quot;:3385,&quot;w&quot;:404,&quot;h&quot;:78,&quot;abs_x&quot;:738,&quot;abs_y&quot;:3428}">
+                                Le seul AI qui route les leads avec des règles personnalisées et précises pour aligner le pipeline sur la réalité de votre équipe Sales.
+                            </p>
+                        </div>
+                        <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4" bis_size="{&quot;x&quot;:710,&quot;y&quot;:3301,&quot;w&quot;:586,&quot;h&quot;:305,&quot;abs_x&quot;:1190,&quot;abs_y&quot;:3344}">
+                            <div class="bg-zinc-900/40 border border-white/5 rounded-2xl p-5 hover:bg-zinc-900/80 hover:border-white/10 transition-colors" bis_size="{&quot;x&quot;:710,&quot;y&quot;:3301,&quot;w&quot;:285,&quot;h&quot;:144,&quot;abs_x&quot;:1190,&quot;abs_y&quot;:3344}">
+                                <div class="flex items-center gap-3 mb-3" bis_size="{&quot;x&quot;:731,&quot;y&quot;:3322,&quot;w&quot;:243,&quot;h&quot;:32,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:3365}">
+                                    <div class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400" bis_size="{&quot;x&quot;:731,&quot;y&quot;:3322,&quot;w&quot;:32,&quot;h&quot;:32,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:3365}">
+                                        <iconify-icon icon="solar:sort-from-top-to-bottom-linear" width="18" bis_size="{&quot;x&quot;:738,&quot;y&quot;:3329,&quot;w&quot;:18,&quot;h&quot;:18,&quot;abs_x&quot;:1218,&quot;abs_y&quot;:3372}"></iconify-icon>
+                                    </div>
+                                    <h4 class="text-white text-sm font-medium" bis_size="{&quot;x&quot;:775,&quot;y&quot;:3328,&quot;w&quot;:106,&quot;h&quot;:20,&quot;abs_x&quot;:1255,&quot;abs_y&quot;:3371}">Account Tiering</h4>
+                                </div>
+                                <p class="text-zinc-500 text-xs leading-relaxed" bis_size="{&quot;x&quot;:731,&quot;y&quot;:3366,&quot;w&quot;:243,&quot;h&quot;:58,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:3409}">Classe automatiquement les comptes par niveau d'impact (Tier 1, 2, 3) pour prioriser l'effort.</p>
+                            </div>
+                            <div class="bg-zinc-900/40 border border-white/5 rounded-2xl p-5 hover:bg-zinc-900/80 hover:border-white/10 transition-colors" bis_size="{&quot;x&quot;:1011,&quot;y&quot;:3301,&quot;w&quot;:285,&quot;h&quot;:144,&quot;abs_x&quot;:1491,&quot;abs_y&quot;:3344}">
+                                <div class="flex items-center gap-3 mb-3" bis_size="{&quot;x&quot;:1032,&quot;y&quot;:3322,&quot;w&quot;:243,&quot;h&quot;:32,&quot;abs_x&quot;:1512,&quot;abs_y&quot;:3365}">
+                                    <div class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400" bis_size="{&quot;x&quot;:1032,&quot;y&quot;:3322,&quot;w&quot;:32,&quot;h&quot;:32,&quot;abs_x&quot;:1512,&quot;abs_y&quot;:3365}">
+                                        <iconify-icon icon="solar:star-fall-linear" width="18" bis_size="{&quot;x&quot;:1039,&quot;y&quot;:3329,&quot;w&quot;:18,&quot;h&quot;:18,&quot;abs_x&quot;:1519,&quot;abs_y&quot;:3372}"></iconify-icon>
+                                    </div>
+                                    <h4 class="text-white text-sm font-medium" bis_size="{&quot;x&quot;:1076,&quot;y&quot;:3328,&quot;w&quot;:95,&quot;h&quot;:20,&quot;abs_x&quot;:1556,&quot;abs_y&quot;:3371}">Scoring Agent</h4>
+                                </div>
+                                <p class="text-zinc-500 text-xs leading-relaxed" bis_size="{&quot;x&quot;:1032,&quot;y&quot;:3366,&quot;w&quot;:243,&quot;h&quot;:58,&quot;abs_x&quot;:1512,&quot;abs_y&quot;:3409}">Détecte les signaux subtils d'intention d'achat (ex : visite pricing, réouverture répétée d'un ancien email).</p>
+                            </div>
+                            <div class="bg-zinc-900/40 border border-white/5 rounded-2xl p-5 hover:bg-zinc-900/80 hover:border-white/10 transition-colors" bis_size="{&quot;x&quot;:710,&quot;y&quot;:3461,&quot;w&quot;:285,&quot;h&quot;:144,&quot;abs_x&quot;:1190,&quot;abs_y&quot;:3504}">
+                                <div class="flex items-center gap-3 mb-3" bis_size="{&quot;x&quot;:731,&quot;y&quot;:3482,&quot;w&quot;:243,&quot;h&quot;:32,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:3525}">
+                                    <div class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400" bis_size="{&quot;x&quot;:731,&quot;y&quot;:3482,&quot;w&quot;:32,&quot;h&quot;:32,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:3525}">
+                                        <iconify-icon icon="solar:share-circle-linear" width="18" bis_size="{&quot;x&quot;:738,&quot;y&quot;:3489,&quot;w&quot;:18,&quot;h&quot;:18,&quot;abs_x&quot;:1218,&quot;abs_y&quot;:3532}"></iconify-icon>
+                                    </div>
+                                    <h4 class="text-white text-sm font-medium" bis_size="{&quot;x&quot;:775,&quot;y&quot;:3488,&quot;w&quot;:91,&quot;h&quot;:20,&quot;abs_x&quot;:1255,&quot;abs_y&quot;:3531}">Team Routing</h4>
+                                </div>
+                                <p class="text-zinc-500 text-xs leading-relaxed" bis_size="{&quot;x&quot;:731,&quot;y&quot;:3526,&quot;w&quot;:243,&quot;h&quot;:58,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:3569}">Distribue les prospects et alloue les comptes CRM selon le tiering, le territoire et des règles custom.</p>
+                            </div>
+                            <div class="bg-zinc-900/40 border border-white/5 rounded-2xl p-5 hover:bg-zinc-900/80 hover:border-white/10 transition-colors" bis_size="{&quot;x&quot;:1011,&quot;y&quot;:3461,&quot;w&quot;:285,&quot;h&quot;:144,&quot;abs_x&quot;:1491,&quot;abs_y&quot;:3504}">
+                                <div class="flex items-center gap-3 mb-3" bis_size="{&quot;x&quot;:1032,&quot;y&quot;:3482,&quot;w&quot;:243,&quot;h&quot;:32,&quot;abs_x&quot;:1512,&quot;abs_y&quot;:3525}">
+                                    <div class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400" bis_size="{&quot;x&quot;:1032,&quot;y&quot;:3482,&quot;w&quot;:32,&quot;h&quot;:32,&quot;abs_x&quot;:1512,&quot;abs_y&quot;:3525}">
+                                        <iconify-icon icon="solar:calendar-search-linear" width="18" bis_size="{&quot;x&quot;:1039,&quot;y&quot;:3489,&quot;w&quot;:18,&quot;h&quot;:18,&quot;abs_x&quot;:1519,&quot;abs_y&quot;:3532}"></iconify-icon>
+                                    </div>
+                                    <h4 class="text-white text-sm font-medium" bis_size="{&quot;x&quot;:1076,&quot;y&quot;:3488,&quot;w&quot;:126,&quot;h&quot;:20,&quot;abs_x&quot;:1556,&quot;abs_y&quot;:3531}">Pre-meeting Agent</h4>
+                                </div>
+                                <p class="text-zinc-500 text-xs leading-relaxed" bis_size="{&quot;x&quot;:1032,&quot;y&quot;:3526,&quot;w&quot;:243,&quot;h&quot;:58,&quot;abs_x&quot;:1512,&quot;abs_y&quot;:3569}">Pré-qualifie du MQL au SQL (via frameworks MEDDIC ou BANT) et maintient les leads engagés avant le call.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Warm Outreach AI -->
+                <div class="relative pl-8 md:pl-16 pb-24 border-l border-zinc-800 last:border-0 group scroll-mt-32" bis_size="{&quot;x&quot;:193,&quot;y&quot;:3702,&quot;w&quot;:1104,&quot;h&quot;:381,&quot;abs_x&quot;:673,&quot;abs_y&quot;:3745}">
+                    <div class="absolute left-0 top-0 -translate-x-1/2 w-12 h-12 rounded-full bg-[#111] border border-zinc-700 flex items-center justify-center text-white z-10 shadow-[0_0_0_8px_#050505] group-hover:border-indigo-500 transition-colors" bis_size="{&quot;x&quot;:170,&quot;y&quot;:3702,&quot;w&quot;:48,&quot;h&quot;:48,&quot;abs_x&quot;:650,&quot;abs_y&quot;:3745}">
+                        <iconify-icon icon="solar:chat-round-line-linear" width="24" stroke-width="1.5" bis_size="{&quot;x&quot;:182,&quot;y&quot;:3714,&quot;w&quot;:24,&quot;h&quot;:24,&quot;abs_x&quot;:662,&quot;abs_y&quot;:3757}"></iconify-icon>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start" bis_size="{&quot;x&quot;:258,&quot;y&quot;:3702,&quot;w&quot;:1039,&quot;h&quot;:285,&quot;abs_x&quot;:738,&quot;abs_y&quot;:3745}">
+                        <div class="lg:col-span-5 pt-1" bis_size="{&quot;x&quot;:258,&quot;y&quot;:3702,&quot;w&quot;:404,&quot;h&quot;:162,&quot;abs_x&quot;:738,&quot;abs_y&quot;:3745}">
+                            <span class="text-indigo-400 font-mono text-xs uppercase tracking-wide mb-3 block" bis_size="{&quot;x&quot;:258,&quot;y&quot;:3706,&quot;w&quot;:404,&quot;h&quot;:16,&quot;abs_x&quot;:738,&quot;abs_y&quot;:3749}">Pilier 04</span>
+                            <h3 class="text-3xl text-white font-semibold mb-4 tracking-tight" bis_size="{&quot;x&quot;:258,&quot;y&quot;:3734,&quot;w&quot;:404,&quot;h&quot;:36,&quot;abs_x&quot;:738,&quot;abs_y&quot;:3777}">Warm Outreach AI</h3>
+                            <p class="text-zinc-400 text-base leading-relaxed" bis_size="{&quot;x&quot;:258,&quot;y&quot;:3786,&quot;w&quot;:404,&quot;h&quot;:78,&quot;abs_x&quot;:738,&quot;abs_y&quot;:3829}">
+                                Un outreach qui "semble humain" : ultra-personnalisé, envoyé au moment le plus opportun, et déployé sur le meilleur canal.
+                            </p>
+                        </div>
+                        <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4" bis_size="{&quot;x&quot;:710,&quot;y&quot;:3702,&quot;w&quot;:586,&quot;h&quot;:285,&quot;abs_x&quot;:1190,&quot;abs_y&quot;:3745}">
+                            <div class="bg-zinc-900/40 border border-white/5 rounded-2xl p-5 hover:bg-zinc-900/80 hover:border-white/10 transition-colors" bis_size="{&quot;x&quot;:710,&quot;y&quot;:3702,&quot;w&quot;:285,&quot;h&quot;:144,&quot;abs_x&quot;:1190,&quot;abs_y&quot;:3745}">
+                                <div class="flex items-center gap-3 mb-3" bis_size="{&quot;x&quot;:731,&quot;y&quot;:3723,&quot;w&quot;:243,&quot;h&quot;:32,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:3766}">
+                                    <div class="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400" bis_size="{&quot;x&quot;:731,&quot;y&quot;:3723,&quot;w&quot;:32,&quot;h&quot;:32,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:3766}">
+                                        <iconify-icon icon="solar:share-linear" width="18" bis_size="{&quot;x&quot;:738,&quot;y&quot;:3730,&quot;w&quot;:18,&quot;h&quot;:18,&quot;abs_x&quot;:1218,&quot;abs_y&quot;:3773}"></iconify-icon>
+                                    </div>
+                                    <h4 class="text-white text-sm font-medium" bis_size="{&quot;x&quot;:775,&quot;y&quot;:3729,&quot;w&quot;:138,&quot;h&quot;:20,&quot;abs_x&quot;:1255,&quot;abs_y&quot;:3772}">Multi-Channel Agent</h4>
+                                </div>
+                                <p class="text-zinc-500 text-xs leading-relaxed" bis_size="{&quot;x&quot;:731,&quot;y&quot;:3767,&quot;w&quot;:243,&quot;h&quot;:58,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:3810}">Adapte dynamiquement le message, le timing et le canal selon les signaux comportementaux du prospect.</p>
+                            </div>
+                            <div class="bg-zinc-900/40 border border-white/5 rounded-2xl p-5 hover:bg-zinc-900/80 hover:border-white/10 transition-colors" bis_size="{&quot;x&quot;:1011,&quot;y&quot;:3702,&quot;w&quot;:285,&quot;h&quot;:144,&quot;abs_x&quot;:1491,&quot;abs_y&quot;:3745}">
+                                <div class="flex items-center gap-3 mb-3" bis_size="{&quot;x&quot;:1032,&quot;y&quot;:3723,&quot;w&quot;:243,&quot;h&quot;:32,&quot;abs_x&quot;:1512,&quot;abs_y&quot;:3766}">
+                                    <div class="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400" bis_size="{&quot;x&quot;:1032,&quot;y&quot;:3723,&quot;w&quot;:32,&quot;h&quot;:32,&quot;abs_x&quot;:1512,&quot;abs_y&quot;:3766}">
+                                        <iconify-icon icon="solar:pen-new-square-linear" width="18" bis_size="{&quot;x&quot;:1039,&quot;y&quot;:3730,&quot;w&quot;:18,&quot;h&quot;:18,&quot;abs_x&quot;:1519,&quot;abs_y&quot;:3773}"></iconify-icon>
+                                    </div>
+                                    <h4 class="text-white text-sm font-medium" bis_size="{&quot;x&quot;:1076,&quot;y&quot;:3729,&quot;w&quot;:124,&quot;h&quot;:20,&quot;abs_x&quot;:1556,&quot;abs_y&quot;:3772}">Copywriting Agent</h4>
+                                </div>
+                                <p class="text-zinc-500 text-xs leading-relaxed" bis_size="{&quot;x&quot;:1032,&quot;y&quot;:3767,&quot;w&quot;:243,&quot;h&quot;:58,&quot;abs_x&quot;:1512,&quot;abs_y&quot;:3810}">Rédaction experte de haut niveau, conçue pour un fort taux de conversion et adaptée au ton de l'ICP.</p>
+                            </div>
+                            <div class="sm:col-span-2 bg-zinc-900/40 border border-white/5 rounded-2xl p-5 hover:bg-zinc-900/80 hover:border-white/10 transition-colors" bis_size="{&quot;x&quot;:710,&quot;y&quot;:3862,&quot;w&quot;:586,&quot;h&quot;:125,&quot;abs_x&quot;:1190,&quot;abs_y&quot;:3905}">
+                                <div class="flex items-center gap-3 mb-3" bis_size="{&quot;x&quot;:731,&quot;y&quot;:3883,&quot;w&quot;:544,&quot;h&quot;:32,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:3926}">
+                                    <div class="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400" bis_size="{&quot;x&quot;:731,&quot;y&quot;:3883,&quot;w&quot;:32,&quot;h&quot;:32,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:3926}">
+                                        <iconify-icon icon="solar:phone-calling-linear" width="18" bis_size="{&quot;x&quot;:738,&quot;y&quot;:3890,&quot;w&quot;:18,&quot;h&quot;:18,&quot;abs_x&quot;:1218,&quot;abs_y&quot;:3933}"></iconify-icon>
+                                    </div>
+                                    <h4 class="text-white text-sm font-medium" bis_size="{&quot;x&quot;:775,&quot;y&quot;:3889,&quot;w&quot;:170,&quot;h&quot;:20,&quot;abs_x&quot;:1255,&quot;abs_y&quot;:3932}">Warm Call Booking Agent</h4>
+                                </div>
+                                <p class="text-zinc-500 text-xs leading-relaxed max-w-lg" bis_size="{&quot;x&quot;:731,&quot;y&quot;:3927,&quot;w&quot;:512,&quot;h&quot;:39,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:3970}">Gère la complexité de l'agenda et planifie automatiquement les appels de découverte lorsque l'engagement du prospect est à son pic maximal.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 5: Revenue Orchestration AI -->
+                <div class="relative pl-8 md:pl-16 pb-12 border-l border-zinc-800 last:border-0 group scroll-mt-32" bis_size="{&quot;x&quot;:193,&quot;y&quot;:4083,&quot;w&quot;:1104,&quot;h&quot;:353,&quot;abs_x&quot;:673,&quot;abs_y&quot;:4126}">
+                    <div class="absolute left-0 top-0 -translate-x-1/2 w-12 h-12 rounded-full bg-[#111] border border-zinc-700 flex items-center justify-center text-white z-10 shadow-[0_0_0_8px_#050505] group-hover:border-green-500 transition-colors" bis_size="{&quot;x&quot;:169,&quot;y&quot;:4083,&quot;w&quot;:48,&quot;h&quot;:48,&quot;abs_x&quot;:649,&quot;abs_y&quot;:4126}">
+                        <iconify-icon icon="solar:chart-square-linear" width="24" stroke-width="1.5" bis_size="{&quot;x&quot;:181,&quot;y&quot;:4095,&quot;w&quot;:24,&quot;h&quot;:24,&quot;abs_x&quot;:661,&quot;abs_y&quot;:4138}"></iconify-icon>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start" bis_size="{&quot;x&quot;:257,&quot;y&quot;:4083,&quot;w&quot;:1040,&quot;h&quot;:305,&quot;abs_x&quot;:737,&quot;abs_y&quot;:4126}">
+                        <div class="lg:col-span-5 pt-1" bis_size="{&quot;x&quot;:257,&quot;y&quot;:4083,&quot;w&quot;:405,&quot;h&quot;:162,&quot;abs_x&quot;:737,&quot;abs_y&quot;:4126}">
+                            <span class="text-green-400 font-mono text-xs uppercase tracking-wide mb-3 block" bis_size="{&quot;x&quot;:257,&quot;y&quot;:4087,&quot;w&quot;:405,&quot;h&quot;:16,&quot;abs_x&quot;:737,&quot;abs_y&quot;:4130}">Pilier 05</span>
+                            <h3 class="text-3xl text-white font-semibold mb-4 tracking-tight" bis_size="{&quot;x&quot;:257,&quot;y&quot;:4115,&quot;w&quot;:405,&quot;h&quot;:36,&quot;abs_x&quot;:737,&quot;abs_y&quot;:4158}">Revenue Orchestration AI</h3>
+                            <p class="text-zinc-400 text-base leading-relaxed" bis_size="{&quot;x&quot;:257,&quot;y&quot;:4167,&quot;w&quot;:405,&quot;h&quot;:78,&quot;abs_x&quot;:737,&quot;abs_y&quot;:4210}">
+                                Réalloue automatiquement les ressources vers les canaux, séquences et segments générant le meilleur ROI pour la croissance.
+                            </p>
+                        </div>
+                        <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4" bis_size="{&quot;x&quot;:710,&quot;y&quot;:4083,&quot;w&quot;:586,&quot;h&quot;:305,&quot;abs_x&quot;:1190,&quot;abs_y&quot;:4126}">
+                            <div class="bg-zinc-900/40 border border-white/5 rounded-2xl p-5 hover:bg-zinc-900/80 hover:border-white/10 transition-colors" bis_size="{&quot;x&quot;:710,&quot;y&quot;:4083,&quot;w&quot;:285,&quot;h&quot;:144,&quot;abs_x&quot;:1190,&quot;abs_y&quot;:4126}">
+                                <div class="flex items-center gap-3 mb-3" bis_size="{&quot;x&quot;:731,&quot;y&quot;:4104,&quot;w&quot;:243,&quot;h&quot;:32,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:4147}">
+                                    <div class="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center text-green-400" bis_size="{&quot;x&quot;:731,&quot;y&quot;:4104,&quot;w&quot;:32,&quot;h&quot;:32,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:4147}">
+                                        <iconify-icon icon="solar:pie-chart-2-linear" width="18" bis_size="{&quot;x&quot;:738,&quot;y&quot;:4111,&quot;w&quot;:18,&quot;h&quot;:18,&quot;abs_x&quot;:1218,&quot;abs_y&quot;:4154}"></iconify-icon>
+                                    </div>
+                                    <h4 class="text-white text-sm font-medium" bis_size="{&quot;x&quot;:775,&quot;y&quot;:4110,&quot;w&quot;:148,&quot;h&quot;:20,&quot;abs_x&quot;:1255,&quot;abs_y&quot;:4153}">Real-time Dashboards</h4>
+                                </div>
+                                <p class="text-zinc-500 text-xs leading-relaxed" bis_size="{&quot;x&quot;:731,&quot;y&quot;:4148,&quot;w&quot;:243,&quot;h&quot;:39,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:4191}">Suivi du ROI en temps réel et visibilité complète sur la machine outbound.</p>
+                            </div>
+                            <div class="bg-zinc-900/40 border border-white/5 rounded-2xl p-5 hover:bg-zinc-900/80 hover:border-white/10 transition-colors" bis_size="{&quot;x&quot;:1011,&quot;y&quot;:4083,&quot;w&quot;:285,&quot;h&quot;:144,&quot;abs_x&quot;:1491,&quot;abs_y&quot;:4126}">
+                                <div class="flex items-center gap-3 mb-3" bis_size="{&quot;x&quot;:1032,&quot;y&quot;:4104,&quot;w&quot;:243,&quot;h&quot;:32,&quot;abs_x&quot;:1512,&quot;abs_y&quot;:4147}">
+                                    <div class="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center text-green-400" bis_size="{&quot;x&quot;:1032,&quot;y&quot;:4104,&quot;w&quot;:32,&quot;h&quot;:32,&quot;abs_x&quot;:1512,&quot;abs_y&quot;:4147}">
+                                        <iconify-icon icon="solar:document-text-linear" width="18" bis_size="{&quot;x&quot;:1039,&quot;y&quot;:4111,&quot;w&quot;:18,&quot;h&quot;:18,&quot;abs_x&quot;:1519,&quot;abs_y&quot;:4154}"></iconify-icon>
+                                    </div>
+                                    <h4 class="text-white text-sm font-medium" bis_size="{&quot;x&quot;:1076,&quot;y&quot;:4110,&quot;w&quot;:108,&quot;h&quot;:20,&quot;abs_x&quot;:1556,&quot;abs_y&quot;:4153}">Reporting Agent</h4>
+                                </div>
+                                <p class="text-zinc-500 text-xs leading-relaxed" bis_size="{&quot;x&quot;:1032,&quot;y&quot;:4148,&quot;w&quot;:243,&quot;h&quot;:58,&quot;abs_x&quot;:1512,&quot;abs_y&quot;:4191}">Interprète le dashboard comme un expert humain et vous donne des insights stratégiques concrets.</p>
+                            </div>
+                            <div class="bg-zinc-900/40 border border-white/5 rounded-2xl p-5 hover:bg-zinc-900/80 hover:border-white/10 transition-colors" bis_size="{&quot;x&quot;:710,&quot;y&quot;:4244,&quot;w&quot;:285,&quot;h&quot;:144,&quot;abs_x&quot;:1190,&quot;abs_y&quot;:4287}">
+                                <div class="flex items-center gap-3 mb-3" bis_size="{&quot;x&quot;:731,&quot;y&quot;:4265,&quot;w&quot;:243,&quot;h&quot;:32,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:4308}">
+                                    <div class="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center text-green-400" bis_size="{&quot;x&quot;:731,&quot;y&quot;:4265,&quot;w&quot;:32,&quot;h&quot;:32,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:4308}">
+                                        <iconify-icon icon="solar:settings-linear" width="18" bis_size="{&quot;x&quot;:738,&quot;y&quot;:4272,&quot;w&quot;:18,&quot;h&quot;:18,&quot;abs_x&quot;:1218,&quot;abs_y&quot;:4315}"></iconify-icon>
+                                    </div>
+                                    <h4 class="text-white text-sm font-medium" bis_size="{&quot;x&quot;:775,&quot;y&quot;:4271,&quot;w&quot;:95,&quot;h&quot;:20,&quot;abs_x&quot;:1255,&quot;abs_y&quot;:4314}">RevOps Agent</h4>
+                                </div>
+                                <p class="text-zinc-500 text-xs leading-relaxed" bis_size="{&quot;x&quot;:731,&quot;y&quot;:4309,&quot;w&quot;:243,&quot;h&quot;:58,&quot;abs_x&quot;:1211,&quot;abs_y&quot;:4352}">Crée des playbooks d'enrichissement et d'engagement sur mesure selon l'évolution de vos données.</p>
+                            </div>
+                            <div class="bg-zinc-900/40 border border-white/5 rounded-2xl p-5 hover:bg-zinc-900/80 hover:border-white/10 transition-colors" bis_size="{&quot;x&quot;:1011,&quot;y&quot;:4244,&quot;w&quot;:285,&quot;h&quot;:144,&quot;abs_x&quot;:1491,&quot;abs_y&quot;:4287}">
+                                <div class="flex items-center gap-3 mb-3" bis_size="{&quot;x&quot;:1032,&quot;y&quot;:4265,&quot;w&quot;:243,&quot;h&quot;:32,&quot;abs_x&quot;:1512,&quot;abs_y&quot;:4308}">
+                                    <div class="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center text-green-400" bis_size="{&quot;x&quot;:1032,&quot;y&quot;:4265,&quot;w&quot;:32,&quot;h&quot;:32,&quot;abs_x&quot;:1512,&quot;abs_y&quot;:4308}">
+                                        <iconify-icon icon="solar:chart-2-linear" width="18" bis_size="{&quot;x&quot;:1039,&quot;y&quot;:4272,&quot;w&quot;:18,&quot;h&quot;:18,&quot;abs_x&quot;:1519,&quot;abs_y&quot;:4315}"></iconify-icon>
+                                    </div>
+                                    <h4 class="text-white text-sm font-medium" bis_size="{&quot;x&quot;:1076,&quot;y&quot;:4271,&quot;w&quot;:137,&quot;h&quot;:20,&quot;abs_x&quot;:1556,&quot;abs_y&quot;:4314}">Strategy Adjustment</h4>
+                                </div>
+                                <p class="text-zinc-500 text-xs leading-relaxed" bis_size="{&quot;x&quot;:1032,&quot;y&quot;:4309,&quot;w&quot;:243,&quot;h&quot;:58,&quot;abs_x&quot;:1512,&quot;abs_y&quot;:4352}">Ajuste automatiquement les stratégies GTM globales selon l'analyse du meilleur ROI constaté.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Bento Grid Solutions -->
+        <section id="solutions" class="py-24 bg-black border-y border-white/5 relative" bis_size="{&quot;x&quot;:0,&quot;y&quot;:4565,&quot;w&quot;:1490,&quot;h&quot;:824,&quot;abs_x&quot;:480,&quot;abs_y&quot;:4608}">
+            <div class="max-w-7xl mx-auto px-6" bis_size="{&quot;x&quot;:105,&quot;y&quot;:4662,&quot;w&quot;:1280,&quot;h&quot;:630,&quot;abs_x&quot;:585,&quot;abs_y&quot;:4705}">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[minmax(280px,auto)]" bis_size="{&quot;x&quot;:129,&quot;y&quot;:4662,&quot;w&quot;:1232,&quot;h&quot;:630,&quot;abs_x&quot;:609,&quot;abs_y&quot;:4705}">
+                    
+                    <!-- Card 1: Intent Sources -->
+                    <div class="md:col-span-2 sc-card rounded-[2rem] p-8 relative spotlight-card flex flex-col justify-between group overflow-hidden" bis_size="{&quot;x&quot;:129,&quot;y&quot;:4662,&quot;w&quot;:813,&quot;h&quot;:326,&quot;abs_x&quot;:609,&quot;abs_y&quot;:4705}">
+                        <div class="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-orange-500/5 to-transparent pointer-events-none" bis_size="{&quot;x&quot;:130,&quot;y&quot;:4663,&quot;w&quot;:811,&quot;h&quot;:324,&quot;abs_x&quot;:610,&quot;abs_y&quot;:4706}"></div>
+                        <div class="relative z-10" bis_size="{&quot;x&quot;:162,&quot;y&quot;:4695,&quot;w&quot;:747,&quot;h&quot;:186,&quot;abs_x&quot;:642,&quot;abs_y&quot;:4738}">
+                            <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-orange-400 mb-6 shadow-lg shadow-black/50" bis_size="{&quot;x&quot;:162,&quot;y&quot;:4695,&quot;w&quot;:40,&quot;h&quot;:40,&quot;abs_x&quot;:642,&quot;abs_y&quot;:4738}">
+                                <iconify-icon icon="solar:database-linear" width="20" aria-hidden="true" bis_size="{&quot;x&quot;:172,&quot;y&quot;:4705,&quot;w&quot;:20,&quot;h&quot;:20,&quot;abs_x&quot;:652,&quot;abs_y&quot;:4748}"></iconify-icon>
+                            </div>
+                            <h3 class="text-2xl text-white font-semibold tracking-tight mb-3" bis_size="{&quot;x&quot;:162,&quot;y&quot;:4759,&quot;w&quot;:747,&quot;h&quot;:32,&quot;abs_x&quot;:642,&quot;abs_y&quot;:4802}">Une Data sur-mesure pour votre GTM</h3>
+                            <p class="text-zinc-400 text-base leading-relaxed max-w-md" bis_size="{&quot;x&quot;:162,&quot;y&quot;:4803,&quot;w&quot;:448,&quot;h&quot;:78,&quot;abs_x&quot;:642,&quot;abs_y&quot;:4846}">L'agent Account Research croise LinkedIn, job boards, sites de review, données légales et RSS pour détecter les signaux que vos concurrents ignorent.</p>
+                        </div>
+                        <div class="mt-8 flex flex-wrap gap-2" bis_size="{&quot;x&quot;:162,&quot;y&quot;:4929,&quot;w&quot;:747,&quot;h&quot;:26,&quot;abs_x&quot;:642,&quot;abs_y&quot;:4972}">
+                            <span class="px-2 py-1 bg-black/50 rounded border border-white/5 text-xs text-zinc-500" bis_size="{&quot;x&quot;:162,&quot;y&quot;:4929,&quot;w&quot;:79,&quot;h&quot;:26,&quot;abs_x&quot;:642,&quot;abs_y&quot;:4972}">Intent Data</span>
+                            <span class="px-2 py-1 bg-black/50 rounded border border-white/5 text-xs text-zinc-500" bis_size="{&quot;x&quot;:249,&quot;y&quot;:4929,&quot;w&quot;:135,&quot;h&quot;:26,&quot;abs_x&quot;:729,&quot;abs_y&quot;:4972}">Waterfall Enrichment</span>
+                            <span class="px-2 py-1 bg-black/50 rounded border border-white/5 text-xs text-zinc-500" bis_size="{&quot;x&quot;:393,&quot;y&quot;:4929,&quot;w&quot;:95,&quot;h&quot;:26,&quot;abs_x&quot;:873,&quot;abs_y&quot;:4972}">CRM Hygiene</span>
+                            <span class="px-2 py-1 bg-black/50 rounded border border-white/5 text-xs text-zinc-500" bis_size="{&quot;x&quot;:497,&quot;y&quot;:4929,&quot;w&quot;:109,&quot;h&quot;:26,&quot;abs_x&quot;:977,&quot;abs_y&quot;:4972}">Technographics</span>
+                            <span class="px-2 py-1 bg-black/50 rounded border border-white/5 text-xs text-white" bis_size="{&quot;x&quot;:614,&quot;y&quot;:4929,&quot;w&quot;:90,&quot;h&quot;:26,&quot;abs_x&quot;:1094,&quot;abs_y&quot;:4972}">50+ Sources</span>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Smart Filter -->
+                    <div class="md:col-span-1 sc-card rounded-[2rem] p-8 relative spotlight-card flex flex-col group overflow-hidden" bis_size="{&quot;x&quot;:966,&quot;y&quot;:4662,&quot;w&quot;:394,&quot;h&quot;:326,&quot;abs_x&quot;:1446,&quot;abs_y&quot;:4705}">
+                        <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-blue-400 mb-6 shadow-lg shadow-black/50" bis_size="{&quot;x&quot;:999,&quot;y&quot;:4695,&quot;w&quot;:40,&quot;h&quot;:40,&quot;abs_x&quot;:1479,&quot;abs_y&quot;:4738}">
+                            <iconify-icon icon="solar:filter-linear" width="20" aria-hidden="true" bis_size="{&quot;x&quot;:1009,&quot;y&quot;:4705,&quot;w&quot;:20,&quot;h&quot;:20,&quot;abs_x&quot;:1489,&quot;abs_y&quot;:4748}"></iconify-icon>
+                        </div>
+                        <h3 class="text-2xl text-white font-semibold tracking-tight mb-3" bis_size="{&quot;x&quot;:999,&quot;y&quot;:4759,&quot;w&quot;:328,&quot;h&quot;:32,&quot;abs_x&quot;:1479,&quot;abs_y&quot;:4802}">Account Tiering &amp; Scoring</h3>
+                        <p class="text-zinc-400 text-base leading-relaxed mb-4" bis_size="{&quot;x&quot;:999,&quot;y&quot;:4803,&quot;w&quot;:328,&quot;h&quot;:104,&quot;abs_x&quot;:1479,&quot;abs_y&quot;:4846}">L'agent Sales Allocation attribue un score dynamique. Ne perdez plus de temps sur des comptes froids — concentrez-vous sur le Tier 1.</p>
+                        <div class="mt-auto w-full bg-zinc-900 rounded-full h-2 overflow-hidden" bis_size="{&quot;x&quot;:999,&quot;y&quot;:4923,&quot;w&quot;:328,&quot;h&quot;:8,&quot;abs_x&quot;:1479,&quot;abs_y&quot;:4966}">
+                            <div class="bg-gradient-to-r from-blue-500 to-green-400 h-full w-[85%] rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]" bis_size="{&quot;x&quot;:999,&quot;y&quot;:4923,&quot;w&quot;:279,&quot;h&quot;:8,&quot;abs_x&quot;:1479,&quot;abs_y&quot;:4966}"></div>
+                        </div>
+                        <div class="text-right text-xs text-white mt-2 font-mono" bis_size="{&quot;x&quot;:999,&quot;y&quot;:4939,&quot;w&quot;:328,&quot;h&quot;:16,&quot;abs_x&quot;:1479,&quot;abs_y&quot;:4982}">Tier 1 · Score: 85/100</div>
+                    </div>
+
+                    <!-- Card 3: Integrations -->
+                    <div class="md:col-span-1 sc-card rounded-[2rem] p-8 relative spotlight-card flex flex-col justify-between overflow-hidden" bis_size="{&quot;x&quot;:129,&quot;y&quot;:5012,&quot;w&quot;:394,&quot;h&quot;:280,&quot;abs_x&quot;:609,&quot;abs_y&quot;:5055}">
+                         <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white mb-6 shadow-lg shadow-black/50" bis_size="{&quot;x&quot;:162,&quot;y&quot;:5045,&quot;w&quot;:40,&quot;h&quot;:40,&quot;abs_x&quot;:642,&quot;abs_y&quot;:5088}">
+                            <iconify-icon icon="solar:plug-circle-linear" width="20" aria-hidden="true" bis_size="{&quot;x&quot;:172,&quot;y&quot;:5055,&quot;w&quot;:20,&quot;h&quot;:20,&quot;abs_x&quot;:652,&quot;abs_y&quot;:5098}"></iconify-icon>
+                        </div>
+                        <div bis_size="{&quot;x&quot;:162,&quot;y&quot;:5115,&quot;w&quot;:328,&quot;h&quot;:144,&quot;abs_x&quot;:642,&quot;abs_y&quot;:5158}">
+                            <h3 class="text-2xl text-white font-semibold tracking-tight mb-2" bis_size="{&quot;x&quot;:162,&quot;y&quot;:5115,&quot;w&quot;:328,&quot;h&quot;:32,&quot;abs_x&quot;:642,&quot;abs_y&quot;:5158}">Nativement intégré</h3>
+                            <p class="text-zinc-400 text-base leading-relaxed" bis_size="{&quot;x&quot;:162,&quot;y&quot;:5155,&quot;w&quot;:328,&quot;h&quot;:104,&quot;abs_x&quot;:642,&quot;abs_y&quot;:5198}">Notre agent RevOps synchronise parfaitement HubSpot, Salesforce ou Pipedrive. L'IA travaille là où votre équipe opère.</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 4: Automated Outreach -->
+                    <div class="md:col-span-2 sc-card rounded-[2rem] p-8 relative spotlight-card flex flex-col md:flex-row items-center justify-between overflow-hidden gap-6" bis_size="{&quot;x&quot;:547,&quot;y&quot;:5012,&quot;w&quot;:813,&quot;h&quot;:280,&quot;abs_x&quot;:1027,&quot;abs_y&quot;:5055}">
+                        <div class="relative z-10 max-w-sm" bis_size="{&quot;x&quot;:580,&quot;y&quot;:5059,&quot;w&quot;:384,&quot;h&quot;:186,&quot;abs_x&quot;:1060,&quot;abs_y&quot;:5102}">
+                            <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-green-400 mb-6 shadow-lg shadow-black/50" bis_size="{&quot;x&quot;:580,&quot;y&quot;:5059,&quot;w&quot;:40,&quot;h&quot;:40,&quot;abs_x&quot;:1060,&quot;abs_y&quot;:5102}">
+                                <iconify-icon icon="solar:plain-linear" width="20" aria-hidden="true" bis_size="{&quot;x&quot;:590,&quot;y&quot;:5069,&quot;w&quot;:20,&quot;h&quot;:20,&quot;abs_x&quot;:1070,&quot;abs_y&quot;:5112}"></iconify-icon>
+                            </div>
+                            <h3 class="text-2xl text-white font-semibold tracking-tight mb-3" bis_size="{&quot;x&quot;:580,&quot;y&quot;:5123,&quot;w&quot;:384,&quot;h&quot;:32,&quot;abs_x&quot;:1060,&quot;abs_y&quot;:5166}">Copywriting Expert, à l'échelle</h3>
+                            <p class="text-zinc-400 text-base leading-relaxed" bis_size="{&quot;x&quot;:580,&quot;y&quot;:5167,&quot;w&quot;:384,&quot;h&quot;:78,&quot;abs_x&quot;:1060,&quot;abs_y&quot;:5210}">L'agent Warm Outreach génère des séquences qui "semblent humaines", respectant les frameworks B2B les plus avancés (MEDDIC, BANT).</p>
+                        </div>
+                        
+                        <div class="flex items-center gap-2 opacity-80" bis_size="{&quot;x&quot;:988,&quot;y&quot;:5127,&quot;w&quot;:339,&quot;h&quot;:50,&quot;abs_x&quot;:1468,&quot;abs_y&quot;:5170}">
+                            <div class="px-3 py-2 bg-zinc-900 border border-white/10 rounded text-xs text-zinc-400" bis_size="{&quot;x&quot;:988,&quot;y&quot;:5127,&quot;w&quot;:91,&quot;h&quot;:50,&quot;abs_x&quot;:1468,&quot;abs_y&quot;:5170}">Signal Capté</div>
+                            <iconify-icon icon="solar:arrow-right-linear" width="16" class="text-zinc-600" aria-hidden="true" bis_size="{&quot;x&quot;:1088,&quot;y&quot;:5144,&quot;w&quot;:16,&quot;h&quot;:16,&quot;abs_x&quot;:1568,&quot;abs_y&quot;:5187}"></iconify-icon>
+                            <div class="px-3 py-2 bg-indigo-900/30 border border-indigo-500/30 rounded text-xs text-indigo-300" bis_size="{&quot;x&quot;:1112,&quot;y&quot;:5127,&quot;w&quot;:102,&quot;h&quot;:50,&quot;abs_x&quot;:1592,&quot;abs_y&quot;:5170}">Copywriting IA</div>
+                            <iconify-icon icon="solar:arrow-right-linear" width="16" class="text-zinc-600" aria-hidden="true" bis_size="{&quot;x&quot;:1222,&quot;y&quot;:5144,&quot;w&quot;:16,&quot;h&quot;:16,&quot;abs_x&quot;:1702,&quot;abs_y&quot;:5187}"></iconify-icon>
+                            <div class="px-3 py-2 bg-green-900/30 border border-green-500/30 rounded text-xs text-green-300" bis_size="{&quot;x&quot;:1246,&quot;y&quot;:5127,&quot;w&quot;:81,&quot;h&quot;:50,&quot;abs_x&quot;:1726,&quot;abs_y&quot;:5170}">Call Booké</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Use Cases Section -->
+        <section id="use-cases" class="py-24 bg-black relative" bis_size="{&quot;x&quot;:0,&quot;y&quot;:5389,&quot;w&quot;:1490,&quot;h&quot;:924,&quot;abs_x&quot;:480,&quot;abs_y&quot;:5432}">
+            <div class="max-w-7xl mr-auto ml-auto pr-6 pl-6" bis_size="{&quot;x&quot;:105,&quot;y&quot;:5485,&quot;w&quot;:1280,&quot;h&quot;:732,&quot;abs_x&quot;:585,&quot;abs_y&quot;:5528}">
+                <div class="text-center mb-16" bis_size="{&quot;x&quot;:129,&quot;y&quot;:5485,&quot;w&quot;:1232,&quot;h&quot;:208,&quot;abs_x&quot;:609,&quot;abs_y&quot;:5528}">
+                    <div class="text-orange-500 font-mono text-xs uppercase tracking-wide mb-2" bis_size="{&quot;x&quot;:129,&quot;y&quot;:5485,&quot;w&quot;:1232,&quot;h&quot;:16,&quot;abs_x&quot;:609,&quot;abs_y&quot;:5528}">Cas clients B2B</div>
+                    <h2 class="md:text-5xl text-3xl font-semibold text-white tracking-tight mb-4" bis_size="{&quot;x&quot;:129,&quot;y&quot;:5509,&quot;w&quot;:1232,&quot;h&quot;:96,&quot;abs_x&quot;:609,&quot;abs_y&quot;:5552}">
+                        Ils ne prospectent plus.<br bis_size="{&quot;x&quot;:1001,&quot;y&quot;:5503,&quot;w&quot;:0,&quot;h&quot;:59,&quot;abs_x&quot;:1481,&quot;abs_y&quot;:5546}">Ils pilotent l'IA.
+                    </h2>
+                    <p class="text-zinc-400 text-base max-w-xl mx-auto" bis_size="{&quot;x&quot;:457,&quot;y&quot;:5621,&quot;w&quot;:576,&quot;h&quot;:72,&quot;abs_x&quot;:937,&quot;abs_y&quot;:5664}">
+                        De la HR Tech au génie climatique, GTMlab déploie ses agents pour s'adapter à votre marché et générer du pipeline mesurable dès les premières semaines.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 gap-x-6 gap-y-6" bis_size="{&quot;x&quot;:129,&quot;y&quot;:5757,&quot;w&quot;:1232,&quot;h&quot;:460,&quot;abs_x&quot;:609,&quot;abs_y&quot;:5800}">
+                    
+                    <!-- Case 1: Hreact -->
+                    <div class="group relative p-8 rounded-[2rem] bg-[#0A0A0A] border border-white/10 hover:border-orange-500/30 transition-all duration-300 flex flex-col h-full hover:shadow-[0_0_30px_rgba(234,88,12,0.1)]" bis_size="{&quot;x&quot;:129,&quot;y&quot;:5757,&quot;w&quot;:394,&quot;h&quot;:460,&quot;abs_x&quot;:609,&quot;abs_y&quot;:5800}">
+                        <div class="flex items-center gap-3 mb-6" bis_size="{&quot;x&quot;:162,&quot;y&quot;:5790,&quot;w&quot;:328,&quot;h&quot;:48,&quot;abs_x&quot;:642,&quot;abs_y&quot;:5833}">
+                            <div class="w-12 h-12 rounded-xl bg-zinc-900 border border-white/10 flex items-center justify-center text-white font-semibold text-xl font-sans tracking-tight shadow-inner" bis_size="{&quot;x&quot;:162,&quot;y&quot;:5790,&quot;w&quot;:48,&quot;h&quot;:48,&quot;abs_x&quot;:642,&quot;abs_y&quot;:5833}">H</div>
+                            <div bis_size="{&quot;x&quot;:222,&quot;y&quot;:5792,&quot;w&quot;:126,&quot;h&quot;:44,&quot;abs_x&quot;:702,&quot;abs_y&quot;:5835}">
+                                <h3 class="text-white font-semibold text-lg" bis_size="{&quot;x&quot;:222,&quot;y&quot;:5792,&quot;w&quot;:126,&quot;h&quot;:28,&quot;abs_x&quot;:702,&quot;abs_y&quot;:5835}">Hreact</h3>
+                                <div class="text-xs text-zinc-500 uppercase tracking-wide" bis_size="{&quot;x&quot;:222,&quot;y&quot;:5820,&quot;w&quot;:126,&quot;h&quot;:16,&quot;abs_x&quot;:702,&quot;abs_y&quot;:5863}">HR Tech · SaaS B2B</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-6 space-y-2" bis_size="{&quot;x&quot;:162,&quot;y&quot;:5862,&quot;w&quot;:328,&quot;h&quot;:64,&quot;abs_x&quot;:642,&quot;abs_y&quot;:5905}">
+                            <div class="text-3xl font-semibold text-white tracking-tight" bis_size="{&quot;x&quot;:162,&quot;y&quot;:5862,&quot;w&quot;:328,&quot;h&quot;:36,&quot;abs_x&quot;:642,&quot;abs_y&quot;:5905}">250 leads/mois</div>
+                            <div class="text-sm text-zinc-500" bis_size="{&quot;x&quot;:162,&quot;y&quot;:5906,&quot;w&quot;:328,&quot;h&quot;:20,&quot;abs_x&quot;:642,&quot;abs_y&quot;:5949}">Pipeline piloté par les agents IA</div>
+                        </div>
+
+                        <p class="text-zinc-400 text-base leading-relaxed mb-8 flex-grow" bis_size="{&quot;x&quot;:162,&quot;y&quot;:5950,&quot;w&quot;:328,&quot;h&quot;:156,&quot;abs_x&quot;:642,&quot;abs_y&quot;:5993}">
+                            L'agent <strong class="text-white" bis_size="{&quot;x&quot;:221,&quot;y&quot;:5953,&quot;w&quot;:121,&quot;h&quot;:20,&quot;abs_x&quot;:701,&quot;abs_y&quot;:5996}">Signal Identifier</strong> détecte les entreprises qui structurent leurs équipes RH. L'agent Outreach arrive avec la bonne offre au bon moment — avant même que le besoin soit formalisé.
+                        </p>
+
+                        <button class="hover:bg-white/20 hover:text-white hover:border-white/20 transition-all flex gap-2 group-hover:bg-white/10 text-sm font-medium text-white bg-white/5 w-full border-white/10 border rounded-xl pt-3 pb-3 gap-x-2 gap-y-2 items-center justify-center" bis_size="{&quot;x&quot;:162,&quot;y&quot;:6138,&quot;w&quot;:328,&quot;h&quot;:46,&quot;abs_x&quot;:642,&quot;abs_y&quot;:6181}">
+                            Lire le cas complet
+                            <iconify-icon icon="solar:arrow-right-linear" width="16" class="group-hover:translate-x-1 transition-transform" aria-hidden="true" bis_size="{&quot;x&quot;:385,&quot;y&quot;:6153,&quot;w&quot;:16,&quot;h&quot;:16,&quot;abs_x&quot;:865,&quot;abs_y&quot;:6196}"></iconify-icon>
+                        </button>
+                    </div>
+
+                    <!-- Case 2: Metamorphoze -->
+                    <div class="group relative p-8 rounded-[2rem] bg-[#0A0A0A] border border-white/10 hover:border-purple-500/30 transition-all duration-300 flex flex-col h-full hover:shadow-[0_0_30px_rgba(168,85,247,0.1)]" bis_size="{&quot;x&quot;:547,&quot;y&quot;:5757,&quot;w&quot;:394,&quot;h&quot;:460,&quot;abs_x&quot;:1027,&quot;abs_y&quot;:5800}">
+                        <div class="flex items-center gap-3 mb-6" bis_size="{&quot;x&quot;:580,&quot;y&quot;:5790,&quot;w&quot;:328,&quot;h&quot;:48,&quot;abs_x&quot;:1060,&quot;abs_y&quot;:5833}">
+                            <div class="w-12 h-12 rounded-xl bg-purple-900/20 border border-purple-500/20 flex items-center justify-center text-purple-400 font-semibold text-xl shadow-inner" bis_size="{&quot;x&quot;:580,&quot;y&quot;:5790,&quot;w&quot;:48,&quot;h&quot;:48,&quot;abs_x&quot;:1060,&quot;abs_y&quot;:5833}">
+                                <iconify-icon icon="solar:sofa-2-bold" width="24" aria-hidden="true" bis_size="{&quot;x&quot;:592,&quot;y&quot;:5802,&quot;w&quot;:24,&quot;h&quot;:24,&quot;abs_x&quot;:1072,&quot;abs_y&quot;:5845}"></iconify-icon>
+                            </div>
+                            <div bis_size="{&quot;x&quot;:640,&quot;y&quot;:5792,&quot;w&quot;:180,&quot;h&quot;:44,&quot;abs_x&quot;:1120,&quot;abs_y&quot;:5835}">
+                                <h3 class="text-white font-semibold text-lg" bis_size="{&quot;x&quot;:640,&quot;y&quot;:5792,&quot;w&quot;:180,&quot;h&quot;:28,&quot;abs_x&quot;:1120,&quot;abs_y&quot;:5835}">Metamorphoze</h3>
+                                <div class="text-xs text-zinc-500 uppercase tracking-wide" bis_size="{&quot;x&quot;:640,&quot;y&quot;:5820,&quot;w&quot;:180,&quot;h&quot;:16,&quot;abs_x&quot;:1120,&quot;abs_y&quot;:5863}">Aménagement de bureaux</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-6 space-y-2" bis_size="{&quot;x&quot;:580,&quot;y&quot;:5862,&quot;w&quot;:328,&quot;h&quot;:64,&quot;abs_x&quot;:1060,&quot;abs_y&quot;:5905}">
+                            <div class="text-3xl font-semibold text-white tracking-tight" bis_size="{&quot;x&quot;:580,&quot;y&quot;:5862,&quot;w&quot;:328,&quot;h&quot;:36,&quot;abs_x&quot;:1060,&quot;abs_y&quot;:5905}">+35% conversion</div>
+                            <div class="text-sm text-zinc-500" bis_size="{&quot;x&quot;:580,&quot;y&quot;:5906,&quot;w&quot;:328,&quot;h&quot;:20,&quot;abs_x&quot;:1060,&quot;abs_y&quot;:5949}">vs. prospection SDR classique</div>
+                        </div>
+
+                        <p class="text-zinc-400 text-base leading-relaxed mb-8 flex-grow" bis_size="{&quot;x&quot;:580,&quot;y&quot;:5950,&quot;w&quot;:328,&quot;h&quot;:156,&quot;abs_x&quot;:1060,&quot;abs_y&quot;:5993}">
+                            Grâce aux agents croisant les données <strong class="text-white" bis_size="{&quot;x&quot;:580,&quot;y&quot;:5979,&quot;w&quot;:230,&quot;h&quot;:20,&quot;abs_x&quot;:1060,&quot;abs_y&quot;:6022}">"Déménagement de bureaux"</strong> et <strong class="text-white" bis_size="{&quot;x&quot;:580,&quot;y&quot;:6005,&quot;w&quot;:171,&quot;h&quot;:20,&quot;abs_x&quot;:1060,&quot;abs_y&quot;:6048}">"Croissance effectifs"</strong>, Metamorphoze route les décideurs immobiliers directement dans les agendas des commerciaux.
+                        </p>
+
+                        <button class="hover:bg-white/20 hover:text-white hover:border-white/20 transition-all flex gap-2 group-hover:bg-white/10 text-sm font-medium text-white bg-white/5 w-full border-white/10 border rounded-xl pt-3 pb-3 gap-x-2 gap-y-2 items-center justify-center cursor-pointer" bis_size="{&quot;x&quot;:580,&quot;y&quot;:6138,&quot;w&quot;:328,&quot;h&quot;:46,&quot;abs_x&quot;:1060,&quot;abs_y&quot;:6181}">
+                            Lire le cas complet
+                            <iconify-icon icon="solar:arrow-right-linear" width="16" class="group-hover:translate-x-1 transition-transform" aria-hidden="true" bis_size="{&quot;x&quot;:803,&quot;y&quot;:6153,&quot;w&quot;:16,&quot;h&quot;:16,&quot;abs_x&quot;:1283,&quot;abs_y&quot;:6196}"></iconify-icon>
+                        </button>
+                    </div>
+
+                    <!-- Case 3: Decoclim -->
+                    <div class="group relative p-8 rounded-[2rem] bg-[#0A0A0A] border border-white/10 hover:border-cyan-500/30 transition-all duration-300 flex flex-col h-full hover:shadow-[0_0_30px_rgba(6,182,212,0.1)]" bis_size="{&quot;x&quot;:966,&quot;y&quot;:5757,&quot;w&quot;:394,&quot;h&quot;:460,&quot;abs_x&quot;:1446,&quot;abs_y&quot;:5800}">
+                        <div class="flex items-center gap-3 mb-6" bis_size="{&quot;x&quot;:999,&quot;y&quot;:5790,&quot;w&quot;:328,&quot;h&quot;:48,&quot;abs_x&quot;:1479,&quot;abs_y&quot;:5833}">
+                            <div class="w-12 h-12 rounded-xl bg-cyan-900/20 border border-cyan-500/20 flex items-center justify-center text-cyan-400 font-semibold text-xl shadow-inner" bis_size="{&quot;x&quot;:999,&quot;y&quot;:5790,&quot;w&quot;:48,&quot;h&quot;:48,&quot;abs_x&quot;:1479,&quot;abs_y&quot;:5833}">
+                                <iconify-icon icon="solar:snowflake-bold" width="24" aria-hidden="true" bis_size="{&quot;x&quot;:1011,&quot;y&quot;:5802,&quot;w&quot;:24,&quot;h&quot;:24,&quot;abs_x&quot;:1491,&quot;abs_y&quot;:5845}"></iconify-icon>
+                            </div>
+                            <div bis_size="{&quot;x&quot;:1059,&quot;y&quot;:5792,&quot;w&quot;:154,&quot;h&quot;:44,&quot;abs_x&quot;:1539,&quot;abs_y&quot;:5835}">
+                                <h3 class="text-white font-semibold text-lg" bis_size="{&quot;x&quot;:1059,&quot;y&quot;:5792,&quot;w&quot;:154,&quot;h&quot;:28,&quot;abs_x&quot;:1539,&quot;abs_y&quot;:5835}">Decoclim</h3>
+                                <div class="text-xs text-zinc-500 uppercase tracking-wide" bis_size="{&quot;x&quot;:1059,&quot;y&quot;:5820,&quot;w&quot;:154,&quot;h&quot;:16,&quot;abs_x&quot;:1539,&quot;abs_y&quot;:5863}">Génie Climatique · CVC</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-6 space-y-2" bis_size="{&quot;x&quot;:999,&quot;y&quot;:5862,&quot;w&quot;:328,&quot;h&quot;:64,&quot;abs_x&quot;:1479,&quot;abs_y&quot;:5905}">
+                            <div class="text-3xl font-semibold text-white tracking-tight" bis_size="{&quot;x&quot;:999,&quot;y&quot;:5862,&quot;w&quot;:328,&quot;h&quot;:36,&quot;abs_x&quot;:1479,&quot;abs_y&quot;:5905}">Orchestration totale</div>
+                            <div class="text-sm text-zinc-500" bis_size="{&quot;x&quot;:999,&quot;y&quot;:5906,&quot;w&quot;:328,&quot;h&quot;:20,&quot;abs_x&quot;:1479,&quot;abs_y&quot;:5949}">Détection → Qualification en 24h</div>
+                        </div>
+
+                        <p class="text-base leading-relaxed flex-grow text-zinc-400 mb-8" bis_size="{&quot;x&quot;:999,&quot;y&quot;:5950,&quot;w&quot;:328,&quot;h&quot;:156,&quot;abs_x&quot;:1479,&quot;abs_y&quot;:5993}">
+                            L'agent <strong class="text-white" bis_size="{&quot;x&quot;:1059,&quot;y&quot;:5953,&quot;w&quot;:114,&quot;h&quot;:20,&quot;abs_x&quot;:1539,&quot;abs_y&quot;:5996}">ICP Challenger</strong> a affiné leur cible. Le système détecte les nouvelles structures via codes NAF et l'agent <strong class="text-white" bis_size="{&quot;x&quot;:999,&quot;y&quot;:6005,&quot;w&quot;:303,&quot;h&quot;:46,&quot;abs_x&quot;:1479,&quot;abs_y&quot;:6048}">Pre-meeting</strong> qualifie l'intérêt avant tout contact humain.
+                        </p>
+
+                        <button class="hover:bg-white/20 hover:text-white hover:border-white/20 transition-all flex gap-2 group-hover:bg-white/10 text-sm font-medium text-white bg-white/5 w-full border-white/10 border rounded-xl pt-3 pb-3 gap-x-2 gap-y-2 items-center justify-center cursor-pointer" bis_size="{&quot;x&quot;:999,&quot;y&quot;:6138,&quot;w&quot;:328,&quot;h&quot;:46,&quot;abs_x&quot;:1479,&quot;abs_y&quot;:6181}">
+                            Lire le cas complet
+                            <iconify-icon icon="solar:arrow-right-linear" width="16" class="group-hover:translate-x-1 transition-transform" aria-hidden="true" bis_size="{&quot;x&quot;:1222,&quot;y&quot;:6153,&quot;w&quot;:16,&quot;h&quot;:16,&quot;abs_x&quot;:1702,&quot;abs_y&quot;:6196}"></iconify-icon>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials Section -->
+        <section class="py-24 bg-black border-t border-white/5 relative" bis_size="{&quot;x&quot;:0,&quot;y&quot;:6313,&quot;w&quot;:1490,&quot;h&quot;:648,&quot;abs_x&quot;:480,&quot;abs_y&quot;:6356}">
+            <div class="max-w-7xl mx-auto px-6" bis_size="{&quot;x&quot;:105,&quot;y&quot;:6410,&quot;w&quot;:1280,&quot;h&quot;:455,&quot;abs_x&quot;:585,&quot;abs_y&quot;:6453}">
+                <div class="text-center mb-16" bis_size="{&quot;x&quot;:129,&quot;y&quot;:6410,&quot;w&quot;:1232,&quot;h&quot;:76,&quot;abs_x&quot;:609,&quot;abs_y&quot;:6453}">
+                    <h2 class="text-3xl font-semibold text-white tracking-tight mb-4" bis_size="{&quot;x&quot;:129,&quot;y&quot;:6410,&quot;w&quot;:1232,&quot;h&quot;:36,&quot;abs_x&quot;:609,&quot;abs_y&quot;:6453}">Ce qu'en disent les leaders Revenue</h2>
+                    <p class="text-zinc-400 text-base" bis_size="{&quot;x&quot;:129,&quot;y&quot;:6462,&quot;w&quot;:1232,&quot;h&quot;:24,&quot;abs_x&quot;:609,&quot;abs_y&quot;:6505}">Des résultats concrets, propulsés par notre suite d'agents IA.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" bis_size="{&quot;x&quot;:129,&quot;y&quot;:6550,&quot;w&quot;:1232,&quot;h&quot;:315,&quot;abs_x&quot;:609,&quot;abs_y&quot;:6593}">
+                    <!-- Testimonial 1 -->
+                    <div class="p-8 rounded-2xl bg-zinc-900/30 border border-white/10 flex flex-col gap-6 hover:border-white/20 transition-colors" bis_size="{&quot;x&quot;:129,&quot;y&quot;:6550,&quot;w&quot;:394,&quot;h&quot;:315,&quot;abs_x&quot;:609,&quot;abs_y&quot;:6593}">
+                        <div class="flex text-orange-500 gap-0.5" bis_size="{&quot;x&quot;:162,&quot;y&quot;:6583,&quot;w&quot;:328,&quot;h&quot;:14,&quot;abs_x&quot;:642,&quot;abs_y&quot;:6626}">
+                            <iconify-icon icon="solar:star-bold" width="14" aria-hidden="true" bis_size="{&quot;x&quot;:162,&quot;y&quot;:6583,&quot;w&quot;:14,&quot;h&quot;:14,&quot;abs_x&quot;:642,&quot;abs_y&quot;:6626}"></iconify-icon>
+                            <iconify-icon icon="solar:star-bold" width="14" aria-hidden="true" bis_size="{&quot;x&quot;:178,&quot;y&quot;:6583,&quot;w&quot;:14,&quot;h&quot;:14,&quot;abs_x&quot;:658,&quot;abs_y&quot;:6626}"></iconify-icon>
+                            <iconify-icon icon="solar:star-bold" width="14" aria-hidden="true" bis_size="{&quot;x&quot;:194,&quot;y&quot;:6583,&quot;w&quot;:14,&quot;h&quot;:14,&quot;abs_x&quot;:674,&quot;abs_y&quot;:6626}"></iconify-icon>
+                            <iconify-icon icon="solar:star-bold" width="14" aria-hidden="true" bis_size="{&quot;x&quot;:210,&quot;y&quot;:6583,&quot;w&quot;:14,&quot;h&quot;:14,&quot;abs_x&quot;:690,&quot;abs_y&quot;:6626}"></iconify-icon>
+                            <iconify-icon icon="solar:star-bold" width="14" aria-hidden="true" bis_size="{&quot;x&quot;:226,&quot;y&quot;:6583,&quot;w&quot;:14,&quot;h&quot;:14,&quot;abs_x&quot;:706,&quot;abs_y&quot;:6626}"></iconify-icon>
+                        </div>
+                        <p class="text-zinc-300 text-base leading-relaxed" bis_size="{&quot;x&quot;:162,&quot;y&quot;:6621,&quot;w&quot;:328,&quot;h&quot;:130,&quot;abs_x&quot;:642,&quot;abs_y&quot;:6664}">
+                            "L'agent Account Tiering a changé notre façon de travailler. Au lieu de spammer 10 000 contacts, on laisse l'IA router les 500 vrais acheteurs potentiels. Le taux de réponse a triplé."
+                        </p>
+                        <div class="flex items-center gap-4 mt-auto pt-4 border-t border-white/5" bis_size="{&quot;x&quot;:162,&quot;y&quot;:6775,&quot;w&quot;:328,&quot;h&quot;:57,&quot;abs_x&quot;:642,&quot;abs_y&quot;:6818}">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-900 to-zinc-900 flex items-center justify-center text-white text-xs font-semibold ring-1 ring-white/10" bis_size="{&quot;x&quot;:162,&quot;y&quot;:6792,&quot;w&quot;:40,&quot;h&quot;:40,&quot;abs_x&quot;:642,&quot;abs_y&quot;:6835}">PD</div>
+                            <div bis_size="{&quot;x&quot;:218,&quot;y&quot;:6794,&quot;w&quot;:202,&quot;h&quot;:36,&quot;abs_x&quot;:698,&quot;abs_y&quot;:6837}">
+                                <div class="text-white text-sm font-medium" bis_size="{&quot;x&quot;:218,&quot;y&quot;:6794,&quot;w&quot;:202,&quot;h&quot;:20,&quot;abs_x&quot;:698,&quot;abs_y&quot;:6837}">Pierre Dubois</div>
+                                <div class="text-zinc-500 text-xs" bis_size="{&quot;x&quot;:218,&quot;y&quot;:6814,&quot;w&quot;:202,&quot;h&quot;:16,&quot;abs_x&quot;:698,&quot;abs_y&quot;:6857}">VP Sales · Scale-up SaaS (85 pers.)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Testimonial 2 -->
+                    <div class="p-8 rounded-2xl bg-zinc-900/30 border border-white/10 flex flex-col gap-6 hover:border-white/20 transition-colors" bis_size="{&quot;x&quot;:547,&quot;y&quot;:6550,&quot;w&quot;:394,&quot;h&quot;:315,&quot;abs_x&quot;:1027,&quot;abs_y&quot;:6593}">
+                        <div class="flex text-orange-500 gap-0.5" bis_size="{&quot;x&quot;:580,&quot;y&quot;:6583,&quot;w&quot;:328,&quot;h&quot;:14,&quot;abs_x&quot;:1060,&quot;abs_y&quot;:6626}">
+                            <iconify-icon icon="solar:star-bold" width="14" aria-hidden="true" bis_size="{&quot;x&quot;:580,&quot;y&quot;:6583,&quot;w&quot;:14,&quot;h&quot;:14,&quot;abs_x&quot;:1060,&quot;abs_y&quot;:6626}"></iconify-icon>
+                            <iconify-icon icon="solar:star-bold" width="14" aria-hidden="true" bis_size="{&quot;x&quot;:596,&quot;y&quot;:6583,&quot;w&quot;:14,&quot;h&quot;:14,&quot;abs_x&quot;:1076,&quot;abs_y&quot;:6626}"></iconify-icon>
+                            <iconify-icon icon="solar:star-bold" width="14" aria-hidden="true" bis_size="{&quot;x&quot;:612,&quot;y&quot;:6583,&quot;w&quot;:14,&quot;h&quot;:14,&quot;abs_x&quot;:1092,&quot;abs_y&quot;:6626}"></iconify-icon>
+                            <iconify-icon icon="solar:star-bold" width="14" aria-hidden="true" bis_size="{&quot;x&quot;:628,&quot;y&quot;:6583,&quot;w&quot;:14,&quot;h&quot;:14,&quot;abs_x&quot;:1108,&quot;abs_y&quot;:6626}"></iconify-icon>
+                            <iconify-icon icon="solar:star-bold" width="14" aria-hidden="true" bis_size="{&quot;x&quot;:644,&quot;y&quot;:6583,&quot;w&quot;:14,&quot;h&quot;:14,&quot;abs_x&quot;:1124,&quot;abs_y&quot;:6626}"></iconify-icon>
+                        </div>
+                        <p class="text-zinc-300 text-base leading-relaxed" bis_size="{&quot;x&quot;:580,&quot;y&quot;:6621,&quot;w&quot;:328,&quot;h&quot;:130,&quot;abs_x&quot;:1060,&quot;abs_y&quot;:6664}">
+                            "Le Scoring Agent est d'une précision redoutable. Mes SDRs ne font plus de recherche ou de séquençage manuel — l'IA orchestre tout, ils ne font que closer des rendez-vous chauds."
+                        </p>
+                        <div class="flex items-center gap-4 mt-auto pt-4 border-t border-white/5" bis_size="{&quot;x&quot;:580,&quot;y&quot;:6775,&quot;w&quot;:328,&quot;h&quot;:57,&quot;abs_x&quot;:1060,&quot;abs_y&quot;:6818}">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-900 to-zinc-900 flex items-center justify-center text-white text-xs font-semibold ring-1 ring-white/10" bis_size="{&quot;x&quot;:580,&quot;y&quot;:6792,&quot;w&quot;:40,&quot;h&quot;:40,&quot;abs_x&quot;:1060,&quot;abs_y&quot;:6835}">SL</div>
+                            <div bis_size="{&quot;x&quot;:636,&quot;y&quot;:6794,&quot;w&quot;:184,&quot;h&quot;:36,&quot;abs_x&quot;:1116,&quot;abs_y&quot;:6837}">
+                                <div class="text-white text-sm font-medium" bis_size="{&quot;x&quot;:636,&quot;y&quot;:6794,&quot;w&quot;:184,&quot;h&quot;:20,&quot;abs_x&quot;:1116,&quot;abs_y&quot;:6837}">Sarah Lecomte</div>
+                                <div class="text-zinc-500 text-xs" bis_size="{&quot;x&quot;:636,&quot;y&quot;:6814,&quot;w&quot;:184,&quot;h&quot;:16,&quot;abs_x&quot;:1116,&quot;abs_y&quot;:6857}">Fondatrice · Agence Growth B2B</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Testimonial 3 -->
+                    <div class="p-8 rounded-2xl bg-zinc-900/30 border border-white/10 flex flex-col gap-6 hover:border-white/20 transition-colors" bis_size="{&quot;x&quot;:966,&quot;y&quot;:6550,&quot;w&quot;:394,&quot;h&quot;:315,&quot;abs_x&quot;:1446,&quot;abs_y&quot;:6593}">
+                        <div class="flex text-orange-500 gap-0.5" bis_size="{&quot;x&quot;:999,&quot;y&quot;:6583,&quot;w&quot;:328,&quot;h&quot;:14,&quot;abs_x&quot;:1479,&quot;abs_y&quot;:6626}">
+                            <iconify-icon icon="solar:star-bold" width="14" aria-hidden="true" bis_size="{&quot;x&quot;:999,&quot;y&quot;:6583,&quot;w&quot;:14,&quot;h&quot;:14,&quot;abs_x&quot;:1479,&quot;abs_y&quot;:6626}"></iconify-icon>
+                            <iconify-icon icon="solar:star-bold" width="14" aria-hidden="true" bis_size="{&quot;x&quot;:1015,&quot;y&quot;:6583,&quot;w&quot;:14,&quot;h&quot;:14,&quot;abs_x&quot;:1495,&quot;abs_y&quot;:6626}"></iconify-icon>
+                            <iconify-icon icon="solar:star-bold" width="14" aria-hidden="true" bis_size="{&quot;x&quot;:1031,&quot;y&quot;:6583,&quot;w&quot;:14,&quot;h&quot;:14,&quot;abs_x&quot;:1511,&quot;abs_y&quot;:6626}"></iconify-icon>
+                            <iconify-icon icon="solar:star-bold" width="14" aria-hidden="true" bis_size="{&quot;x&quot;:1047,&quot;y&quot;:6583,&quot;w&quot;:14,&quot;h&quot;:14,&quot;abs_x&quot;:1527,&quot;abs_y&quot;:6626}"></iconify-icon>
+                            <iconify-icon icon="solar:star-bold" width="14" aria-hidden="true" bis_size="{&quot;x&quot;:1063,&quot;y&quot;:6583,&quot;w&quot;:14,&quot;h&quot;:14,&quot;abs_x&quot;:1543,&quot;abs_y&quot;:6626}"></iconify-icon>
+                        </div>
+                        <p class="text-zinc-300 text-base leading-relaxed" bis_size="{&quot;x&quot;:999,&quot;y&quot;:6621,&quot;w&quot;:328,&quot;h&quot;:130,&quot;abs_x&quot;:1479,&quot;abs_y&quot;:6664}">
+                            "L'agent Copywriting rédige des approches si contextuelles via le framework MEDDIC que personne ne devine que c'est l'IA. C'est du strategic outbound automatisé et parfaitement exécuté."
+                        </p>
+                        <div class="flex items-center gap-4 mt-auto pt-4 border-t border-white/5" bis_size="{&quot;x&quot;:999,&quot;y&quot;:6775,&quot;w&quot;:328,&quot;h&quot;:57,&quot;abs_x&quot;:1479,&quot;abs_y&quot;:6818}">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-900 to-zinc-900 flex items-center justify-center text-white text-xs font-semibold ring-1 ring-white/10" bis_size="{&quot;x&quot;:999,&quot;y&quot;:6792,&quot;w&quot;:40,&quot;h&quot;:40,&quot;abs_x&quot;:1479,&quot;abs_y&quot;:6835}">TM</div>
+                            <div bis_size="{&quot;x&quot;:1055,&quot;y&quot;:6794,&quot;w&quot;:210,&quot;h&quot;:36,&quot;abs_x&quot;:1535,&quot;abs_y&quot;:6837}">
+                                <div class="text-white text-sm font-medium" bis_size="{&quot;x&quot;:1055,&quot;y&quot;:6794,&quot;w&quot;:210,&quot;h&quot;:20,&quot;abs_x&quot;:1535,&quot;abs_y&quot;:6837}">Thomas Martin</div>
+                                <div class="text-zinc-500 text-xs" bis_size="{&quot;x&quot;:1055,&quot;y&quot;:6814,&quot;w&quot;:210,&quot;h&quot;:16,&quot;abs_x&quot;:1535,&quot;abs_y&quot;:6857}">Head of Growth · FinTech (200 pers.)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Box (With Calendar) -->
+        <section id="demo" class="py-24 px-6 relative overflow-hidden" bis_size="{&quot;x&quot;:0,&quot;y&quot;:6961,&quot;w&quot;:1490,&quot;h&quot;:1107,&quot;abs_x&quot;:480,&quot;abs_y&quot;:7004}">
+            <div class="absolute inset-0 bg-grid-pattern opacity-20 pointer-events-none" bis_size="{&quot;x&quot;:0,&quot;y&quot;:6961,&quot;w&quot;:1490,&quot;h&quot;:1107,&quot;abs_x&quot;:480,&quot;abs_y&quot;:7004}"></div>
+            <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-orange-600/10 blur-[150px] rounded-full pointer-events-none" bis_size="{&quot;x&quot;:0,&quot;y&quot;:7568,&quot;w&quot;:500,&quot;h&quot;:500,&quot;abs_x&quot;:480,&quot;abs_y&quot;:7611}"></div>
+
+            <div class="max-w-7xl mx-auto rounded-[2.5rem] overflow-hidden border border-white/10 bg-[#080808] relative z-10 shadow-2xl" bis_size="{&quot;x&quot;:105,&quot;y&quot;:7057,&quot;w&quot;:1280,&quot;h&quot;:915,&quot;abs_x&quot;:585,&quot;abs_y&quot;:7100}">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-0 lg:gap-12 p-8 md:p-12 lg:p-16 items-start" bis_size="{&quot;x&quot;:106,&quot;y&quot;:7058,&quot;w&quot;:1278,&quot;h&quot;:913,&quot;abs_x&quot;:586,&quot;abs_y&quot;:7101}">
+                    
+                    <!-- Left Column: Copy -->
+                    <div class="flex flex-col justify-center h-full pt-4 lg:pt-12" bis_size="{&quot;x&quot;:170,&quot;y&quot;:7122,&quot;w&quot;:551,&quot;h&quot;:785,&quot;abs_x&quot;:650,&quot;abs_y&quot;:7165}">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-orange-500/20 bg-orange-500/5 text-orange-300 text-xs uppercase font-medium tracking-wide mb-6 w-fit" bis_size="{&quot;x&quot;:170,&quot;y&quot;:7311,&quot;w&quot;:220,&quot;h&quot;:26,&quot;abs_x&quot;:650,&quot;abs_y&quot;:7354}">
+                            <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-signal" bis_size="{&quot;x&quot;:183,&quot;y&quot;:7321,&quot;w&quot;:6,&quot;h&quot;:6,&quot;abs_x&quot;:663,&quot;abs_y&quot;:7364}"></span>
+                            Audit Stratégique Offert
+                        </div>
+                        <h2 class="text-4xl md:text-5xl font-semibold text-white mb-6 tracking-tight leading-[1.1]" bis_size="{&quot;x&quot;:170,&quot;y&quot;:7361,&quot;w&quot;:551,&quot;h&quot;:96,&quot;abs_x&quot;:650,&quot;abs_y&quot;:7404}">
+                            Déployez vos premiers<br bis_size="{&quot;x&quot;:673,&quot;y&quot;:7355,&quot;w&quot;:0,&quot;h&quot;:59,&quot;abs_x&quot;:1153,&quot;abs_y&quot;:7398}">Agents IA B2B.
+                        </h2>
+                        <p class="text-zinc-400 text-lg mb-8 leading-relaxed max-w-md" bis_size="{&quot;x&quot;:170,&quot;y&quot;:7481,&quot;w&quot;:448,&quot;h&quot;:117,&quot;abs_x&quot;:650,&quot;abs_y&quot;:7524}">
+                            En 15 minutes, découvrez comment notre suite d'agents s'intègre à votre CRM pour remplacer l'outbound générique par un système prédictible et scalable.
+                        </p>
+                        
+                        <div class="space-y-4 mb-8" bis_size="{&quot;x&quot;:170,&quot;y&quot;:7630,&quot;w&quot;:551,&quot;h&quot;:104,&quot;abs_x&quot;:650,&quot;abs_y&quot;:7673}">
+                            <div class="flex items-center gap-3" bis_size="{&quot;x&quot;:170,&quot;y&quot;:7630,&quot;w&quot;:551,&quot;h&quot;:24,&quot;abs_x&quot;:650,&quot;abs_y&quot;:7673}">
+                                <div class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-white" bis_size="{&quot;x&quot;:170,&quot;y&quot;:7630,&quot;w&quot;:24,&quot;h&quot;:24,&quot;abs_x&quot;:650,&quot;abs_y&quot;:7673}">
+                                    <iconify-icon icon="solar:check-circle-linear" width="14" aria-hidden="true" bis_size="{&quot;x&quot;:175,&quot;y&quot;:7635,&quot;w&quot;:14,&quot;h&quot;:14,&quot;abs_x&quot;:655,&quot;abs_y&quot;:7678}"></iconify-icon>
+                                </div>
+                                <span class="text-sm text-zinc-300" bis_size="{&quot;x&quot;:206,&quot;y&quot;:7632,&quot;w&quot;:258,&quot;h&quot;:20,&quot;abs_x&quot;:686,&quot;abs_y&quot;:7675}">Audit de votre ICP &amp; signaux pertinents</span>
+                            </div>
+                            <div class="flex items-center gap-3" bis_size="{&quot;x&quot;:170,&quot;y&quot;:7670,&quot;w&quot;:551,&quot;h&quot;:24,&quot;abs_x&quot;:650,&quot;abs_y&quot;:7713}">
+                                <div class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-white" bis_size="{&quot;x&quot;:170,&quot;y&quot;:7670,&quot;w&quot;:24,&quot;h&quot;:24,&quot;abs_x&quot;:650,&quot;abs_y&quot;:7713}">
+                                    <iconify-icon icon="solar:check-circle-linear" width="14" aria-hidden="true" bis_size="{&quot;x&quot;:175,&quot;y&quot;:7675,&quot;w&quot;:14,&quot;h&quot;:14,&quot;abs_x&quot;:655,&quot;abs_y&quot;:7718}"></iconify-icon>
+                                </div>
+                                <span class="text-sm text-zinc-300" bis_size="{&quot;x&quot;:206,&quot;y&quot;:7672,&quot;w&quot;:299,&quot;h&quot;:20,&quot;abs_x&quot;:686,&quot;abs_y&quot;:7715}">Démonstration des agents en condition réelle</span>
+                            </div>
+                            <div class="flex items-center gap-3" bis_size="{&quot;x&quot;:170,&quot;y&quot;:7710,&quot;w&quot;:551,&quot;h&quot;:24,&quot;abs_x&quot;:650,&quot;abs_y&quot;:7753}">
+                                <div class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-white" bis_size="{&quot;x&quot;:170,&quot;y&quot;:7710,&quot;w&quot;:24,&quot;h&quot;:24,&quot;abs_x&quot;:650,&quot;abs_y&quot;:7753}">
+                                    <iconify-icon icon="solar:check-circle-linear" width="14" aria-hidden="true" bis_size="{&quot;x&quot;:175,&quot;y&quot;:7715,&quot;w&quot;:14,&quot;h&quot;:14,&quot;abs_x&quot;:655,&quot;abs_y&quot;:7758}"></iconify-icon>
+                                </div>
+                                <span class="text-sm text-zinc-300" bis_size="{&quot;x&quot;:206,&quot;y&quot;:7712,&quot;w&quot;:174,&quot;h&quot;:20,&quot;abs_x&quot;:686,&quot;abs_y&quot;:7755}">Aucun engagement requis</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Calendar Embed -->
+                    <div class="relative w-full h-full min-h-[500px] lg:min-h-[600px] bg-[#0c0c0c] border border-white/10 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/5" bis_size="{&quot;x&quot;:769,&quot;y&quot;:7122,&quot;w&quot;:551,&quot;h&quot;:785,&quot;abs_x&quot;:1249,&quot;abs_y&quot;:7165}">
+                        <div style="width:100%;height:100%;overflow:scroll" id="my-cal-inline-15min" class="cal-inline-container" bis_size="{&quot;x&quot;:770,&quot;y&quot;:7123,&quot;w&quot;:549,&quot;h&quot;:783,&quot;abs_x&quot;:1250,&quot;abs_y&quot;:7166}">
+                        
+    <style>.cal-inline-container::-webkit-scrollbar{display:none}.cal-inline-container{scrollbar-width:none}</style>
+    <style>.cal-inline-container::-webkit-scrollbar{display:none}.cal-inline-container{scrollbar-width:none}</style>
+    <style>.cal-inline-container::-webkit-scrollbar{display:none}.cal-inline-container{scrollbar-width:none}</style></div>
+                        <script type="text/javascript">
+                          (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if(typeof namespace === "string"){cal.ns[namespace] = cal.ns[namespace] || api;p(cal.ns[namespace], ar);p(cal, ["initNamespace", namespace]);} else p(cal, ar); return;} p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
+                        Cal("init", "15min", {origin:"https://app.cal.com"});
+                          Cal.ns["15min"]("inline", {
+                            elementOrSelector:"#my-cal-inline-15min",
+                            config: {"layout":"month_view","useSlotsViewOnSmallScreen":"true", "theme":"dark"},
+                            calLink: "guillaume-tonet-mejox0/15min",
+                          });
+                          Cal.ns["15min"]("ui", {"theme":"dark", "cssVarsPerTheme":{"light":{"cal-brand":"#881717"},"dark":{"cal-brand":"#ea580c","cal-text":"#ffffff","cal-text-muted":"#a1a1aa","cal-bg":"#0c0c0c"}},"hideEventTypeDetails":false,"layout":"month_view"});
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black border-t border-white/5 pt-20 pb-10 text-sm" bis_size="{&quot;x&quot;:0,&quot;y&quot;:8068,&quot;w&quot;:1490,&quot;h&quot;:398,&quot;abs_x&quot;:480,&quot;abs_y&quot;:8111}">
+        <div class="max-w-7xl mx-auto px-6" bis_size="{&quot;x&quot;:105,&quot;y&quot;:8149,&quot;w&quot;:1280,&quot;h&quot;:277,&quot;abs_x&quot;:585,&quot;abs_y&quot;:8192}">
+            <div class="grid grid-cols-2 md:grid-cols-6 gap-8 mb-16" bis_size="{&quot;x&quot;:129,&quot;y&quot;:8149,&quot;w&quot;:1232,&quot;h&quot;:164,&quot;abs_x&quot;:609,&quot;abs_y&quot;:8192}">
+                <div class="col-span-2 pr-8" bis_size="{&quot;x&quot;:129,&quot;y&quot;:8149,&quot;w&quot;:389,&quot;h&quot;:164,&quot;abs_x&quot;:609,&quot;abs_y&quot;:8192}">
+                    <a href="/" class="flex items-center gap-3 text-white font-semibold tracking-tight text-lg mb-6 group" aria-label="Retour à l'accueil GTMlab" bis_size="{&quot;x&quot;:129,&quot;y&quot;:8149,&quot;w&quot;:357,&quot;h&quot;:36,&quot;abs_x&quot;:609,&quot;abs_y&quot;:8192}">
+                        <div class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shadow-lg shadow-orange-500/5 relative overflow-hidden group-hover:bg-orange-500/10 group-hover:border-orange-500/20 transition-all duration-300" bis_size="{&quot;x&quot;:129,&quot;y&quot;:8149,&quot;w&quot;:36,&quot;h&quot;:36,&quot;abs_x&quot;:609,&quot;abs_y&quot;:8192}">
+                             <iconify-icon icon="solar:box-linear" width="20" stroke-width="1.5" class="text-white group-hover:text-orange-500 transition-colors duration-300" bis_size="{&quot;x&quot;:137,&quot;y&quot;:8157,&quot;w&quot;:20,&quot;h&quot;:20,&quot;abs_x&quot;:617,&quot;abs_y&quot;:8200}"></iconify-icon>
+                        </div>
+                        GTMlab
+                    </a>
+                    <p class="text-zinc-500 mb-6 leading-relaxed max-w-xs" bis_size="{&quot;x&quot;:129,&quot;y&quot;:8209,&quot;w&quot;:320,&quot;h&quot;:68,&quot;abs_x&quot;:609,&quot;abs_y&quot;:8252}">
+                        The 1st AI co-pilot for Strategic Outbound. GTMlab remplace l'outbound générique par une suite d'agents IA pilotés par des experts.
+                    </p>
+                </div>
+
+                <div class="flex flex-col gap-4" bis_size="{&quot;x&quot;:550,&quot;y&quot;:8149,&quot;w&quot;:178,&quot;h&quot;:164,&quot;abs_x&quot;:1030,&quot;abs_y&quot;:8192}">
+                    <h4 class="text-white font-medium" bis_size="{&quot;x&quot;:550,&quot;y&quot;:8149,&quot;w&quot;:178,&quot;h&quot;:20,&quot;abs_x&quot;:1030,&quot;abs_y&quot;:8192}">Plateforme</h4>
+                    <a href="#" class="text-zinc-500 hover:text-orange-400 transition-colors" bis_size="{&quot;x&quot;:550,&quot;y&quot;:8185,&quot;w&quot;:178,&quot;h&quot;:20,&quot;abs_x&quot;:1030,&quot;abs_y&quot;:8228}">ICP Refinement</a>
+                    <a href="#" class="text-zinc-500 hover:text-orange-400 transition-colors" bis_size="{&quot;x&quot;:550,&quot;y&quot;:8221,&quot;w&quot;:178,&quot;h&quot;:20,&quot;abs_x&quot;:1030,&quot;abs_y&quot;:8264}">Account Research</a>
+                    <a href="#" class="text-zinc-500 hover:text-orange-400 transition-colors" bis_size="{&quot;x&quot;:550,&quot;y&quot;:8257,&quot;w&quot;:178,&quot;h&quot;:20,&quot;abs_x&quot;:1030,&quot;abs_y&quot;:8300}">Sales Allocation</a>
+                    <a href="#" class="text-zinc-500 hover:text-orange-400 transition-colors" bis_size="{&quot;x&quot;:550,&quot;y&quot;:8293,&quot;w&quot;:178,&quot;h&quot;:20,&quot;abs_x&quot;:1030,&quot;abs_y&quot;:8336}">Warm Outreach</a>
+                </div>
+
+                <div class="flex flex-col gap-4" bis_size="{&quot;x&quot;:761,&quot;y&quot;:8149,&quot;w&quot;:178,&quot;h&quot;:164,&quot;abs_x&quot;:1241,&quot;abs_y&quot;:8192}">
+                    <h4 class="text-white font-medium" bis_size="{&quot;x&quot;:761,&quot;y&quot;:8149,&quot;w&quot;:178,&quot;h&quot;:20,&quot;abs_x&quot;:1241,&quot;abs_y&quot;:8192}">Ressources</h4>
+                    <a href="#" class="text-zinc-500 hover:text-orange-400 transition-colors" bis_size="{&quot;x&quot;:761,&quot;y&quot;:8185,&quot;w&quot;:178,&quot;h&quot;:20,&quot;abs_x&quot;:1241,&quot;abs_y&quot;:8228}">Blog &amp; Playbooks</a>
+                    <a href="#" class="text-zinc-500 hover:text-orange-400 transition-colors" bis_size="{&quot;x&quot;:761,&quot;y&quot;:8221,&quot;w&quot;:178,&quot;h&quot;:20,&quot;abs_x&quot;:1241,&quot;abs_y&quot;:8264}">Revenue Orchestration</a>
+                    <a href="#" class="text-zinc-500 hover:text-orange-400 transition-colors" bis_size="{&quot;x&quot;:761,&quot;y&quot;:8257,&quot;w&quot;:178,&quot;h&quot;:20,&quot;abs_x&quot;:1241,&quot;abs_y&quot;:8300}">Stratégie GTM</a>
+                </div>
+
+                <div class="flex flex-col gap-4" bis_size="{&quot;x&quot;:971,&quot;y&quot;:8149,&quot;w&quot;:178,&quot;h&quot;:164,&quot;abs_x&quot;:1451,&quot;abs_y&quot;:8192}">
+                    <h4 class="text-white font-medium" bis_size="{&quot;x&quot;:971,&quot;y&quot;:8149,&quot;w&quot;:178,&quot;h&quot;:20,&quot;abs_x&quot;:1451,&quot;abs_y&quot;:8192}">Société</h4>
+                    <a href="#" class="text-zinc-500 hover:text-orange-400 transition-colors" bis_size="{&quot;x&quot;:971,&quot;y&quot;:8185,&quot;w&quot;:178,&quot;h&quot;:20,&quot;abs_x&quot;:1451,&quot;abs_y&quot;:8228}">À propos</a>
+                    <a href="#" class="text-zinc-500 hover:text-orange-400 transition-colors" bis_size="{&quot;x&quot;:971,&quot;y&quot;:8221,&quot;w&quot;:178,&quot;h&quot;:20,&quot;abs_x&quot;:1451,&quot;abs_y&quot;:8264}">Contact</a>
+                    <a href="#" class="text-zinc-500 hover:text-orange-400 transition-colors" bis_size="{&quot;x&quot;:971,&quot;y&quot;:8257,&quot;w&quot;:178,&quot;h&quot;:20,&quot;abs_x&quot;:1451,&quot;abs_y&quot;:8300}">Confidentialité</a>
+                </div>
+            </div>
+
+            <div class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4" bis_size="{&quot;x&quot;:129,&quot;y&quot;:8377,&quot;w&quot;:1232,&quot;h&quot;:49,&quot;abs_x&quot;:609,&quot;abs_y&quot;:8420}">
+                <div class="text-zinc-600 text-xs" bis_size="{&quot;x&quot;:129,&quot;y&quot;:8410,&quot;w&quot;:217,&quot;h&quot;:16,&quot;abs_x&quot;:609,&quot;abs_y&quot;:8453}">
+                    © 2024 GTMlab. Tous droits réservés.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const cards = document.querySelectorAll('.spotlight-card');
+        cards.forEach(card => {
+            card.onmousemove = e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            };
+        });
+
+        const scene = document.getElementById('interactive-scene');
+        const cube = document.getElementById('cube');
+        let isHovering = false;
+
+        if (scene && cube) {
+            scene.addEventListener('mousemove', (e) => {
+                isHovering = true;
+                const rect = scene.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 2 - 1; 
+                const y = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+                const rotY = x * 60;
+                const rotX = -y * 60;
+                cube.style.animation = 'none';
+                cube.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+            });
+
+            scene.addEventListener('mouseleave', () => {
+                isHovering = false;
+                cube.style.animation = 'spinCube 20s infinite linear';
+            });
+        }
+    </script>
+
+
+</body></html>
