@@ -121,18 +121,23 @@
     .chat-bubble.ai{background:rgba(255,255,255,0.04);color:#A1A1AA;border:1px solid rgba(255,255,255,0.07);align-self:flex-start;border-bottom-left-radius:3px}
     .chat-cursor{display:inline-block;width:7px;height:12px;background:#00E5FF;margin-left:4px;border-radius:1px;animation:blink 1s infinite}
     @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-    .mock-preview{padding:20px;display:flex;flex-direction:column;gap:10px;justify-content:center}
-    .mock-preview .preview-label{font-size:10px;font-weight:700;color:#3F3F46;text-transform:uppercase;letter-spacing:1px}
-    .mock-site{flex:1;background:linear-gradient(135deg,#FAFAFA 0%,#F0F9FF 50%,#ECFDF5 100%);border-radius:12px;min-height:150px;overflow:hidden;position:relative;display:flex;flex-direction:column}
-    .mock-site-nav{background:rgba(255,255,255,0.9);padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(0,0,0,0.06)}
-    .mock-site-dot{width:24px;height:6px;border-radius:3px;background:#0EA5E9}
-    .mock-site-links{display:flex;gap:6px;margin-left:auto}
-    .mock-site-link{width:24px;height:6px;border-radius:3px;background:rgba(0,0,0,0.08)}
-    .mock-site-hero{padding:16px;flex:1;display:flex;flex-direction:column;gap:8px;align-items:center;justify-content:center;text-align:center}
-    .mock-site-h{width:70%;height:12px;background:linear-gradient(90deg,#1E3A5F,#0EA5E9);border-radius:6px}
-    .mock-site-p{width:50%;height:6px;background:rgba(0,0,0,0.1);border-radius:3px}
-    .mock-site-btn{width:80px;height:20px;background:#0EA5E9;border-radius:5px;margin-top:4px}
-    .mock-site-badge{position:absolute;bottom:10px;right:10px;background:rgba(9,9,11,0.75);backdrop-filter:blur(8px);color:#00E5FF;font-size:9px;font-weight:700;padding:3px 8px;border-radius:6px;border:1px solid rgba(0,229,255,0.3);letter-spacing:.3px}
+    .mock-preview{padding:16px;display:flex;flex-direction:column;gap:8px;background:#060608;border-left:1px solid rgba(255,255,255,0.05);position:relative;overflow:hidden}
+    .mock-code-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+    .mock-code-label{font-size:10px;font-weight:600;color:#3F3F46;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:6px}
+    .mock-code-label .blink-dot{width:5px;height:5px;border-radius:50%;background:#00E5FF;animation:livePulse 1.5s infinite}
+    .mock-code-lines{font-family:'Courier New',monospace;font-size:11px;line-height:1.8;flex:1;overflow:hidden}
+    .cl{display:flex;gap:10px;opacity:0;animation:fadeInLine .3s ease forwards}
+    .ln{color:#3F3F46;min-width:16px;text-align:right;user-select:none;flex-shrink:0}
+    .lc{white-space:nowrap;overflow:hidden}
+    .t-tag{color:#7DD3FC}
+    .t-attr{color:#86EFAC}
+    .t-val{color:#FCA5A5}
+    .t-txt{color:#A1A1AA}
+    .t-cyan{color:#67E8F9}
+    @keyframes fadeInLine{from{opacity:0;transform:translateX(-4px)}to{opacity:1;transform:translateX(0)}}
+    .mock-cursor-line{display:flex;gap:10px}
+    .mock-cursor-line .ln{color:#3F3F46;min-width:16px;text-align:right}
+    .mock-cursor-line .lc::after{content:'▋';color:#00E5FF;animation:blink 1s infinite;font-size:10px}
 
     /* === SECTIONS COMMON === */
     .sec-eyebrow{text-align:center;font-size:11px;font-weight:700;color:#00E5FF;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px}
@@ -384,23 +389,12 @@
               <div class="chat-bubble ai">✨ <span data-i18n="preview_ai">Building your professional coffee shop page...</span><span class="chat-cursor"></span></div>
             </div>
             <div class="mock-preview">
-              <div class="preview-label" data-i18n="mock_label_preview">Live Preview</div>
-              <div class="mock-site">
-                <div class="mock-site-nav">
-                  <div class="mock-site-dot"></div>
-                  <div class="mock-site-links">
-                    <div class="mock-site-link"></div>
-                    <div class="mock-site-link"></div>
-                    <div class="mock-site-link"></div>
-                  </div>
-                </div>
-                <div class="mock-site-hero">
-                  <div class="mock-site-h"></div>
-                  <div class="mock-site-p"></div>
-                  <div class="mock-site-btn"></div>
-                </div>
-                <div class="mock-site-badge" data-i18n="preview_result">✓ Live</div>
+              <div class="mock-code-bar">
+                <div class="mock-code-label"><span class="blink-dot"></span>Generating</div>
+                <div style="font-size:9px;color:#3F3F46;font-family:monospace">index.html</div>
               </div>
+              <div class="mock-code-lines" id="mock-code-lines"></div>
+              <div class="mock-cursor-line"><span class="ln" id="mock-cursor-ln">1</span><span class="lc"></span></div>
             </div>
           </div>
         </div>
@@ -753,6 +747,43 @@
   }
   function closeModal() { document.getElementById('model-modal').classList.remove('show'); }
   function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('show'); }
+
+  // Animated code typewriter in hero mock
+  (function(){
+    var lines = [
+      ['<span class="t-tag">&lt;!DOCTYPE html&gt;</span>'],
+      ['<span class="t-tag">&lt;html&gt;&lt;head&gt;</span>'],
+      ['&nbsp;&nbsp;<span class="t-tag">&lt;title&gt;</span><span class="t-txt">Coffee Shop Tashkent</span><span class="t-tag">&lt;/title&gt;</span>'],
+      ['&nbsp;&nbsp;<span class="t-tag">&lt;style&gt;</span>'],
+      ['&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-attr">body</span> { <span class="t-val">background</span>: <span class="t-cyan">#0a0a0a</span> }'],
+      ['&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-attr">.hero</span> { <span class="t-val">padding</span>: <span class="t-cyan">80px 40px</span> }'],
+      ['&nbsp;&nbsp;<span class="t-tag">&lt;/style&gt;</span>'],
+      ['<span class="t-tag">&lt;/head&gt;&lt;body&gt;</span>'],
+      ['&nbsp;&nbsp;<span class="t-tag">&lt;section</span> <span class="t-attr">class</span>=<span class="t-val">"hero"</span><span class="t-tag">&gt;</span>'],
+      ['&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-tag">&lt;h1&gt;</span><span class="t-txt">Best Coffee</span><span class="t-tag">&lt;/h1&gt;</span>'],
+      ['&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-tag">&lt;p&gt;</span><span class="t-txt">Tashkent, Uzbekistan</span><span class="t-tag">&lt;/p&gt;</span>'],
+      ['&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-tag">&lt;a</span> <span class="t-attr">href</span>=<span class="t-val">"#menu"</span><span class="t-tag">&gt;</span><span class="t-cyan">View Menu →</span><span class="t-tag">&lt;/a&gt;</span>'],
+      ['&nbsp;&nbsp;<span class="t-tag">&lt;/section&gt;</span>'],
+    ];
+    var container = document.getElementById('mock-code-lines');
+    var cursorLn = document.getElementById('mock-cursor-ln');
+    if(!container) return;
+    var i = 0;
+    function addLine() {
+      if(i >= lines.length){ i = 0; container.innerHTML = ''; }
+      var row = document.createElement('div');
+      row.className = 'cl';
+      row.style.animationDelay = '0s';
+      row.innerHTML = '<span class="ln">'+(i+1)+'</span><span class="lc">'+lines[i][0]+'</span>';
+      container.appendChild(row);
+      if(cursorLn) cursorLn.textContent = i+2;
+      // Keep only last 10 lines visible
+      if(container.children.length > 10) container.removeChild(container.firstChild);
+      i++;
+      setTimeout(addLine, 320);
+    }
+    setTimeout(addLine, 800);
+  })();
 
   // ===== Scroll reveal =====
   var observer = new IntersectionObserver(function(entries) {
