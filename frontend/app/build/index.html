@@ -2698,20 +2698,54 @@
       return { render:render, createTab:createTab, createNewTab:createNewTab, switchTo:switchTo, closeTab:closeTab, updateActiveTab:updateActiveTab, captureState:captureState, save:save, getActiveTabId:getActiveTabId, getTabs:getTabs, load:load, resetBuilderState:resetBuilderState };
     })();
 
-    // Auto-create tab for current build if none exists
+    // Save tab state before leaving the page
+    window.addEventListener('beforeunload', function(){
+      var tabs = TabMgr.getTabs();
+      var activeId = TabMgr.getActiveTabId();
+      var cur = tabs.find(function(t){ return t.id === activeId; });
+      if(cur){ cur.state = TabMgr.captureState(); TabMgr.save(); }
+    });
+
+    // Auto-create tab or restore existing tabs on page load
     (function(){
-      TabMgr.render();
-      // If we arrived with a build intent, create a tab
       var hasIntent = sessionStorage.getItem('builder_prompt') || sessionStorage.getItem('builder_template_file') || sessionStorage.getItem('builder_project_id');
       if(hasIntent && !TabMgr.getActiveTabId()){
+        // New build from dashboard
         var name = sessionStorage.getItem('builder_template_name') || 'New Build';
         TabMgr.createTab(name);
-      } else if(TabMgr.getActiveTabId()){
-        TabMgr.render();
-      } else if(TabMgr.getTabs().length===0){
+      } else if(hasIntent && TabMgr.getActiveTabId()){
+        // New build but tabs already exist — create new tab for it
+        var name2 = sessionStorage.getItem('builder_template_name') || 'New Build';
+        TabMgr.createNewTab();
+        TabMgr.updateActiveTab({name: name2});
+      } else if(TabMgr.getActiveTabId() && TabMgr.getTabs().length > 0){
+        // Returning to builder — restore active tab's state
+        var tabs = TabMgr.getTabs();
+        var activeId = TabMgr.getActiveTabId();
+        var active = tabs.find(function(t){ return t.id === activeId; });
+        if(active && active.state){
+          // Delay restore to after builder init has completed
+          setTimeout(function(){
+            if(active.state.currentHtml && typeof updatePreview === 'function'){
+              currentHtml = active.state.currentHtml;
+              if(typeof currentBuildId !== 'undefined') currentBuildId = active.state.currentBuildId || '';
+              if(typeof projectFiles !== 'undefined') projectFiles = active.state.projectFiles || {};
+              if(typeof brainstormHistory !== 'undefined') brainstormHistory = active.state.brainstormHistory || [];
+              if(typeof currentProjectId !== 'undefined') currentProjectId = active.state.currentProjectId || null;
+              if(typeof currentProjectName !== 'undefined') currentProjectName = active.state.currentProjectName || '';
+              if(typeof lastPrompt !== 'undefined') lastPrompt = active.state.lastPrompt || '';
+              var ch = document.getElementById('chat-history');
+              if(ch && active.state.chatHtml) ch.innerHTML = active.state.chatHtml;
+              updatePreview(currentHtml);
+              if(typeof setStatus === 'function') setStatus(active.state.status || 'ready');
+            }
+          }, 600);
+        }
+      } else if(TabMgr.getTabs().length === 0){
         // No tabs, no intent — create a default tab
         TabMgr.createTab('New Build');
       }
+      TabMgr.render();
     })();
 
     // Initialize Lucide icons
