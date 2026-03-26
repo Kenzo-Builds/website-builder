@@ -424,14 +424,36 @@ app.post('/api/generate-stream', async (req, res) => {
     'Access-Control-Allow-Origin': '*'
   });
 
-  const messages = [{ role: 'system', content: SYSTEM_PROMPT }];
+  // Choose system prompt based on whether we're modifying existing code
+  const isMultiFile = existingCode && existingCode.includes('--- FILE:');
+  const isModifying = !!existingCode;
+
+  const MODIFY_PROMPT = `You are an expert web developer modifying an existing website.
+
+## CRITICAL RULES
+- You are given an EXISTING website. The user wants you to ADAPT/MODIFY it.
+- KEEP: the entire design system, CSS, layout, animations, typography, visual style, color scheme
+- CHANGE: text content, headings, descriptions, branding, business-specific information based on the user's request
+- If the user asks to change colors or style, do that — but PRESERVE the overall quality and complexity
+- Output the COMPLETE modified file(s) — never output partial code or snippets
+- NEVER simplify the design. The output must be as polished and detailed as the input.
+- NEVER strip CSS, animations, or effects from the original
+- If the original is a single HTML file with inline CSS, keep it as a single file with inline CSS
+- If the original uses Tailwind, keep using Tailwind
+- Use placeholder images from https://picsum.photos/ when needed
+- Write real relevant content — never use Lorem Ipsum
+
+## OUTPUT FORMAT
+${isMultiFile ? 'Return ALL files using the --- FILE: filename --- format.' : 'Return a single complete HTML file. No file markers, no markdown fences. Just the complete HTML from <!DOCTYPE html> to </html>.'}`;
+
+  const systemPrompt = isModifying ? MODIFY_PROMPT : SYSTEM_PROMPT;
+  const messages = [{ role: 'system', content: systemPrompt }];
 
   // Build user message — support image attachment
-  const isMultiFile = existingCode && existingCode.includes('--- FILE:');
   let userContent;
   if (image) {
     const textPart = existingCode
-      ? `Current project files:\n${existingCode}\n\nModify based on the attached image and instruction: ${prompt}`
+      ? `Current website code:\n${existingCode}\n\nModify this website based on the attached image and instruction: ${prompt}`
       : `Create a website based on the attached image and instruction: ${prompt}`;
     userContent = [
       { type: 'text', text: textPart },
@@ -439,8 +461,8 @@ app.post('/api/generate-stream', async (req, res) => {
     ];
   } else if (existingCode) {
     userContent = isMultiFile
-      ? `Current project files:\n${existingCode}\n\nModify: ${prompt}\n\nReturn ALL files in the project (modified and unmodified) using the --- FILE: filename --- format.`
-      : `Current HTML:\n${existingCode}\n\nModify: ${prompt}`;
+      ? `Current project files:\n${existingCode}\n\nUser request: ${prompt}\n\nReturn ALL files in the project (modified and unmodified) using the --- FILE: filename --- format.`
+      : `Here is the current website:\n${existingCode}\n\nUser request: ${prompt}\n\nReturn the complete modified HTML file.`;
   } else {
     userContent = `Create a website: ${prompt}`;
   }
