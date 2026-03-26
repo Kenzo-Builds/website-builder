@@ -73,13 +73,13 @@
     .sb-footer{padding:10px 8px;position:relative}
     .sb-profile{display:flex;align-items:center;gap:10px;width:100%;padding:8px;border-radius:10px;border:none;background:none;cursor:pointer;overflow:hidden}
     .sb-profile:hover{background:rgba(255,255,255,0.04)}
-    .sb-avatar{width:30px;height:30px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,#00E5FF,#06B6D4);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+    .sb-avatar{width:30px;height:30px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,#0ea5b0,#06B6D4);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
 
     .profile-popup{display:none;position:fixed;bottom:66px;left:8px;width:240px;background:#111113;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:6px;z-index:200;box-shadow:0 -8px 32px rgba(0,0,0,.6);animation:ppIn .15s ease}
     @keyframes ppIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
     .profile-popup.show{display:block}
     .pp-header{padding:10px 12px 8px;display:flex;align-items:center;gap:10px}
-    .pp-header-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#00E5FF,#06B6D4);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+    .pp-header-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#0ea5b0,#06B6D4);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
     .pp-header-info{min-width:0}
     .pp-header-name{font-size:13px;font-weight:600;color:#F4F4F5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .pp-header-email{font-size:11px;color:#71717A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -150,7 +150,7 @@
     .bar-icon:hover{background:rgba(255,255,255,0.06);color:#9CA3AF}
     .bar-icon svg{width:16px;height:16px}
     .bar-icon.recording{color:#EAB308;background:rgba(234,179,8,0.12);animation:mic-pulse 1s ease-in-out infinite}
-    .bar-icon.transcribing{color:#00E5FF;background:rgba(0,229,255,0.1)}
+    .bar-icon.transcribing{color:#0ea5b0;background:rgba(0,229,255,0.1)}
     @keyframes mic-pulse{0%,100%{box-shadow:0 0 0 0 rgba(234,179,8,0.3)}50%{box-shadow:0 0 0 6px rgba(234,179,8,0)}}
 
     /* DROPDOWN TRIGGERS — compact pill */
@@ -191,7 +191,7 @@
     .chips-row::-webkit-scrollbar{display:none}
     .chip{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:20px;font-size:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);color:#D1D5DB;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
     .chip:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.1);color:#fff}
-    .chip.more-ideas{color:#00E5FF;border-color:rgba(0,229,255,0.15)}
+    .chip.more-ideas{color:#0ea5b0;border-color:rgba(0,229,255,0.15)}
     .chip.more-ideas:hover{background:rgba(0,229,255,0.08);border-color:rgba(0,229,255,0.25);color:#93C5FD}
     .more-btn{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);color:#9CA3AF;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all .15s}
     .more-btn:hover{background:rgba(255,255,255,0.08);color:#fff}
@@ -201,7 +201,7 @@
     .rs-tabs{display:flex;gap:20px;border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:16px}
     .rs-tab{padding:8px 0;border:none;background:none;font-size:13px;font-weight:600;color:#6B7280;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit}
     .rs-tab:hover{color:#9CA3AF}
-    .rs-tab.active{color:#fff;border-bottom-color:#00E5FF}
+    .rs-tab.active{color:#fff;border-bottom-color:#0ea5b0}
 
     /* PROJECT GRID */
     .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
@@ -241,7 +241,7 @@
     .cm-btn.cancel:hover{background:rgba(255,255,255,0.1)}
     .cm-btn.del{background:#EF4444;color:#fff}
     .cm-btn.del:hover{background:#DC2626}
-    .cm-btn.primary{background:#00E5FF;color:#fff}
+    .cm-btn.primary{background:#0ea5b0;color:#fff}
     .cm-btn.primary:hover{background:#00BCD4}
 
     .pcard-new{border-style:dashed;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:170px;gap:6px}
@@ -289,7 +289,7 @@
     /* PROFILE PAGE */
     .prof-banner{height:140px;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 40%,#0f3460 70%,#1a1a2e 100%);position:relative;border-radius:0 0 16px 16px}
     .prof-top{display:flex;align-items:flex-end;gap:20px;padding:0 40px;margin-top:-50px;position:relative;z-index:2}
-    .prof-av-big{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,#00E5FF,#06B6D4);color:#fff;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;border:4px solid #09090B;flex-shrink:0}
+    .prof-av-big{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,#0ea5b0,#06B6D4);color:#fff;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;border:4px solid #09090B;flex-shrink:0}
     .prof-info{flex:1;padding-bottom:8px}
     .prof-name{font-size:22px;font-weight:700;color:#F4F4F5}
     .prof-handle{font-size:13px;color:#71717A;margin-top:2px}
@@ -304,7 +304,7 @@
     .prof-empty{text-align:center;padding:48px 20px;background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.08);border-radius:12px}
     .prof-empty-icon{font-size:32px;margin-bottom:12px;opacity:0.3}
     .prof-empty-text{color:#71717A;font-size:13px;margin-bottom:16px}
-    .prof-empty-btn{padding:8px 20px;border-radius:8px;background:#00E5FF;color:#fff;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+    .prof-empty-btn{padding:8px 20px;border-radius:8px;background:#0ea5b0;color:#fff;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
     .prof-empty-btn:hover{opacity:0.9}
 
     /* PROFILE FORM (inline) */
@@ -323,7 +323,7 @@
     .pf-textarea{min-height:80px;resize:vertical}
     .pf-row{display:flex;gap:16px}
     .pf-row .pf-field{flex:1}
-    .pf-save{align-self:flex-start;padding:10px 28px;border-radius:10px;background:#00E5FF;color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit;margin-top:4px}
+    .pf-save{align-self:flex-start;padding:10px 28px;border-radius:10px;background:#0ea5b0;color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit;margin-top:4px}
     .pf-save:hover{background:#00BCD4}
     .pf-save:disabled{opacity:0.4;cursor:not-allowed}
     .pf-save-status{font-size:12px;color:#22C55E;margin-left:12px;opacity:0;transition:opacity .3s}
@@ -360,7 +360,7 @@
     /* APPEARANCE */
     .theme-opt{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;border-radius:12px;border:2px solid rgba(255,255,255,0.07);background:transparent;cursor:pointer;transition:all .15s;color:#A1A1AA;font-size:12px;font-weight:600;font-family:inherit;flex:1}
     .theme-opt:hover{border-color:rgba(255,255,255,0.15)}
-    .theme-opt.active{border-color:#00E5FF;color:#F4F4F5}
+    .theme-opt.active{border-color:#0ea5b0;color:#F4F4F5}
     .theme-preview{width:100%;height:48px;border-radius:8px;border:1px solid rgba(255,255,255,0.06)}
     .dark-prev{background:linear-gradient(135deg,#0D0D0D 50%,#1C1C22 50%)}
     .light-prev{background:linear-gradient(135deg,#F4F4F5 50%,#E5E7EB 50%)}
@@ -377,7 +377,7 @@
 
     /* USAGE BAR */
     .usage-bar-wrap{background:rgba(255,255,255,0.04);border-radius:8px;height:8px;overflow:hidden;margin:8px 0 4px}
-    .usage-bar-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,#00E5FF,#00E5FF);transition:width .5s ease}
+    .usage-bar-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,#0ea5b0,#0ea5b0);transition:width .5s ease}
     .usage-bar-fill.warn{background:linear-gradient(90deg,#EAB308,#F97316)}
     .usage-bar-fill.full{background:linear-gradient(90deg,#EF4444,#DC2626)}
 
@@ -448,7 +448,7 @@
     [data-theme="light"] .rs-tabs{border-bottom-color:var(--border-2)}
     [data-theme="light"] .rs-tab{color:var(--text-4)}
     [data-theme="light"] .rs-tab:hover{color:var(--text-3)}
-    [data-theme="light"] .rs-tab.active{color:var(--text);border-bottom-color:#00E5FF}
+    [data-theme="light"] .rs-tab.active{color:var(--text);border-bottom-color:#0ea5b0}
 
     [data-theme="light"] .pcard{background:var(--bg-card);border-color:var(--border)}
     [data-theme="light"] .pcard:hover{border-color:var(--border-3)}
@@ -499,7 +499,7 @@
 
     [data-theme="light"] .theme-opt{border-color:var(--border-2);color:var(--text-3)}
     [data-theme="light"] .theme-opt:hover{border-color:var(--border-3)}
-    [data-theme="light"] .theme-opt.active{border-color:#00E5FF;color:var(--text)}
+    [data-theme="light"] .theme-opt.active{border-color:#0ea5b0;color:var(--text)}
     [data-theme="light"] .faq-q{color:var(--text-2)}
     [data-theme="light"] .faq-chevron{color:var(--text-4)}
     [data-theme="light"] .faq-a{color:var(--text-3)}
@@ -576,7 +576,7 @@
       <button class="sb-item" onclick="location.href='/app/build/'"><i data-lucide="code-2"></i><span class="sb-item-label" id="nav-builder">Builder</span></button>
 
     </div>
-    <div class="sb-upgrade" onclick="location.href='/#pricing'"><b><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="2" style="display:inline;vertical-align:-2px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Upgrade your plan</b><span>Get more builds & premium models</span></div>
+    <div class="sb-upgrade" onclick="location.href='/#pricing'"><b><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0ea5b0" stroke-width="2" style="display:inline;vertical-align:-2px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Upgrade your plan</b><span>Get more builds & premium models</span></div>
     <div class="sb-footer">
       <div class="profile-popup" id="pp"></div>
       <button class="sb-profile" id="prof-btn">
@@ -969,12 +969,12 @@
                   <div class="set-section-desc">Adjust the code editor font size in the builder.</div>
                   <div style="display:flex;align-items:center;gap:10px;margin-top:12px">
                     <button onclick="updateFontSize(Math.max(11,parseInt(document.getElementById('sp-font-slider').value)-1))" style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:#D1D5DB;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:inherit;transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">−</button>
-                    <input type="range" id="sp-font-slider" min="11" max="20" value="13" aria-label="Editor font size" style="flex:1;accent-color:#00E5FF;height:4px" oninput="updateFontSize(this.value)">
+                    <input type="range" id="sp-font-slider" min="11" max="20" value="13" aria-label="Editor font size" style="flex:1;accent-color:#0ea5b0;height:4px" oninput="updateFontSize(this.value)">
                     <button onclick="updateFontSize(Math.min(20,parseInt(document.getElementById('sp-font-slider').value)+1))" style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:#D1D5DB;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:inherit;transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">+</button>
                     <span id="sp-font-val" style="font-size:13px;font-weight:600;color:#A1A1AA;min-width:34px;text-align:center">13px</span>
                   </div>
                   <div style="margin-top:12px;padding:10px 14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px">
-                    <span style="font-family:'Courier New',monospace;color:#00E5FF" id="sp-font-preview">const website = buildWith('AI');</span>
+                    <span style="font-family:'Courier New',monospace;color:#0ea5b0" id="sp-font-preview">const website = buildWith('AI');</span>
                   </div>
                 </div>
               </div>
@@ -994,7 +994,7 @@
                     <div style="font-size:12px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Current Plan</div>
                     <div style="font-size:22px;font-weight:800;color:#F4F4F5" id="sp-plan-name">Free</div>
                   </div>
-                  <div style="padding:6px 14px;border-radius:8px;background:#00E5FF;color:#fff;font-size:12px;font-weight:600;cursor:pointer" onclick="location.href='/#pricing'">Upgrade</div>
+                  <div style="padding:6px 14px;border-radius:8px;background:#0ea5b0;color:#fff;font-size:12px;font-weight:600;cursor:pointer" onclick="location.href='/#pricing'">Upgrade</div>
                 </div>
                 <div style="font-size:12px;color:#6B7280">
                   <span id="sp-plan-used">0</span> / <span id="sp-plan-limit">5</span> generations used this month
@@ -1007,15 +1007,15 @@
               <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:0">
                 <div class="set-section" style="margin-bottom:0">
                   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-                    <div><div class="set-section-title">Starter</div><div style="font-size:13px;color:#00E5FF;font-weight:700">$9.99 / month</div></div>
-                    <div style="padding:6px 14px;border-radius:8px;border:1px solid rgba(0,229,255,0.3);color:#00E5FF;font-size:12px;font-weight:600;cursor:pointer">Upgrade</div>
+                    <div><div class="set-section-title">Starter</div><div style="font-size:13px;color:#0ea5b0;font-weight:700">$9.99 / month</div></div>
+                    <div style="padding:6px 14px;border-radius:8px;border:1px solid rgba(0,229,255,0.3);color:#0ea5b0;font-size:12px;font-weight:600;cursor:pointer">Upgrade</div>
                   </div>
                   <div style="font-size:12px;color:#71717A;line-height:1.7">✓ 100 generations/month &nbsp;·&nbsp; ✓ 10 deploys &nbsp;·&nbsp; ✓ All models &nbsp;·&nbsp; ✓ Download code</div>
                 </div>
                 <div class="set-section" style="margin-bottom:0;border-color:rgba(0,229,255,0.2);background:rgba(0,229,255,0.03)">
                   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-                    <div><div class="set-section-title">Pro</div><div style="font-size:13px;color:#00E5FF;font-weight:700">$19.99 / month</div></div>
-                    <div style="padding:6px 14px;border-radius:8px;background:#00E5FF;color:#09090B;font-size:12px;font-weight:700;cursor:pointer">Upgrade</div>
+                    <div><div class="set-section-title">Pro</div><div style="font-size:13px;color:#0ea5b0;font-weight:700">$19.99 / month</div></div>
+                    <div style="padding:6px 14px;border-radius:8px;background:#0ea5b0;color:#09090B;font-size:12px;font-weight:700;cursor:pointer">Upgrade</div>
                   </div>
                   <div style="font-size:12px;color:#71717A;line-height:1.7">✓ 300 generations/month &nbsp;·&nbsp; ✓ 30 deploys &nbsp;·&nbsp; ✓ Premium models &nbsp;·&nbsp; ✓ Custom domains &nbsp;·&nbsp; ✓ Remove badge</div>
                 </div>
@@ -1118,21 +1118,21 @@ var user=null,curModel='anthropic/claude-sonnet-4.6',curMode='brainstorm',attach
 var TPLS=[
   // ── New templates (most recent first) ──
 
-  {n:'GTMlab Outbound',d:'AI co-pilot for sales',p:'GTMlab — the 1st AI co-pilot for strategic outbound with dashboard mockup, pipeline features, ROI calculator, and enterprise pricing. Dark theme with cyan accents.',tag:'New',colors:['#00E5FF','#10B981','#0A0A0F'],file:'/templates/gtmlab-outbound.html?v=1'},
+  {n:'GTMlab Outbound',d:'AI co-pilot for sales',p:'GTMlab — the 1st AI co-pilot for strategic outbound with dashboard mockup, pipeline features, ROI calculator, and enterprise pricing. Dark theme with cyan accents.',tag:'New',colors:['#0ea5b0','#10B981','#0A0A0F'],file:'/templates/gtmlab-outbound.html?v=1'},
   {n:'Raw Architecture',d:'Next-gen app framework',p:'Raw — architecture for next-gen apps with minimal hero, code-first features, performance benchmarks, and developer pricing. Ultra-minimal dark theme.',tag:'New',colors:['#F4F4F5','#71717A','#0A0A0A'],file:'/templates/raw-architecture.html?v=1'},
-  {n:'Core Infrastructure',d:'High-performance hosting',p:'Core — high-performance infrastructure platform with server dashboard hero, uptime stats, global network map, and tiered pricing. Dark theme with cyan accents.',tag:'New',colors:['#00E5FF','#22C55E','#050505'],file:'/templates/core-infrastructure.html?v=1'},
+  {n:'Core Infrastructure',d:'High-performance hosting',p:'Core — high-performance infrastructure platform with server dashboard hero, uptime stats, global network map, and tiered pricing. Dark theme with cyan accents.',tag:'New',colors:['#0ea5b0','#22C55E','#050505'],file:'/templates/core-infrastructure.html?v=1'},
   {n:'Holmes AI QA',d:'AI testing detective',p:'Holmes — AI QA detective with investigation-style hero, bug detection features, testing pipeline, and team pricing. Dark noir theme.',tag:'New',colors:['#F59E0B','#D97706','#0A0A0A'],file:'/templates/holmes-ai-qa.html?v=1'},
-  {n:'Sigmal Intelligence',d:'Competitive radar & analytics',p:'Sigmal — competitive intelligence radar with live signal dashboard, market analysis features, competitor tracking, and enterprise pricing. Dark theme with cyan accents.',tag:'New',colors:['#00E5FF','#3B82F6','#0A0A0F'],file:'/templates/sigmal-intelligence.html?v=1'},
+  {n:'Sigmal Intelligence',d:'Competitive radar & analytics',p:'Sigmal — competitive intelligence radar with live signal dashboard, market analysis features, competitor tracking, and enterprise pricing. Dark theme with cyan accents.',tag:'New',colors:['#0ea5b0','#3B82F6','#0A0A0F'],file:'/templates/sigmal-intelligence.html?v=1'},
   {n:'Locus Corporate',d:'Corporate housing management',p:'Locus — corporate housing control platform with property dashboard, booking features, occupancy analytics, and business pricing. Professional dark theme.',tag:'New',colors:['#10B981','#06B6D4','#0A0A0A'],file:'/templates/locus-corporate.html?v=1'},
   // ── Original templates ──
-  {n:'Quantum SaaS',d:'Enterprise glass UI',p:'Quantum Shard Field — enterprise SaaS with glassmorphism, constellation testimonials, animated pricing. Dark theme.',tag:'',colors:['#00E5FF','#0EA5E9','#09090B'],file:'/templates/quantum-saas.html?v=1'},
-  {n:'Cybersecurity SaaS',d:'Security & threat detection',p:'SENTRY — cybersecurity platform with threat detection dashboard, security features, and tiered pricing. Dark theme with cyan/emerald.',tag:'',colors:['#00E5FF','#10B981','#0A0A0F'],file:'/templates/cybersecurity-saas.html?v=2'},
+  {n:'Quantum SaaS',d:'Enterprise glass UI',p:'Quantum Shard Field — enterprise SaaS with glassmorphism, constellation testimonials, animated pricing. Dark theme.',tag:'',colors:['#0ea5b0','#0EA5E9','#09090B'],file:'/templates/quantum-saas.html?v=1'},
+  {n:'Cybersecurity SaaS',d:'Security & threat detection',p:'SENTRY — cybersecurity platform with threat detection dashboard, security features, and tiered pricing. Dark theme with cyan/emerald.',tag:'',colors:['#0ea5b0','#10B981','#0A0A0F'],file:'/templates/cybersecurity-saas.html?v=2'},
   {n:'Nexus Workflow',d:'Team sync & management',p:'Nexus — workflow sync with animated nodes, team features, and modern pricing. Dark minimal with indigo.',tag:'',colors:['#6366F1','#818CF8','#0A0A0A'],file:'/templates/nexus-workflow.html?v=1'},
   {n:'Horizon Radar',d:'Trend monitoring',p:'Horizon Radar — trend intelligence with radar hero, signal tracking, and animated data cards. Dark with green/indigo.',tag:'',colors:['#22C55E','#6366F1','#0A0A0A'],file:'/templates/horizon-radar.html?v=1'},
-  {n:'Digital Agency',d:'Services & portfolio',p:'Professional agency landing with gradient hero, services grid, portfolio, testimonials. Dark with purple.',tag:'Popular',colors:['#6366F1','#00E5FF','#0A0A0F'],file:'/templates/digital-agency.html?v=2'},
-  {n:'AI SaaS Platform',d:'Dashboard & pricing',p:'AI monitoring SaaS with dashboard hero, features grid, pricing toggle. Dark with blue.',tag:'Trending',colors:['#00E5FF','#67E8F9','#0A0A1A'],file:'/templates/ai-saas.html?v=2'},
+  {n:'Digital Agency',d:'Services & portfolio',p:'Professional agency landing with gradient hero, services grid, portfolio, testimonials. Dark with purple.',tag:'Popular',colors:['#6366F1','#0ea5b0','#0A0A0F'],file:'/templates/digital-agency.html?v=2'},
+  {n:'AI SaaS Platform',d:'Dashboard & pricing',p:'AI monitoring SaaS with dashboard hero, features grid, pricing toggle. Dark with blue.',tag:'Trending',colors:['#0ea5b0','#67E8F9','#0A0A1A'],file:'/templates/ai-saas.html?v=2'},
   {n:'Creative Studio',d:'Portfolio & team',p:'Creative studio with bold typography, portfolio grid, team section. Dark with pink-orange.',tag:'',colors:['#F43F5E','#F97316','#0A0A0F'],file:'/templates/creative-studio.html?v=2'},
-  {n:'AI Telemetry',d:'Dashboard & monitoring',p:'AI telemetry with live dashboard, threat signals, activity log. Deep navy with cyan.',tag:'',colors:['#00E5FF','#06B6D4','#050510'],file:'/templates/ai-telemetry.html?v=2'},
+  {n:'AI Telemetry',d:'Dashboard & monitoring',p:'AI telemetry with live dashboard, threat signals, activity log. Deep navy with cyan.',tag:'',colors:['#0ea5b0','#06B6D4','#050510'],file:'/templates/ai-telemetry.html?v=2'},
 ];
 var CHIPS=[
   {t:'SaaS Landing',p:'Modern SaaS landing page with hero, features, pricing, testimonials'},
@@ -1380,7 +1380,7 @@ function requireReauth(onSuccess){
   overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);z-index:99999;display:flex;align-items:center;justify-content:center;animation:ppIn .15s ease';
   overlay.innerHTML=`
     <div style="background:#0F0F12;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:28px;width:90%;max-width:380px;box-shadow:0 24px 64px rgba(0,0,0,.7);animation:cmIn .2s ease">
-      <div style="width:44px;height:44px;border-radius:12px;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="1.75"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+      <div style="width:44px;height:44px;border-radius:12px;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0ea5b0" stroke-width="1.75"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
       <div style="font-size:17px;font-weight:700;color:#F4F4F5;text-align:center;margin-bottom:6px">Confirm your identity</div>
       <div style="font-size:13px;color:#71717A;text-align:center;margin-bottom:20px">Enter your current password to continue</div>
       <input id="reauth-pw" type="password" placeholder="Current password" aria-label="Current password"
@@ -1390,7 +1390,7 @@ function requireReauth(onSuccess){
       <div id="reauth-error" style="font-size:12px;color:#EF4444;margin-bottom:12px;display:none;text-align:center"></div>
       <div style="display:flex;gap:10px">
         <button id="reauth-cancel" style="flex:1;padding:10px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:#D1D5DB;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Cancel</button>
-        <button id="reauth-submit" style="flex:1;padding:10px;border-radius:10px;background:#00E5FF;border:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s">Confirm</button>
+        <button id="reauth-submit" style="flex:1;padding:10px;border-radius:10px;background:#0ea5b0;border:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s">Confirm</button>
       </div>
     </div>`;
   document.body.appendChild(overlay);
@@ -1477,7 +1477,7 @@ function changeEmail(){
     // which fires only after the user clicks the confirmation link
     document.getElementById('sp-new-email').value='';
     var st=document.getElementById('sp-email-status');st.classList.add('show');setTimeout(function(){st.classList.remove('show');},3000);
-    showToast('✓ Confirmation email sent to '+email+' — click the link to confirm','#00E5FF');
+    showToast('✓ Confirmation email sent to '+email+' — click the link to confirm','#0ea5b0');
   });
 }
 
@@ -1564,7 +1564,7 @@ async function checkAndRestoreAccount(token){
 function showToast(msg,color){
   var t=document.createElement('div');
   t.textContent=msg;
-  t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:'+(color||'#00E5FF')+';color:#fff;padding:12px 24px;border-radius:12px;font-size:13px;font-weight:600;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,.4);animation:ppIn .2s ease';
+  t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:'+(color||'#0ea5b0')+';color:#fff;padding:12px 24px;border-radius:12px;font-size:13px;font-weight:600;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,.4);animation:ppIn .2s ease';
   document.body.appendChild(t);
   setTimeout(function(){t.style.opacity='0';t.style.transition='opacity .4s';setTimeout(function(){t.remove();},400);},4000);
 }
@@ -2145,7 +2145,7 @@ function applyDashLang(){
   // Upgrade box
   var ub=document.querySelector('.sb-upgrade b');
   var us=document.querySelector('.sb-upgrade span');
-  if(ub)ub.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="2" style="display:inline;vertical-align:-2px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> '+T.upgrade_title;
+  if(ub)ub.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0ea5b0" stroke-width="2" style="display:inline;vertical-align:-2px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> '+T.upgrade_title;
   if(us)us.textContent=T.upgrade_sub;
 
   // Chips — swap global CHIPS array and re-render
