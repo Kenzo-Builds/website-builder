@@ -168,7 +168,7 @@
     /* === PRICING === */
     .pricing{padding:100px 0}
     .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:900px;margin:0 auto}
-    .pr-card{background:rgba(255,255,255,0.03);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:32px 28px;text-align:left;transition:border-color .25s ease,box-shadow .25s ease,transform .25s ease;position:relative;animation:cardFloat 6s ease-in-out infinite alternate}
+    .pr-card{background:rgba(255,255,255,0.03);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:32px 28px;text-align:left;transition:border-color .25s ease,box-shadow .25s ease,transform .25s ease;position:relative;animation:cardFloat 6s ease-in-out infinite alternate;display:flex;flex-direction:column}
     .pr-card:nth-child(2){animation-delay:-2s}
     .pr-card:nth-child(3){animation-delay:-4s}
     .pr-card:hover{transform:translateY(-4px);border-color:rgba(0,229,255,0.3);box-shadow:0 0 28px rgba(0,229,255,0.07),0 12px 32px rgba(0,0,0,.3)}
@@ -181,7 +181,7 @@
     .pr-price .period{font-size:14px;font-weight:400;color:#52525B;letter-spacing:0}
     .pr-desc{font-size:13px;color:#52525B;margin:12px 0 24px;line-height:1.6}
     .pr-divider{height:1px;background:rgba(255,255,255,0.06);margin-bottom:24px}
-    .pr-list{list-style:none;margin-bottom:32px}
+    .pr-list{list-style:none;margin-bottom:32px;flex:1}
     .pr-list li{font-size:13px;color:#A1A1AA;padding:8px 0;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.04)}
     .pr-list li:last-child{border-bottom:none}
     .check-icon{width:16px;height:16px;border-radius:50%;background:transparent;border:1px solid rgba(0,229,255,0.35);display:flex;align-items:center;justify-content:center;flex-shrink:0}
