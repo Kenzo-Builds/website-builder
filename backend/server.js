@@ -8,6 +8,7 @@ const path = require('path');
 const crypto = require('crypto');
 
 const app = express();
+app.set('trust proxy', 1); // Trust first proxy (nginx)
 app.use(cors({
   origin: [
     'https://builder.kenzoagent.com'
