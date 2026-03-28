@@ -260,9 +260,15 @@ Any web application:
 
 ### Phase 1 — Launch (NOW → 2 weeks)
 - [x] Website builder (static sites)
+- [x] WebContainer integration (full-stack apps in browser)
+- [x] Supabase schema-per-user (multi-tenant database)
+- [x] AI generates Supabase-connected code + schema.sql
+- [x] Deploy/Redeploy/Undeploy system
+- [x] Subdomain conflict check
 - [ ] Payme/Click payment integration
 - [ ] Plan enforcement (generation limits)
-- [ ] Streaming responses
+- [ ] Queue system for concurrent AI generation
+- [ ] Race condition protection (atomic subdomain/schema reservation)
 - [ ] Custom subdomains
 
 ### Phase 2 — Dynamic Sites (Month 2)
@@ -278,17 +284,33 @@ Any web application:
 - [ ] Knowledge base (RAG)
 
 ### Phase 4 — App Builder (Month 4-5)
-- [ ] WebContainer integration
-- [ ] Multi-file projects with npm
-- [ ] Database provisioning (schema-per-user)
+- [x] WebContainer integration
+- [x] Multi-file projects with npm
+- [x] Database provisioning (schema-per-user)
 - [ ] Docker container deployment
 - [ ] Deploy manager v2
+- [ ] Server-side sandboxes (alternative to WebContainers for low-end devices)
+- [ ] Auto-sleep containers (idle >30min)
 
 ### Phase 5 — Scale (Month 6+)
 - [ ] Template/plugin marketplace
 - [ ] Team collaboration
 - [ ] White-label option
 - [ ] Mobile app (PWA)
+
+### Phase 6 — Agent + App Integration (Month 7+)
+- [ ] "My Agents" section in dashboard (alongside Recent Projects, Deployed Apps)
+- [ ] "Connect Agent" button on deployed full-stack app cards
+- [ ] Auto-configure API bridge: generate API key + inject app URL into agent tool definitions
+- [ ] Agent can query/write to the connected app's Supabase schema
+- [ ] Connected Apps as Pro/Expert-only feature (monetization hook)
+- [ ] Example flow: User builds CRM → deploys → builds Telegram bot → connects → bot can check sales, add customers via Telegram
+
+**Architecture:**
+- Full-stack app exposes /api/agent/* routes (AI generates these automatically)
+- Agent-runtime calls those routes with generated API key
+- Platform manages key rotation, permissions per connected app
+- Dashboard shows connection status: "Bot connected to My CRM ✅"
 
 ---
 

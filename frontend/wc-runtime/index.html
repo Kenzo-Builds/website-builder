@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WebContainer Runtime</title>
+  <script type="module">
+    import { WebContainer } from 'https://esm.sh/@webcontainer/api';
+
+    let wc = null;
+    let bootAttempts = 0;
+
+    async function boot() {
+      if (wc) return wc;
+      try {
+        wc = await WebContainer.boot({ coep: 'credentialless' });
+        return wc;
+      } catch(e) {
+        if (e.message && e.message.includes('more instances') && bootAttempts < 3) {
+          bootAttempts++;
+          // Wait for stale instance to be garbage collected
+          await new Promise(r => setTimeout(r, 2000));
+          return boot();
+        }
+        throw e;
+      }
+    }
+
+    // Listen for commands from parent builder page
+    window.addEventListener('message', async (e) => {
+      // Only accept messages from the builder
+      if (e.origin !== 'https://builder.kenzoagent.com') return;
+
+      const { type, id, payload } = e.data;
+      if (!type) return;
+
+      try {
+        if (type === 'boot') {
+          await boot();
+          parent.postMessage({ type: 'boot-ready', id }, '*');
+        }
+
+        if (type === 'mount') {
+          await boot();
+          await wc.mount(payload.files);
+          parent.postMessage({ type: 'mount-done', id }, '*');
+        }
+
+        if (type === 'spawn') {
+          await boot();
+          const proc = await wc.spawn(payload.cmd, payload.args || []);
+          // Stream output back
+          proc.output.pipeTo(new WritableStream({
+            write(data) {
+              parent.postMessage({ type: 'output', id, data: data }, '*');
+            }
+          }));
+          const exitCode = await proc.exit;
+          parent.postMessage({ type: 'exit', id, exitCode }, '*');
+        }
+
+        if (type === 'spawn-bg') {
+          // Spawn without waiting for exit (e.g. npm start)
+          await boot();
+          const proc = await wc.spawn(payload.cmd, payload.args || []);
+          proc.output.pipeTo(new WritableStream({
+            write(data) {
+              parent.postMessage({ type: 'output', id, data: data }, '*');
+            }
+          }));
+          parent.postMessage({ type: 'spawned', id }, '*');
+        }
+
+      } catch (err) {
+        parent.postMessage({ type: 'error', id, error: err.message }, '*');
+      }
+    });
+
+    // Forward server-ready events
+    (async function() {
+      await boot();
+      wc.on('server-ready', (port, url) => {
+        parent.postMessage({ type: 'server-ready', port, url }, '*');
+      });
+      // Tell parent we're ready
+      parent.postMessage({ type: 'runtime-ready' }, '*');
+    })();
+  </script>
+</head>
+<body></body>
+</html>

@@ -3,3 +3,5 @@ backend/config.json
 backend/ecosystem.config.js
 backend/supabase-config.json
 backend/builds/
+backend/docker-apps/
+backend/docker-ports.json

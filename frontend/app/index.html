@@ -133,7 +133,19 @@
 
     /* PROMPT CARD */
     .prompt-wrap{max-width:820px;margin:0 auto}
-    .prompt-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.11);border-radius:14px;padding:16px;box-shadow:0 4px 24px rgba(0,0,0,.35);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+    /* Mode tabs — above prompt card, blends into card */
+    .mode-tabs{display:flex;gap:0;margin-bottom:0;position:relative;z-index:2}
+    .mode-tab{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;font-size:13px;font-weight:600;color:#52525B;background:transparent;border:none;border-radius:12px 12px 0 0;cursor:pointer;font-family:inherit;transition:all .15s;position:relative}
+    .mode-tab:hover:not(.disabled){color:#9CA3AF}
+    .mode-tab.active{color:#E5E7EB;background:rgba(255,255,255,0.05);border-top-left-radius:12px;border-top-right-radius:12px;position:relative}
+    /* Concave outward corner — right side always */
+    .mode-tab.active::after{content:'';position:absolute;bottom:0;right:-10px;width:10px;height:10px;background:radial-gradient(circle at top right,transparent 10px,rgba(255,255,255,0.05) 10px)}
+    /* Concave outward corner — left side only when NOT first tab */
+    .mode-tab.active:not(:first-child)::before{content:'';position:absolute;bottom:0;left:-10px;width:10px;height:10px;background:radial-gradient(circle at top left,transparent 10px,rgba(255,255,255,0.05) 10px)}
+    .mode-tab.disabled{opacity:0.3;cursor:not-allowed}
+    .mode-tab-soon{font-size:9px;font-weight:700;color:#0ea5b0;background:rgba(14,165,176,0.12);padding:1px 5px;border-radius:4px;letter-spacing:0.3px;text-transform:uppercase}
+
+    .prompt-card{background:rgba(255,255,255,0.05);border:none;border-radius:0 14px 14px 14px;padding:16px;box-shadow:0 4px 24px rgba(0,0,0,.35);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
     .prompt-card:focus-within{border-color:rgba(99,102,241,0.18)}
     .attach-area{display:none;margin-bottom:8px;position:relative}
     .attach-area img{max-height:70px;border-radius:8px;border:1px solid rgba(255,255,255,0.08)}
@@ -197,11 +209,20 @@
     .more-btn:hover{background:rgba(255,255,255,0.08);color:#fff}
 
     /* RECENT SECTION */
-    .recent-section{max-width:880px;margin:32px auto 0;padding:0 32px 40px;width:100%;background:rgba(255,255,255,0.025);border-radius:20px 20px 0 0;border-top:1px solid rgba(255,255,255,0.07);border-left:1px solid rgba(255,255,255,0.05);border-right:1px solid rgba(255,255,255,0.05)}
-    .rs-tabs{display:flex;gap:20px;border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:16px}
-    .rs-tab{padding:8px 0;border:none;background:none;font-size:13px;font-weight:600;color:#6B7280;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit}
+    .recent-section{max-width:880px;margin:32px auto 0;padding:0 32px 32px;width:100%;background:rgba(255,255,255,0.025);border-radius:20px;border:1px solid rgba(255,255,255,0.07);min-height:320px}
+    .rs-tabs{display:flex;align-items:center;gap:4px;border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:20px;padding-top:4px}
+    .rs-tab{display:inline-flex;align-items:center;gap:6px}
+    .rs-tab-sep{color:rgba(255,255,255,0.12);font-size:13px;padding:0 2px;line-height:1;margin-bottom:-1px;user-select:none}
+    .rs-empty{text-align:center;padding:52px 20px;display:flex;flex-direction:column;align-items:center;gap:10px}
+    .rs-empty-box{width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;margin-bottom:4px}
+    .rs-empty-box-icon{width:22px;height:22px;color:#6B7280}
+    .rs-empty-title{font-size:15px;font-weight:600;color:#9CA3AF}
+    .rs-empty-text{color:#52525B;font-size:12px;line-height:1.6;max-width:320px}
+    .rs-empty-btn{margin-top:4px;padding:8px 22px;border-radius:8px;background:#0ea5b0;color:#fff;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity .15s}
+    .rs-empty-btn:hover{opacity:0.85}
+    .rs-tab{padding:10px 4px;border:none;background:none;font-size:13px;font-weight:600;color:#6B7280;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit;transition:color .15s}
     .rs-tab:hover{color:#9CA3AF}
-    .rs-tab.active{color:#fff;border-bottom-color:#0ea5b0}
+    .rs-tab.active{color:#0ea5b0;border-bottom-color:#0ea5b0}
 
     /* PROJECT GRID */
     .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
@@ -209,6 +230,10 @@
     .pcard:hover{border-color:rgba(255,255,255,0.12);transform:translateY(-1px)}
     .pcard.menu-open{transform:none !important}
     .pcard-thumb{height:120px;overflow:hidden;background:#1E1E1E;position:relative}
+    .pcard-fs-thumb{display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#0A0A0F 0%,#1a1a2e 50%,#0f172a 100%)}
+    .pcard-fs-icon{font-size:24px;margin-bottom:4px}
+    .pcard-fs-label{font-size:11px;font-weight:700;color:#F59E0B;letter-spacing:0.5px}
+    .pcard-fs-sub{font-size:9px;color:#6B7280;margin-top:2px}
     .pcard-thumb iframe{width:200%;height:200%;transform:scale(.5);transform-origin:top left;pointer-events:none;border:none}
     .pcard-info{padding:10px 12px;position:relative}
     .pcard-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:24px}
@@ -249,7 +274,7 @@
     .pcard-new span{font-size:11px;color:#6B7280}
 
     /* TEMPLATES — premium cards */
-    .tpl-section{max-width:880px;margin:0 auto 0;padding:0 32px 40px;width:100%;background:rgba(255,255,255,0.025);border-left:1px solid rgba(255,255,255,0.05);border-right:1px solid rgba(255,255,255,0.05);border-bottom:1px solid rgba(255,255,255,0.05);border-radius:0 0 20px 20px}
+
     .tpl-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
     .tpl-header h3{font-size:15px;font-weight:600;color:#E5E7EB}
     .tpl-header a{font-size:12px;color:#6B7280;text-decoration:none;transition:color .15s}
@@ -423,6 +448,9 @@
     [data-theme="light"] .hero h1{color:var(--text);background:none;-webkit-text-fill-color:unset}
     [data-theme="light"] .hero p{color:var(--text-3)}
 
+    [data-theme="light"] .mode-tab{color:#9CA3AF}
+    [data-theme="light"] .mode-tab:hover:not(.disabled){color:#6B7280;background:rgba(0,0,0,0.03)}
+    [data-theme="light"] .mode-tab.active{color:#1F2937;background:rgba(255,255,255,0.85);border-color:var(--border-2)}
     [data-theme="light"] .prompt-card{background:rgba(255,255,255,0.85);border-color:var(--border-2);box-shadow:0 2px 12px var(--shadow);backdrop-filter:blur(12px)}
     [data-theme="light"] .prompt-card:focus-within{border-color:rgba(0,229,255,0.35)}
     [data-theme="light"] .prompt-textarea{color:var(--text-2)}
@@ -518,12 +546,14 @@
       .hero p{font-size:13px;margin-bottom:16px}
       /* Prompt */
       .prompt-wrap{padding:0;max-width:100%}
-      .prompt-card{padding:10px;border-radius:12px}
+      .mode-tabs{gap:0;overflow-x:auto}
+      .mode-tab{padding:7px 12px;font-size:11px}
+      .prompt-card{padding:10px;border-radius:0 12px 12px 12px}
       .prompt-card .prompt-textarea{font-size:16px;min-height:44px}
       .chips-row{padding:0;max-width:100%;gap:6px;margin-top:10px}
       .chip{font-size:11px;padding:5px 10px}
       /* Sections */
-      .tpl-section{margin-top:16px;padding:0 12px 40px}
+
       .recent-section{padding:0 12px 24px}
       .pgrid{grid-template-columns:1fr 1fr}
       /* Prompt bar compact */
@@ -606,6 +636,20 @@
         <p id="hero-sub">Describe your idea and AI will build it in seconds</p>
 
         <div class="prompt-wrap">
+          <div class="mode-tabs" id="dash-mode-tabs">
+            <button class="mode-tab active" data-mode="build" onclick="switchDashMode('build')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+              Landing Page
+            </button>
+            <button class="mode-tab" data-mode="fullstack" onclick="switchDashMode('fullstack')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+              Full Stack App
+            </button>
+            <button class="mode-tab disabled" data-mode="agent" onclick="return false">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+              Agent <span class="mode-tab-soon">soon</span>
+            </button>
+          </div>
           <div class="prompt-card">
             <div class="attach-area" id="att-area">
               <img id="att-img" src="" alt="">
@@ -659,13 +703,13 @@
                   </div>
                 </div>
 
-                <div class="dd-trigger" id="dd-mode">
-                  <span id="md-ico">◎</span>
+                <div class="dd-trigger" id="dd-mode" style="min-width:auto">
+                  <span id="md-ico"><i data-lucide="sparkles" style="width:14px;height:14px;stroke-width:1.75"></i></span>
                   <span id="md-lbl">Brainstorm</span>
                   <span class="chev">▾</span>
                   <div class="dd-menu" id="menu-mode">
-                    <div class="dd-opt" data-mode="brainstorm" data-ico="◎" data-l="Brainstorm">◎ Brainstorm</div>
-                    <div class="dd-opt" data-mode="build" data-ico="→" data-l="Build">→ Build directly</div>
+                    <div class="dd-opt active" data-mode="brainstorm" data-l="Brainstorm"><i data-lucide="sparkles" style="width:14px;height:14px;stroke-width:1.75;vertical-align:-2px"></i> Brainstorm first</div>
+                    <div class="dd-opt" data-mode="direct" data-l="Build directly"><i data-lucide="zap" style="width:14px;height:14px;stroke-width:1.75;vertical-align:-2px"></i> Build directly</div>
                   </div>
                 </div>
               </div>
@@ -686,14 +730,63 @@
         </div>
       </div>
 
-      <!-- TABS: Recent Projects + Templates -->
+      <!-- TABBED PANEL: Recent Projects | Templates | Deployed Apps -->
       <div class="recent-section" id="recent-sec">
         <div class="rs-tabs">
-          <button class="rs-tab active" id="rtab-tpl" onclick="rsTab('tpl')">Templates</button>
-          <button class="rs-tab" id="rtab-recent" onclick="rsTab('recent')">Recent projects</button>
+          <button class="rs-tab active" id="rtab-recent" onclick="rsTab('recent')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span id="rtab-recent-lbl">Recent Projects</span>
+          </button>
+          <span class="rs-tab-sep">|</span>
+          <button class="rs-tab" id="rtab-tpl" onclick="rsTab('tpl')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            <span id="rtab-tpl-lbl">Templates</span>
+          </button>
+          <span class="rs-tab-sep">|</span>
+          <button class="rs-tab" id="rtab-deployed" onclick="rsTab('deployed')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span id="rtab-deployed-lbl">Deployed Apps</span>
+          </button>
         </div>
-        <div id="rs-tpl" class="tpl-grid"></div>
-        <div id="rs-recent" class="pgrid" style="display:none"></div>
+
+        <!-- Recent Projects pane -->
+        <div id="rs-pane-recent">
+          <div id="rs-recent" class="pgrid"></div>
+          <div style="display:flex;justify-content:center;margin-top:20px">
+            <a id="rs-recent-viewmore" href="#" onclick="showPage('page-projects');return false;" style="display:none;font-size:12px;color:#9CA3AF;text-decoration:none;padding:8px 24px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">View more →</a>
+          </div>
+          <div id="rs-recent-empty" class="rs-empty" style="display:none">
+            <div class="rs-empty-box">
+              <svg class="rs-empty-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="rs-empty-title">No recent projects</div>
+            <div class="rs-empty-text">Start building something and it'll show up here.</div>
+            <button class="rs-empty-btn" onclick="location.href='/app/build/'">Start Building</button>
+          </div>
+        </div>
+
+        <!-- Templates pane -->
+        <div id="rs-pane-tpl" style="display:none">
+          <div id="rs-tpl" class="tpl-grid"></div>
+          <div style="display:flex;justify-content:center;margin-top:20px">
+            <a id="rs-tpl-viewmore" href="#" onclick="showPage('page-templates');return false;" style="display:none;font-size:12px;color:#9CA3AF;text-decoration:none;padding:8px 24px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">View all templates →</a>
+          </div>
+        </div>
+
+        <!-- Deployed Apps pane -->
+        <div id="rs-pane-deployed" style="display:none">
+          <div id="rs-deployed" class="pgrid"></div>
+          <div style="display:flex;justify-content:center;margin-top:20px">
+            <a id="rs-deployed-viewmore" href="#" onclick="showPage('page-projects');return false;" style="display:none;font-size:12px;color:#9CA3AF;text-decoration:none;padding:8px 24px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">View more →</a>
+          </div>
+          <div id="rs-deployed-empty" class="rs-empty" style="display:none">
+            <div class="rs-empty-box">
+              <svg class="rs-empty-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <div class="rs-empty-title">0 apps deployed</div>
+            <div class="rs-empty-text">Deploy your application to a production-ready environment.<br>This will make it publicly accessible with a live URL.</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1133,10 +1226,28 @@
 
 
 <script>
+// ============================================================
+// Dashboard JS — AI Website Builder (/app/index.html)
+// ============================================================
+// Responsibilities:
+//   - Auth gate: redirects unauthenticated users to landing page
+//   - Project grid: load, display, rename, delete user projects
+//   - Template gallery: lazy-loaded preview iframes + preview modal
+//   - Prompt bar: model selector, mode selector, chip suggestions
+//   - Sidebar navigation: collapsible, persists state in localStorage
+//   - Profile popup + settings subpages (profile, account, appearance, usage, FAQ)
+//   - Voice input: record → transcribe via /api/transcribe
+//   - Soft account deletion + restore flow
+//   - i18n: English / Uzbek / Russian UI labels (DASH_T lookup)
+//   - Dashboard mode: 'build' (direct) or 'brainstorm' (planning first)
+// ============================================================
+
+// ── Supabase Setup ────────────────────────────────────────────────────────────
 var SUPA_URL='https://ljfkpkytcahmugwphrqo.supabase.co';
 var SUPA_KEY='sb_publishable_7eIDQqzdu6zy7-tLpLVpXw_ciCm1doM';
 var sb;try{sb=window.supabase.createClient(SUPA_URL,SUPA_KEY)}catch(e){}
-var user=null,curModel='anthropic/claude-sonnet-4.6',curMode='brainstorm',attachB64=null;
+// Global state
+var user=null,curModel='anthropic/claude-sonnet-4.6',curBuildMode='brainstorm',attachB64=null;
 
 var TPLS=[
   // ── New templates (most recent first) ──
@@ -1171,6 +1282,19 @@ var CHIPS=[
 ];
 var chipIdx=0;
 
+// ── init ──────────────────────────────────────────────────────────────────────
+// Main entry point — called once on page load
+// Dependencies: renderChips, setupDropdowns, initSidebar, setupNav, lucide,
+//               applyTheme, setupProfile, setupCardMenus, sb.auth
+// Flow:
+//   1. Render prompt chips, dropdowns, sidebar, nav buttons, Lucide icons
+//   2. Apply saved theme from localStorage
+//   3. Subscribe to Supabase auth state changes (email confirm, password reset)
+//   4. Get current session → if no session redirect to landing page
+//   5. If session: load projects, render templates, load profile data
+//   6. Check if account was pending soft-delete → restore if < 30 days
+// Affects: DOM (entire dashboard rendered), calls loadProjects, renderTplHome
+// Called by: inline at bottom of <script> block
 function init(){
   renderChips();
   setupDropdowns();
@@ -1216,7 +1340,17 @@ function init(){
   }else{location.href='/';}
 }
 
-// CHIPS
+// ── CHIPS ─────────────────────────────────────────────────────────────────────
+
+// ── renderChips ───────────────────────────────────────────────────────────────
+// Renders the scrollable prompt suggestion chips below the prompt card
+// Dependencies: CHIPS array, chipIdx, curModel, sessionStorage
+// Flow:
+//   1. Slice 5 chips from CHIPS starting at chipIdx (wraps around)
+//   2. Each chip click → store prompt + mode in sessionStorage → navigate to builder
+//   3. Append "More ideas" chip and refresh button to cycle through chip batches
+// Affects: #chips-row DOM
+// Called by: init(), chip "More ideas" click, applyDashLang()
 function renderChips(){
   var row=document.getElementById('chips-row');row.innerHTML='';
   var show=CHIPS.slice(chipIdx,chipIdx+5);
@@ -1235,7 +1369,17 @@ function renderChips(){
   row.appendChild(mb);
 }
 
-// DROPDOWNS
+// ── DROPDOWNS ─────────────────────────────────────────────────────────────────
+
+// ── setupDropdowns ────────────────────────────────────────────────────────────
+// Wires up model and mode dropdown menus (toggle + option selection)
+// Dependencies: closeAllDD
+// Flow:
+//   - Model dropdown: click dd-model → toggle menu-model → option click updates curModel, label, icon
+//   - Mode dropdown: click dd-mode → toggle menu-mode → option click updates curMode, label, icon
+//   - Outside click: document click → closeAllDD
+// Affects: curModel, curMode globals; DOM labels/icons in header bar
+// Called by: init()
 function setupDropdowns(){
   // Model dropdown
   document.getElementById('dd-model').addEventListener('click',function(e){
@@ -1255,7 +1399,7 @@ function setupDropdowns(){
     closeAllDD();
   });
 
-  // Mode dropdown
+  // Mode dropdown — Brainstorm first vs Build directly
   document.getElementById('dd-mode').addEventListener('click',function(e){
     e.stopPropagation();
     closeAllDD();
@@ -1264,9 +1408,13 @@ function setupDropdowns(){
   document.getElementById('menu-mode').addEventListener('click',function(e){
     var opt=e.target.closest('.dd-opt');if(!opt)return;
     e.stopPropagation();
-    curMode=opt.getAttribute('data-mode');
-    document.getElementById('md-ico').textContent=opt.getAttribute('data-ico');
+    curBuildMode=opt.getAttribute('data-mode');
+    var icoName = curBuildMode === 'direct' ? 'zap' : 'sparkles';
+    document.getElementById('md-ico').innerHTML='<i data-lucide="'+icoName+'" style="width:14px;height:14px;stroke-width:1.75"></i>';
     document.getElementById('md-lbl').textContent=opt.getAttribute('data-l');
+    if(window.lucide) lucide.createIcons();
+    document.querySelectorAll('#menu-mode .dd-opt').forEach(function(el){el.classList.remove('active');});
+    opt.classList.add('active');
     closeAllDD();
   });
 
@@ -1275,12 +1423,30 @@ function setupDropdowns(){
 }
 function closeAllDD(){document.querySelectorAll('.dd-menu.open').forEach(function(m){m.classList.remove('open');});}
 
-// NAV
+// ── NAV ───────────────────────────────────────────────────────────────────────
+
+// ── setupNav ──────────────────────────────────────────────────────────────────
+// Attaches click listeners to all [data-v] sidebar navigation buttons
+// Dependencies: switchPage
+// Flow: querySelectorAll('[data-v]') → addEventListener → switchPage(data-v)
+// Affects: nothing (wires listeners only)
+// Called by: init()
 function setupNav(){
   document.querySelectorAll('[data-v]').forEach(function(b){
     b.addEventListener('click',function(){switchPage(b.getAttribute('data-v'));});
   });
 }
+// ── switchPage ────────────────────────────────────────────────────────────────
+// Shows the target page div and updates sidebar nav active state
+// Dependencies: switchSP, loadSettingsData
+// Flow:
+//   1. Alias 'appearance' → settings/appearance, 'support' → settings/help
+//   2. Hide all .page divs → show #page-{name}
+//   3. Toggle .active class on nav buttons
+//   4. Hide main sidebar in settings mode (has its own sidebar), show elsewhere
+//   5. Load settings data if entering settings
+// Affects: .page DOM visibility, sidebar display
+// Called by: setupNav event listeners, ppNav(), switchDashMode()
 function switchPage(name){
   // If navigating to appearance/support, redirect to settings subpage
   if(name==='appearance'){switchPage('settings');switchSP('appearance');return;}
@@ -1294,14 +1460,32 @@ function switchPage(name){
   else{dashSidebar.style.display='';}
 }
 
-// SETTINGS SUBPAGE NAVIGATION
+// ── SETTINGS SUBPAGE NAVIGATION ───────────────────────────────────────────────
+
+// ── switchSP ──────────────────────────────────────────────────────────────────
+// Switches between settings subpages (profile, account, appearance, etc.)
+// Dependencies: none
+// Flow: hide all .spage → show #sp-{name} → update .settings-nav-item active state
+// Affects: .spage DOM visibility
+// Called by: settings sidebar nav buttons, ppNav()
 function switchSP(name){
   document.querySelectorAll('.spage').forEach(function(p){p.classList.remove('active');});
   document.getElementById('sp-'+name).classList.add('active');
   document.querySelectorAll('.settings-nav-item').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-sp')===name);});
 }
 
-// SETTINGS DATA LOAD
+// ── SETTINGS DATA LOAD ────────────────────────────────────────────────────────
+
+// ── loadSettingsData ──────────────────────────────────────────────────────────
+// Populates all settings subpages with live data (profile, stats, usage, appearance)
+// Dependencies: sb (Supabase client), user, profileData, /api/usage
+// Flow:
+//   1. Fill Profile subpage: name, handle, joined date, form fields
+//   2. Fetch counts from generations/projects/deployments tables (for stats)
+//   3. Fetch /api/usage → fill subscription + usage bars
+//   4. Restore saved theme button state and font size slider
+// Affects: sp-* DOM elements (labels, inputs, progress bars)
+// Called by: switchPage('settings')
 async function loadSettingsData(){
   if(!user||!sb) return;
   // Profile subpage
@@ -1358,7 +1542,16 @@ async function loadSettingsData(){
   if(preview) preview.style.fontSize=fs+'px';
 }
 
-// SETTINGS — SAVE PROFILE (re-auth if phone changed)
+// ── saveProfileSP ─────────────────────────────────────────────────────────────
+// Saves profile data from the Settings > Profile subpage form
+// Dependencies: sb.auth.updateUser, sb.from('profiles').update, loadProfileData, updateAuth
+// Flow:
+//   1. Read form fields (name, username, bio, location, website)
+//   2. Validate username format (3-20 chars, lowercase alphanum/hyphens)
+//   3. Update Supabase auth metadata (full_name) + profiles table
+//   4. Refresh user object + UI
+// Affects: Supabase auth.users metadata, `profiles` table
+// Called by: Settings Profile form "Save Changes" button
 function saveProfileSP(){
   if(!user||!sb) return;
   var nm=document.getElementById('sp-pf-name').value.trim();
@@ -1388,14 +1581,29 @@ function saveProfileSP(){
   doSave();
 }
 
-// CHECK IF USER HAS PASSWORD (vs OAuth-only)
+// ── userHasPassword ───────────────────────────────────────────────────────────
+// Returns true if the user signed up with email/password (not OAuth only)
+// Dependencies: user.identities array from Supabase
+// Flow: checks for an identity with provider === 'email'
+// Used to decide whether to show the re-auth password modal
+// Called by: requireReauth()
 function userHasPassword(){
   if(!user) return false;
   var identities=user.identities||[];
   return identities.some(function(i){return i.provider==='email';});
 }
 
-// REAUTH MODAL — verify current password before sensitive changes
+// ── requireReauth ─────────────────────────────────────────────────────────────
+// Shows a "confirm your identity" modal before sensitive account changes
+// Dependencies: userHasPassword, sb.auth.signInWithPassword
+// Flow:
+//   1. If OAuth-only user → call onSuccess directly (can't verify with password)
+//   2. Otherwise: render overlay modal with password input
+//   3. On submit: re-sign-in with current email + typed password
+//   4. If correct → remove modal → call onSuccess()
+//   5. If wrong → show "Incorrect password" error, clear field
+// Affects: DOM (appends/removes modal overlay)
+// Called by: changePW(), changeEmail(), changePhone()
 function requireReauth(onSuccess){
   // OAuth users (Google, etc.) — can't verify with password, proceed directly
   if(!userHasPassword()){onSuccess();return;}
@@ -1442,7 +1650,12 @@ function requireReauth(onSuccess){
   };
 }
 
-// SETTINGS — CHANGE PASSWORD
+// ── changePW ──────────────────────────────────────────────────────────────────
+// Changes the user's password after re-auth verification
+// Dependencies: requireReauth, sb.auth.updateUser
+// Flow: validate fields → requireReauth → sb.auth.updateUser({password}) → show status
+// Affects: Supabase auth.users (password hash)
+// Called by: Account Settings "Update" button for Change Password section
 function changePW(){
   var pw=document.getElementById('sp-new-pw').value;
   var pw2=document.getElementById('sp-confirm-pw').value;
@@ -1462,7 +1675,12 @@ function changePW(){
   });
 }
 
-// SETTINGS — CHANGE PHONE
+// ── changePhone ───────────────────────────────────────────────────────────────
+// Updates the user's phone number in the profiles table (after re-auth)
+// Dependencies: requireReauth, sb.from('profiles').update
+// Flow: validate phone → requireReauth → PATCH profiles → update display fields
+// Affects: Supabase `profiles` table (phone column)
+// Called by: Account Settings "Update" button for Change Phone section
 function changePhone(){
   var phone=document.getElementById('sp-new-phone').value.trim();
   var err=document.getElementById('sp-phone-error');
@@ -1486,7 +1704,16 @@ function changePhone(){
   });
 }
 
-// SETTINGS — CHANGE EMAIL
+// ── changeEmail ───────────────────────────────────────────────────────────────
+// Sends a confirmation email to the new address (email change requires verification)
+// Dependencies: requireReauth, sb.auth.updateUser
+// Flow:
+//   1. Validate email format → requireReauth
+//   2. Call sb.auth.updateUser({email}) — Supabase sends verification email
+//   3. onAuthStateChange USER_UPDATED fires when user clicks the link
+//      → that handler syncs new email to profiles table
+// Affects: triggers Supabase email confirmation flow; profiles table updated later via onAuthStateChange
+// Called by: Account Settings "Update" button for Change Email section
 function changeEmail(){
   var email=document.getElementById('sp-new-email').value.trim();
   var err=document.getElementById('sp-email-error');
@@ -1504,7 +1731,16 @@ function changeEmail(){
   });
 }
 
-// SETTINGS — DELETE ACCOUNT (soft delete)
+// ── deleteAccount ─────────────────────────────────────────────────────────────
+// Soft-deletes the user account (30-day recovery window)
+// Dependencies: sb.auth.getSession, /api/delete-account, sb.auth.signOut
+// Flow:
+//   1. Show confirmation modal
+//   2. On confirm: POST /api/delete-account with JWT (sets profiles.deleted_at)
+//   3. Sign out → redirect to /?deleted=1
+//   4. On next login: checkAndRestoreAccount() will clear deleted_at
+// Affects: Supabase `profiles` table (deleted_at), auth session (signed out)
+// Called by: Account Settings "Delete Account" button
 function deleteAccount(){
   // Show custom branded confirmation modal
   var overlay=document.createElement('div');
@@ -1540,11 +1776,22 @@ function deleteAccount(){
   };
 }
 
-// SETTINGS — THEME
+// ── applyTheme ────────────────────────────────────────────────────────────────
+// Applies dark/light theme by setting data-theme on <html>
+// Dependencies: window.matchMedia (for 'system' mode)
+// Flow: resolves 'system' to actual OS preference → sets data-theme="dark"|"light"
+// Affects: document.documentElement data-theme attribute (CSS variable switching)
+// Called by: init(), setTheme(), system preference change listener
 function applyTheme(theme){
   var isDark = theme==='dark' || (theme==='system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
   document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
 }
+// ── setTheme ──────────────────────────────────────────────────────────────────
+// Persists and applies a theme choice
+// Dependencies: applyTheme, localStorage
+// Flow: save to localStorage → update active button → call applyTheme
+// Affects: localStorage 'theme', .theme-opt active state, CSS theme variables
+// Called by: Appearance subpage theme buttons
 function setTheme(theme){
   localStorage.setItem('theme',theme);
   document.querySelectorAll('.theme-opt').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-theme')===theme);});
@@ -1555,7 +1802,12 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',func
   if(localStorage.getItem('theme')==='system') applyTheme('system');
 });
 
-// SETTINGS — FONT SIZE
+// ── updateFontSize ────────────────────────────────────────────────────────────
+// Updates Monaco editor font size preference (saved to localStorage)
+// Dependencies: localStorage, DOM (#sp-font-slider, #sp-font-val, #sp-font-preview)
+// Flow: clamp value → save to localStorage → update slider + label + preview span
+// Affects: localStorage 'editorFontSize', preview element font-size style
+// Called by: Appearance font size slider oninput and +/- buttons
 function updateFontSize(val){
   val=parseInt(val);
   localStorage.setItem('editorFontSize',val);
@@ -1567,10 +1819,19 @@ function updateFontSize(val){
   if(preview) preview.style.fontSize=val+'px';
 }
 
-// FAQ TOGGLE
+// ── toggleFaq ─────────────────────────────────────────────────────────────────
+// Toggles a FAQ accordion item open/closed
+// Dependencies: none
+// Flow: toggle 'open' class on .faq-item (CSS expands .faq-a via max-height)
+// Called by: .faq-item onclick in Help & FAQ subpage
 function toggleFaq(el){el.classList.toggle('open');}
 
-// RESTORE CHECK — called on every login
+// ── checkAndRestoreAccount ────────────────────────────────────────────────────
+// On every login, checks if account was soft-deleted and restores it if < 30 days
+// Dependencies: /api/restore-account
+// Flow: POST /api/restore-account → if 'restored' → show welcome-back toast
+// Affects: Supabase `profiles` table (deleted_at cleared via API)
+// Called by: init() after successful session load
 async function checkAndRestoreAccount(token){
   try{
     var res=await fetch('/api/restore-account',{method:'POST',headers:{'Authorization':'Bearer '+token}});
@@ -1583,7 +1844,12 @@ async function checkAndRestoreAccount(token){
   }catch(e){}
 }
 
-// TOAST NOTIFICATION
+// ── showToast ─────────────────────────────────────────────────────────────────
+// Shows a temporary floating toast notification at the bottom of the screen
+// Dependencies: none
+// Flow: create div → append to body → after 4s fade out → remove
+// Affects: DOM (appends/removes toast element)
+// Called by: saveProfileSP, saveProfileInline, changePW, changeEmail, checkAndRestoreAccount, deleteAccount
 function showToast(msg,color){
   var t=document.createElement('div');
   t.textContent=msg;
@@ -1592,7 +1858,16 @@ function showToast(msg,color){
   setTimeout(function(){t.style.opacity='0';t.style.transition='opacity .4s';setTimeout(function(){t.remove();},400);},4000);
 }
 
-// USERNAME CHECK (shared helper)
+// ── checkUsernameField ────────────────────────────────────────────────────────
+// Validates and checks availability of a username input (debounced 400ms)
+// Dependencies: sb.from('profiles').select, user
+// Flow:
+//   1. Sanitize input to lowercase alphanum/hyphens
+//   2. Check length 3-20
+//   3. Debounce 400ms → query profiles table for existing username
+//   4. Show 'available' or 'taken' hint
+// Affects: hint element DOM, input value (sanitized in-place)
+// Called by: Settings Profile username input oninput (sp-pf-username)
 function checkUsernameField(input,hintId){
   var val=input.value.toLowerCase().replace(/[^a-z0-9-]/g,'');
   input.value=val;
@@ -1609,13 +1884,27 @@ function checkUsernameField(input,hintId){
   },400);
 }
 
-// PROFILE
+// ── PROFILE ───────────────────────────────────────────────────────────────────
+
+// ── setupProfile ──────────────────────────────────────────────────────────────
+// Wires the profile button (bottom-left avatar) to show/hide the profile popup
+// Dependencies: renderProfilePopup
+// Flow: click prof-btn → renderProfilePopup → toggle 'show' class on #pp
+//        outside click → remove 'show'
+// Affects: #pp (profile popup) visibility
+// Called by: init()
 function setupProfile(){
   var btn=document.getElementById('prof-btn');
   var pp=document.getElementById('pp');
   btn.addEventListener('click',function(e){e.stopPropagation();renderProfilePopup();pp.classList.toggle('show');});
   document.addEventListener('click',function(e){if(!e.target.closest('.sb-footer'))pp.classList.remove('show');});
 }
+// ── renderProfilePopup ────────────────────────────────────────────────────────
+// Renders the profile popup menu (name, email, nav links, sign out)
+// Dependencies: user, lucide.createIcons, ppNav, doLogout
+// Flow: build HTML string with user name/email → set innerHTML → re-run lucide icons
+// Affects: #pp innerHTML
+// Called by: setupProfile() on prof-btn click
 function renderProfilePopup(){
   var pp=document.getElementById('pp');
   var nm=user?user.user_metadata?.full_name||user.email.split('@')[0]:'Guest';
@@ -1631,6 +1920,11 @@ function renderProfilePopup(){
   // Re-run lucide to render newly injected icons
   if(window.lucide) lucide.createIcons();
 }
+// ── ppNav ─────────────────────────────────────────────────────────────────────
+// Navigates from the profile popup to a page or settings subpage
+// Dependencies: switchPage, switchSP
+// Flow: close popup → route profile/settings/appearance to settings shell → switchPage
+// Called by: profile popup buttons
 function ppNav(page){
   document.getElementById('pp').classList.remove('show');
   // Route profile/settings/appearance to settings shell with correct subpage
@@ -1639,8 +1933,21 @@ function ppNav(page){
   if(page==='appearance'){switchPage('settings');switchSP('appearance');return;}
   switchPage(page);
 }
+// In-memory cache of profile fields loaded from Supabase `profiles` table
 var profileData={bio:'',location:'',website:'',username:'',phone:''};
-var usernameTimer=null;
+var usernameTimer=null; // debounce timer for username availability check
+
+// ── loadProfileData ───────────────────────────────────────────────────────────
+// Loads user profile from Supabase and populates all profile form fields
+// Dependencies: sb.from('profiles').select, user, DOM profile fields
+// Flow:
+//   1. Fetch profiles row for current user
+//   2. Cache in profileData global
+//   3. Update profile header (avatar, name, handle, joined date)
+//   4. Fill pf-* form inputs
+//   5. Load generation/project/deployment counts for stats display
+// Affects: profileData global, DOM profile page elements
+// Called by: init(), saveProfileInline(), saveProfileSP(), updateAuth()
 async function loadProfileData(){
   if(!user||!sb)return;
   try{
@@ -1675,6 +1982,13 @@ async function loadProfileData(){
   try{var {count}=await sb.from('projects').select('*',{count:'exact',head:true}).eq('user_id',user.id);document.getElementById('prof-projects').textContent=count||0;}catch(e){}
   try{var {count}=await sb.from('deployments').select('*',{count:'exact',head:true}).eq('user_id',user.id);document.getElementById('prof-deployed').textContent=count||0;}catch(e){}
 }
+// ── checkUsername ─────────────────────────────────────────────────────────────
+// Validates and checks availability for the Profile page username input (pf-username)
+// Same logic as checkUsernameField but uses pf-username-hint and profileData.username
+// Dependencies: sb.from('profiles').select, user, usernameTimer
+// Flow: sanitize → length check → debounce 400ms → Supabase availability check
+// Affects: #pf-username-hint DOM, pf-username input value
+// Called by: pf-username input oninput
 function checkUsername(val){
   val=val.toLowerCase().replace(/[^a-z0-9-]/g,'');
   document.getElementById('pf-username').value=val;
@@ -1692,6 +2006,16 @@ function checkUsername(val){
     }catch(e){hint.className='pf-hint';hint.textContent='Could not check';}
   },400);
 }
+// ── saveProfileInline ─────────────────────────────────────────────────────────
+// Saves profile from the standalone Profile page (not settings shell)
+// Dependencies: sb.auth.updateUser, sb.from('profiles').update, loadProfileData, updateAuth
+// Flow:
+//   1. Read all pf-* form fields
+//   2. Validate username format
+//   3. sb.auth.updateUser({data: {full_name}}) + profiles table PATCH
+//   4. Refresh user + UI + show "Saved" status
+// Affects: Supabase auth.users metadata, `profiles` table
+// Called by: Profile page "Save Changes" button
 async function saveProfileInline(){
   if(!user||!sb)return;
   var btn=document.getElementById('pf-save-btn');
@@ -1723,21 +2047,77 @@ async function saveProfileInline(){
   var st=document.getElementById('pf-save-status');st.classList.add('show');setTimeout(function(){st.classList.remove('show');},2000);
 }
 
-// ATTACHMENT
+// ── ATTACHMENT ────────────────────────────────────────────────────────────────
+
+// ── handleFile ────────────────────────────────────────────────────────────────
+// Reads an image file and shows a thumbnail preview above the prompt textarea
+// Dependencies: FileReader
+// Flow: read file as DataURL → set attachB64 → show att-area with thumbnail
+// Affects: attachB64 global, #att-area DOM
+// Called by: #file-in input onchange
+
+// ── rmAtt ─────────────────────────────────────────────────────────────────────
+// Removes the attached image and hides the preview area
+// Called by: × button in att-area
 function handleFile(inp){var f=inp.files[0];if(!f)return;var r=new FileReader();r.onload=function(e){attachB64=e.target.result;document.getElementById('att-img').src=attachB64;document.getElementById('att-area').style.display='block';};r.readAsDataURL(f);inp.value='';}
 function rmAtt(){attachB64=null;document.getElementById('att-area').style.display='none';}
 
-// GO
+// ── GO / BUILD TRIGGER ────────────────────────────────────────────────────────
+var dashMode = 'build'; // tracks which mode tab is active: 'build' | 'fullstack'
+
+// ── switchDashMode ────────────────────────────────────────────────────────────
+// Switches between "Landing Page" and "Full Stack App" mode tabs
+// Dependencies: DOM .mode-tab elements, .prompt-card
+// Flow: update dashMode → toggle active class → change placeholder text
+//        → adjust prompt card border-radius for visual continuity with active tab
+// Affects: dashMode global, DOM tab styles, prompt placeholder
+// Called by: mode tab button onclick
+function switchDashMode(mode) {
+  if (mode === 'agent') return;
+  dashMode = mode;
+  document.querySelectorAll('.mode-tab').forEach(function(t){ t.classList.toggle('active', t.getAttribute('data-mode') === mode); });
+  var prompt = document.getElementById('prompt');
+  if (mode === 'fullstack') {
+    prompt.placeholder = 'Describe your app — CRM, dashboard, booking system...';
+  } else {
+    prompt.placeholder = 'Describe what you want to build...';
+  }
+  // Update prompt card border-radius based on active tab position
+  var card = document.querySelector('.prompt-card');
+  if (mode === 'build') {
+    card.style.borderRadius = '0 14px 14px 14px';
+  } else if (mode === 'fullstack') {
+    card.style.borderRadius = '14px 0 14px 14px';
+  }
+}
+// ── go ────────────────────────────────────────────────────────────────────────
+// Reads the dashboard prompt, stores context in sessionStorage, navigates to builder
+// Dependencies: sessionStorage, dashMode, curMode, curModel, attachB64
+// Flow:
+//   1. Get prompt text → abort if empty
+//   2. Save prompt, mode, model (and optional image) to sessionStorage
+//   3. Navigate to /app/build/ (builder page reads sessionStorage on load)
+// Affects: sessionStorage (builder_prompt, builder_mode, builder_model, builder_attach)
+// Called by: send button click, Enter key in prompt textarea
 function go(){
   var p=document.getElementById('prompt').value.trim();if(!p)return;
   sessionStorage.setItem('builder_prompt',p);
-  sessionStorage.setItem('builder_mode',curMode);
+  sessionStorage.setItem('builder_mode', dashMode);
+  sessionStorage.setItem('builder_buildmode', curBuildMode);
   sessionStorage.setItem('builder_model',curModel);
   if(attachB64)sessionStorage.setItem('builder_attach',attachB64);
   location.href='/app/build/';
 }
 
-// AUTH
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+
+// ── updateAuth ────────────────────────────────────────────────────────────────
+// Updates the avatar and greeting text based on auth state
+// Dependencies: user, DASH_T (i18n), localStorage 'builder_lang'
+// Flow: if user → set avatar initial → show time-based greeting with first name
+//        if no user → show '?' avatar
+// Affects: #d-av, #greeting DOM elements
+// Called by: init(), saveProfileInline(), saveProfileSP(), loadProfileData()
 function updateAuth(){
   var av=document.getElementById('d-av'),gr=document.getElementById('greeting');
   if(user){
@@ -1750,6 +2130,12 @@ function updateAuth(){
     else gr.textContent=_DT.greeting_evening+', '+fn+' 🌙';
   }else{av.textContent='?';}
 }
+// ── doLogout ──────────────────────────────────────────────────────────────────
+// Shows sign-out confirm modal using the shared cm-overlay
+// Dependencies: showCModal, sb.auth.signOut
+// Flow: configure modal as 'logout' → on confirm: signOut → redirect to /
+// Affects: auth session, localStorage (clears guest flags)
+// Called by: Profile popup "Sign out" button
 async function doLogout(){
   showCModal('delete',null);
   document.getElementById('cm-icon').className='cm-icon danger';
@@ -1761,26 +2147,50 @@ async function doLogout(){
   _cmAction='logout';
 }
 
-// RECENT TABS
+// ── SIDEBAR ───────────────────────────────────────────────────────────────────
+
+// ── toggleSidebar ─────────────────────────────────────────────────────────────
+// Collapses/expands the sidebar (icon-only vs full labels)
+// Dependencies: localStorage 'sb_collapsed'
+// Flow: toggle 'collapsed' class on #sidebar → save state to localStorage
+// Affects: sidebar width (CSS transition via .sidebar.collapsed)
+// Called by: sidebar toggle button onclick
 function toggleSidebar(){
   var sb=document.getElementById('sidebar');
   sb.classList.toggle('collapsed');
   localStorage.setItem('sb_collapsed', sb.classList.contains('collapsed')?'1':'0');
 }
+// ── initSidebar ───────────────────────────────────────────────────────────────
+// Restores sidebar collapsed state from localStorage on page load
+// Called by: init()
 function initSidebar(){
   if(localStorage.getItem('sb_collapsed')==='1'){
     document.getElementById('sidebar').classList.add('collapsed');
   }
 }
 
+// ── rsTab ─────────────────────────────────────────────────────────────────────
+// Switches between Recent / Templates / Deployed Apps tabs on the home page panel
+// Dependencies: DOM rs-pane-* and rtab-* elements
+// Flow: toggle active class on tab buttons → show/hide corresponding pane
+//        → re-evaluate empty states for recent/deployed
+// Called by: tab button onclick
 function rsTab(t){
-  document.getElementById('rtab-tpl').classList.toggle('active',t==='tpl');
-  document.getElementById('rtab-recent').classList.toggle('active',t==='recent');
-  document.getElementById('rs-tpl').style.display=t==='tpl'?'grid':'none';
-  document.getElementById('rs-recent').style.display=t==='recent'?'grid':'none';
+  ['recent','tpl','deployed'].forEach(function(k){
+    document.getElementById('rtab-'+k).classList.toggle('active',k===t);
+    document.getElementById('rs-pane-'+k).style.display=k===t?'block':'none';
+  });
+  // Always re-evaluate empty states when switching tabs
+  var rg=document.getElementById('rs-recent'),re=document.getElementById('rs-recent-empty');
+  if(re) re.style.display=(rg&&rg.children.length===0)?'flex':'none';
+  var dg=document.getElementById('rs-deployed'),de=document.getElementById('rs-deployed-empty');
+  if(de) de.style.display=(dg&&dg.children.length===0)?'flex':'none';
+  if(window.lucide) lucide.createIcons();
 }
 
-// TEMPLATES — lazy-loaded previews via IntersectionObserver
+// ── TEMPLATES ────────────────────────────────────────────────────────────────
+// IntersectionObserver: lazy-loads template preview iframes as they scroll into view
+// rootMargin 200px ensures iframes start loading slightly before they're visible
 var _tplObserver=new IntersectionObserver(function(entries){
   entries.forEach(function(e){
     if(e.isIntersecting){
@@ -1802,9 +2212,20 @@ var _tplObserver=new IntersectionObserver(function(entries){
   });
 },{rootMargin:'200px 0px',threshold:0});
 
-function renderTpl(id){
+// ── renderTpl ─────────────────────────────────────────────────────────────────
+// Renders template cards into a grid container (idempotent — skips if already rendered)
+// Dependencies: TPLS array, _tplObserver, openPreview
+// Flow:
+//   1. If container already has children → skip
+//   2. Slice TPLS by limit → create .tcard divs with background color
+//   3. Set data-tpl-src for lazy iframe loading → observe with IntersectionObserver
+//   4. Show "View all" link if limited and there are more templates
+// Affects: DOM (appends .tcard elements to container)
+// Called by: renderTplHome() (rs-tpl + all-tpl grids)
+function renderTpl(id, limit){
   var g=document.getElementById(id);if(!g||g.children.length>0)return;
-  TPLS.forEach(function(t,i){
+  var tpls=limit?TPLS.slice(0,limit):TPLS;
+  tpls.forEach(function(t,i){
     var c=document.createElement('div');c.className='tcard';
     c.onclick=function(){openPreview(t);};
     c.setAttribute('data-tpl-src',t.file);
@@ -1815,7 +2236,20 @@ function renderTpl(id){
     g.appendChild(c);
     _tplObserver.observe(c);
   });
+  // Add "View all" if limited and there are more
+  if(limit&&TPLS.length>limit){
+    var more=document.getElementById('rs-tpl-viewmore');
+    if(more){more.style.display='';more.textContent='View all '+(TPLS.length-limit)+' more templates →';}
+  }
 }
+// ── openPreview ───────────────────────────────────────────────────────────────
+// Opens the full-screen template preview modal
+// Dependencies: DOM #preview-modal, #preview-frame, #pv-use-btn, sessionStorage
+// Flow:
+//   1. Set modal title + load template URL in iframe
+//   2. Wire "Use this template" button → store template file + prompt in sessionStorage → navigate to builder
+// Affects: sessionStorage (builder_template_file, builder_template_name, builder_prompt, etc.)
+// Called by: .tcard onclick
 function openPreview(t){
   document.getElementById('pv-title').textContent=t.n;
   document.getElementById('preview-frame').src=t.file;
@@ -1831,12 +2265,19 @@ function openPreview(t){
   };
   document.getElementById('preview-modal').classList.add('open');
 }
+// ── closePreview ──────────────────────────────────────────────────────────────
+// Closes the template preview modal and clears the iframe (prevent background audio/video)
+// Called by: "Close" button in preview-bar
 function closePreview(){
   document.getElementById('preview-modal').classList.remove('open');
   document.getElementById('preview-frame').src='about:blank';
 }
+// ── renderTplHome ─────────────────────────────────────────────────────────────
+// Renders templates in both the home tab panel (max 8) and the full templates page
+// Dependencies: renderTpl, TPLS, _tplObserver, openPreview
+// Called by: init() (authenticated path)
 function renderTplHome(){
-  renderTpl('rs-tpl');
+  renderTpl('rs-tpl', 8);
   var allTpl=document.getElementById('all-tpl');
   if(allTpl&&allTpl.children.length===0){
     TPLS.forEach(function(t,i){
@@ -1853,48 +2294,89 @@ function renderTplHome(){
   }
 }
 
-// PROJECTS
+// ── PROJECTS ─────────────────────────────────────────────────────────────────
+
+// esc — HTML-escapes a string for safe injection into innerHTML
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+// ago — returns a human-readable relative time string ("now", "5m", "2h", "3d")
 function ago(d){var s=Math.floor((Date.now()-d.getTime())/1000);if(s<60)return'now';if(s<3600)return Math.floor(s/60)+'m';if(s<86400)return Math.floor(s/3600)+'h';return Math.floor(s/86400)+'d'}
+// ── mkCard ────────────────────────────────────────────────────────────────────
+// Creates a project card DOM element with iframe thumbnail, name, timestamp, and context menu
+// Dependencies: esc, ago, closeCM, showCModal, location.href
+// Flow:
+//   1. Build card HTML with srcdoc iframe (project preview) + menu button
+//   2. Move dropdown to body (avoids z-index/overflow clipping from card)
+//   3. Card click → navigate to /app/build/?project={id}
+//   4. Menu click → position fixed dropdown at menu button location
+//   5. Dropdown items → rename (showCModal) or delete (showCModal)
+// Affects: DOM (returns a .pcard div)
+// Called by: loadProjects() render function
 function mkCard(p){
   var c=document.createElement('div');c.className='pcard';
-  c.onclick=function(e){if(e.target.closest('.pcard-menu')||e.target.closest('.pcard-dd'))return;sessionStorage.setItem('builder_project_id',p.id);location.href='/app/build/';};
+  c.setAttribute('data-pid',p.id);
   var d=new Date(p.updated_at||p.created_at);
-  c.innerHTML='<div class="pcard-thumb"><iframe srcdoc="'+esc(p.html||'')+'" sandbox="allow-scripts"></iframe></div><div class="pcard-info"><div class="pcard-menu">···</div><div class="pcard-dd"><div data-act="rename" data-pid="'+esc(p.id)+'">✏️ Rename</div><div class="danger" data-act="delete" data-pid="'+esc(p.id)+'">🗑 Delete</div></div><div class="pcard-name">'+esc(p.name)+'</div><div class="pcard-meta">'+ago(d)+' ago</div></div>';
+  var isFS = p.files && (p.files['index.js'] || p.files['server.js'] || p.files['package.json']);
+  var thumbHtml = isFS
+    ? '<div class="pcard-thumb pcard-fs-thumb"><div class="pcard-fs-icon">⚡</div><div class="pcard-fs-label">Full Stack App</div><div class="pcard-fs-sub">Node.js + Express</div></div>'
+    : '<div class="pcard-thumb"><iframe srcdoc="'+esc(p.html||'')+'" sandbox="allow-scripts"></iframe></div>';
+  c.innerHTML=thumbHtml+'<div class="pcard-info"><div class="pcard-menu">···</div><div class="pcard-dd"><div class="pcard-dd-item" data-act="rename">✏️ Rename</div><div class="pcard-dd-item danger" data-act="delete">🗑 Delete</div></div><div class="pcard-name">'+esc(p.name)+'</div><div class="pcard-meta">'+ago(d)+' ago</div></div>';
+  // Card body click → open builder (URL-based, tab-safe)
+  c.addEventListener('click',function(e){
+    if(e.target.closest('.pcard-menu')||e.target.closest('.pcard-dd'))return;
+    location.href='/app/build/?project='+encodeURIComponent(p.id);
+  });
+  // Menu button click → toggle dropdown
+  var menu=c.querySelector('.pcard-menu');
+  var dd=c.querySelector('.pcard-dd');
+  // Move dropdown to body so z-index/overflow can't clip it
+  document.body.appendChild(dd);
+  menu.addEventListener('click',function(e){
+    e.stopPropagation();
+    var wasOpen=dd.classList.contains('show');
+    closeCM();
+    if(!wasOpen){
+      c.classList.add('menu-open');
+      var r=menu.getBoundingClientRect();
+      dd.style.position='fixed';
+      dd.style.top=(r.bottom+4)+'px';
+      dd.style.left=r.left+'px';
+      dd.style.right='auto';
+      dd.classList.add('show');
+    }
+  });
+  dd.querySelectorAll('.pcard-dd-item').forEach(function(item){
+    item.addEventListener('click',function(e){
+      e.stopPropagation();
+      var a=item.getAttribute('data-act');
+      closeCM();
+      if(a==='delete')showCModal('delete',p.id);
+      if(a==='rename')showCModal('rename',p.id);
+    });
+  });
   return c;
 }
+// ── setupCardMenus ────────────────────────────────────────────────────────────
+// Registers a global document click handler to close open card context menus
+// Called by: init()
 function setupCardMenus(){
+  // Close any open dropdown when clicking outside
   document.addEventListener('click',function(e){
-    // Handle action clicks (rename, delete)
-    var t=e.target.closest('[data-act]');
-    if(t){e.stopPropagation();e.preventDefault();
-      var a=t.getAttribute('data-act'),id=t.getAttribute('data-pid');closeCM();
-      if(a==='delete'){showCModal('delete',id);}
-      if(a==='rename'){showCModal('rename',id);}
-      return;
-    }
-    // Handle menu button click
-    var mb=e.target.closest('.pcard-menu');
-    if(mb){e.stopPropagation();e.preventDefault();
-      var dd=mb.nextElementSibling;var wasOpen=dd.classList.contains('show');
-      closeCM();
-      if(!wasOpen){
-        var card=mb.closest('.pcard');
-        if(card)card.classList.add('menu-open');
-        var r=mb.getBoundingClientRect();
-        dd.style.top=(r.bottom+4)+'px';
-        dd.style.right=(window.innerWidth-r.right)+'px';
-        dd.classList.add('show');
-      }
-      return;
-    }
-    // Click outside — close
-    if(!e.target.closest('.pcard-dd'))closeCM();
+    if(!e.target.closest('.pcard-menu')&&!e.target.closest('.pcard-dd'))closeCM();
   });
 }
+// ── closeCM — closes all open card context menus
 function closeCM(){document.querySelectorAll('.pcard-dd.show').forEach(function(d){d.classList.remove('show')});document.querySelectorAll('.pcard.menu-open').forEach(function(c){c.classList.remove('menu-open')})}
 
+// State for shared confirm/rename modal
 var _cmAction=null,_cmId=null;
+
+// ── showCModal ────────────────────────────────────────────────────────────────
+// Shows the shared confirmation/rename modal (delete or rename a project)
+// Dependencies: DOM #cm-overlay, #cm-icon, #cm-title, #cm-sub, #cm-input, #cm-confirm
+// Flow: configure modal content based on action type → show overlay → focus input if rename
+// Affects: #cm-overlay visibility, _cmAction/_cmId globals
+// Called by: mkCard dropdown item clicks
 function showCModal(action,id){
   _cmAction=action;_cmId=id;
   var overlay=document.getElementById('cm-overlay');
@@ -1919,19 +2401,26 @@ function showCModal(action,id){
   }
   overlay.classList.add('show');
 }
+// ── closeCModal — hides the confirm/rename modal
 function closeCModal(){document.getElementById('cm-overlay').classList.remove('show');_cmAction=null;_cmId=null;}
+
+// ── cmConfirm ─────────────────────────────────────────────────────────────────
+// Executes the confirmed action (delete, rename, or logout)
+// Dependencies: delProj, renProj, sb.auth.signOut
+// Flow: read _cmAction → execute appropriate function → close modal
+// Called by: modal confirm button onclick, Enter key listener
 function cmConfirm(){
   if(_cmAction==='delete'&&_cmId){
     var delId=_cmId; // capture before closeCModal nulls it
     closeCModal();
     // Animate card out
-    var cards=document.querySelectorAll('.pcard');
-    cards.forEach(function(c){
-      if(c.querySelector('[data-pid="'+delId+'"]')){
-        c.classList.add('deleting');
-        setTimeout(function(){delProj(delId);},350);
-      }
-    });
+    var cards=document.querySelectorAll('.pcard[data-pid="'+delId+'"]');
+    if(cards.length>0){
+      cards.forEach(function(c){c.classList.add('deleting');});
+      setTimeout(function(){delProj(delId);},350);
+    }else{
+      delProj(delId);
+    }
   }else if(_cmAction==='rename'&&_cmId){
     var nn=document.getElementById('cm-input').value.trim();
     if(!nn)return;
@@ -1948,36 +2437,121 @@ document.addEventListener('keydown',function(e){
   if(e.key==='Enter')cmConfirm();
   if(e.key==='Escape')closeCModal();
 });
+// ── loadProjects ──────────────────────────────────────────────────────────────
+// Loads all user projects from Supabase (or localStorage for guests) and renders them
+// Dependencies: sb.from('projects').select, mkCard, localStorage
+// Flow:
+//   1. Fetch up to 50 projects ordered by updated_at desc
+//   2. Render undeployed projects to #rs-recent (home tab, max 6 visible)
+//   3. Render all projects to #all-proj (My Projects page)
+//   4. Render deployed projects to #rs-deployed (home tab, max 6 visible)
+//   5. Show/hide empty states and "View more" links based on count
+// Affects: #rs-recent, #all-proj, #rs-deployed DOM
+// Called by: init(), delProj(), renProj()
 function loadProjects(){
   function render(list){
-    var rs=document.getElementById('recent-sec'),rg=document.getElementById('rs-recent');rg.innerHTML='';
-    rs.style.display='';
-    if(list.length>0){list.slice(0,4).forEach(function(p){rg.appendChild(mkCard(p))});}
+    var rg=document.getElementById('rs-recent');rg.innerHTML='';
+    var recentEmpty=document.getElementById('rs-recent-empty');
+    var undeployed=list.filter(function(p){return !p.deployed_url;});
+    var viewMoreRecent=document.getElementById('rs-recent-viewmore');
+    if(undeployed.length>0){
+      recentEmpty.style.display='none';
+      undeployed.slice(0,6).forEach(function(p){rg.appendChild(mkCard(p));});
+      if(viewMoreRecent){
+        if(undeployed.length>6){
+          viewMoreRecent.style.display='';
+          viewMoreRecent.textContent='View '+(undeployed.length-6)+' more →';
+        }else{
+          viewMoreRecent.style.display='none';
+        }
+      }
+    }else{
+      recentEmpty.style.display='flex';
+      if(viewMoreRecent) viewMoreRecent.style.display='none';
+    }
     var ag=document.getElementById('all-proj');
     ag.innerHTML='<div class="pcard pcard-new" onclick="location.href=\'/app/build/\'"><div class="plus">+</div><span>New Project</span></div>';
     var np=document.getElementById('no-proj');
     if(list.length>0){np.style.display='none';list.forEach(function(p){ag.appendChild(mkCard(p))});}else{np.style.display='';}
-    var sr=document.getElementById('sb-recent');sr.innerHTML='';
-    if(list.length>0){list.slice(0,5).forEach(function(p){var b=document.createElement('button');b.className='sb-item';b.style.fontSize='11px';b.textContent=p.name.length>22?p.name.slice(0,22)+'…':p.name;b.onclick=function(){sessionStorage.setItem('builder_project_id',p.id);location.href='/app/build/';};sr.appendChild(b);});}
-    else{sr.innerHTML='<div class="sb-item" style="color:#4B5563;font-size:11px;cursor:default">No recent projects</div>';}
+
+    // Render deployed apps section
+    var dg=document.getElementById('rs-deployed');dg.innerHTML='';
+    var deployedEmpty=document.getElementById('rs-deployed-empty');
+    var deployed=list.filter(function(p){return p.deployed_url;});
+    var viewMoreDeployed=document.getElementById('rs-deployed-viewmore');
+    if(deployed.length>0){
+      deployedEmpty.style.display='none';
+      deployed.slice(0,6).forEach(function(p){dg.appendChild(mkCard(p));});
+      if(viewMoreDeployed){
+        if(deployed.length>6){
+          viewMoreDeployed.style.display='';
+          viewMoreDeployed.textContent='View '+(deployed.length-6)+' more →';
+        }else{
+          viewMoreDeployed.style.display='none';
+        }
+      }
+    }else{
+      deployedEmpty.style.display='flex';
+      if(viewMoreDeployed) viewMoreDeployed.style.display='none';
+    }
+    // Re-init Lucide icons (empty state icons may have been hidden before)
+    if(window.lucide) lucide.createIcons();
   }
-  if(sb&&user){sb.from('projects').select('id,name,html,model,prompt,build_id,deployed_url,created_at,updated_at').eq('user_id',user.id).order('updated_at',{ascending:false}).limit(50).then(function(r){render(r.data||[])});}
+  if(sb&&user){sb.from('projects').select('id,name,html,model,prompt,build_id,deployed_url,files,created_at,updated_at').eq('user_id',user.id).order('updated_at',{ascending:false}).limit(50).then(function(r){render(r.data||[])});}
   else{render(JSON.parse(localStorage.getItem('guest_projects')||'[]'));}
 }
-function delProj(id){
-  if(sb&&user){sb.from('projects').delete().eq('id',id).then(function(){loadProjects()});}
-  else{var p=JSON.parse(localStorage.getItem('guest_projects')||'[]');localStorage.setItem('guest_projects',JSON.stringify(p.filter(function(x){return x.id!==id})));loadProjects();}
+// ── delProj ───────────────────────────────────────────────────────────────────
+// Fully deletes a project: undeploys, removes files, deletes DB record
+// Dependencies: sb.from('projects').select, /api/delete-project, sb.auth.getSession, loadProjects
+// Flow:
+//   1. Get project record to find deployed_url + build_id
+//   2. POST /api/delete-project (handles undeploy + filesystem + DB delete)
+//   3. Reload project list
+// Affects: Supabase `projects` table, server filesystem (via API)
+// Called by: cmConfirm() after animation delay
+async function delProj(id){
+  if(sb&&user){
+    try{
+      var r=await sb.from('projects').select('deployed_url,build_id').eq('id',id).single();
+      var subdomain=null;
+      if(r.data&&r.data.deployed_url) subdomain=r.data.deployed_url.replace('https://','').replace('.kenzoagent.com','');
+      var sess=await sb.auth.getSession();
+      var tok=sess.data.session?.access_token;
+      await fetch('/api/delete-project',{
+        method:'POST',
+        headers:{'Content-Type':'application/json',...(tok?{'Authorization':'Bearer '+tok}:{})},
+        body:JSON.stringify({projectId:id,buildId:r.data?.build_id,subdomain:subdomain})
+      });
+    }catch(e){console.warn('delete-project failed',e);}
+    loadProjects();
+  }else{
+    var p=JSON.parse(localStorage.getItem('guest_projects')||'[]');
+    localStorage.setItem('guest_projects',JSON.stringify(p.filter(function(x){return x.id!==id})));
+    loadProjects();
+  }
 }
+// ── renProj ───────────────────────────────────────────────────────────────────
+// Renames a project in Supabase (or localStorage for guests)
+// Dependencies: sb.from('projects').update, loadProjects
+// Called by: cmConfirm() on rename action
 function renProj(id,name){
   if(sb&&user){sb.from('projects').update({name:name}).eq('id',id).then(function(){loadProjects()});}
   else{var p=JSON.parse(localStorage.getItem('guest_projects')||'[]');var f=p.find(function(x){return x.id===id});if(f){f.name=name;localStorage.setItem('guest_projects',JSON.stringify(p));}loadProjects();}
 }
 
-// VOICE MODE
+// ── VOICE MODE ────────────────────────────────────────────────────────────────
+// Records audio via MediaRecorder API, sends to /api/transcribe, injects text into prompt
 var isRecording=false,mediaRecorder=null,audioChunks=[],voiceLang='en';
 var voiceLangs=['en','uz','ru'];
 var voiceLangLabels={en:'EN',uz:'UZ',ru:'RU'};
 var voiceLangApi={en:'en',uz:'uz',ru:'ru'}; // GPT-4o supports Uzbek natively
+// ── setupVoice ────────────────────────────────────────────────────────────────
+// Wires mic button and language toggle button for voice input
+// Dependencies: startRecording, stopRecording
+// Flow:
+//   - mic button click → toggle recording start/stop
+//   - voice-lang button click → cycle through voiceLangs array (EN/UZ/RU)
+// Called by: inline at bottom of <script>
 function setupVoice(){
   var btn=document.getElementById('mic-btn');
   btn.addEventListener('click',function(){
@@ -2008,6 +2582,16 @@ function _dashShowWarning(secsLeft){
 }
 function _dashRemoveOverlays(){var c=document.getElementById('dash-voice-counter');if(c)c.remove();var w=document.getElementById('dash-voice-warning');if(w)w.remove();}
 
+// ── startRecording ────────────────────────────────────────────────────────────
+// Starts audio recording with MediaRecorder; auto-stops at 60s
+// Dependencies: navigator.mediaDevices.getUserMedia, MediaRecorder, transcribeAudio
+// Flow:
+//   1. Request mic access → create MediaRecorder (prefers webm/opus)
+//   2. Push chunks on ondataavailable
+//   3. On onstop → call transcribeAudio with blob
+//   4. Start 1s interval counter → auto-stop at 60s → warn at 45s
+// Affects: isRecording, mediaRecorder, audioChunks globals; mic button visual state
+// Called by: setupVoice() mic button click
 function startRecording(){
   navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
     audioChunks=[];
@@ -2043,6 +2627,11 @@ function startRecording(){
     alert('Microphone access denied. Please allow microphone access.');
   });
 }
+// ── stopRecording ─────────────────────────────────────────────────────────────
+// Stops audio recording (if >= 500ms of audio) and triggers transcription
+// Dependencies: mediaRecorder
+// Flow: clear timer → check elapsed time → stop MediaRecorder → reset UI
+// Called by: setupVoice() mic button click (while recording), auto-stop timer
 function stopRecording(){
   clearInterval(_dashVoiceTimer);_dashVoiceTimer=null;
   _dashRemoveOverlays();
@@ -2055,6 +2644,16 @@ function stopRecording(){
   var btn=document.getElementById('mic-btn');
   btn.classList.remove('recording','transcribing');btn.title='Voice input';
 }
+// ── transcribeAudio ───────────────────────────────────────────────────────────
+// Sends recorded audio blob to /api/transcribe and injects result into prompt textarea
+// Dependencies: /api/transcribe, FileReader
+// Flow:
+//   1. Check blob size (>1KB required)
+//   2. Show 'transcribing' state on mic button
+//   3. Read blob as base64 → POST to /api/transcribe with language
+//   4. Append returned text to prompt textarea → resize textarea
+// Affects: #prompt textarea value, mic button visual state
+// Called by: MediaRecorder onstop handler in startRecording()
 function transcribeAudio(blob,mimeType){
   var btn=document.getElementById('mic-btn');
   console.log('Audio blob size:',blob.size,'type:',blob.type,'lang:',voiceLang);
@@ -2096,7 +2695,8 @@ setTimeout(function(){
   if(g&&g.children.length===0)renderTplHome();
 },2000);
 
-// ── DASHBOARD i18n ──────────────────────────────────────────
+// ── DASHBOARD i18n ────────────────────────────────────────────────────────────
+// All UI strings for EN / UZ / RU; selected via localStorage 'builder_lang'
 var DASH_T={
   uz:{
     greeting_default:"G'oyalaringiz ro'yobga chiqsin",
@@ -2169,6 +2769,16 @@ var DASH_T={
   }
 };
 
+// ── applyDashLang ─────────────────────────────────────────────────────────────
+// Applies the current language to all dashboard UI strings
+// Dependencies: DASH_T lookup, CHIPS global, renderChips
+// Flow:
+//   1. Read saved lang from localStorage
+//   2. Update hero subtitle, prompt placeholder, nav labels, tab labels, upgrade box
+//   3. Swap CHIPS array with localised version → re-render chip row
+//   4. Update greeting text if user is already logged in
+// Affects: various DOM text nodes, CHIPS global, chipIdx reset
+// Called by: inline at bottom of <script>
 function applyDashLang(){
   var lang=localStorage.getItem('builder_lang')||'en';
   var T=DASH_T[lang]||DASH_T['en'];
@@ -2188,8 +2798,8 @@ function applyDashLang(){
   var nb=document.getElementById('nav-builder');if(nb)nb.textContent=T.nav_builder||'Builder';
 
   // Tabs
-  var tt=document.getElementById('rtab-tpl');if(tt)tt.textContent=T.tab_templates;
-  var tr=document.getElementById('rtab-recent');if(tr)tr.textContent=T.tab_recent;
+  var tt=document.getElementById('rtab-tpl-lbl');if(tt)tt.textContent=T.tab_templates;
+  var tr=document.getElementById('rtab-recent-lbl');if(tr)tr.textContent=T.tab_recent;
 
   // No projects empty state
   var np2=document.getElementById('no-proj');if(np2)np2.textContent=T.no_projects;

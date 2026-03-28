@@ -20,6 +20,12 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/editor/editor.main.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- WebContainer API — page has COEP credentialless -->
+  <script type="module">
+    import { WebContainer } from 'https://esm.sh/@webcontainer/api';
+    window.WebContainer = WebContainer;
+    window._wcReady = true;
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -99,66 +105,8 @@
     .pill-btn { transition: all 0.2s ease; }
 
     /* ===== TAB BAR — Emergent style ===== */
-    #tab-bar {
-      display: flex; align-items: stretch; height: 34px; background: var(--bg);
-      flex-shrink: 0; padding: 0 4px; gap: 2px; overflow-x: auto; z-index: 101;
-      position: relative; -webkit-overflow-scrolling: touch; padding-top: 4px;
-    }
-    #tab-bar::-webkit-scrollbar { display: none; }
-    /* No explicit border — color difference between tab bar and content creates the visual separation */
-    .tab-item {
-      display: flex; align-items: center; gap: 10px; height: 100%; padding: 0 42px;
-      font-size: 13px; font-weight: 500; color: var(--text-3);
-      cursor: pointer; white-space: nowrap; flex-shrink: 0; border: none;
-      background: transparent; font-family: inherit; transition: color 0.15s, background 0.15s;
-      position: relative; z-index: 1; border-radius: 0;
-    }
-    .tab-item:hover { color: var(--text-2); background: rgba(255,255,255,0.03); }
-    /* Active tab — blends into content below */
-    .tab-item.active {
-      background: var(--bg-2); color: var(--text);
-      border-radius: 12px 12px 0 0;
-      position: relative;
-    }
-    /* Extend active tab color flush to content */
-    .tab-item.active::after {
-      content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
-      background: var(--bg-2); z-index: 2;
-    }
-    /* Concave bottom-left corner */
-    .tab-item.active::before {
-      content: ''; position: absolute; bottom: 0; left: -12px; width: 12px; height: 12px;
-      background: radial-gradient(circle at top left, transparent 12px, var(--bg-2) 12px);
-      z-index: 2;
-    }
-    /* Concave bottom-right corner — use a wrapper span */
-    .tab-curve-r {
-      display: none; position: absolute; bottom: 0; right: -12px; width: 12px; height: 12px;
-      background: radial-gradient(circle at top right, transparent 12px, var(--bg-2) 12px);
-      z-index: 2;
-    }
-    .tab-item.active .tab-curve-r { display: block; }
-    .tab-item.home { padding: 0 36px; }
-    .tab-item.home svg { width: 16px; height: 16px; stroke-width: 1.75; }
-    .tab-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-    .tab-dot.idle { background: var(--text-3); opacity: 0.5; }
-    .tab-dot.ready { background: var(--green); }
-    .tab-dot.generating { background: var(--blue); animation: pulse 1s infinite; }
-    .tab-name { max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
-    .tab-close {
-      width: 16px; height: 16px; border-radius: 4px; border: none; background: transparent;
-      color: var(--text-3); cursor: pointer; display: flex; align-items: center; justify-content: center;
-      font-size: 12px; line-height: 1; padding: 0; opacity: 0; transition: all 0.1s; margin-left: auto; position: absolute; right: 8px;
-    }
-    .tab-item:hover .tab-close { opacity: 0.7; }
-    .tab-close:hover { background: rgba(239,68,68,0.15); color: var(--red); opacity: 1 !important; }
-    .tab-add {
-      width: 32px; height: 100%; border: none; background: transparent;
-      color: var(--text-3); cursor: pointer; display: flex; align-items: center; justify-content: center;
-      font-size: 16px; flex-shrink: 0; transition: all 0.15s; font-family: inherit;
-      position: relative; z-index: 1;
-    }
-    .tab-add:hover { color: var(--text-2); background: rgba(255,255,255,0.03); }
+    /* tab bar removed */
+    /* tab bar CSS removed — single project mode */
 
     /* ===== HEADER ===== */
     #header {
@@ -224,6 +172,24 @@
     .h-btn.primary { background: #fff; border-color: transparent; color: #0D0D0D; font-weight: 700; }
     .h-btn.primary:hover { opacity: 0.88; }
     .h-btn.accent { background: #fff; border-color: transparent; color: #0D0D0D; font-weight: 700; }
+    .h-btn-danger { color: #EF4444 !important; border-color: rgba(239,68,68,0.3) !important; }
+    .h-btn-danger:hover { background: rgba(239,68,68,0.08) !important; border-color: rgba(239,68,68,0.5) !important; }
+
+    /* Toast notification */
+    #toast{position:fixed;bottom:24px;right:24px;z-index:99999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+    .toast-item{background:#1a1a1e;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px 18px;font-size:13px;font-weight:500;color:#F4F4F5;display:flex;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,0.5);animation:toastIn .25s ease;min-width:260px}
+    @keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .toast-item.out{animation:toastOut .25s ease forwards}
+    @keyframes toastOut{to{opacity:0;transform:translateY(12px)}}
+    .toast-icon{font-size:16px;flex-shrink:0}
+    .toast-spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,0.15);border-top:2px solid #0ea5b0;border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* Subdomain check indicator */
+    .subdomain-status{font-size:11px;font-weight:600;margin-top:6px;height:16px;display:block}
+    .subdomain-status.ok{color:#22C55E}
+    .subdomain-status.taken{color:#EF4444}
+    .subdomain-status.checking{color:#6B7280}
 
     #status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-3); flex-shrink: 0; }
     #status-dot.generating { background: var(--blue); animation: pulse 1s infinite; }
@@ -466,7 +432,7 @@
     .etab .etab-close:hover { background: rgba(239,68,68,0.15); color: var(--red); }
 
     /* ===== PREVIEW PANE ===== */
-    #pane-preview { flex: 1; min-height: 0; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    #pane-preview { flex: 1; min-height: 0; position: relative; overflow: hidden; }
     #pane-code { flex: 1; min-height: 0; position: relative; display: none; flex-direction: column; }
     #monaco-editor { width: 100%; flex: 1; min-height: 0; }
 
@@ -543,8 +509,7 @@
 
     /* Preview iframe wrapper — handles device frames */
     #preview-container {
-      width: 100%; height: 100%;
-      display: flex; align-items: center; justify-content: center;
+      position: absolute; inset: 0;
       padding: 12px; transition: padding 0.3s ease;
     }
     #preview-container.device-tablet,
@@ -588,7 +553,7 @@
 
     #preview-frame {
       width: 100%; height: 100%; border: none; background: white;
-      display: none; border-radius: 12px;
+      display: none; border-radius: 20px;
     }
 
     /* ===== MODALS ===== */
@@ -600,28 +565,30 @@
     }
     .modal-overlay.show { display: flex; }
     .modal-box {
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
-      padding: 24px; width: 90%; max-width: 400px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      background: #0F0F12; border: 1px solid rgba(255,255,255,0.08); border-radius: 20px;
+      padding: 28px; width: 90%; max-width: 420px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.6);
     }
-    .modal-box h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
-    .modal-box label { font-size: 12px; color: var(--text-3); display: block; margin-bottom: 6px; font-weight: 500; }
-    .domain-row { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+    .modal-box h3 { font-size: 18px; font-weight: 700; margin-bottom: 6px; color: #F4F4F5; display:flex;align-items:center;gap:8px; }
+    .modal-box .modal-sub { font-size:12px;color:#6B7280;margin-bottom:20px; }
+    .modal-box label { font-size: 11px; color: #71717A; display: block; margin-bottom: 8px; font-weight: 600; text-transform:uppercase;letter-spacing:0.5px; }
+    .domain-row { display: flex; align-items: center; background:#09090B; border:1px solid rgba(255,255,255,0.08); border-radius: 10px; overflow:hidden; margin-bottom: 24px; transition:border-color .15s; }
+    .domain-row:focus-within { border-color: #0ea5b0; }
     .modal-input {
-      flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
-      padding: 10px 12px; font-size: 14px; color: var(--text); outline: none;
-      font-family: inherit; transition: border-color 0.15s;
+      flex: 1; background: transparent; border: none;
+      padding: 11px 14px; font-size: 14px; color: #F4F4F5; outline: none;
+      font-family: inherit;
     }
-    .modal-input:focus { border-color: var(--blue); }
-    .domain-suffix { font-size: 13px; color: var(--text-3); white-space: nowrap; }
-    .modal-actions { display: flex; gap: 8px; }
+    .modal-input::placeholder { color:#52525B; }
+    .domain-suffix { font-size: 13px; color: #0ea5b0; white-space: nowrap; padding-right:14px; font-weight:500; }
+    .modal-actions { display: flex; gap: 10px; }
     .modal-btn {
-      flex: 1; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 600;
-      cursor: pointer; border: none; transition: all 0.15s;
+      flex: 1; padding: 11px; border-radius: 10px; font-size: 13px; font-weight: 600;
+      cursor: pointer; border: none; transition: all 0.15s; font-family:inherit;
     }
-    .modal-btn.cancel { background: var(--bg-hover); color: var(--text-2); }
-    .modal-btn.cancel:hover { background: var(--border); }
-    .modal-btn.confirm { background: var(--green); color: #000; }
+    .modal-btn.cancel { background: rgba(255,255,255,0.06); color: #9CA3AF; border:1px solid rgba(255,255,255,0.08); }
+    .modal-btn.cancel:hover { background: rgba(255,255,255,0.1); }
+    .modal-btn.confirm { background: #0ea5b0; color: #fff; }
     .modal-btn.confirm:hover { opacity: 0.9; }
 
     /* ===== AUTH MODAL ===== */
@@ -667,23 +634,24 @@
     }
     .auth-guest-btn:hover { border-color: var(--border-2); color: var(--text-2); }
 
-    /* ===== MODE TOGGLE ===== */
-    .mode-toggle {
-      display: flex; align-items: center; gap: 2px;
-      background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 2px;
-      height: 28px;
-    }
-    .mode-btn {
-      padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 600;
-      border: none; background: transparent; color: var(--text-3);
-      cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 5px;
-      white-space: nowrap; font-family: inherit;
-    }
-    .mode-btn:hover { color: var(--text-2); }
-    .mode-btn.active { background: rgba(255,255,255,0.07); color: var(--text); }
-    .mode-btn .mode-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink:0; }
-    .mode-btn.brainstorm .mode-dot { background: #67E8F9; }
-    .mode-btn.build .mode-dot { background: var(--green); }
+    /* ===== MODE GEAR DROPDOWN ===== */
+    .mode-gear-wrap{position:relative;display:flex;align-items:center}
+    .mode-gear-btn{display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg);cursor:pointer;font-family:inherit;font-size:11px;font-weight:600;color:var(--text-2);transition:all .15s;height:28px;white-space:nowrap}
+    .mode-gear-btn:hover{border-color:var(--border-2);color:var(--text)}
+    .mode-gear-icon{width:14px;height:14px;transition:transform .3s ease;color:var(--text-3)}
+    .mode-gear-btn.open .mode-gear-icon{transform:rotate(90deg)}
+    .mode-gear-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+    .mode-gear-dot.brainstorm{background:#67E8F9}
+    .mode-gear-dot.build{background:var(--green)}
+    .mode-gear-dot.fullstack{background:#F59E0B}
+    .mode-gear-chev{font-size:9px;color:var(--text-4);margin-left:2px}
+    .mode-gear-dd{display:none;position:fixed;min-width:180px;background:#111113;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:4px;box-shadow:0 8px 32px rgba(0,0,0,0.5);z-index:9999}
+    .mode-gear-dd.show{display:block}
+    .mode-gear-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:7px;font-size:12px;font-weight:500;color:#9CA3AF;cursor:pointer;transition:all .1s}
+    .mode-gear-item:hover{background:rgba(255,255,255,0.06);color:#E5E7EB}
+    .mode-gear-item.active{color:#E5E7EB}
+    .mode-gear-item .mg-check{margin-left:auto;font-size:13px;color:#0ea5b0;opacity:0}
+    .mode-gear-item.active .mg-check{opacity:1}
 
     /* Build-it button in chat */
     .build-it-btn {
@@ -747,7 +715,7 @@
       #app { height: calc(100vh - 48px - 48px); }
       #chat-panel { width: 100% !important; max-width: 100% !important; min-width: 0 !important; border-right: none; }
       #right-panel { display: none; }
-      #tab-bar { display: none; }
+      /* tab-bar removed */
       #app.tab-chat #chat-panel { display: flex; }
       #app.tab-chat #right-panel { display: none; }
       #app.tab-preview #chat-panel { display: none; }
@@ -766,13 +734,7 @@
 <body>
 
   <!-- Tab Bar -->
-  <div id="tab-bar">
-    <button class="tab-item home" onclick="location.href='/app/'" title="Home">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-    </button>
-    <!-- Project tabs injected by TabManager -->
-    <button class="tab-add" id="tab-add-btn" onclick="TabMgr.createNewTab()" title="New tab">+</button>
-  </div>
+  <!-- Tab bar removed — single project mode -->
 
   <!-- Header -->
   <div id="header">
@@ -820,9 +782,19 @@
 
       <span id="status-dot"></span>
 
+      <!-- Deploy button (undeployed state) -->
       <button class="h-btn" id="deploy-btn" onclick="deploysite()" style="display:none">
-        <i data-lucide="rocket" style="width:14px;height:14px;stroke-width:1.75"></i>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
         Deploy
+      </button>
+      <!-- Redeploy + Undeploy buttons (deployed state) -->
+      <button class="h-btn" id="redeploy-btn" onclick="redeploySite()" style="display:none">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Redeploy
+      </button>
+      <button class="h-btn h-btn-danger" id="undeploy-btn" onclick="undeploySite()" style="display:none">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        Undeploy
       </button>
 
       <span id="usage-badge" style="font-size:11px;color:#a1a1aa;padding:4px 10px;border-radius:8px;background:#18181b;border:1px solid #27272a;display:none;white-space:nowrap;"></span>
@@ -879,8 +851,8 @@
           <div class="msg-body">
             <div class="msg-name">AI Builder</div>
             <div class="msg-text">
-              I'm in <strong>Brainstorm</strong> mode — tell me what you want to build and I'll help you plan it before writing any code.<br><br>
-              <span style="color:var(--text-3);font-size:12px">Try: "a website for my coffee shop" · "portfolio for freelance clients" · "landing page for my SaaS"</span>
+              Tell me what you want to build — I'll ask a few smart questions to get the brief perfect, then generate it for you.<br><br>
+              <span style="color:var(--text-3);font-size:12px">Try: "a website for my coffee shop" · "a CRM dashboard for my team" · "a booking system for my salon"</span>
             </div>
           </div>
         </div>
@@ -905,13 +877,25 @@
             </div>
           </div>
           <div class="input-footer">
-            <div class="mode-toggle">
-              <button class="mode-btn brainstorm active" id="mode-brainstorm" onclick="setMode('brainstorm')">
-                <span class="mode-dot"></span> Brainstorm
-              </button>
-              <button class="mode-btn build" id="mode-build" onclick="setMode('build')">
-                <span class="mode-dot"></span> Build
-              </button>
+            <div class="mode-gear-wrap">
+              <div class="mode-gear-btn" id="mode-gear-btn" onclick="toggleModeGear()">
+                <svg class="mode-gear-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span class="mode-gear-dot build" id="mode-gear-dot"></span>
+                <span id="mode-gear-label">Landing Page</span>
+                <span class="mode-gear-chev">▾</span>
+              </div>
+              <div class="mode-gear-dd" id="mode-gear-dd">
+                <div class="mode-gear-item active" data-mode="build" onclick="selectMode('build')">
+                  <span class="mode-gear-dot build"></span>
+                  <span>Landing Page</span>
+                  <span class="mg-check">✓</span>
+                </div>
+                <div class="mode-gear-item" data-mode="fullstack" onclick="selectMode('fullstack')">
+                  <span class="mode-gear-dot fullstack"></span>
+                  <span>Full Stack App</span>
+                  <span class="mg-check">✓</span>
+                </div>
+              </div>
             </div>
             <select id="model-select" aria-label="Select AI model">
               <option value="openai/gpt-5.3-codex" selected>GPT-5.3 Codex</option>
@@ -1011,7 +995,55 @@
                 <div class="es-slide-num">Step 03</div>
                 <div class="es-slide-title">Your website is ready</div>
                 <div class="es-result-frame">
-                  <iframe loading="lazy" src="/templates/quantum-saas.html?v=1"></iframe>
+                  <!-- Static mockup — no iframe needed -->
+                  <div style="width:100%;height:100%;background:linear-gradient(135deg,#0A0A0F 0%,#0f172a 100%);display:flex;flex-direction:column;overflow:hidden">
+                    <!-- Mock nav -->
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid rgba(255,255,255,0.06)">
+                      <div style="display:flex;align-items:center;gap:6px">
+                        <div style="width:6px;height:6px;border-radius:50%;background:#0ea5b0"></div>
+                        <div style="width:40px;height:5px;border-radius:3px;background:rgba(255,255,255,0.15)"></div>
+                      </div>
+                      <div style="display:flex;gap:6px">
+                        <div style="width:22px;height:5px;border-radius:3px;background:rgba(255,255,255,0.08)"></div>
+                        <div style="width:22px;height:5px;border-radius:3px;background:rgba(255,255,255,0.08)"></div>
+                        <div style="width:22px;height:5px;border-radius:3px;background:rgba(255,255,255,0.08)"></div>
+                        <div style="width:28px;height:5px;border-radius:3px;background:#0ea5b0"></div>
+                      </div>
+                    </div>
+                    <!-- Mock hero -->
+                    <div style="padding:14px 14px 8px;flex:1">
+                      <div style="width:55%;height:7px;border-radius:4px;background:rgba(255,255,255,0.7);margin-bottom:6px"></div>
+                      <div style="width:80%;height:5px;border-radius:3px;background:rgba(255,255,255,0.2);margin-bottom:4px"></div>
+                      <div style="width:65%;height:5px;border-radius:3px;background:rgba(255,255,255,0.15);margin-bottom:10px"></div>
+                      <div style="display:flex;gap:6px;margin-bottom:12px">
+                        <div style="width:60px;height:18px;border-radius:4px;background:#0ea5b0"></div>
+                        <div style="width:60px;height:18px;border-radius:4px;border:1px solid rgba(255,255,255,0.15)"></div>
+                      </div>
+                      <!-- Mock cards -->
+                      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+                        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:8px">
+                          <div style="width:16px;height:16px;border-radius:4px;background:#0ea5b0;opacity:.7;margin-bottom:5px"></div>
+                          <div style="width:70%;height:4px;border-radius:2px;background:rgba(255,255,255,0.4);margin-bottom:3px"></div>
+                          <div style="width:90%;height:3px;border-radius:2px;background:rgba(255,255,255,0.12)"></div>
+                        </div>
+                        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:8px">
+                          <div style="width:16px;height:16px;border-radius:4px;background:#6366f1;opacity:.7;margin-bottom:5px"></div>
+                          <div style="width:60%;height:4px;border-radius:2px;background:rgba(255,255,255,0.4);margin-bottom:3px"></div>
+                          <div style="width:80%;height:3px;border-radius:2px;background:rgba(255,255,255,0.12)"></div>
+                        </div>
+                        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:8px">
+                          <div style="width:16px;height:16px;border-radius:4px;background:#22c55e;opacity:.7;margin-bottom:5px"></div>
+                          <div style="width:75%;height:4px;border-radius:2px;background:rgba(255,255,255,0.4);margin-bottom:3px"></div>
+                          <div style="width:85%;height:3px;border-radius:2px;background:rgba(255,255,255,0.12)"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Deploy badge -->
+                    <div style="padding:6px 14px;border-top:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between">
+                      <div style="font-size:9px;color:#0ea5b0;font-family:monospace">✓ Live at mysite.kenzoagent.com</div>
+                      <div style="width:40px;height:14px;border-radius:4px;background:#0ea5b0;opacity:.8"></div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1024,31 +1056,52 @@
         </div>
         <div id="preview-container">
           <div id="device-frame">
-            <iframe id="preview-frame" title="Website preview" sandbox="allow-scripts allow-same-origin"></iframe>
+            <iframe id="preview-frame" title="Website preview"></iframe>
+            <iframe id="wc-preview-frame" title="App preview" allow="cross-origin-isolated" style="display:none;position:absolute;inset:0;width:100%;height:100%;border:none;background:#fff;border-radius:20px;overflow:hidden"></iframe>
           </div>
         </div>
       </div>
 
       <!-- Code -->
       <div id="pane-code">
-        <div id="editor-tabs"></div>
+        <div style="display:flex;align-items:center">
+          <div id="editor-tabs" style="flex:1"></div>
+          <button id="run-code-btn" onclick="runCodeChanges()" style="display:none;margin:4px 8px;padding:4px 14px;border-radius:6px;font-size:11px;font-weight:600;background:#22C55E;color:#000;border:none;cursor:pointer;font-family:inherit;white-space:nowrap;transition:opacity .15s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">▶ Run</button>
+        </div>
         <div id="monaco-editor"></div>
+      </div>
+
+      <!-- Terminal (Full Stack mode) -->
+      <div id="pane-terminal" style="display:none;flex-direction:column;height:200px;min-height:120px;max-height:320px;border-top:1px solid rgba(255,255,255,0.06);background:#0A0A0A;flex-shrink:0">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 12px;border-bottom:1px solid rgba(255,255,255,0.05)">
+          <span style="font-size:11px;font-weight:600;color:#6B7280;letter-spacing:0.5px;text-transform:uppercase">Terminal</span>
+          <button onclick="document.getElementById('pane-terminal').style.display='none'" style="background:none;border:none;color:#6B7280;cursor:pointer;font-size:14px;line-height:1;padding:0">×</button>
+        </div>
+        <div id="terminal-output" style="flex:1;overflow-y:auto;padding:8px 12px;font-family:'Courier New',monospace;font-size:11px;line-height:1.6;color:#A1A1AA;word-break:break-all"></div>
       </div>
     </div>
   </div>
 
   <!-- Deploy modal -->
+  <!-- Toast container -->
+  <div id="toast"></div>
+
   <div class="modal-overlay" id="deploy-modal">
     <div class="modal-box">
-      <h3>🚀 Deploy Your Site</h3>
+      <h3>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0ea5b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        Deploy Your Site
+      </h3>
+      <p class="modal-sub">Your site will be live at a public URL instantly.</p>
       <label>Choose a subdomain</label>
       <div class="domain-row">
-        <input class="modal-input" id="subdomain-input" aria-label="Subdomain name" type="text" placeholder="my-site" onkeydown="if(event.key==='Enter')confirmDeploy()" />
+        <input class="modal-input" id="subdomain-input" aria-label="Subdomain name" type="text" placeholder="my-site" onkeydown="if(event.key==='Enter')confirmDeploy()" oninput="checkSubdomain(this.value)" />
         <span class="domain-suffix">.kenzoagent.com</span>
       </div>
-      <div class="modal-actions">
+      <span class="subdomain-status" id="subdomain-status"></span>
+      <div class="modal-actions" style="margin-top:12px">
         <button class="modal-btn cancel" onclick="closeDeployModal()">Cancel</button>
-        <button class="modal-btn confirm" onclick="confirmDeploy()">Deploy →</button>
+        <button class="modal-btn confirm" id="deploy-confirm-btn" onclick="confirmDeploy()">Deploy →</button>
       </div>
     </div>
   </div>
@@ -1085,8 +1138,25 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
   <script>
+    // ============================================================
+    // Builder JS — AI Website Builder (/app/build/index.html)
+    // ============================================================
+    // Responsibilities:
+    //   - Chat panel: brainstorm mode (planning), build mode (code gen), fullstack mode (Node.js)
+    //   - SSE streaming: real-time token display in chat + loading bar in preview
+    //   - Monaco Editor: multi-file code editing with language detection
+    //   - Virtual file system: projectFiles map, file tree, editor tabs
+    //   - Preview panel: iframe srcdoc rendering, device frames (desktop/tablet/phone)
+    //   - Page routing: URL bar dropdown for multi-page HTML or Express routes
+    //   - Deploy flow: subdomain check → /api/deploy → redeploy/undeploy
+    //   - WebContainers: Full Stack mode runs Node.js in-browser via isolated iframe
+    //   - Voice input: MediaRecorder → /api/transcribe
+    //   - Auth: login/signup modal, guest mode (localStorage limit), usage tracking
+    //   - Project persistence: Supabase (logged in) or localStorage (guest)
+    // ============================================================
+
     // ===== CONFIG =====
-    const API = '';
+    const API = ''; // relative — all /api/* calls go to same origin (proxied by nginx)
     const SUPABASE_URL = 'https://ljfkpkytcahmugwphrqo.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_7eIDQqzdu6zy7-tLpLVpXw_ciCm1doM';
     let sb;
@@ -1096,27 +1166,41 @@
       console.warn('Supabase init failed:', e);
     }
 
-    let currentHtml = '';
-    let currentBuildId = '';
-    let monacoEditor = null;
-    let activeTab = 'preview';
+    // ===== GLOBAL STATE =====
+    let currentHtml = '';          // HTML content of the currently previewed page
+    let currentBuildId = '';       // UUID of the saved build on server (for deploy)
+    let monacoEditor = null;       // Monaco editor instance (set after require())
+    let activeTab = 'preview';     // 'preview' | 'code'
 
     // ===== VIRTUAL FILE SYSTEM =====
-    let projectFiles = {}; // { 'index.html': '...', 'css/styles.css': '...', 'about.html': '...' }
-    let activeFile = null; // currently open file path
-    let openTabs = []; // array of file paths open as tabs
-    let fileTreeVisible = false;
-    let currentUser = null;
-    let isGuest = false;
-    let authMode = 'signup';
-    let currentDevice = 'desktop';
-    let appMode = 'brainstorm'; // 'brainstorm' or 'build'
-    let brainstormHistory = []; // conversation history for brainstorm API
-    let currentProjectId = null; // Supabase project ID if loaded/saved
-    let currentProjectName = ''; // auto-generated from prompt
-    let lastPrompt = ''; // track the prompt that generated current HTML
+    let projectFiles = {};       // { 'index.html': '...', 'css/styles.css': '...', 'about.html': '...' }
+    let activeFile = null;       // path of the file currently open in Monaco editor
+    let openTabs = [];           // paths of files open as editor tabs
+    let fileTreeVisible = false; // whether file tree panel is expanded
+    let currentUser = null;      // Supabase user object (null = not logged in)
+    let isGuest = false;         // true if user chose "Continue without account"
+    let authMode = 'signup';     // auth modal mode: 'signup' | 'login'
+    let currentDevice = 'desktop'; // preview device frame: 'desktop' | 'tablet' | 'phone'
+    let appMode = 'build';  // chat mode: 'build' (landing page) | 'fullstack'
+    let _readyToBuild = false;  // set to true when AI confirms brief is complete
+    let brainstormHistory = [];  // conversation history array for /api/brainstorm
+    let currentProjectId = null; // Supabase projects.id for current project
+    let currentProjectName = ''; // auto-generated from first prompt
+    let currentDeployedUrl = null; // live URL after deploy (e.g. https://mysite.kenzoagent.com)
+    let lastPrompt = '';         // the prompt that produced the current HTML (for re-save)
 
     // ===== RESIZE HANDLE =====
+
+    // ── initResize ────────────────────────────────────────────────────────────
+    // Makes the chat panel resizable by dragging the divider handle
+    // Dependencies: DOM #resize-handle, #chat-panel, monacoEditor
+    // Flow:
+    //   - mousedown on handle → start dragging, record start pos + width
+    //   - mousemove → clamp new width to [300, 600]px → set chat panel width
+    //   - mouseup → stop dragging → trigger Monaco layout recalculation
+    //   - dblclick → reset to 420px
+    // Affects: #chat-panel inline width style
+    // Called by: init sequence at bottom of script
     function initResize() {
       const handle = document.getElementById('resize-handle');
       const chat = document.getElementById('chat-panel');
@@ -1157,6 +1241,13 @@
     }
 
     // ===== DEVICE PREVIEW =====
+
+    // ── setDevice ─────────────────────────────────────────────────────────────
+    // Switches the preview pane between desktop/tablet/phone frame modes
+    // Dependencies: DOM #preview-container, .device-btn elements
+    // Flow: update currentDevice → set className on #preview-container → update active button
+    // Affects: #preview-container className (CSS adds device frame styling)
+    // Called by: device toggle buttons in header
     function setDevice(device) {
       currentDevice = device;
       const container = document.getElementById('preview-container');
@@ -1167,6 +1258,12 @@
     }
 
     // ===== AUTH =====
+
+    // ── showAuthModal ─────────────────────────────────────────────────────────
+    // Shows the auth modal configured for signup or login
+    // Dependencies: authMode global, DOM #auth-modal
+    // Flow: set authMode → update modal title/subtitle/button text/switch link → show modal
+    // Called by: "Get started" header button, guest limit modal "Sign Up Free" button
     function showAuthModal(mode) {
       authMode = mode;
       const errorDiv = document.getElementById('auth-error');
@@ -1188,10 +1285,19 @@
       document.getElementById('auth-modal').classList.add('show');
     }
 
+    // ── hideAuthModal — hides the auth modal overlay
     function hideAuthModal() { document.getElementById('auth-modal').classList.remove('show'); }
 
     function togglePwVis(){const p=document.getElementById('auth-password'),e=document.getElementById('pw-eye');if(p.type==='password'){p.type='text';e.innerHTML='<svg width=16 height=16 viewBox="0 0 24 24" fill=none stroke=currentColor stroke-width=2><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1=1 y1=1 x2=23 y2=23/></svg>';}else{p.type='password';e.innerHTML='<svg width=16 height=16 viewBox="0 0 24 24" fill=none stroke=currentColor stroke-width=2><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx=12 cy=12 r=3/></svg>';}}
 
+    // ── handleAuth ────────────────────────────────────────────────────────────
+    // Handles auth form submission (signup or login)
+    // Dependencies: /api/auth/signup (signup), sb.auth.signInWithPassword (login)
+    // Flow:
+    //   Signup: POST /api/auth/signup (admin auto-confirm) → sb.auth.signInWithPassword → redirect /app/
+    //   Login: sb.auth.signInWithPassword → redirect /app/
+    // Affects: currentUser, isGuest, localStorage (clears guest counters), auth session
+    // Called by: auth modal submit button onclick, Enter key listener
     async function handleAuth() {
       const email = document.getElementById('auth-email').value.trim();
       const password = document.getElementById('auth-password').value;
@@ -1241,6 +1347,9 @@
       }
     }
 
+    // ── continueAsGuest ───────────────────────────────────────────────────────
+    // Allows access without an account (limited to 3 builds tracked in localStorage)
+    // Called by: auth modal "Continue without account" button
     function continueAsGuest() {
       isGuest = true;
       localStorage.setItem('builder_guest', 'true');
@@ -1248,6 +1357,7 @@
       updateAuthUI();
     }
 
+    // Callbacks for the builder's inline confirm/prompt modals (separate from dashboard cm-overlay)
     var _builderConfirmCb=null,_builderPromptCb=null;
     function showBuilderConfirm(title,sub,btnText,btnClass,cb){
       var o=document.getElementById('builder-confirm-overlay');
@@ -1274,6 +1384,10 @@
       }
     });
 
+    // ── logoutUser ────────────────────────────────────────────────────────────
+    // Signs the user out and redirects to landing page
+    // Dependencies: showBuilderConfirm, sb.auth.signOut
+    // Called by: user dropdown "Sign Out" button
     async function logoutUser() {
       showBuilderConfirm('Sign out?','You will be redirected to the landing page.','Sign out','del',async function(){
         if(sb) await sb.auth.signOut();
@@ -1285,6 +1399,10 @@
       });
     }
 
+    // ── updateAuthUI ──────────────────────────────────────────────────────────
+    // Updates header auth state: shows user avatar+menu or "Get started" button
+    // Dependencies: currentUser, DOM #login-btn, #user-menu, #user-avatar, #ud-email
+    // Called by: initAuth(), sb.auth.onAuthStateChange, continueAsGuest()
     function updateAuthUI() {
       const loginBtn = document.getElementById('login-btn');
       const userMenu = document.getElementById('user-menu');
@@ -1326,6 +1444,17 @@
       addMessage('📁 Projects feature coming soon!', 'ai');
     }
 
+    // ── initAuth ──────────────────────────────────────────────────────────────
+    // Initializes auth state on page load; shows auth modal if not logged in
+    // Dependencies: sb.auth.getSession, showAuthModal, updateAuthUI, localStorage
+    // Flow:
+    //   1. Check ?auth= query param (from landing page sign-in link)
+    //   2. Get current Supabase session
+    //   3. If session → set currentUser, update UI
+    //   4. If ?auth param but no session → show auth modal after 300ms
+    //   5. If guest flag in localStorage → set isGuest
+    //   6. First visit (no session, no guest) → show signup modal after 800ms
+    // Called by: initAndLoad() IIFE at bottom of script
     async function initAuth() {
       if (!sb) { updateAuthUI(); return; }
       // Check if coming from landing page sign-in link
@@ -1363,7 +1492,16 @@
       });
     }
 
-    // ===== MONACO =====
+    // ===== MONACO EDITOR =====
+
+    // ── Monaco setup ──────────────────────────────────────────────────────────
+    // Initializes the Monaco code editor with dark theme and live preview sync
+    // Dependencies: Monaco CDN loader, localStorage 'editorFontSize', updatePreview
+    // Flow:
+    //   1. Load Monaco via require()
+    //   2. Create editor with saved font size, HTML language, dark theme
+    //   3. onDidChangeModelContent → sync to projectFiles[activeFile] → updatePreview
+    // Affects: monacoEditor global, projectFiles (on user edits), preview iframe
     require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
     require(['vs/editor/editor.main'], () => {
       const savedFontSize = parseInt(localStorage.getItem('editorFontSize') || '13');
@@ -1379,8 +1517,8 @@
         const val = monacoEditor.getValue();
         // Sync to file system
         if (activeFile) projectFiles[activeFile] = val;
-        // Update preview if editing HTML
-        if (!activeFile || activeFile.endsWith('.html')) {
+        // Update preview if editing HTML (static mode only — full-stack uses Run button)
+        if (appMode !== 'fullstack' && (!activeFile || activeFile.endsWith('.html')) && val && val.length > 50) {
           currentHtml = val;
           updatePreview(currentHtml);
         }
@@ -1388,11 +1526,18 @@
     });
 
     // ===== IMAGE ATTACH =====
-    var _attachData = null; // { base64, mimeType, dataUrl }
+    var _attachData = null; // { base64, mimeType, dataUrl } — cleared after each generate()
 
+    // ── triggerAttach — opens the hidden file input for image attachment
+    // Called by: paperclip icon button in input area
     function triggerAttach() {
       document.getElementById('attach-file').click();
     }
+    // ── handleAttach ──────────────────────────────────────────────────────────
+    // Reads an image file and stores it as base64 for inclusion in the next generate() call
+    // Dependencies: FileReader
+    // Flow: read file → store in _attachData → show thumbnail preview
+    // Affects: _attachData global, #attach-preview DOM
     function handleAttach(input) {
       var file = input.files[0];
       if (!file) return;
@@ -1407,6 +1552,7 @@
       reader.readAsDataURL(file);
       input.value = '';
     }
+    // ── removeAttach — clears the attached image and hides the preview
     function removeAttach() {
       _attachData = null;
       document.getElementById('attach-preview').classList.remove('show');
@@ -1414,8 +1560,17 @@
     }
 
     // ===== VOICE INPUT =====
+    // Records audio, converts to base64, POSTs to /api/transcribe, appends text to prompt
     var _mediaRec = null, _voiceChunks = [], _voiceLang = 'en';
     var _voiceTimer = null, _voiceSeconds = 0, _voiceMaxSec = 60;
+    // ── toggleVoice ───────────────────────────────────────────────────────────
+    // Starts or stops voice recording; auto-stops at 60s; POSTs to /api/transcribe on stop
+    // Dependencies: navigator.mediaDevices.getUserMedia, MediaRecorder, /api/transcribe
+    // Flow:
+    //   Start: request mic → MediaRecorder.start(500ms chunks) → start timer
+    //   Stop: MediaRecorder.stop → blob → base64 → POST /api/transcribe → append text
+    // Affects: #prompt-input value, mic button visual state (_mediaRec state)
+    // Called by: mic button in input area
     function toggleVoice() {
       var btn = document.getElementById('mic-btn');
       if (_mediaRec && _mediaRec.state === 'recording') {
@@ -1529,19 +1684,550 @@
     }
 
     // ===== MODE SWITCHING =====
+
+    // ── setMode ───────────────────────────────────────────────────────────────
+    // Switches the chat panel mode (brainstorm / build / fullstack)
+    // Dependencies: appMode, DOM .mode-btn, #prompt-input, _wcBaseUrl
+    // Flow:
+    //   - Update appMode global
+    //   - Toggle active class on mode buttons
+    //   - Update prompt placeholder text
+    //   - On switch FROM fullstack: clear WebContainer state + hide wc-preview-frame
+    // Affects: appMode global, DOM mode buttons, prompt placeholder, WC state
+    // Called by: mode button onclick, generate() routing, buildFromPlan()
     function setMode(mode) {
       appMode = mode;
-      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById(`mode-${mode}`).classList.add('active');
+      // Update gear dropdown UI
+      var label = document.getElementById('mode-gear-label');
+      var dot = document.getElementById('mode-gear-dot');
+      var labels = {brainstorm:'Brainstorm', build:'Landing Page', fullstack:'Full Stack App'};
+      if(label) label.textContent = labels[mode] || mode;
+      if(dot) { dot.className = 'mode-gear-dot ' + mode; }
+      document.querySelectorAll('.mode-gear-item').forEach(function(el){ el.classList.toggle('active', el.getAttribute('data-mode') === mode); });
 
       const input = document.getElementById('prompt-input');
+      var runBtn = document.getElementById('run-code-btn');
       if (mode === 'brainstorm') {
         input.placeholder = "What do you want to build? Let's plan it...";
+        if (runBtn) runBtn.style.display = 'none';
+      } else if (mode === 'fullstack') {
+        input.placeholder = "Describe changes to your app, or edit code and click Run...";
+        if (runBtn) runBtn.style.display = 'inline-flex';
       } else {
+        _wcBaseUrl = null;
+        _wcCurrentPath = '/';
+        const wcFrame = document.getElementById('wc-preview-frame');
+        if (wcFrame) { wcFrame.src = ''; wcFrame.style.display = 'none'; }
+        const staticFrame = document.getElementById('preview-frame');
+        if (staticFrame) staticFrame.style.display = '';
+        if (runBtn) runBtn.style.display = 'none';
         input.placeholder = "Describe your website or changes...";
       }
     }
 
+    function toggleModeGear() {
+      var btn = document.getElementById('mode-gear-btn');
+      var dd = document.getElementById('mode-gear-dd');
+      var isOpen = dd.classList.toggle('show');
+      btn.classList.toggle('open', isOpen);
+      if (isOpen) {
+        var r = btn.getBoundingClientRect();
+        dd.style.left = r.left + 'px';
+        dd.style.bottom = (window.innerHeight - r.top + 6) + 'px';
+        setTimeout(function() {
+          document.addEventListener('click', function closeModeGear(e) {
+            if (!e.target.closest('.mode-gear-wrap')) {
+              dd.classList.remove('show');
+              btn.classList.remove('open');
+            }
+            document.removeEventListener('click', closeModeGear);
+          }, { once: true });
+        }, 10);
+      }
+    }
+
+    function selectMode(mode) {
+      setMode(mode);
+      document.getElementById('mode-gear-dd').classList.remove('show');
+      document.getElementById('mode-gear-btn').classList.remove('open');
+    }
+
+    // ── WEBCONTAINER BRIDGE ───────────────────────────────────────────────────
+    // Communicates with the isolated wc-runtime iframe (at /app/wc-runtime/)
+    // All WC operations are proxied via postMessage with promise-based callbacks
+    let _wcRuntimeReady = false;
+    let _wcRuntimeFrame = null;
+    let _wcMsgCallbacks = {};
+    let _wcMsgId = 0;
+
+    // ── Full Stack App Builder (WebContainers — direct on page with COEP) ──
+    let _wcInstance = null;
+
+    // ── bootWebContainer ──────────────────────────────────────────────────────
+    // Boots or returns the existing WebContainer instance
+    // Flow: return existing → wait for runtime-ready event (up to 30s timeout)
+    // Called by: runInWebContainer(), generateFullStack()
+    async function bootWebContainer() {
+      if (_wcInstance) return _wcInstance;
+      var WC = window.WebContainer;
+      if (!WC) {
+        // Wait for module to load
+        await new Promise(function(r) {
+          var check = setInterval(function() { if (window.WebContainer) { clearInterval(check); r(); } }, 100);
+          setTimeout(function() { clearInterval(check); r(); }, 15000);
+        });
+        WC = window.WebContainer;
+        if (!WC) throw new Error('WebContainer API failed to load');
+      }
+      _wcInstance = await WC.boot({ coep: 'credentialless' });
+      return _wcInstance;
+    }
+
+    const FULLSTACK_SYSTEM_PROMPT = `You are an expert full-stack developer building Node.js web applications with Supabase database.
+
+## OUTPUT FORMAT
+Return a multi-file project using this EXACT format. Each file starts with "--- FILE: filename ---" on its own line:
+
+--- FILE: package.json ---
+{...}
+
+--- FILE: index.js ---
+...
+
+--- FILE: public/index.html ---
+...
+
+--- FILE: schema.sql ---
+...
+
+## RULES
+
+### Server & Routing
+- Always create: package.json, index.js (Express server), public/ HTML files, public/styles.css, schema.sql
+- Use Express.js for the server (npm install express @supabase/supabase-js)
+- Server listens on process.env.PORT || 3000
+- CRITICAL: Each page MUST have its own Express route AND its own HTML file
+- Navigation links use href="/products" (server routes, not hash/JS routing)
+- API endpoints use /api/ prefix
+- Use vanilla JS/HTML/CSS — no build steps, no React, no TypeScript
+- Make it beautiful with a consistent shared navigation on every page
+- package.json must have "start": "node index.js" script
+
+### Database (Supabase)
+- Generate a schema.sql file with CREATE TABLE statements for ALL data the app needs
+- In index.js, set up Supabase client:
+  const { createClient } = require('@supabase/supabase-js');
+  const supabase = createClient(
+    process.env.SUPABASE_URL || 'http://localhost',
+    process.env.SUPABASE_KEY || 'placeholder',
+    { db: { schema: process.env.SUPABASE_SCHEMA || 'public' } }
+  );
+- ALL API routes MUST use Supabase for data:
+  // GET all items
+  app.get('/api/items', async (req, res) => {
+    const { data, error } = await supabase.from('items').select('*');
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
+  });
+  // CREATE item
+  app.post('/api/items', async (req, res) => {
+    const { data, error } = await supabase.from('items').insert(req.body).select();
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data[0]);
+  });
+  // UPDATE item
+  app.put('/api/items/:id', async (req, res) => {
+    const { data, error } = await supabase.from('items').update(req.body).eq('id', req.params.id).select();
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data[0]);
+  });
+  // DELETE item
+  app.delete('/api/items/:id', async (req, res) => {
+    const { error } = await supabase.from('items').delete().eq('id', req.params.id);
+    if (error) return res.status(500).json({ error: error.message });
+    res.json({ success: true });
+  });
+- ALSO include in-memory fallback so the app works without database (for WebContainer preview):
+  let useDB = !!process.env.SUPABASE_URL && process.env.SUPABASE_URL !== 'http://localhost';
+  // In each route, check useDB — if false, use in-memory arrays as fallback
+- NEVER hardcode data — always use API calls from frontend with fetch()
+
+### Schema.sql Rules
+- Use standard SQL: CREATE TABLE, PRIMARY KEY, NOT NULL, DEFAULT
+- Always include: id SERIAL PRIMARY KEY, created_at TIMESTAMP DEFAULT NOW()
+- Use appropriate types: TEXT, INTEGER, BOOLEAN, TIMESTAMP, NUMERIC
+- Add meaningful column constraints (NOT NULL where required)
+- Include sample INSERT statements (3-5 rows of realistic data)
+
+### Frontend
+- HTML files in public/ with fetch() calls to /api/ endpoints
+- Include a shared CSS file: /public/styles.css linked in every HTML page
+- Real working forms that POST to API endpoints
+- Display data from GET endpoints in tables or cards
+- Include edit and delete functionality with PUT and DELETE calls`;
+
+    // ── generateFullStack ─────────────────────────────────────────────────────
+    // Generates a Node.js Express app with AI then boots it in WebContainers
+    // Dependencies: /api/generate-stream (FULLSTACK_SYSTEM_PROMPT), runInWebContainer,
+    //               extractMultiFileClient, renderFileTree, renderEditorTabs, saveProject
+    // Flow:
+    //   1. Stream AI response using FULLSTACK_SYSTEM_PROMPT
+    //   2. Parse multi-file output (package.json, index.js, public/*)
+    //   3. Load files into Monaco + file tree
+    //   4. Boot WebContainer → npm install → npm start → server-ready → show preview
+    // Affects: projectFiles, currentHtml, monacoEditor, WebContainer runtime
+    // Called by: generate() when appMode === 'fullstack'
+    async function generateFullStack(prompt) {
+      setStatus('generating');
+      document.getElementById('send-btn').classList.add('disabled');
+      startBuildStatusMessages();
+
+      try {
+        // Generate multi-file app with AI
+        const model = document.getElementById('model-select').value;
+        const res = await fetch(`${API}/api/generate-stream`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...(await getAuthHeader()) },
+          body: JSON.stringify({ prompt: prompt + '\n\nBuild this as a Node.js Express app.', model, _systemOverride: FULLSTACK_SYSTEM_PROMPT })
+        });
+
+        if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Generation failed'); }
+
+        // Read SSE stream
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let fullContent = '';
+        let buildId = null;
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            try {
+              const event = JSON.parse(line.slice(6));
+              if (event.type === 'chunk') fullContent += event.delta;
+              if (event.type === 'done') { buildId = event.buildId; }
+              if (event.type === 'error') throw new Error(event.error);
+            } catch(e) { if (e.message && !e.message.includes('JSON')) throw e; }
+          }
+        }
+
+        // Parse files from AI output
+        const files = extractMultiFileClient(fullContent);
+        clearBuildStatusMessages();
+        if (_buildMsgEl) _buildMsgEl.innerHTML = '✓ App generated — booting Node.js in your browser...';
+
+        // Load files into Monaco editor + file tree
+        currentHtml = files['index.html'] || files['public/index.html'] || '';
+        projectFiles = files;
+        activeFile = 'index.js';
+        openTabs = Object.keys(files).slice(0, 5);
+        if (typeof renderFileTree === 'function') renderFileTree();
+        if (typeof renderEditorTabs === 'function') renderEditorTabs();
+        if (typeof updateEditor === 'function') updateEditor(files['index.js'] || files['index.html'] || '');
+
+        // Boot WebContainer and run the app
+        await runInWebContainer(files, _buildMsgEl);
+        saveProject(prompt, fullContent, model, buildId);
+        incrementGuestCount();
+        fetchUsage();
+
+      } catch(err) {
+        if (_buildMsgEl) _buildMsgEl.innerHTML = `<span style="color:var(--red)">Error: ${err.message}</span>`;
+        else addMessage(`<span style="color:var(--red)">Error: ${err.message}</span>`, 'ai');
+        setStatus('error');
+      }
+      document.getElementById('send-btn').classList.remove('disabled');
+    }
+
+    // ── extractMultiFileClient ────────────────────────────────────────────────
+    // Client-side multi-file parser (mirrors server-side extractMultiFile)
+    // Dependencies: none
+    // Flow: regex "--- FILE: name ---" delimiters → fallback to single index.html
+    // Called by: generateFullStack()
+    function extractMultiFileClient(response) {
+      const filePattern = /---\s*FILE:\s*(.+?)\s*---\n([\s\S]*?)(?=---\s*FILE:|$)/gi;
+      const files = {};
+      let match;
+      while ((match = filePattern.exec(response)) !== null) {
+        const filename = match[1].trim().toLowerCase();
+        const content = match[2].trim();
+        if (filename && content) files[filename] = content;
+      }
+      if (Object.keys(files).length === 0) files['index.html'] = response;
+      return files;
+    }
+
+    // ── getAuthHeader — returns { Authorization: Bearer <token> } if logged in
+    async function getAuthHeader() {
+      if (!sb) return {};
+      const session = await sb.auth.getSession();
+      const token = session.data.session?.access_token;
+      return token ? { 'Authorization': `Bearer ${token}` } : {};
+    }
+
+    function termLog(msg, color) {
+      const out = document.getElementById('terminal-output');
+      if (!out) return;
+      const line = document.createElement('div');
+      line.style.color = color || '#A1A1AA';
+      line.textContent = msg;
+      out.appendChild(line);
+      out.scrollTop = out.scrollHeight;
+    }
+
+    function termClear() {
+      const out = document.getElementById('terminal-output');
+      if (out) out.innerHTML = '';
+    }
+
+    function showTerminal() {
+      const t = document.getElementById('pane-terminal');
+      if (t) t.style.display = 'flex';
+    }
+
+    // ── Fake terminal animation (runs during npm install) ──
+    const _fakeLines = [
+      ['const express = require(\'express\');', '#67E8F9'],
+      ['const path = require(\'path\');', '#67E8F9'],
+      ['const fs = require(\'fs\');', '#67E8F9'],
+      ['const app = express();', '#A78BFA'],
+      ['app.use(express.json({ limit: \'10mb\' }));', '#A78BFA'],
+      ['app.use(express.urlencoded({ extended: true }));', '#A78BFA'],
+      ['app.use(express.static(path.join(__dirname, \'public\')));', '#A78BFA'],
+      ['✓ Resolving dependencies from package.json...', '#6B7280'],
+      ['✓ express@4.18.2 — web framework', '#22C55E'],
+      ['✓ body-parser@1.20.2 — request body parsing', '#22C55E'],
+      ['✓ cors@2.8.5 — cross origin resource sharing', '#22C55E'],
+      ['✓ nodemon@3.0.1 — file watcher for dev mode', '#22C55E'],
+      ['router.get(\'/api/items\', async (req, res) => {', '#FBBF24'],
+      ['  try { const items = db.getAll(); res.json({ success: true, data: items }); }', '#FBBF24'],
+      ['  catch (err) { res.status(500).json({ success: false, error: err.message }); }', '#FBBF24'],
+      ['});', '#FBBF24'],
+      ['✓ Fetching lockfile and validating integrity hashes...', '#6B7280'],
+      ['CREATE TABLE IF NOT EXISTS users (', '#F472B6'],
+      ['  id SERIAL PRIMARY KEY,', '#F472B6'],
+      ['  name VARCHAR(100) NOT NULL,', '#F472B6'],
+      ['  email VARCHAR(255) UNIQUE NOT NULL,', '#F472B6'],
+      ['  created_at TIMESTAMP DEFAULT NOW()', '#F472B6'],
+      [');', '#F472B6'],
+      ['✓ path-to-regexp@0.1.7', '#22C55E'],
+      ['✓ mime@1.6.0, send@0.18.0, serve-static@1.15.0', '#22C55E'],
+      ['✓ qs@6.11.0, parseurl@1.3.3, safe-buffer@5.2.1', '#22C55E'],
+      ['const PORT = process.env.PORT || 3000;', '#A78BFA'],
+      ['app.listen(PORT, () => {', '#A78BFA'],
+      ['  console.log(`🚀 Server running on http://localhost:${PORT}`);', '#A78BFA'],
+      ['  console.log(`Environment: ${process.env.NODE_ENV || \'development\'}`);', '#A78BFA'],
+      ['});', '#A78BFA'],
+      ['✓ Linking binaries and resolving peer dependencies...', '#6B7280'],
+      ['router.post(\'/api/create\', async (req, res) => {', '#FBBF24'],
+      ['  const { name, email, role = \'user\' } = req.body;', '#FBBF24'],
+      ['  if (!name || !email) return res.status(400).json({ error: \'Missing required fields\' });', '#FBBF24'],
+      ['  const result = await db.insert({ name, email, role, createdAt: new Date() });', '#FBBF24'],
+      ['  res.status(201).json({ success: true, data: result });', '#FBBF24'],
+      ['});', '#FBBF24'],
+      ['✓ on-finished@2.4.1, depd@2.0.0, inherits@2.0.4', '#22C55E'],
+      ['✓ ms@2.1.3, debug@2.6.9, setprototypeof@1.2.0', '#22C55E'],
+      ['module.exports = { router, middleware };', '#67E8F9'],
+      ['✓ Building optimized dependency tree...', '#6B7280'],
+      ['const helmet = require(\'helmet\');', '#67E8F9'],
+      ['const compression = require(\'compression\');', '#67E8F9'],
+      ['app.use(helmet({ contentSecurityPolicy: false }));', '#A78BFA'],
+      ['app.use(compression());', '#A78BFA'],
+      ['✓ fresh@0.5.2, etag@1.8.1, vary@1.1.2', '#22C55E'],
+      ['✓ range-parser@1.2.1, content-type@1.0.5', '#22C55E'],
+      ['async function bootstrap() {', '#FBBF24'],
+      ['  console.log(\'Connecting to data layer...\');', '#FBBF24'],
+      ['  await db.initialize();', '#FBBF24'],
+      ['  await db.migrate({ force: false });', '#FBBF24'],
+      ['  console.log(\'Migrations complete. Ready.\');', '#FBBF24'],
+      ['}', '#FBBF24'],
+      ['✓ Running security audit on 57 packages...', '#6B7280'],
+      ['✓ found 0 vulnerabilities across 412 dependencies', '#22C55E'],
+      ['✓ 57 packages installed in 2.3s (disk: 14.2 MB)', '#22C55E'],
+    ];
+    let _fakeInterval = null;
+    let _fakeIdx = 0;
+
+    function startFakeTerminal() {
+      _fakeIdx = 0;
+      _fakeInterval = setInterval(() => {
+        if (_fakeIdx >= _fakeLines.length) _fakeIdx = 0;
+        const [text, color] = _fakeLines[_fakeIdx++];
+        termLog(text, color);
+      }, 80);
+    }
+
+    function stopFakeTerminal() {
+      if (_fakeInterval) { clearInterval(_fakeInterval); _fakeInterval = null; }
+      termLog('', '');
+    }
+
+    // ── Chat build status messages ──
+    let _buildMsgEl = null;
+    const _buildSteps = [
+      { text: '🧠 Analyzing your requirements...', delay: 0 },
+      { text: '📁 Generating project structure...', delay: 1200 },
+      { text: '⚡ Writing server & API routes...', delay: 2800 },
+      { text: '🎨 Building frontend interface...', delay: 4500 },
+      { text: '📦 Preparing dependencies...', delay: 6500 },
+    ];
+
+    function startBuildStatusMessages() {
+      _buildMsgEl = addMessage('🧠 Analyzing your requirements...', 'ai');
+      _buildSteps.slice(1).forEach(step => {
+        setTimeout(() => {
+          if (_buildMsgEl) _buildMsgEl.innerHTML = step.text;
+        }, step.delay);
+      });
+    }
+
+    function clearBuildStatusMessages() {
+      _buildMsgEl = null;
+    }
+
+    // ── runInWebContainer ─────────────────────────────────────────────────────
+    // Mounts files in WebContainer, runs npm install + npm start, waits for server-ready
+    // Dependencies: bootWebContainer, wcSend, startFakeTerminal, stopFakeTerminal
+    // Flow:
+    //   1. Show terminal panel → boot WC → mount project files
+    //   2. Run npm install (blocking spawn — shows fake terminal animation)
+    //   3. Run npm start (background spawn — server-ready fires via global message listener)
+    //   4. Global message listener shows app in wc-preview-frame on server-ready
+    // Affects: terminal output DOM, wc-preview-frame src, _wcBaseUrl
+    // Called by: generateFullStack()
+    // ── Run Code Changes — pushes Monaco edits to WebContainer ──
+    async function runCodeChanges() {
+      if (!_wcInstance) { addMessage('⚠️ WebContainer not running. Generate a Full Stack app first.', 'ai'); return; }
+      // Save current editor to projectFiles
+      if (activeFile && monacoEditor) projectFiles[activeFile] = monacoEditor.getValue();
+      addMessage('🔄 Applying changes...', 'ai');
+      try {
+        // Write each changed file to WebContainer
+        for (var [filename, content] of Object.entries(projectFiles)) {
+          var parts = filename.split('/');
+          // Create directories if needed
+          if (parts.length > 1) {
+            var dir = parts.slice(0, -1).join('/');
+            try { await _wcInstance.fs.mkdir(dir, { recursive: true }); } catch(e) {}
+          }
+          await _wcInstance.fs.writeFile(filename, content);
+        }
+        // Restart the server by killing and re-running npm start
+        showTerminal();
+        termLog('$ Restarting server with changes...', '#0ea5b0');
+        var server = await _wcInstance.spawn('npm', ['start']);
+        server.output.pipeTo(new WritableStream({ write(d) { termLog(d.trim(), '#22C55E'); } }));
+        // server-ready listener already exists — will update preview
+        addMessage('✅ Changes applied! Server restarting...', 'ai');
+      } catch(err) {
+        addMessage('<span style="color:var(--red)">Failed to apply changes: ' + err.message + '</span>', 'ai');
+      }
+    }
+
+    async function runInWebContainer(files, statusEl) {
+      try {
+        // Hide empty state
+        var es = document.getElementById('empty-state');
+        if (es) { es.style.display = 'none'; es.style.opacity = '0'; }
+        showTerminal();
+        termClear();
+        termLog('$ Booting WebContainer...', '#6B7280');
+
+        const wc = await bootWebContainer();
+
+        if (statusEl) statusEl.innerHTML = `<div style="font-size:13px;color:var(--text-2)">
+          <span style="color:#F59E0B">⚡</span> Installing dependencies...
+        </div>`;
+
+        // Convert files to WebContainer format
+        const wcFiles = {};
+        for (const [filename, content] of Object.entries(files)) {
+          const parts = filename.split('/');
+          let cur = wcFiles;
+          for (let i = 0; i < parts.length - 1; i++) {
+            if (!cur[parts[i]]) cur[parts[i]] = { directory: {} };
+            cur = cur[parts[i]].directory;
+          }
+          cur[parts[parts.length - 1]] = { file: { contents: content } };
+        }
+
+        termLog('$ Mounting project files...', '#6B7280');
+        await wc.mount(wcFiles);
+
+        termLog('$ npm install', '#0ea5b0');
+        startFakeTerminal();
+
+        const install = await wc.spawn('npm', ['install']);
+        install.output.pipeTo(new WritableStream({ write(d) { /* silent — fake terminal covers it */ } }));
+        const installCode = await install.exit;
+        stopFakeTerminal();
+        if (installCode !== 0) throw new Error('npm install failed');
+
+        termLog('✓ Packages installed', '#22C55E');
+        termLog('', '');
+        termLog('$ npm start', '#0ea5b0');
+        if (statusEl) statusEl.innerHTML = `<div style="font-size:13px;color:var(--text-2)">
+          <span style="color:#F59E0B">⚡</span> Starting server...
+        </div>`;
+
+        const server = await wc.spawn('npm', ['start']);
+        server.output.pipeTo(new WritableStream({ write(d) { termLog(d.trim(), '#22C55E'); } }));
+
+        wc.on('server-ready', (port, url) => {
+          termLog('', '');
+          termLog('✓ Server ready on port ' + port, '#22C55E');
+          _wcBaseUrl = url.endsWith('/') ? url.slice(0,-1) : url;
+          _wcCurrentPath = '/';
+          const staticFrame = document.getElementById('preview-frame');
+          const wcFrame = document.getElementById('wc-preview-frame');
+          if (staticFrame) staticFrame.style.display = 'none';
+          if (wcFrame) { wcFrame.style.display = 'block'; wcFrame.src = url; }
+          updatePageRouteDropdown();
+          if (window.innerWidth <= 768) switchMobileTab('preview');
+          if (statusEl) statusEl.innerHTML = '<div style="font-size:13px;color:var(--text-2)"><span style="color:#22C55E">✓</span> Node.js running in your browser!</div>';
+          setStatus('ready');
+          updateDeployButtons();
+          addMessage('🚀 Your app is live in the preview panel!', 'ai');
+          // Auto-close terminal after 1.5s — let user see "Server ready" then fade out
+          var term = document.getElementById('pane-terminal');
+          if (term) {
+            setTimeout(function() {
+              term.style.transition = 'opacity 0.4s ease, height 0.4s ease';
+              term.style.opacity = '0';
+              term.style.height = '0';
+              term.style.minHeight = '0';
+              setTimeout(function() { term.style.display = 'none'; }, 400);
+            }, 1500);
+          }
+        });
+
+      } catch(err) {
+        stopFakeTerminal();
+        termLog('✗ Error: ' + err.message, '#EF4444');
+        if (statusEl) statusEl.innerHTML = '<span style="color:var(--red)">WebContainer error: ' + err.message + '</span>';
+        addMessage('WebContainer failed: ' + err.message + '. Make sure you\'re using Chrome/Edge.', 'ai');
+        setStatus('error');
+        throw err;
+      }
+    }
+
+    // ── brainstorm ────────────────────────────────────────────────────────────
+    // Sends a message to /api/brainstorm (conversational planner, no HTML output)
+    // Dependencies: brainstormHistory, /api/brainstorm, addMessage, setStatus
+    // Flow:
+    //   1. Build multimodal message content (text + optional image)
+    //   2. Append to brainstormHistory → show typing indicator
+    //   3. POST to /api/brainstorm with full history
+    //   4. Format reply (markdown-lite → HTML) → check for build trigger phrase
+    //   5. If plan is ready → append "Build it →" button
+    // Affects: brainstormHistory, chat DOM
+    // Called by: generate() when appMode === 'brainstorm'
     async function brainstorm(userMsg, imgData) {
       // Build message content — multimodal if image attached
       // Use image_url format (OpenRouter normalizes for Claude/GPT/Gemini)
@@ -1562,7 +2248,8 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             messages: brainstormHistory,
-            model: document.getElementById('model-select').value
+            model: document.getElementById('model-select').value,
+            mode: appMode
           })
         });
 
@@ -1570,7 +2257,18 @@
         const data = await res.json();
         if (data.error) throw new Error(data.error);
 
-        const reply = data.reply;
+        let reply = data.reply;
+
+        // Check if AI says brief is complete — auto-trigger build
+        if (reply.includes('__BUILD_READY__')) {
+          reply = reply.replace('__BUILD_READY__', '').trim();
+          brainstormHistory.push({ role: 'assistant', content: reply });
+          typingEl.innerHTML = '<div style="font-size:13px;color:var(--text-2)"><span style="color:#22C55E">✓</span> Brief complete — generating your ' + (appMode === 'fullstack' ? 'app' : 'website') + '...</div>';
+          _readyToBuild = true;
+          setTimeout(function(){ buildFromPlan(); }, 500);
+          return;
+        }
+
         brainstormHistory.push({ role: 'assistant', content: reply });
 
         // Format the reply — convert markdown-ish to HTML
@@ -1581,11 +2279,11 @@
           .replace(/\n(\d+)\. /g, '<br>$1. ')
           .replace(/\n/g, '<br>');
 
-        // Check if the plan is ready (contains the build trigger)
-        const isReady = reply.includes('Ready to build') || reply.includes('Build it') || reply.includes('🎯 WEBSITE PLAN') || reply.includes('ready to build');
+        // Check if the plan is ready (contains build triggers)
+        const isReady = reply.includes('READY TO BUILD') || reply.includes('Ready to build') || reply.includes('🎯') || reply.includes('ready to build') || reply.includes('build it');
 
         if (isReady) {
-          formatted += '<br><button class="build-it-btn" onclick="buildFromPlan()">🚀 Build it →</button>';
+          formatted += '<br><br><button class="build-it-btn" onclick="buildFromPlan()">🚀 Build it →</button><span style="margin-left:12px;font-size:11px;color:var(--text-4)">or keep refining</span>';
         }
 
         typingEl.innerHTML = formatted;
@@ -1597,49 +2295,61 @@
       }
     }
 
+    // ── buildFromPlan ─────────────────────────────────────────────────────────
+    // Called by the "Build it →" button in brainstorm reply
+    // Switches to build mode and generates from the last assistant message
+    // Dependencies: setMode, generateFromPlan
+    // Called by: .build-it-btn onclick injected by brainstorm()
     function buildFromPlan() {
-      // Switch to build mode
-      setMode('build');
-
-      // Compile the brainstorm into a build prompt
+      // Compile the full conversation into a build prompt
       const lastAssistantMsg = brainstormHistory.filter(m => m.role === 'assistant').pop();
       const buildPrompt = lastAssistantMsg ? lastAssistantMsg.content : brainstormHistory.map(m => m.content).join('\n');
 
-      addMessage('🚀 Switching to Build mode. Generating your website from the plan...', 'ai');
+      addMessage('🚀 Generating your ' + (appMode === 'fullstack' ? 'app' : 'website') + ' from the plan...', 'ai');
 
-      // Inject the plan as the prompt and generate
-      currentHtml = ''; // fresh build
-      const input = document.getElementById('prompt-input');
-      const originalPrompt = input.value;
-
-      // Call generate with the plan
+      currentHtml = '';
+      _readyToBuild = true;
       generateFromPlan(buildPrompt);
     }
 
+    // ── generateFromPlan ──────────────────────────────────────────────────────
+    // Injects plan text into prompt and triggers generate() in build mode
+    // Called by: buildFromPlan()
     async function generateFromPlan(planText) {
-      // Reuse the main generate flow — just inject the plan as a prompt in build mode
       const input = document.getElementById('prompt-input');
-      const prevMode = appMode;
-      appMode = 'build';
-      setMode('build');
-      input.value = 'Build this website based on the following plan. Follow it precisely:\n\n' + planText;
+      if (appMode === 'fullstack') {
+        input.value = 'Build this full-stack app based on the following plan. Follow it precisely:\n\n' + planText;
+      } else {
+        input.value = 'Build this website based on the following plan. Follow it precisely:\n\n' + planText;
+      }
       lastPrompt = input.value;
       await generate();
       // Restore mode if needed
     }
 
-    // ===== CORE =====
+    // ===== CORE GENERATION =====
+
+    // ── handleKey — legacy key handler (now also bound via addEventListener)
     function handleKey(e) {
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); generate(); }
     }
 
+    // ── setStatus ─────────────────────────────────────────────────────────────
+    // Updates the status indicator dot in the header
+    // States: 'ready' (green), 'generating' (blue pulsing), 'error' (red)
     function setStatus(state) {
       const dot = document.getElementById('status-dot');
       dot.className = state;
       // Sync with tab bar
-      if(typeof TabMgr!=='undefined' && TabMgr.updateActiveTab) TabMgr.updateActiveTab({status:state});
+
     }
 
+    // ── addMessage ────────────────────────────────────────────────────────────
+    // Appends a message bubble to the chat history panel
+    // Dependencies: currentUser, DOM #chat-history
+    // Flow: create .msg div with avatar + name + text → append → scroll to bottom
+    // Returns: the textDiv element (used to update in-flight messages like typing dots)
+    // Called by: generate(), brainstorm(), clearChat(), buildFromPlan(), etc.
     function addMessage(text, role) {
       const h = document.getElementById('chat-history');
       const wrapper = document.createElement('div');
@@ -1669,6 +2379,12 @@
       return textDiv;
     }
 
+    // ── clearChat ─────────────────────────────────────────────────────────────
+    // Resets the chat, file system, and preview to a blank state
+    // Dependencies: setMode, addMessage, renderFileTree, renderEditorTabs
+    // Affects: brainstormHistory, projectFiles, currentHtml, currentBuildId,
+    //          chat DOM, preview iframe, deploy buttons
+    // Called by: "New conversation" button in chat header
     function clearChat() {
       const h = document.getElementById('chat-history');
       h.innerHTML = '';
@@ -1685,18 +2401,33 @@
       document.getElementById('empty-state').style.opacity = '1';
       document.getElementById('empty-state').style.display = 'flex';
       document.getElementById('preview-frame').style.display = 'none';
+      var wcf = document.getElementById('wc-preview-frame'); if(wcf) wcf.style.display = 'none';
       document.getElementById('preview-frame').style.opacity = '0';
       document.getElementById('deploy-btn').style.display = 'none';
+      document.getElementById('redeploy-btn').style.display = 'none';
+      document.getElementById('undeploy-btn').style.display = 'none';
     }
 
+    // ── updatePreview ─────────────────────────────────────────────────────────
+    // Renders HTML into the preview iframe via srcdoc
+    // Dependencies: DOM #empty-state, #preview-frame, #wc-preview-frame
+    // Flow:
+    //   1. Hide empty state → show preview-frame
+    //   2. Inject <base target="_blank"> so all links open in new tab (not inside iframe)
+    //   3. If animate: inject reveal CSS + JS (staggered translateY animation per section)
+    //   4. Set frame.srcdoc = html (sandboxed for safety)
+    // Affects: #preview-frame srcdoc, #empty-state visibility
+    // Called by: generate() onDone, openFile(), switchPreviewPage(), Monaco onChange
     function updatePreview(html, animate) {
-      if (!html) return;
+      if (!html) { console.warn('[preview] no html to render'); return; }
       var es = document.getElementById('empty-state');
-      es.style.opacity = '0';
-      setTimeout(function(){ es.style.display = 'none'; }, 300);
+      es.style.display = 'none';
       var f = document.getElementById('preview-frame');
+      var wcf = document.getElementById('wc-preview-frame'); if(wcf) wcf.style.display = 'none';
       f.style.display = 'block';
-      requestAnimationFrame(function(){ f.style.opacity = '1'; });
+      f.style.opacity = '1';
+      f.style.position = 'absolute';
+      f.style.inset = '0';
       if (html.includes('<head>')) {
         html = html.replace('<head>', '<head><base target="_blank">');
       } else if (html.includes('<html>')) {
@@ -1756,9 +2487,29 @@
         }
       }
 
-      f.srcdoc = html;
+      // Blob URL — works under COEP credentialless, no CSP/sandbox restrictions
+      var blob = new Blob([html], {type:'text/html;charset=utf-8'});
+      var blobUrl = URL.createObjectURL(blob);
+      if(f._prevBlob) URL.revokeObjectURL(f._prevBlob);
+      f._prevBlob = blobUrl;
+      f.src = blobUrl;
     }
 
+    // ── generate ──────────────────────────────────────────────────────────────
+    // Main entry point for all AI generation (build mode)
+    // Dependencies: /api/generate-stream (SSE), addMessage, updatePreview,
+    //               updateEditor, renderFileTree, saveProject, fetchUsage
+    // Flow:
+    //   1. Read prompt → show in chat → capture+clear attachment
+    //   2. Route to brainstorm() or generateFullStack() if applicable
+    //   3. Build auth header + existing code context (multi-file aware)
+    //   4. POST to /api/generate-stream → read SSE response
+    //   5. Feed each 'chunk' delta to typewriter queue in chat bubble
+    //   6. On 'done': parse files → updatePreview(animate=true) → updateEditor
+    //      → saveProject → incrementGuestCount → fetchUsage
+    //   7. Handle 429 limit_reached → showLimitModal
+    // Affects: currentHtml, currentBuildId, projectFiles, chat DOM, preview iframe
+    // Called by: send button, Enter key listener
     async function generate() {
       const input = document.getElementById('prompt-input');
       const prompt = input.value.trim();
@@ -1778,8 +2529,18 @@
       const attachSnapshot = _attachData ? { ..._attachData } : null;
       if (_attachData) removeAttach();
 
-      // Route to brainstorm if in brainstorm mode
-      if (appMode === 'brainstorm') {
+      // Route to full-stack app builder (direct build)
+      if (appMode === 'fullstack' && _readyToBuild) {
+        _readyToBuild = false;
+        return generateFullStack(prompt);
+      }
+
+      // Route to landing page builder (direct build)
+      if (appMode === 'build' && _readyToBuild) {
+        _readyToBuild = false;
+        // Fall through to the existing generate-stream code below
+      } else {
+        // Smart discovery conversation — AI asks questions first
         return brainstorm(prompt, attachSnapshot);
       }
 
@@ -1940,7 +2701,26 @@
                   </div>
                   <div style="font-size:12px;color:var(--text-4);margin-top:4px">Ask me to change anything.</div>`;
                 setStatus('ready');
-                document.getElementById('deploy-btn').style.display = 'flex';
+                updateDeployButtons();
+                // If full-stack mode + WebContainer running, remount changed files
+                if (appMode === 'fullstack' && _wcInstance && event.files) {
+                  addMessage('🔄 Applying changes to running app...', 'ai');
+                  (async function() {
+                    try {
+                      for (var [fn, ct] of Object.entries(event.files)) {
+                        var parts = fn.split('/');
+                        if (parts.length > 1) {
+                          try { await _wcInstance.fs.mkdir(parts.slice(0,-1).join('/'), { recursive: true }); } catch(e) {}
+                        }
+                        await _wcInstance.fs.writeFile(fn, ct);
+                      }
+                      showTerminal();
+                      termLog('$ Restarting server with AI changes...', '#0ea5b0');
+                      var srv = await _wcInstance.spawn('npm', ['start']);
+                      srv.output.pipeTo(new WritableStream({ write(d) { termLog(d.trim(), '#22C55E'); } }));
+                    } catch(e) { addMessage('⚠️ Could not hot-reload: ' + e.message, 'ai'); }
+                  })();
+                }
                 // Auto-save + usage
                 saveProject(lastPrompt || 'Untitled', currentHtml, model, currentBuildId);
                 incrementGuestCount();
@@ -1964,6 +2744,10 @@
       }
     }
 
+    // ── updateEditor ──────────────────────────────────────────────────────────
+    // Pushes new content to Monaco editor without triggering undo history
+    // Dependencies: monacoEditor
+    // Called by: generate() onDone, openFile(), checkDashboardContext()
     function updateEditor(html) {
       if (!monacoEditor) return;
       try {
@@ -1972,19 +2756,26 @@
       } catch(e) {}
     }
 
-    // ===== FILE SYSTEM =====
+    // ===== VIRTUAL FILE SYSTEM =====
+
+    // ── getFileIcon — returns emoji icon for a file path based on extension
     function getFileIcon(path) {
       const ext = path.split('.').pop().toLowerCase();
       const icons = { html: '🌐', css: '🎨', js: '⚡', json: '📋', md: '📝', svg: '🖼️', txt: '📄' };
       return icons[ext] || '📄';
     }
 
+    // ── getMonacoLang — returns Monaco language ID for a file path
     function getMonacoLang(path) {
       const ext = path.split('.').pop().toLowerCase();
       const langs = { html: 'html', css: 'css', js: 'javascript', json: 'json', md: 'markdown', svg: 'xml', txt: 'plaintext' };
       return langs[ext] || 'plaintext';
     }
 
+    // ── initProjectFiles ──────────────────────────────────────────────────────
+    // Initializes the virtual file system with a single HTML (or updates existing)
+    // Dependencies: renderFileTree, renderEditorTabs, updatePageRouteDropdown
+    // Called by: generate() onDone (single-file case), checkDashboardContext (template load)
     function initProjectFiles(html) {
       // Convert single HTML to project files (keep existing if multi-file)
       if (Object.keys(projectFiles).length <= 1) {
@@ -2000,6 +2791,12 @@
       updatePageRouteDropdown();
     }
 
+    // ── renderFileTree ────────────────────────────────────────────────────────
+    // Renders the file tree panel from projectFiles map
+    // Dependencies: projectFiles, createFileItem, updatePageRouteDropdown
+    // Flow: sort paths (folders first) → build tree structure → render with indentation
+    // Affects: #ft-list DOM
+    // Called by: initProjectFiles, generate() onDone, openFile, deleteFile, createNewFile
     function renderFileTree() {
       const list = document.getElementById('ft-list');
       if (!list) return;
@@ -2058,6 +2855,10 @@
       updatePageRouteDropdown();
     }
 
+    // ── createFileItem ────────────────────────────────────────────────────────
+    // Creates a single file row element for the file tree
+    // Dependencies: getFileIcon, openFile, deleteFile
+    // Called by: renderFileTree()
     function createFileItem(filePath, displayName) {
       const item = document.createElement('div');
       item.className = 'ft-item' + (filePath === activeFile ? ' active' : '');
@@ -2066,6 +2867,13 @@
       return item;
     }
 
+    // ── openFile ──────────────────────────────────────────────────────────────
+    // Opens a file in Monaco editor and (if HTML) updates the preview
+    // Dependencies: saveActiveFile, renderFileTree, renderEditorTabs, monacoEditor, updatePreview
+    // Flow: save current → set activeFile → add to openTabs → update Monaco language + content
+    //        → if HTML: update preview → switch to code view
+    // Affects: activeFile, openTabs, Monaco model, preview iframe
+    // Called by: createFileItem onclick, renderEditorTabs tab click
     function openFile(filePath) {
       if (!projectFiles[filePath] && projectFiles[filePath] !== '') return;
       // Save current editor content
@@ -2081,8 +2889,8 @@
         monaco.editor.setModelLanguage(model, lang);
         model.pushEditOperations([], [{ range: model.getFullModelRange(), text: projectFiles[filePath] }], () => null);
       }
-      // If it's an HTML file, update preview
-      if (filePath.endsWith('.html')) {
+      // If it's an HTML file with actual content, update preview (static mode only)
+      if (appMode !== 'fullstack' && filePath.endsWith('.html') && projectFiles[filePath] && projectFiles[filePath].length > 50) {
         currentHtml = projectFiles[filePath];
         updatePreview(currentHtml);
         // Sync route dropdown
@@ -2093,6 +2901,9 @@
       switchTab('code');
     }
 
+    // ── saveActiveFile ────────────────────────────────────────────────────────
+    // Flushes Monaco editor content to projectFiles[activeFile]
+    // Called by: openFile(), downloadCode(), generate() before sending existingCode
     function saveActiveFile() {
       if (activeFile && monacoEditor) {
         projectFiles[activeFile] = monacoEditor.getValue();
@@ -2103,6 +2914,11 @@
       }
     }
 
+    // ── renderEditorTabs ──────────────────────────────────────────────────────
+    // Renders the editor tab bar from openTabs array
+    // Dependencies: openTabs, activeFile, getFileIcon, openFile, closeTab
+    // Affects: #editor-tabs DOM
+    // Called by: openFile, closeTab, initProjectFiles, generate() onDone
     function renderEditorTabs() {
       const container = document.getElementById('editor-tabs');
       if (!container) return;
@@ -2117,6 +2933,10 @@
       });
     }
 
+    // ── closeTab ──────────────────────────────────────────────────────────────
+    // Closes an editor tab; switches to adjacent tab if it was active
+    // Dependencies: openFile, renderEditorTabs
+    // Called by: tab × button onclick
     function closeTab(filePath) {
       const idx = openTabs.indexOf(filePath);
       if (idx === -1) return;
@@ -2135,18 +2955,73 @@
 
     let previewingFile = 'index.html';
 
+    // ── parseExpressRoutes ────────────────────────────────────────────────────
+    // Extracts HTTP route paths from Express server code (for URL bar dropdown)
+    // Dependencies: none
+    // Flow: regex app.get/post/put/delete/use calls → filter out wildcards and /api/ routes
+    // Called by: updatePageRouteDropdown() in fullstack mode
+    function parseExpressRoutes(code) {
+      const routes = new Set(['/']);
+      const routePattern = /app\.(get|post|put|delete|patch|use)\s*\(\s*['"`]([^'"`]+)['"`]/g;
+      let m;
+      while ((m = routePattern.exec(code)) !== null) {
+        const route = m[2];
+        // Skip middleware patterns, API-only routes, and wildcards
+        if (route.includes(':') || route.includes('*') || route.startsWith('/api/')) continue;
+        if (route !== '/') routes.add(route);
+      }
+      return Array.from(routes).sort((a, b) => a === '/' ? -1 : b === '/' ? 1 : a.localeCompare(b));
+    }
+
+    // WebContainer state
+    let _wcBaseUrl = null;
+    let _wcCurrentPath = '/';
+
+    // ── updatePageRouteDropdown ───────────────────────────────────────────────
+    // Populates the URL bar dropdown with navigable pages/routes
+    // Dependencies: projectFiles, parseExpressRoutes, _wcBaseUrl, _wcCurrentPath
+    // Flow:
+    //   Fullstack mode: parse Express routes from index.js → list as clickable items
+    //   Static mode: list HTML files → map to URL paths (index.html → /)
+    // Affects: #url-bar, #url-dropdown, #url-display DOM
+    // Called by: renderFileTree, initProjectFiles, generate() onDone, openFile
     function updatePageRouteDropdown() {
       const bar = document.getElementById('url-bar');
       const dropdown = document.getElementById('url-dropdown');
       const display = document.getElementById('url-display');
       if (!bar || !dropdown) return;
+
+      // Full Stack mode — use parsed Express routes
+      if (appMode === 'fullstack' && _wcBaseUrl) {
+        const indexJs = projectFiles['index.js'] || projectFiles['server.js'] || projectFiles['app.js'] || '';
+        const routes = parseExpressRoutes(indexJs);
+        bar.classList.toggle('has-pages', routes.length >= 1);
+        display.textContent = _wcCurrentPath;
+        dropdown.innerHTML = '';
+        routes.forEach(route => {
+          const item = document.createElement('div');
+          item.className = 'url-bar-dropdown-item' + (route === _wcCurrentPath ? ' active' : '');
+          item.innerHTML = `<span>🌐</span><span>${route}</span>`;
+          item.onclick = (e) => {
+            e.stopPropagation();
+            _wcCurrentPath = route;
+            const wcFrame = document.getElementById('wc-preview-frame');
+            if (wcFrame) wcFrame.src = _wcBaseUrl + route;
+            display.textContent = route;
+            dropdown.querySelectorAll('.url-bar-dropdown-item').forEach(el => el.classList.remove('active'));
+            item.classList.add('active');
+            dropdown.classList.remove('show');
+          };
+          dropdown.appendChild(item);
+        });
+        return;
+      }
+
+      // Static mode — HTML files
       const htmlFiles = Object.keys(projectFiles).filter(f => f.endsWith('.html'));
-      // Show chevron only if multiple pages
       bar.classList.toggle('has-pages', htmlFiles.length > 1);
-      // Update display text
       const label = previewingFile === 'index.html' ? '/' : '/' + previewingFile.replace('.html', '');
       display.textContent = label;
-      // Build dropdown items
       dropdown.innerHTML = '';
       htmlFiles.sort((a, b) => a === 'index.html' ? -1 : b === 'index.html' ? 1 : a.localeCompare(b));
       htmlFiles.forEach(f => {
@@ -2159,6 +3034,10 @@
       });
     }
 
+    // ── toggleUrlDropdown ─────────────────────────────────────────────────────
+    // Shows/hides the URL bar dropdown; positions it below the URL bar
+    // Only shows if there are multiple pages (single page → no dropdown)
+    // Called by: URL bar onclick
     function toggleUrlDropdown(e) {
       const htmlFiles = Object.keys(projectFiles).filter(f => f.endsWith('.html'));
       if (htmlFiles.length <= 1) return;
@@ -2179,6 +3058,10 @@
       }
     }
 
+    // ── switchPreviewPage ─────────────────────────────────────────────────────
+    // Renders a different HTML file from projectFiles in the preview iframe
+    // Dependencies: updatePreview, updatePageRouteDropdown, switchTab
+    // Called by: URL bar dropdown item onclick
     function switchPreviewPage(filePath) {
       if (!projectFiles[filePath]) return;
       previewingFile = filePath;
@@ -2189,12 +3072,18 @@
       if (activeTab !== 'preview') switchTab('preview');
     }
 
+    // ── toggleFileTree — shows/hides the file tree panel and reflows Monaco
     function toggleFileTree() {
       fileTreeVisible = !fileTreeVisible;
       document.getElementById('file-tree-panel').classList.toggle('show', fileTreeVisible);
       if (monacoEditor) setTimeout(() => monacoEditor.layout(), 200);
     }
 
+    // ── createNewFile ─────────────────────────────────────────────────────────
+    // Prompts for a filename and creates it in projectFiles with a template
+    // Dependencies: showBuilderPrompt, renderFileTree, openFile
+    // Templates: HTML (full boilerplate), CSS ("/* Styles */"), JS ("// JavaScript")
+    // Called by: file tree + button
     function createNewFile() {
       showBuilderPrompt('New file','File name (e.g. about.html, css/styles.css):','Create',function(name){
       if (!name || !name.trim()) return;
@@ -2216,6 +3105,9 @@
       });
     }
 
+    // ── createNewFolder ───────────────────────────────────────────────────────
+    // Creates a placeholder .gitkeep file to make a folder appear in the tree
+    // Called by: file tree 📁 button
     function createNewFolder() {
       showBuilderPrompt('New folder','Folder name:','Create',function(name){
       if (!name || !name.trim()) return;
@@ -2229,6 +3121,10 @@
       });
     }
 
+    // ── deleteFile ────────────────────────────────────────────────────────────
+    // Removes a file from projectFiles (cannot delete index.html)
+    // Dependencies: showBuilderConfirm, closeTab, renderFileTree
+    // Called by: file tree item × button
     function deleteFile(filePath) {
       if (filePath === 'index.html') { alert('Cannot delete index.html'); return; }
       showBuilderConfirm('Delete '+filePath+'?','This file will be permanently removed.','Delete','del',function(){
@@ -2238,11 +3134,18 @@
       });
     }
 
-    // ===== TABS =====
+    // ===== PANEL & TAB MANAGEMENT =====
+
+    // ── toggleChatPanel — collapses/expands the chat panel sidebar
     function toggleChatPanel() {
       document.getElementById('app').classList.toggle('chat-collapsed');
     }
 
+    // ── switchTab ─────────────────────────────────────────────────────────────
+    // Switches between Preview and Code views in the right panel
+    // Dependencies: monacoEditor (relayout), fileTreeVisible
+    // Flow: show/hide pane-preview/pane-code → show file tree with code view
+    // Called by: pill toggle buttons, openFile() (auto-switches to code)
     function switchTab(tab) {
       activeTab = tab;
       document.getElementById('pane-preview').style.display = tab === 'preview' ? 'flex' : 'none';
@@ -2261,6 +3164,9 @@
       if (tab === 'code' && monacoEditor) setTimeout(() => monacoEditor.layout(), 50);
     }
 
+    // ── switchMobileTab ───────────────────────────────────────────────────────
+    // Switches mobile tab bar (Chat / Preview / Code) by setting className on #app
+    // Called by: mobile tab bar buttons, generate() onDone (auto-preview on mobile)
     function switchMobileTab(tab) {
       document.getElementById('app').className = `tab-${tab}`;
       document.querySelectorAll('.m-tab').forEach(b => b.classList.remove('active'));
@@ -2269,17 +3175,25 @@
     }
 
     // ===== UTILITY =====
+
+    // ── openNewTab — opens currentHtml in a new browser tab for full-screen preview
     function openNewTab() {
       if (!currentHtml) return;
       const w = window.open('', '_blank');
       w.document.write(currentHtml); w.document.close();
     }
 
+    // ── copyCode — copies the current HTML to clipboard
     function copyCode() {
       if (!currentHtml) return;
       navigator.clipboard.writeText(currentHtml);
     }
 
+    // ── downloadCode ──────────────────────────────────────────────────────────
+    // Downloads the project: single HTML file directly, or ZIP for multi-file projects
+    // Dependencies: JSZip (CDN), saveActiveFile
+    // Flow: saveActiveFile → single file → direct download; multi-file → JSZip → download
+    // Called by: Download button in header
     function downloadCode() {
       if (!currentHtml && Object.keys(projectFiles).length === 0) return;
       saveActiveFile();
@@ -2307,8 +3221,13 @@
     }
 
     // ===== USAGE TRACKING =====
+    // Fetches from /api/usage and displays build count badge in header
     let usageData = { plan: 'guest', used: 0, limit: 3, remaining: 3 };
 
+    // ── fetchUsage ────────────────────────────────────────────────────────────
+    // Fetches current usage stats from /api/usage and updates the header badge
+    // Dependencies: /api/usage, getAuthHeader, updateUsageBadge
+    // Called by: generate() onDone, initAndLoad(), auth state change
     async function fetchUsage() {
       try {
         const headers = {};
@@ -2324,6 +3243,10 @@
       } catch(e) { console.warn('Usage fetch failed:', e); }
     }
 
+    // ── updateUsageBadge ──────────────────────────────────────────────────────
+    // Updates the usage counter badge in the header with color coding
+    // Colors: grey (normal) → yellow (>80%) → red (at limit)
+    // For guests: reads localStorage guest_gen_count
     function updateUsageBadge() {
       const badge = document.getElementById('usage-badge');
       if (!badge) return;
@@ -2349,6 +3272,10 @@
       }
     }
 
+    // ── checkGuestLimit ───────────────────────────────────────────────────────
+    // Checks if a guest user has exceeded their 3-build limit
+    // Returns false (and shows modal) if limit reached; true otherwise
+    // Logged-in users always return true (server enforces their limit)
     function checkGuestLimit() {
       if (currentUser) return true; // server handles limit for logged-in users
       const count = parseInt(localStorage.getItem('guest_gen_count') || '0');
@@ -2359,6 +3286,7 @@
       return true;
     }
 
+    // ── incrementGuestCount — increments localStorage guest build counter (guests only)
     function incrementGuestCount() {
       if (currentUser) return;
       const count = parseInt(localStorage.getItem('guest_gen_count') || '0') + 1;
@@ -2366,6 +3294,10 @@
       updateUsageBadge();
     }
 
+    // ── showLimitModal ────────────────────────────────────────────────────────
+    // Shows a full-screen overlay when build limit is reached
+    // Shows different CTAs for guests (Sign Up) vs. logged-in users (Upgrade Plan)
+    // Called by: checkGuestLimit() and generate() on 429 response
     function showLimitModal() {
       // Remove existing if any
       const existing = document.getElementById('limit-modal');
@@ -2401,6 +3333,9 @@
 
     // ===== PROJECTS (Save/Load) =====
 
+    // ── autoNameProject ───────────────────────────────────────────────────────
+    // Generates a short display name from the user's prompt
+    // Strips "create/build/make a/an/the" prefixes → capitalize → truncate at 50 chars
     function autoNameProject(prompt) {
       // Take first 40 chars, clean up, capitalize
       let name = prompt.replace(/^(create|build|make|generate|design)\s+(a|an|the|me)?\s*/i, '').trim();
@@ -2408,10 +3343,21 @@
       if (name.length > 50) name = name.substring(0, 47) + '...';
       name = name || 'Untitled Project';
       // Sync with tab bar
-      if(typeof TabMgr!=='undefined' && TabMgr.updateActiveTab) TabMgr.updateActiveTab({name:name});
+
       return name;
     }
 
+    // ── saveProject ───────────────────────────────────────────────────────────
+    // Saves or updates the current project to Supabase (or localStorage for guests)
+    // Dependencies: sb.from('projects'), sb.from('generations'), autoNameProject
+    // Flow:
+    //   Guest: save to localStorage (max 5 guest projects)
+    //   Logged in:
+    //     New project → INSERT → store currentProjectId
+    //     Existing project → UPDATE html/prompt/model/build_id/files
+    //     Always → INSERT into generations table for usage tracking
+    // Affects: Supabase `projects` + `generations` tables (or localStorage)
+    // Called by: generate() onDone, generateFullStack() onDone
     async function saveProject(prompt, html, model, buildId) {
       if (!currentUser || !sb) {
         // Guest: save to localStorage
@@ -2484,6 +3430,11 @@
       } catch(e) { console.warn('Save error:', e); }
     }
 
+    // ── loadProject ───────────────────────────────────────────────────────────
+    // Loads a project by ID from Supabase or localStorage
+    // Dependencies: sb.from('projects').select, localStorage
+    // Flow: if local- prefix → localStorage; else Supabase
+    // Called by: checkDashboardContext() on ?project= URL param
     async function loadProject(projectId) {
       // Guest: check localStorage first
       if (projectId.startsWith('local-')) {
@@ -2502,33 +3453,207 @@
     }
 
     // ===== DEPLOY =====
-    function deploysite() { document.getElementById('deploy-modal').classList.add('show'); }
+
+    // ── showToast ─────────────────────────────────────────────────────────────
+    // Shows a brief toast notification in the bottom-right corner
+    // Dependencies: DOM #toast container
+    // Called by: confirmDeploy, redeploySite, undeploySite
+    function showToast(icon, msg, duration) {
+      const container = document.getElementById('toast');
+      const el = document.createElement('div');
+      el.className = 'toast-item';
+      el.innerHTML = `<span class="toast-icon">${icon}</span><span>${msg}</span>`;
+      container.appendChild(el);
+      setTimeout(() => {
+        el.classList.add('out');
+        setTimeout(() => el.remove(), 250);
+      }, duration || 2000);
+    }
+    function showLoadingToast(msg) {
+      const container = document.getElementById('toast');
+      const el = document.createElement('div');
+      el.className = 'toast-item toast-loading';
+      el.id = 'toast-loading';
+      el.innerHTML = `<span class="toast-spinner"></span><span>${msg}</span>`;
+      container.appendChild(el);
+      return el;
+    }
+    function removeLoadingToast() {
+      const el = document.getElementById('toast-loading');
+      if (el) { el.classList.add('out'); setTimeout(() => el.remove(), 250); }
+    }
+
+    // ── checkSubdomain ────────────────────────────────────────────────────────
+    // Checks subdomain availability (debounced 400ms) and updates status indicator
+    // Dependencies: /api/check-subdomain
+    // Flow: debounce → GET /api/check-subdomain → show ✓ Available or ✗ reason
+    // Affects: #subdomain-status DOM, #deploy-confirm-btn disabled state
+    // Called by: subdomain input oninput in deploy modal
+    let _subCheck = null;
+    async function checkSubdomain(val) {
+      const status = document.getElementById('subdomain-status');
+      const btn = document.getElementById('deploy-confirm-btn');
+      val = val.trim().toLowerCase();
+      if (!val || val.length < 3) { status.textContent = ''; btn.disabled = false; return; }
+      status.textContent = 'Checking…'; status.className = 'subdomain-status checking';
+      clearTimeout(_subCheck);
+      _subCheck = setTimeout(async () => {
+        try {
+          const r = await fetch(`${API}/api/check-subdomain?subdomain=${encodeURIComponent(val)}&projectId=${encodeURIComponent(currentProjectId||'')}`);
+          const d = await r.json();
+          if (d.available) {
+            status.textContent = '✓ Available'; status.className = 'subdomain-status ok';
+            btn.disabled = false;
+          } else {
+            const msg = d.reason === 'reserved' ? '✗ Reserved subdomain' : d.reason === 'invalid' ? '✗ Invalid format' : '✗ Already taken';
+            status.textContent = msg; status.className = 'subdomain-status taken';
+            btn.disabled = true;
+          }
+        } catch(e) { status.textContent = ''; btn.disabled = false; }
+      }, 400);
+    }
+
+    // ── updateDeployButtons ───────────────────────────────────────────────────
+    // Shows/hides Deploy vs Redeploy+Undeploy buttons based on deployed state
+    // Called by: generate() onDone, confirmDeploy(), undeploySite(), checkDashboardContext
+    function updateDeployButtons() {
+      const deployBtn = document.getElementById('deploy-btn');
+      const redeployBtn = document.getElementById('redeploy-btn');
+      const undeployBtn = document.getElementById('undeploy-btn');
+      if (currentDeployedUrl) {
+        deployBtn.style.display = 'none';
+        redeployBtn.style.display = 'flex';
+        undeployBtn.style.display = 'flex';
+      } else {
+        deployBtn.style.display = 'flex';
+        redeployBtn.style.display = 'none';
+        undeployBtn.style.display = 'none';
+      }
+    }
+
+    // ── deploysite — opens the deploy modal (clears previous status)
+    // Called by: Deploy button in header
+    function deploysite() {
+      document.getElementById('subdomain-status').textContent = '';
+      document.getElementById('deploy-confirm-btn').disabled = false;
+      document.getElementById('deploy-modal').classList.add('show');
+    }
     function closeDeployModal() { document.getElementById('deploy-modal').classList.remove('show'); }
 
+    // ── redeploySite ──────────────────────────────────────────────────────────
+    // Redeploys the current build to the existing subdomain (no subdomain prompt)
+    // Dependencies: /api/deploy, sb.auth.getSession
+    // Flow: extract subdomain from currentDeployedUrl → POST /api/deploy → show toast
+    // Called by: Redeploy button in header
+    async function redeploySite() {
+      if (!currentDeployedUrl || !currentBuildId) return;
+      const subdomain = currentDeployedUrl.replace('https://','').replace('.kenzoagent.com','');
+      showLoadingToast('Redeploying changes...');
+      setStatus('generating');
+      try {
+        const session = await sb.auth.getSession();
+        const token = session.data.session?.access_token;
+        const res = await fetch(`${API}/api/deploy`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...(token?{'Authorization':'Bearer '+token}:{}) },
+          body: JSON.stringify({ buildId: currentBuildId, subdomain, projectId: currentProjectId })
+        });
+        const data = await res.json();
+        removeLoadingToast();
+        if (data.error) throw new Error(data.error);
+        showToast('✅', 'Redeployed! Changes are now live.', 3000);
+        setStatus('ready');
+      } catch(err) {
+        removeLoadingToast();
+        showToast('❌', `Redeploy failed: ${err.message}`, 4000);
+        setStatus('error');
+      }
+    }
+
+    // ── undeploySite ──────────────────────────────────────────────────────────
+    // Takes the site offline by calling /api/undeploy
+    // Dependencies: /api/undeploy, sb.auth.getSession
+    // Flow: extract subdomain → POST /api/undeploy → clear currentDeployedUrl → updateDeployButtons
+    // Called by: Undeploy button in header
+    async function undeploySite() {
+      if (!currentDeployedUrl) return;
+      const subdomain = currentDeployedUrl.replace('https://','').replace('.kenzoagent.com','');
+      showLoadingToast('Taking site offline...');
+      setStatus('generating');
+      try {
+        const session = await sb.auth.getSession();
+        const token = session.data.session?.access_token;
+        const res = await fetch(`${API}/api/undeploy`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...(token?{'Authorization':'Bearer '+token}:{}) },
+          body: JSON.stringify({ subdomain, projectId: currentProjectId })
+        });
+        const data = await res.json();
+        removeLoadingToast();
+        if (data.error) throw new Error(data.error);
+        currentDeployedUrl = null;
+        updateDeployButtons();
+        showToast('🔴', 'Site taken offline successfully.', 3000);
+        addMessage('🔴 Site is now offline. You can redeploy anytime from the dashboard.', 'ai');
+        setStatus('ready');
+      } catch(err) {
+        removeLoadingToast();
+        showToast('❌', `Undeploy failed: ${err.message}`, 4000);
+        setStatus('error');
+      }
+    }
+
+    // ── confirmDeploy ─────────────────────────────────────────────────────────
+    // Deploys the current build to the subdomain entered in the modal
+    // Dependencies: /api/deploy, sb.auth.getSession, addMessage, updateDeployButtons
+    // Flow:
+    //   1. Read subdomain input → close modal → show loading toast
+    //   2. POST /api/deploy with buildId + subdomain + projectId
+    //   3. On success: store currentDeployedUrl → updateDeployButtons → show URL in chat
+    //   4. On error: show error toast + chat message
+    // Affects: currentDeployedUrl, deploy button states, chat DOM
+    // Called by: deploy modal confirm button
     async function confirmDeploy() {
       const sub = document.getElementById('subdomain-input').value.trim().toLowerCase().replace(/[^a-z0-9-]/g,'-');
       if (!sub) return alert('Enter a subdomain');
-      if (!currentBuildId) return alert('Generate a site first');
+      if (!currentBuildId && appMode !== 'fullstack') return alert('Generate a site first');
       closeDeployModal();
+      showLoadingToast('Deploying to ' + sub + '.kenzoagent.com...');
       setStatus('generating');
       try {
-        const res = await fetch(`${API}/api/deploy`, {
+        const session = await sb.auth.getSession();
+        const token = session.data.session?.access_token;
+
+        // Full-stack apps use Docker deployment
+        var isFS = appMode === 'fullstack' || (projectFiles && (projectFiles['index.js'] || projectFiles['package.json']));
+        var endpoint = isFS ? `${API}/api/deploy-fullstack` : `${API}/api/deploy`;
+        var body = isFS
+          ? { projectId: currentProjectId, subdomain: sub, files: projectFiles, schemaSql: projectFiles['schema.sql'] || null }
+          : { buildId: currentBuildId, subdomain: sub, projectId: currentProjectId };
+
+        const res = await fetch(endpoint, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ buildId: currentBuildId, subdomain: sub })
+          headers: { 'Content-Type': 'application/json', ...(token?{'Authorization':'Bearer '+token}:{}) },
+          body: JSON.stringify(body)
         });
         const data = await res.json();
+        removeLoadingToast();
         if (data.error) throw new Error(data.error);
+        currentDeployedUrl = data.url;
+        updateDeployButtons();
+        showToast('✅', `Deployed! Live at ${sub}.kenzoagent.com`, 3000);
         addMessage(`🚀 Live at <a href="${data.url}" target="_blank" style="color:var(--blue)">${data.url}</a>`, 'ai');
         setStatus('ready');
         if (window.innerWidth <= 768) switchMobileTab('chat');
       } catch(err) {
+        removeLoadingToast();
+        showToast('❌', `Deploy failed: ${err.message}`, 4000);
         addMessage(`<span style="color:var(--red)">Deploy failed: ${err.message}</span>`, 'ai');
         setStatus('error');
       }
     }
 
-    // ===== INIT =====
+    // ===== INIT SEQUENCE =====
     // Core UI first — these must work even if auth fails
     try { switchTab('preview'); } catch(e) { console.error('switchTab error:', e); }
     try { initResize(); } catch(e) { console.error('initResize error:', e); }
@@ -2557,16 +3682,33 @@
       }
     })();
 
-    // Auth + project load (must be sequential — project load needs auth session)
+    // Auth + project load (sequential — loadProject requires valid session)
+    // ── initAndLoad ───────────────────────────────────────────────────────────
+    // Main async initialization: auth → usage → context detection
+    // Flow:
+    //   1. initAuth() — establish session or show modal
+    //   2. fetchUsage() + updateUsageBadge() after 500ms delay
+    //   3. checkDashboardContext() — load project / template / prompt from sessionStorage or ?project= URL param
     (async function initAndLoad() {
     try { await initAuth(); } catch(e) { console.error('initAuth error:', e); }
     setTimeout(() => { fetchUsage(); updateUsageBadge(); }, 500);
 
     // Check for incoming prompt OR project from dashboard
+    // ── checkDashboardContext ─────────────────────────────────────────────────
+    // Reads sessionStorage and URL params to restore state from dashboard navigation
+    // Dependencies: loadProject, updatePreview, updateEditor, setMode, generate
+    // Flow:
+    //   1. ?project= URL param → loadProject → restore HTML/files/deploy state
+    //   2. builder_template_file in sessionStorage → fetch template HTML → load it
+    //   3. builder_prompt in sessionStorage → inject into prompt → auto-generate
+    // Called by: initAndLoad()
     (async function checkDashboardContext() {
       const prompt = sessionStorage.getItem('builder_prompt');
       const mode = sessionStorage.getItem('builder_mode');
-      const projectId = sessionStorage.getItem('builder_project_id');
+      // URL param takes priority (tab-safe, survives refresh)
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlProjectId = urlParams.get('project');
+      const projectId = urlProjectId || sessionStorage.getItem('builder_project_id');
       sessionStorage.removeItem('builder_prompt');
       sessionStorage.removeItem('builder_mode');
       sessionStorage.removeItem('builder_project_id');
@@ -2591,11 +3733,34 @@
           } else {
             initProjectFiles(currentHtml);
           }
-          updatePreview(currentHtml);
-          updateEditor(currentHtml);
-          setMode('build');
-          addMessage(`📁 Loaded project: <strong>${project.name}</strong>`, 'ai');
-          document.getElementById('deploy-btn').style.display = 'flex';
+          // Delay preview to ensure DOM is ready
+          // Detect full-stack project (has index.js or package.json in files)
+          var isFullStack = project.files && (project.files['index.js'] || project.files['server.js'] || project.files['package.json']);
+
+          if (isFullStack) {
+            setMode('fullstack');
+            // Hide empty state immediately
+            var es = document.getElementById('empty-state');
+            if (es) { es.style.display = 'none'; es.style.opacity = '0'; }
+            addMessage(`📁 Loaded project: <strong>${project.name}</strong>`, 'ai');
+            addMessage('⚡ Re-booting Node.js app in your browser...', 'ai');
+            // Show index.js in editor
+            updateEditor(project.files['index.js'] || project.files['server.js'] || currentHtml);
+            // Boot WebContainer with the saved files
+            runInWebContainer(project.files, null);
+          } else {
+            setTimeout(function(){ updatePreview(currentHtml); }, 300);
+            updateEditor(currentHtml);
+            setMode('build');
+            addMessage(`📁 Loaded project: <strong>${project.name}</strong>`, 'ai');
+          }
+          if (project.deployed_url) {
+            currentDeployedUrl = project.deployed_url;
+            const existingSub = project.deployed_url.replace('https://','').replace('.kenzoagent.com','');
+            document.getElementById('subdomain-input').value = existingSub;
+            addMessage(`🌐 Live at <a href="${project.deployed_url}" target="_blank" style="color:var(--blue)">${project.deployed_url}</a>`, 'ai');
+          }
+          updateDeployButtons();
           document.getElementById('url-display').textContent = project.name;
           return;
         }
@@ -2618,7 +3783,7 @@
             updateEditor(currentHtml);
             setMode('build');
             addMessage('✦ Loaded template: <strong>' + (tplName||'Template') + '</strong>. Edit anything or tell me what to change.', 'ai');
-            document.getElementById('deploy-btn').style.display = 'flex';
+            updateDeployButtons();
             if (tplName) document.getElementById('url-display').textContent = tplName.toLowerCase().replace(/\s+/g,'-');
             return;
           }
@@ -2627,8 +3792,15 @@
 
       // New build from dashboard prompt
       if (prompt) {
-        if (mode === 'build') setMode('build');
-        else setMode('brainstorm');
+        if (mode === 'fullstack') setMode('fullstack');
+        else setMode('build');
+
+        // Check if user chose "Build directly" from dashboard
+        var buildMode = sessionStorage.getItem('builder_buildmode') || 'brainstorm';
+        sessionStorage.removeItem('builder_buildmode');
+        if (buildMode === 'direct') {
+          _readyToBuild = true; // skip discovery, generate immediately
+        }
 
         setTimeout(() => {
           const input = document.getElementById('prompt-input');
@@ -2751,241 +3923,6 @@
       esCar.addEventListener('mouseenter',function(){clearInterval(_esTimer);});
       esCar.addEventListener('mouseleave',function(){_esTimer=setInterval(esNext,5000);});
     }
-
-    // ===== TAB MANAGER =====
-    var TabMgr = (function(){
-      var MAX_TABS = 3;
-      var KEY = 'builder_tabs';
-      var ACTIVE_KEY = 'builder_active_tab';
-      var tabs = []; // [{id, name, status, state}]
-      var activeTabId = null;
-
-      function save(){ sessionStorage.setItem(KEY, JSON.stringify(tabs.map(function(t){ return {id:t.id, name:t.name, status:t.status, state:t.state}; }))); sessionStorage.setItem(ACTIVE_KEY, activeTabId||''); }
-
-      function load(){
-        try { var d=sessionStorage.getItem(KEY); if(d) tabs=JSON.parse(d); } catch(e){ tabs=[]; }
-        activeTabId = sessionStorage.getItem(ACTIVE_KEY)||'';
-      }
-
-      function captureState(){
-        return {
-          currentHtml: (typeof currentHtml!=='undefined')?currentHtml:'',
-          currentBuildId: (typeof currentBuildId!=='undefined')?currentBuildId:'',
-          projectFiles: (typeof projectFiles!=='undefined')?JSON.parse(JSON.stringify(projectFiles)):{},
-          activeFile: (typeof activeFile!=='undefined')?activeFile:null,
-          openTabs: (typeof openTabs!=='undefined')?openTabs.slice():[],
-          brainstormHistory: (typeof brainstormHistory!=='undefined')?brainstormHistory.slice():[],
-          appMode: (typeof appMode!=='undefined')?appMode:'brainstorm',
-          currentProjectId: (typeof currentProjectId!=='undefined')?currentProjectId:null,
-          currentProjectName: (typeof currentProjectName!=='undefined')?currentProjectName:'',
-          lastPrompt: (typeof lastPrompt!=='undefined')?lastPrompt:'',
-          chatHtml: document.getElementById('chat-history')?document.getElementById('chat-history').innerHTML:'',
-          previewHtml: (typeof currentHtml!=='undefined')?currentHtml:''
-        };
-      }
-
-      function restoreState(s){
-        if(!s) return;
-        if(typeof currentHtml!=='undefined') currentHtml=s.currentHtml||'';
-        if(typeof currentBuildId!=='undefined') currentBuildId=s.currentBuildId||'';
-        if(typeof projectFiles!=='undefined') projectFiles=s.projectFiles||{};
-        if(typeof activeFile!=='undefined') activeFile=s.activeFile||null;
-        if(typeof openTabs!=='undefined') openTabs=s.openTabs||[];
-        if(typeof brainstormHistory!=='undefined') brainstormHistory=s.brainstormHistory||[];
-        if(typeof appMode!=='undefined'){ appMode=s.appMode||'brainstorm'; if(typeof setMode==='function') setMode(appMode); }
-        if(typeof currentProjectId!=='undefined') currentProjectId=s.currentProjectId||null;
-        if(typeof currentProjectName!=='undefined') currentProjectName=s.currentProjectName||'';
-        if(typeof lastPrompt!=='undefined') lastPrompt=s.lastPrompt||'';
-        var ch=document.getElementById('chat-history'); if(ch&&s.chatHtml) ch.innerHTML=s.chatHtml;
-        // Restore preview using the proper updatePreview function
-        if(s.currentHtml && typeof updatePreview==='function'){
-          currentHtml=s.currentHtml;
-          updatePreview(currentHtml);
-        } else if(s.previewHtml && typeof updatePreview==='function'){
-          currentHtml=s.previewHtml;
-          updatePreview(currentHtml);
-        } else {
-          // No preview content — show empty state
-          var pf=document.getElementById('preview-frame'); if(pf){pf.style.display='none';pf.srcdoc='';}
-          var es=document.getElementById('empty-state'); if(es){es.style.display='flex';es.style.opacity='1';}
-        }
-        // Refresh file tree if open
-        if(typeof renderFileTree==='function') renderFileTree();
-        if(typeof renderEditorTabs==='function') renderEditorTabs();
-      }
-
-      function render(){
-        var bar=document.getElementById('tab-bar'); if(!bar) return;
-        // Remove existing project tabs (keep home + add button)
-        var existing=bar.querySelectorAll('.tab-item.project'); existing.forEach(function(e){e.remove();});
-        var addBtn=bar.querySelector('.tab-add');
-        tabs.forEach(function(t){
-          var el=document.createElement('button');
-          el.className='tab-item project'+(t.id===activeTabId?' active':'');
-          el.setAttribute('data-tab-id',t.id);
-          // Status dot
-          var dot=document.createElement('span');
-          dot.className='tab-dot '+(t.status||'idle');
-          el.appendChild(dot);
-          // Name
-          var name=document.createElement('span');
-          name.className='tab-name';
-          name.textContent=t.name||'New Build';
-          el.appendChild(name);
-          // Close button
-          var close=document.createElement('button');
-          close.className='tab-close';
-          close.textContent='×';
-          close.onclick=function(e){ e.stopPropagation(); closeTab(t.id); };
-          el.appendChild(close);
-          // Right concave curve
-          var curve=document.createElement('span');
-          curve.className='tab-curve-r';
-          el.appendChild(curve);
-          // Click to switch
-          el.onclick=function(){ switchTo(t.id); };
-          bar.insertBefore(el, addBtn);
-        });
-        // Update home tab active state
-        var homeTab=bar.querySelector('.tab-item.home');
-        if(homeTab){ homeTab.classList.toggle('active', !activeTabId || tabs.length===0); }
-        // Hide add button if at max
-        if(addBtn) addBtn.style.display=tabs.length>=MAX_TABS?'none':'flex';
-      }
-
-      function createTab(name, projectId){
-        if(tabs.length>=MAX_TABS) return null;
-        var id='tab-'+Date.now()+'-'+Math.random().toString(36).substr(2,6);
-        var t={id:id, name:name||'New Build', status:'idle', state:null};
-        tabs.push(t);
-        activeTabId=id;
-        save(); render();
-        return id;
-      }
-
-      function createNewTab(){
-        if(tabs.length>=MAX_TABS) return;
-        // Save current tab state first
-        var cur=tabs.find(function(t){return t.id===activeTabId;});
-        if(cur) cur.state=captureState();
-        // Create fresh tab
-        var id=createTab('New Build');
-        if(!id) return;
-        // Reset builder to fresh state
-        resetBuilderState();
-        save();
-      }
-
-      function resetBuilderState(){
-        if(typeof currentHtml!=='undefined') currentHtml='';
-        if(typeof currentBuildId!=='undefined') currentBuildId='';
-        if(typeof projectFiles!=='undefined') projectFiles={};
-        if(typeof activeFile!=='undefined') activeFile=null;
-        if(typeof openTabs!=='undefined') openTabs=[];
-        if(typeof brainstormHistory!=='undefined') brainstormHistory=[];
-        if(typeof appMode!=='undefined'){ appMode='brainstorm'; if(typeof setMode==='function') setMode('brainstorm'); }
-        if(typeof currentProjectId!=='undefined') currentProjectId=null;
-        if(typeof currentProjectName!=='undefined') currentProjectName='';
-        if(typeof lastPrompt!=='undefined') lastPrompt='';
-        var ch=document.getElementById('chat-history');
-        if(ch) ch.innerHTML='<div class="msg"><div class="msg-avatar ai">✦</div><div class="msg-body"><div class="msg-name">AI Builder</div><div class="msg-text">I\'m in <strong>Brainstorm</strong> mode — tell me what you want to build and I\'ll help you plan it before writing any code.<br><br><span style="color:var(--text-3);font-size:12px">Try: "a website for my coffee shop" · "portfolio for freelance clients" · "landing page for my SaaS"</span></div></div></div>';
-        var pf=document.getElementById('preview-frame'); if(pf) pf.srcdoc='';
-        var es=document.getElementById('empty-state'); if(es) es.style.display='flex';
-        var pp=document.getElementById('pane-preview'); if(pp){var pfc=pp.querySelector('#preview-frame');if(pfc)pfc.style.display='none';}
-        if(typeof setStatus==='function') setStatus('');
-        var ta=document.getElementById('prompt-input'); if(ta) ta.value='';
-      }
-
-      function switchTo(id){
-        if(id===activeTabId) return;
-        // Save current tab state
-        var cur=tabs.find(function(t){return t.id===activeTabId;});
-        if(cur) cur.state=captureState();
-        // Load target
-        var target=tabs.find(function(t){return t.id===id;});
-        if(!target) return;
-        activeTabId=id;
-        restoreState(target.state);
-        save(); render();
-      }
-
-      function closeTab(id){
-        var idx=tabs.findIndex(function(t){return t.id===id;});
-        if(idx<0) return;
-        tabs.splice(idx,1);
-        if(activeTabId===id){
-          if(tabs.length>0){ activeTabId=tabs[Math.max(0,idx-1)].id; restoreState(tabs.find(function(t){return t.id===activeTabId;}).state); }
-          else { activeTabId=null; location.href='/app/'; return; }
-        }
-        save(); render();
-      }
-
-      function updateActiveTab(props){
-        var t=tabs.find(function(t){return t.id===activeTabId;});
-        if(!t) return;
-        if(props.name) t.name=props.name;
-        if(props.status) t.status=props.status;
-        save(); render();
-      }
-
-      function getActiveTabId(){ return activeTabId; }
-      function getTabs(){ return tabs; }
-
-      // Init on load
-      load();
-
-      return { render:render, createTab:createTab, createNewTab:createNewTab, switchTo:switchTo, closeTab:closeTab, updateActiveTab:updateActiveTab, captureState:captureState, save:save, getActiveTabId:getActiveTabId, getTabs:getTabs, load:load, resetBuilderState:resetBuilderState };
-    })();
-
-    // Save tab state before leaving the page
-    window.addEventListener('beforeunload', function(){
-      var tabs = TabMgr.getTabs();
-      var activeId = TabMgr.getActiveTabId();
-      var cur = tabs.find(function(t){ return t.id === activeId; });
-      if(cur){ cur.state = TabMgr.captureState(); TabMgr.save(); }
-    });
-
-    // Auto-create tab or restore existing tabs on page load
-    (function(){
-      var hasIntent = sessionStorage.getItem('builder_prompt') || sessionStorage.getItem('builder_template_file') || sessionStorage.getItem('builder_project_id');
-      if(hasIntent && !TabMgr.getActiveTabId()){
-        // New build from dashboard
-        var name = sessionStorage.getItem('builder_template_name') || 'New Build';
-        TabMgr.createTab(name);
-      } else if(hasIntent && TabMgr.getActiveTabId()){
-        // New build but tabs already exist — create new tab for it
-        var name2 = sessionStorage.getItem('builder_template_name') || 'New Build';
-        TabMgr.createNewTab();
-        TabMgr.updateActiveTab({name: name2});
-      } else if(TabMgr.getActiveTabId() && TabMgr.getTabs().length > 0){
-        // Returning to builder — restore active tab's state
-        var tabs = TabMgr.getTabs();
-        var activeId = TabMgr.getActiveTabId();
-        var active = tabs.find(function(t){ return t.id === activeId; });
-        if(active && active.state){
-          // Delay restore to after builder init has completed
-          setTimeout(function(){
-            if(active.state.currentHtml && typeof updatePreview === 'function'){
-              currentHtml = active.state.currentHtml;
-              if(typeof currentBuildId !== 'undefined') currentBuildId = active.state.currentBuildId || '';
-              if(typeof projectFiles !== 'undefined') projectFiles = active.state.projectFiles || {};
-              if(typeof brainstormHistory !== 'undefined') brainstormHistory = active.state.brainstormHistory || [];
-              if(typeof currentProjectId !== 'undefined') currentProjectId = active.state.currentProjectId || null;
-              if(typeof currentProjectName !== 'undefined') currentProjectName = active.state.currentProjectName || '';
-              if(typeof lastPrompt !== 'undefined') lastPrompt = active.state.lastPrompt || '';
-              var ch = document.getElementById('chat-history');
-              if(ch && active.state.chatHtml) ch.innerHTML = active.state.chatHtml;
-              updatePreview(currentHtml);
-              if(typeof setStatus === 'function') setStatus(active.state.status || 'ready');
-            }
-          }, 600);
-        }
-      } else if(TabMgr.getTabs().length === 0){
-        // No tabs, no intent — create a default tab
-        TabMgr.createTab('New Build');
-      }
-      TabMgr.render();
-    })();
 
     // Initialize Lucide icons
     if(window.lucide) lucide.createIcons();

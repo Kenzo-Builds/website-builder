@@ -33,3 +33,19 @@
 - [ ] Template marketplace
 - [ ] White-label/agency plan
 - [ ] Mobile app (Phase 3)
+
+## 🧠 Model Routing — Research (2026-03-26)
+Models to evaluate for multi-tier routing:
+
+| Model | Tier | Best For |
+|-------|------|----------|
+| GPT-5.4 Nano | Ultra-cheap | Brainstorm replies, quick edits, chat |
+| GPT-5.4 Mini | Budget code | Simple sites, modifications, fast iterations |
+| Gemini 3.1 Flash Lite | Bulk processing | Transcript cleaning, text processing |
+| Gemini 2.5 Flash | Fast generation | Quick prototypes, simple pages |
+| Gemini 3 Flash Preview | Mid-tier code | Good quality sites, balanced cost |
+| GPT-5.4 | Premium code | Complex sites, multi-page apps |
+| Minimax M2.7 | TBD | Evaluate — Chinese model, unknown code quality |
+| Xiaomi MiMo-V2-Pro | TBD | Evaluate — reasoning model, math/code focused |
+
+**Routing strategy to discuss:** Nano for chat → Mini for simple builds → Flash for standard → GPT-5.4/Sonnet for premium

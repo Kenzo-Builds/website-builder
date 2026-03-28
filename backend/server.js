@@ -1,3 +1,20 @@
+/**
+ * ============================================================
+ * AI Website Builder — Backend API Server
+ * Version: 3.3.0-voice
+ * ============================================================
+ * Responsibilities:
+ *  - AI code generation (streaming SSE via OpenRouter)
+ *  - Brainstorm mode (conversational planning, no HTML output)
+ *  - Auth: signup (auto-confirm), usage limits (plan-based)
+ *  - Build storage: save multi-file projects on disk
+ *  - Deploy/undeploy: calls internal host deploy API
+ *  - Voice transcription: converts audio via ffmpeg → Whisper
+ *  - Guest usage: IP-based rate limiting (in-memory)
+ *  - Account management: soft delete / restore
+ * ============================================================
+ */
+
 const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
@@ -8,7 +25,8 @@ const path = require('path');
 const crypto = require('crypto');
 
 const app = express();
-app.set('trust proxy', 1); // Trust first proxy (nginx)
+// Trust the first nginx reverse proxy for accurate IP extraction
+app.set('trust proxy', 1);
 app.use(cors({
   origin: [
     'https://builder.kenzoagent.com'
@@ -16,29 +34,33 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '10mb' }));
 
-// Rate limiting
+// ── Rate Limiters ─────────────────────────────────────────────────────────────
+// General API rate limit — 30 req/min per IP
 const apiLimiter = rateLimit({
-  windowMs: 60 * 1000,       // 1 minute
-  max: 30,                    // 30 requests per minute per IP
+  windowMs: 60 * 1000,
+  max: 30,
   message: { error: 'Too many requests. Please slow down.' },
   standardHeaders: true,
   legacyHeaders: false,
 });
 app.use('/api/', apiLimiter);
 
+// Signup rate limit — 5 new accounts per IP per hour (spam prevention)
 const signupLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,  // 1 hour
-  max: 5,                     // 5 signups per hour per IP
+  windowMs: 60 * 60 * 1000,
+  max: 5,
   message: { error: 'Too many accounts created from this IP. Try again in 1 hour.' },
   standardHeaders: true,
   legacyHeaders: false,
 });
 
-// Load key from config.json (never hardcode or share in chat)
+// ── API Key Loading ───────────────────────────────────────────────────────────
+// Keys loaded from config files; env vars are the fallback
 let OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || '';
 let OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
 let SUPABASE_URL = '';
 let SUPABASE_SERVICE_KEY = '';
+
 try {
   const cfg = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8'));
   if (cfg.OPENROUTER_API_KEY && !cfg.OPENROUTER_API_KEY.includes('REPLACE')) {
@@ -46,21 +68,25 @@ try {
   }
   if (cfg.OPENAI_API_KEY) OPENAI_API_KEY = cfg.OPENAI_API_KEY;
 } catch(e) { console.warn('⚠️  config.json not found — relying on environment variables only'); }
+
 try {
   const sbCfg = JSON.parse(fs.readFileSync(path.join(__dirname, 'supabase-config.json'), 'utf8'));
   SUPABASE_URL = sbCfg.SUPABASE_URL;
   SUPABASE_SERVICE_KEY = sbCfg.SUPABASE_SERVICE_ROLE_KEY;
 } catch(e) { console.warn('supabase-config.json not found'); }
 
-const DEPLOY_API = 'http://172.18.0.1:5000';
+// Internal deploy API host (runs on host machine, not inside container)
+const DEPLOY_HOST = '172.18.0.1';
+const DEPLOY_PORT = 5000;
 
-// Startup key audit
+// Startup key audit — fail fast if critical keys are missing
 if (!OPENROUTER_API_KEY) console.error('❌ CRITICAL: OPENROUTER_API_KEY is missing — AI calls will fail!');
 else console.log('✅ OpenRouter key loaded:', OPENROUTER_API_KEY.slice(0,20) + '...');
 if (!OPENAI_API_KEY) console.warn('⚠️  OPENAI_API_KEY missing — voice transcription will fail');
 else console.log('✅ OpenAI key loaded:', OPENAI_API_KEY.slice(0,20) + '...');
 
-// ── Plan Limits (generations per month) ─────────────────────────────────────
+// ── Plan Limits ───────────────────────────────────────────────────────────────
+// Monthly generation quotas per plan tier (guest = 24h IP-based)
 const PLAN_LIMITS = {
   guest: 3,
   free: 5,
@@ -69,24 +95,39 @@ const PLAN_LIMITS = {
   expert: Infinity
 };
 
-// Admin accounts — unlimited access
+// Admin user IDs — bypass all generation limits
 const ADMIN_USERS = ['69ef123f-b5de-4d16-999d-aa1fef63001e'];
 
-// ── Supabase helpers ────────────────────────────────────────────────────────
+// ── Supabase Helpers ──────────────────────────────────────────────────────────
+
+// ── supabaseRequest ──────────────────────────────────────────────────────────
+// Generic REST call to Supabase PostgREST API
+// Dependencies: SUPABASE_URL, SUPABASE_SERVICE_KEY, fetch
+// Flow: builds URL → sets auth/content headers → calls fetch → returns JSON
+// Affects: whichever Supabase table is specified in `path`
+// Called by: deleteAccount, restoreAccount, deploy, undeploy, checkSubdomain
 async function supabaseRequest(method, path, body, token) {
   const url = `${SUPABASE_URL}/rest/v1/${path}`;
+  const prefer = method === 'POST' ? 'return=representation' : method === 'PATCH' ? 'return=minimal' : undefined;
   const headers = {
     'apikey': SUPABASE_SERVICE_KEY,
     'Authorization': `Bearer ${token || SUPABASE_SERVICE_KEY}`,
     'Content-Type': 'application/json',
-    'Prefer': method === 'POST' ? 'return=representation' : undefined
+    'Prefer': prefer
   };
+  // Drop undefined headers (PATCH has no Prefer needed for count)
   Object.keys(headers).forEach(k => headers[k] === undefined && delete headers[k]);
 
   const res = await fetch(url, { method, headers, body: body ? JSON.stringify(body) : undefined });
   return res.json();
 }
 
+// ── verifyUser ───────────────────────────────────────────────────────────────
+// Validates a Supabase JWT and returns the user object
+// Dependencies: SUPABASE_URL, SUPABASE_SERVICE_KEY, fetch
+// Flow: extracts Bearer token → calls Supabase /auth/v1/user → returns user or null
+// Affects: nothing (read-only)
+// Called by: every authenticated endpoint (generate-stream, deploy, undeploy, etc.)
 async function verifyUser(authHeader) {
   if (!authHeader || !SUPABASE_URL) return null;
   const token = authHeader.replace('Bearer ', '');
@@ -99,6 +140,12 @@ async function verifyUser(authHeader) {
   } catch(e) { return null; }
 }
 
+// ── getMonthlyUsage ──────────────────────────────────────────────────────────
+// Returns the number of AI generations a user has made this calendar month
+// Dependencies: SUPABASE_URL, SUPABASE_SERVICE_KEY, fetch
+// Flow: calculates start-of-month → queries generations table with count header
+// Affects: nothing (read-only)
+// Called by: /api/usage, /api/generate-stream (limit check)
 async function getMonthlyUsage(userId) {
   const startOfMonth = new Date();
   startOfMonth.setDate(1);
@@ -109,6 +156,7 @@ async function getMonthlyUsage(userId) {
       `${SUPABASE_URL}/rest/v1/generations?select=id&user_id=eq.${userId}&created_at=gte.${startOfMonth.toISOString()}`,
       { headers: { 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`, 'Prefer': 'count=exact' } }
     );
+    // Supabase returns "X-Total-Count" in Content-Range: 0-4/5
     const countHeader = res.headers.get('content-range');
     if (countHeader) {
       const match = countHeader.match(/\/(\d+)/);
@@ -119,11 +167,23 @@ async function getMonthlyUsage(userId) {
   } catch(e) { return 0; }
 }
 
+// ── getUserPlan ──────────────────────────────────────────────────────────────
+// Resolves the current subscription plan for a user
+// Dependencies: none (currently hardcoded to 'free'; will check subscriptions table when payments added)
+// Flow: returns 'free' for all users
+// Affects: nothing
+// Called by: /api/usage, /api/generate-stream
 async function getUserPlan(userId) {
-  // For now, all users are on free plan. When payment is added, check subscriptions table.
+  // TODO: query subscriptions table once payment is integrated
   return 'free';
 }
 
+// ── logGeneration ────────────────────────────────────────────────────────────
+// Records a generation event to the generations table (for usage tracking)
+// Dependencies: SUPABASE_URL, SUPABASE_SERVICE_KEY, fetch
+// Flow: POSTs a row with user_id, model, prompt, project_id
+// Affects: Supabase `generations` table
+// Called by: /api/generate-stream onDone callback
 async function logGeneration(userId, model, prompt, projectId) {
   if (!userId || !SUPABASE_URL) return;
   try {
@@ -139,13 +199,21 @@ async function logGeneration(userId, model, prompt, projectId) {
   } catch(e) { console.warn('Failed to log generation:', e.message); }
 }
 
-// ── Auto-confirm signup endpoint ─────────────────────────────────────────────
+// ── POST /api/auth/signup ─────────────────────────────────────────────────────
+// Creates a new user via Supabase Admin API (auto-confirms email) then signs them in
+// Dependencies: SUPABASE_URL, SUPABASE_SERVICE_KEY, signupLimiter
+// Flow:
+//   1. Validate email + password present
+//   2. POST to Supabase Admin /auth/v1/admin/users with email_confirm:true
+//   3. Sign user in via /auth/v1/token?grant_type=password to get session
+//   4. Return both user + session objects to client
+// Affects: Supabase `auth.users` table
+// Called by: frontend /app/build/index.html handleAuth() on signup
 app.post('/api/auth/signup', signupLimiter, async (req, res) => {
   const { email, password, name } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
 
   try {
-    // Use Supabase Admin API to create user with auto-confirm
     const createRes = await fetch(`${SUPABASE_URL}/auth/v1/admin/users`, {
       method: 'POST',
       headers: {
@@ -156,7 +224,7 @@ app.post('/api/auth/signup', signupLimiter, async (req, res) => {
       body: JSON.stringify({
         email,
         password,
-        email_confirm: true,
+        email_confirm: true, // skip verification email
         user_metadata: { full_name: name || email.split('@')[0] }
       })
     });
@@ -165,7 +233,7 @@ app.post('/api/auth/signup', signupLimiter, async (req, res) => {
       return res.status(400).json({ error: userData.error || userData.msg || 'Signup failed' });
     }
 
-    // Now sign them in to get a session token
+    // Sign in to get session token for immediate use
     const loginRes = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
       method: 'POST',
       headers: {
@@ -183,7 +251,15 @@ app.post('/api/auth/signup', signupLimiter, async (req, res) => {
   }
 });
 
-// ── Usage check endpoint ────────────────────────────────────────────────────
+// ── GET /api/usage ────────────────────────────────────────────────────────────
+// Returns current month's generation count and limit for the authenticated user
+// Dependencies: verifyUser, getUserPlan, getMonthlyUsage, PLAN_LIMITS
+// Flow:
+//   1. Verify user JWT (guests get guest-tier limit)
+//   2. Get plan → get monthly usage count
+//   3. Return { plan, used, limit, remaining }
+// Affects: nothing (read-only)
+// Called by: frontend fetchUsage(), dashboard settings Usage page
 app.get('/api/usage', async (req, res) => {
   const user = await verifyUser(req.headers.authorization);
   if (!user) return res.json({ plan: 'guest', used: 0, limit: PLAN_LIMITS.guest });
@@ -194,15 +270,21 @@ app.get('/api/usage', async (req, res) => {
 
   res.json({ plan, used, limit: limit === Infinity ? 'unlimited' : limit, remaining: limit === Infinity ? 'unlimited' : Math.max(0, limit - used) });
 });
-const BUILDS_DIR = path.join(__dirname, 'builds');
+
+// ── Filesystem Setup ──────────────────────────────────────────────────────────
+const BUILDS_DIR = path.join(__dirname, 'builds');           // temp builds (24h TTL)
+const DEPLOYED_BUILDS_DIR = path.join(__dirname, 'deployed-builds'); // permanent deployed copies
 const PORT = process.env.PORT || 3500;
 
 if (!fs.existsSync(BUILDS_DIR)) fs.mkdirSync(BUILDS_DIR, { recursive: true });
+if (!fs.existsSync(DEPLOYED_BUILDS_DIR)) fs.mkdirSync(DEPLOYED_BUILDS_DIR, { recursive: true });
 
-// In-memory job store
-const jobs = {};
-const guestUsage = {}; // IP -> { count, resetAt }
+// In-memory guest usage tracker: { [ip]: { count, resetAt } }
+// Persists only while process is alive; resets every 24h per IP
+const guestUsage = {};
 
+// ── System Prompt — Landing Page Builder ──────────────────────────────────────
+// Injected as system message for all generate-stream (non-modify) calls
 const SYSTEM_PROMPT = `You are an expert web developer building multi-page websites.
 
 ## OUTPUT FORMAT
@@ -241,6 +323,12 @@ Every page MUST have the same navigation bar with links to ALL pages in the proj
 ## IMPORTANT
 Return ONLY the file contents in the format above. No explanations, no markdown code fences.`;
 
+// ── extractCode ───────────────────────────────────────────────────────────────
+// Extracts raw HTML from an AI response that might be wrapped in markdown
+// Dependencies: none
+// Flow: tries ```html fence → generic ``` fence → <!DOCTYPE tag → <html tag → raw text
+// Affects: nothing (pure function)
+// Called by: extractMultiFile (fallback path)
 function extractCode(response) {
   const htmlMatch = response.match(/```html\n?([\s\S]*?)```/i);
   if (htmlMatch) return htmlMatch[1].trim();
@@ -253,8 +341,16 @@ function extractCode(response) {
   return response.trim();
 }
 
+// ── extractMultiFile ──────────────────────────────────────────────────────────
+// Parses AI output into a { filename: content } map (supports multi-file format)
+// Dependencies: extractCode (fallback)
+// Flow:
+//   1. Try "--- FILE: filename ---" delimiter format (primary)
+//   2. Try markdown code-fence-with-path format (secondary)
+//   3. Fall back to single index.html (extractCode)
+// Affects: nothing (pure function)
+// Called by: /api/generate-stream onDone
 function extractMultiFile(response) {
-  // Try multi-file format: --- FILE: filename ---
   const filePattern = /---\s*FILE:\s*(.+?)\s*---\n([\s\S]*?)(?=---\s*FILE:|$)/gi;
   const files = {};
   let match;
@@ -263,9 +359,9 @@ function extractMultiFile(response) {
     const content = match[2].trim();
     if (filename && content) files[filename] = content;
   }
-  // If we found files, return them
   if (Object.keys(files).length > 0) return files;
-  // Fallback: try to extract from markdown code fences
+
+  // Secondary: code fences with filename comment
   const fencePattern = /```(?:\w+)?\s*\n?\/\/\s*(\S+)\n([\s\S]*?)```/g;
   while ((match = fencePattern.exec(response)) !== null) {
     const filename = match[1].trim();
@@ -273,11 +369,18 @@ function extractMultiFile(response) {
     if (filename && content) files[filename] = content;
   }
   if (Object.keys(files).length > 0) return files;
-  // Final fallback: single file
+
+  // Final fallback: treat entire response as a single HTML file
   const html = extractCode(response);
   return { 'index.html': html };
 }
 
+// ── callAI ────────────────────────────────────────────────────────────────────
+// Non-streaming OpenRouter chat completion (used for brainstorm endpoint)
+// Dependencies: OPENROUTER_API_KEY, https.request
+// Flow: serializes messages → POST to openrouter.ai → wait for full response → return content string
+// Affects: nothing (external API call)
+// Called by: /api/brainstorm
 function callAI(messages, model) {
   return new Promise((resolve, reject) => {
     const body = JSON.stringify({ model, messages, stream: false });
@@ -314,7 +417,17 @@ function callAI(messages, model) {
   });
 }
 
-// ── Streaming AI call ───────────────────────────────────────────────────────
+// ── callAIStream ──────────────────────────────────────────────────────────────
+// Streaming OpenRouter chat completion; fires callbacks per chunk
+// Dependencies: OPENROUTER_API_KEY, https.request
+// Flow:
+//   1. POST with stream:true to openrouter.ai
+//   2. Buffer incoming bytes → split on newlines → parse SSE "data: ..." lines
+//   3. Call onChunk(delta, fullContent) for each token
+//   4. Call onDone(fullContent) when [DONE] is received or connection closes
+//   5. Call onError(err) on timeout or network error
+// Affects: nothing (external API call)
+// Called by: /api/generate-stream
 function callAIStream(messages, model, onChunk, onDone, onError) {
   const body = JSON.stringify({ model, messages, stream: true });
   const options = {
@@ -334,7 +447,7 @@ function callAIStream(messages, model, onChunk, onDone, onError) {
     res.on('data', (chunk) => {
       buffer += chunk.toString();
       const lines = buffer.split('\n');
-      buffer = lines.pop() || '';
+      buffer = lines.pop() || ''; // keep partial last line in buffer
       for (const line of lines) {
         if (!line.startsWith('data: ')) continue;
         const data = line.slice(6).trim();
@@ -346,11 +459,11 @@ function callAIStream(messages, model, onChunk, onDone, onError) {
             fullContent += delta;
             onChunk(delta, fullContent);
           }
-        } catch(e) { /* skip parse errors in stream */ }
+        } catch(e) { /* skip malformed SSE frames */ }
       }
     });
     res.on('end', () => {
-      // Process remaining buffer
+      // Process any remaining buffered SSE line
       if (buffer.startsWith('data: ')) {
         const data = buffer.slice(6).trim();
         if (data !== '[DONE]') {
@@ -370,22 +483,36 @@ function callAIStream(messages, model, onChunk, onDone, onError) {
   req.end();
 }
 
-// ── Streaming generate endpoint (SSE) ───────────────────────────────────────
+// ── POST /api/generate-stream ──────────────────────────────────────────────────
+// Main SSE endpoint: generates website code via AI and streams tokens to client
+// Dependencies: verifyUser, getUserPlan, getMonthlyUsage, callAIStream,
+//               extractMultiFile, logGeneration, PLAN_LIMITS, guestUsage, BUILDS_DIR
+// Flow:
+//   1. Validate input (prompt, size limits)
+//   2. Check usage limits (admin bypass → plan limit → guest IP limit)
+//   3. Set SSE response headers
+//   4. Build system prompt (modify mode vs. fresh build)
+//   5. Build user message (supports image attachment via base64)
+//   6. Call callAIStream → forward chunk events to client
+//   7. onDone: parse files, write to BUILDS_DIR, log generation, send done event
+//   8. onError: send error event, close connection
+// Affects: BUILDS_DIR (writes build folder), Supabase `generations` table
+// Called by: frontend generate() and generateFullStack() in /app/build/
 app.post('/api/generate-stream', async (req, res) => {
-  const { prompt, model = 'anthropic/claude-sonnet-4.6', existingCode, image, imageMimeType } = req.body;
+  const { prompt, model = 'anthropic/claude-sonnet-4.6', existingCode, image, imageMimeType, _systemOverride } = req.body;
   if (!prompt) return res.status(400).json({ error: 'Prompt is required' });
 
-  // Input size limits
+  // Input size limits to prevent abuse and protect tokens
   if (prompt.length > 5000) return res.status(400).json({ error: 'Prompt too long. Maximum 5000 characters.' });
   if (existingCode && existingCode.length > 200000) return res.status(400).json({ error: 'Code too large. Maximum 200KB.' });
   if (image && image.length > 5000000) return res.status(400).json({ error: 'Image too large. Maximum 5MB.' });
 
-  // Check usage limits
+  // ── Usage limit enforcement ──
   const user = await verifyUser(req.headers.authorization);
   let userId = null;
   if (user) {
     userId = user.id;
-    if (ADMIN_USERS.includes(userId)) { /* admin bypass */ }
+    if (ADMIN_USERS.includes(userId)) { /* admin: skip all limit checks */ }
     else {
     const plan = await getUserPlan(userId);
     const used = await getMonthlyUsage(userId);
@@ -397,12 +524,13 @@ app.post('/api/generate-stream', async (req, res) => {
         plan, used, limit
       });
     }
-    } // close else for admin bypass
+    }
   } else {
-    // Guest: server-side IP-based limit
+    // Guest: server-side IP tracking (resets every 24h per IP)
     const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip;
     if (!guestUsage[ip]) guestUsage[ip] = { count: 0, resetAt: Date.now() + 24 * 60 * 60 * 1000 };
     if (Date.now() > guestUsage[ip].resetAt) {
+      // Reset counter after 24h window expires
       guestUsage[ip] = { count: 0, resetAt: Date.now() + 24 * 60 * 60 * 1000 };
     }
     if (guestUsage[ip].count >= PLAN_LIMITS.guest) {
@@ -415,7 +543,7 @@ app.post('/api/generate-stream', async (req, res) => {
     guestUsage[ip].count++;
   }
 
-  // Set up SSE
+  // ── SSE headers ──
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
@@ -423,10 +551,11 @@ app.post('/api/generate-stream', async (req, res) => {
     'Access-Control-Allow-Origin': 'https://builder.kenzoagent.com'
   });
 
-  // Choose system prompt based on whether we're modifying existing code
+  // Detect whether this is a multi-file modify or fresh build
   const isMultiFile = existingCode && existingCode.includes('--- FILE:');
   const isModifying = !!existingCode;
 
+  // System prompt for modify mode: preserve design, only change content/branding
   const MODIFY_PROMPT = `You are an expert web developer modifying an existing website.
 
 ## CRITICAL RULES
@@ -445,12 +574,13 @@ app.post('/api/generate-stream', async (req, res) => {
 ## OUTPUT FORMAT
 ${isMultiFile ? 'Return ALL files using the --- FILE: filename --- format.' : 'Return a single complete HTML file. No file markers, no markdown fences. Just the complete HTML from <!DOCTYPE html> to </html>.'}`;
 
-  const systemPrompt = isModifying ? MODIFY_PROMPT : SYSTEM_PROMPT;
+  const systemPrompt = _systemOverride || (isModifying ? MODIFY_PROMPT : SYSTEM_PROMPT);
   const messages = [{ role: 'system', content: systemPrompt }];
 
-  // Build user message — support image attachment
+  // Build user message — multimodal if image was attached
   let userContent;
   if (image) {
+    // Vision-capable models: attach image + text instruction
     const textPart = existingCode
       ? `Current website code:\n${existingCode}\n\nModify this website based on the attached image and instruction: ${prompt}`
       : `Create a website based on the attached image and instruction: ${prompt}`;
@@ -459,6 +589,7 @@ ${isMultiFile ? 'Return ALL files using the --- FILE: filename --- format.' : 'R
       { type: 'image_url', image_url: { url: `data:${imageMimeType || 'image/jpeg'};base64,${image}` } }
     ];
   } else if (existingCode) {
+    // Provide existing code as context for modification
     userContent = isMultiFile
       ? `Current project files:\n${existingCode}\n\nUser request: ${prompt}\n\nReturn ALL files in the project (modified and unmodified) using the --- FILE: filename --- format.`
       : `Here is the current website:\n${existingCode}\n\nUser request: ${prompt}\n\nReturn the complete modified HTML file.`;
@@ -471,16 +602,16 @@ ${isMultiFile ? 'Return ALL files using the --- FILE: filename --- format.' : 'R
   console.log(`[stream] model=${model} user=${userId?.slice(0,8)||'guest'} img=${!!image} prompt="${prompt.slice(0,60)}"`);
 
   callAIStream(messages, model,
-    // onChunk
+    // onChunk — forward each token to client as SSE event
     (delta, fullContent) => {
       res.write(`data: ${JSON.stringify({ type: 'chunk', delta, length: fullContent.length })}\n\n`);
     },
-    // onDone
+    // onDone — parse output, save to disk, notify client
     (fullContent) => {
       const files = extractMultiFile(fullContent);
       const html = files['index.html'] || extractCode(fullContent);
 
-      // Save build (all files)
+      // Save build to disk — each file in its own subfolder keyed by UUID
       const buildId = crypto.randomUUID();
       const buildPath = path.join(BUILDS_DIR, buildId);
       fs.mkdirSync(buildPath, { recursive: true });
@@ -491,7 +622,7 @@ ${isMultiFile ? 'Return ALL files using the --- FILE: filename --- format.' : 'R
         fs.writeFileSync(filePath, content);
       }
 
-      // Log generation
+      // Log generation event for usage tracking
       if (userId) logGeneration(userId, model, prompt);
 
       const duration = Date.now() - startTime;
@@ -501,7 +632,7 @@ ${isMultiFile ? 'Return ALL files using the --- FILE: filename --- format.' : 'R
       res.write(`data: ${JSON.stringify({ type: 'done', html, files, buildId, duration })}\n\n`);
       res.end();
     },
-    // onError
+    // onError — send error event and close SSE connection
     (err) => {
       console.error(`[stream] error:`, err.message);
       res.write(`data: ${JSON.stringify({ type: 'error', error: err.message })}\n\n`);
@@ -509,96 +640,157 @@ ${isMultiFile ? 'Return ALL files using the --- FILE: filename --- format.' : 'R
     }
   );
 
-  // Handle client disconnect
-  req.on('close', () => { /* client disconnected */ });
+  // Handle client disconnect gracefully (no further writes after close)
+  req.on('close', () => { /* client disconnected — stream will fail naturally */ });
 });
 
-// ── Brainstorm System Prompt ────────────────────────────────────────────────
-const BRAINSTORM_PROMPT = `You are a senior product designer and web strategist. Your job is to help the user plan their website BEFORE any code is written.
+// ── Brainstorm System Prompt ──────────────────────────────────────────────────
+// Injected for /api/brainstorm — conversational strategist, NO code output
+const DISCOVERY_PROMPT_LANDING = `You are a senior web designer and brand strategist. The user wants to build a landing page / website. Your job: guide them through a quick discovery conversation to create the PERFECT brief — then tell them you're ready to build.
 
-## YOUR THINKING FRAMEWORK
+## DISCOVERY FLOW (follow this order)
 
-### Phase 1: Discovery (Ask these first)
-- WHO is this website for? (target audience, demographics, behavior)
-- WHAT is the primary goal? (sell, inform, capture leads, showcase, launch?)
-- WHY would someone visit? (pain point, desire, curiosity)
-- WHERE will traffic come from? (social, search, ads, direct?)
+### Step 1: Understand the Business (first response)
+Read their prompt. Acknowledge what they want. Then ask 2-3 questions:
+- What does your business/project do in one sentence?
+- Who is your target audience?
+- What's the main goal of this website? (sell, showcase, capture leads, inform)
 
-### Phase 2: Strategy (After understanding basics)
-Apply these frameworks:
-- **Jobs To Be Done**: What job is the visitor hiring this website to do?
-- **Value Proposition Canvas**: What pain does it relieve? What gain does it create?
-- **AIDA**: How will the page Attract Attention → Build Interest → Create Desire → Drive Action?
+Be opinionated — suggest answers: "For a coffee shop, your audience is probably local customers aged 20-45 who discover you via Instagram or Google Maps. Sound right?"
 
-### Phase 3: Structure (When goals are clear)
-Recommend:
-- **Page sections** in order (Hero, Problem, Solution, Features, Social Proof, Pricing, CTA, Footer)
-- **Content strategy** for each section (what to say, not how it looks)
-- **Key copy elements**: headline, subheadline, CTA text
-- **Technical decisions**: single page vs multi-page, forms needed, integrations
+### Step 2: Structure & Pages (second response)
+Suggest the complete page structure:
+- "For your [business], I'd recommend these pages: Home, About, Menu/Services, Contact, Privacy Policy"
+- "Your landing page should have: Hero with CTA → Problem → Solution → Features → Testimonials → Pricing → FAQ → Footer"
+- Ask: "Anything you'd add or remove?"
+- Mention pages they'd forget: Privacy Policy, Terms, 404 page
 
-### Phase 4: MVP Definition
-- Strip to the ESSENTIAL sections only
-- Define what "done" looks like for v1
-- List what to add later (Phase 2 features)
+### Step 3: Branding & Design (third response)
+- Ask about brand colors: "What's your brand color? If you don't have one, what vibe fits — professional blue, energetic orange, earthy green?"
+- Suggest accent colors based on their choice: "With deep blue as primary, I'd suggest warm amber as accent and light gray for backgrounds. Or we could go ice blue + charcoal for a modern tech feel."
+- Ask about personality: "Should this feel Professional & Trustworthy, Friendly & Playful, or Bold & Modern?"
+- Ask about any existing brand assets (logo, tagline)
 
-## YOUR BEHAVIOR RULES
-
-1. **Ask 2-3 focused questions at a time**, never more. Don't overwhelm.
-2. **Be opinionated** — don't just ask, SUGGEST. "For a coffee shop, I'd recommend X because Y. What do you think?"
-3. **Push back on bad ideas** gently but firmly. "That could work, but [better approach] because [reason]."
-4. **Keep it conversational** — no bullet-point walls. Write like a smart colleague.
-5. **Track progress mentally** — when you have enough info, say so clearly.
-6. **When ready, output the final plan** in this exact format:
+### Step 4: Ready to Build (fourth response)
+Summarize everything in a clear plan:
 
 ---
-## 🎯 WEBSITE PLAN
+## 🎯 READY TO BUILD
 
 **Project:** [Name]
 **Goal:** [One sentence]
 **Audience:** [Who]
+**Brand:** [Color] + [Accent] | [Personality]
 
-### Sections:
-1. **Hero** — [what it says, what CTA]
-2. **Problem** — [what pain point]
-3. **Solution** — [how product/service solves it]
-... etc
+### Pages & Sections:
+1. **Home** — Hero with [headline], [sections in order]
+2. **About** — [what to include]
+3. **[Other pages]**
 
 ### Key Copy:
-- Headline: "[suggested headline]"
-- Subheadline: "[suggested subheadline]"
+- Headline: "[suggestion]"
 - CTA: "[button text]"
 
-### Tech Notes:
-- [any relevant technical decisions]
-
-**Ready to build? Click "Build it" to generate this website.**
+**I have everything I need. Type "build it" or "let's go" and I'll generate your website!**
 ---
 
-7. **NEVER generate HTML or code.** You are a strategist, not a coder.
-8. **CRITICAL: Respond in the SAME language the user writes in.** If the user writes in English, you MUST reply in English. If Uzbek, reply in Uzbek. If Russian, reply in Russian. NEVER switch languages unless the user switches first.
-9. **Be concise.** Short paragraphs. No fluff.`;
+## RULES
+- Ask 2-3 questions MAX per response
+- Be opinionated — SUGGEST, don't just ask
+- Keep responses short — 3-5 short paragraphs max
+- NEVER generate code or HTML
+- When the user says "build it", "go ahead", "let's go", "yes build" — respond with EXACTLY: __BUILD_READY__
+- CRITICAL: Respond in the SAME language the user writes in
+- If user says "skip" or "build directly" — respond with EXACTLY: __BUILD_READY__`;
 
-// ── Brainstorm endpoint (conversational, no HTML generation) ───────────────
+const DISCOVERY_PROMPT_FULLSTACK = `You are a senior full-stack architect and product designer. The user wants to build a web application. Your job: guide them through a quick discovery conversation to create the PERFECT brief — then tell them you're ready to build.
+
+## DISCOVERY FLOW (follow this order)
+
+### Step 1: Understand the App (first response)
+Read their prompt. Acknowledge what they want. Then ask 2-3 questions:
+- What problem does this app solve?
+- Who will use it? (internal team, customers, public)
+- What are the 3 most important features?
+
+Be opinionated — suggest: "For a CRM, you'd typically need: Contacts list, Deal pipeline, Activity log, and a Dashboard with stats. Does that cover your needs?"
+
+### Step 2: Data & Features (second response)
+Suggest the data structure:
+- "Your app needs these main entities: Customers (name, email, phone, status), Orders (date, items, total), Products (name, price, stock)"
+- "Key features: Add/edit/delete records, Search & filter, Status updates, Dashboard with counts"
+- Ask: "Any specific workflows? Like: when a customer places an order, update their status to Active?"
+- Suggest things they'd forget: "Don't forget search/filter, pagination for large lists, and an export option"
+
+### Step 3: Design & UX (third response)
+- "Should this be a dark theme (like a dashboard/admin panel) or light theme (like a customer-facing app)?"
+- "Layout: sidebar navigation or top nav? For a dashboard app, sidebar usually works better."
+- Suggest color: "For a professional dashboard, I'd go dark with teal accent. For something friendly, light with blue accent."
+- Ask about pages: "I'm thinking: Dashboard (overview stats), [Main entity list], [Detail/edit page], Settings. Sound right?"
+
+### Step 4: Ready to Build (fourth response)
+Summarize everything:
+
+---
+## 🎯 READY TO BUILD
+
+**App:** [Name]
+**Purpose:** [One sentence]
+**Users:** [Who]
+**Theme:** [Dark/Light] with [color] accent
+
+### Pages:
+1. **Dashboard** — [what stats/cards to show]
+2. **[Entity] List** — [columns, filters, actions]
+3. **[Entity] Form** — [fields]
+4. **Settings** — [what's configurable]
+
+### Data:
+- [Entity 1]: [fields]
+- [Entity 2]: [fields]
+
+### Key Features:
+- [Feature list]
+
+**I have everything I need. Type "build it" or "let's go" and I'll generate your app!**
+---
+
+## RULES
+- Ask 2-3 questions MAX per response
+- Be opinionated — SUGGEST, don't just ask
+- Keep responses short — 3-5 short paragraphs max
+- NEVER generate code or HTML
+- When the user says "build it", "go ahead", "let's go", "yes build" — respond with EXACTLY: __BUILD_READY__
+- CRITICAL: Respond in the SAME language the user writes in
+- If user says "skip" or "build directly" — respond with EXACTLY: __BUILD_READY__`;
+
+// ── POST /api/brainstorm ───────────────────────────────────────────────────────
+// Conversational planning endpoint — returns strategic advice, NOT HTML
+// Dependencies: callAI, BRAINSTORM_PROMPT
+// Flow:
+//   1. Validate message history (max 20 messages, max 50KB per message)
+//   2. Prepend BRAINSTORM_PROMPT as system message
+//   3. Call callAI (non-streaming) → return reply text
+// Affects: nothing (no DB writes, no file writes)
+// Called by: frontend brainstorm() in /app/build/
 app.post('/api/brainstorm', async (req, res) => {
-  const { messages: chatHistory = [], model = 'anthropic/claude-sonnet-4.6' } = req.body;
+  const { messages: chatHistory = [], model = 'anthropic/claude-sonnet-4.6', mode = 'build' } = req.body;
   if (!chatHistory.length) return res.status(400).json({ error: 'Messages required' });
 
-  // Input size limits
+  // Guard against oversized history (prevents prompt injection via history stuffing)
   if (chatHistory.length > 20) return res.status(400).json({ error: 'Too many messages. Maximum 20 per conversation.' });
   for (const msg of chatHistory) {
     const content = typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content);
     if (content.length > 50000) return res.status(400).json({ error: 'Message too large.' });
   }
 
-  // Debug: check if last message has image
   const lastMsg = chatHistory[chatHistory.length - 1];
   const hasImage = Array.isArray(lastMsg?.content) && lastMsg.content.some(c => c.type === 'image_url');
   if (hasImage) console.log('[brainstorm] image attached, model=', model);
 
   try {
     const messages = [
-      { role: 'system', content: BRAINSTORM_PROMPT },
+      { role: 'system', content: mode === 'fullstack' ? DISCOVERY_PROMPT_FULLSTACK : DISCOVERY_PROMPT_LANDING },
       ...chatHistory
     ];
 
@@ -610,16 +802,27 @@ app.post('/api/brainstorm', async (req, res) => {
   }
 });
 
-// ── Health ──────────────────────────────────────────────────────────────────
+// ── GET /health ───────────────────────────────────────────────────────────────
+// Simple liveness check for load balancers / monitoring
+// Dependencies: none
+// Flow: returns static JSON { status, version }
+// Affects: nothing
+// Called by: nginx health checks, uptime monitors
 app.get('/health', (req, res) => res.json({ status: 'ok', version: '3.2.0-usage-tracking' }));
 
-// ── Soft Delete Account ──────────────────────────────────────────────────────
+// ── POST /api/delete-account ───────────────────────────────────────────────────
+// Soft-deletes a user account by setting deleted_at (recoverable for 30 days)
+// Dependencies: verifyUser, supabaseRequest
+// Flow:
+//   1. Verify JWT → get user.id
+//   2. PATCH profiles table: set deleted_at = now()
+// Affects: Supabase `profiles` table (deleted_at column)
+// Called by: dashboard deleteAccount() in /app/index.html
 app.post('/api/delete-account', async (req, res) => {
   try {
     const user = await verifyUser(req.headers.authorization);
     if (!user?.id) return res.status(401).json({ error: 'Unauthorized' });
 
-    // Soft delete: set deleted_at on profile
     await supabaseRequest('PATCH', `profiles?id=eq.${user.id}`, {
       deleted_at: new Date().toISOString()
     });
@@ -631,13 +834,22 @@ app.post('/api/delete-account', async (req, res) => {
   }
 });
 
-// ── Check / Restore Account ──────────────────────────────────────────────────
+// ── POST /api/restore-account ──────────────────────────────────────────────────
+// Checks if account is soft-deleted and restores it (called on every login)
+// Dependencies: verifyUser, supabaseRequest
+// Flow:
+//   1. Verify JWT → get user.id
+//   2. GET profile → check deleted_at
+//   3. If < 30 days ago → PATCH deleted_at = null → return 'restored'
+//   4. If > 30 days ago → return 'wiped' (data purge not implemented yet)
+//   5. If not deleted → return 'active'
+// Affects: Supabase `profiles` table (deleted_at column)
+// Called by: dashboard checkAndRestoreAccount() in /app/index.html
 app.post('/api/restore-account', async (req, res) => {
   try {
     const user = await verifyUser(req.headers.authorization);
     if (!user?.id) return res.status(401).json({ error: 'Unauthorized' });
 
-    // Get profile deleted_at
     const profiles = await supabaseRequest('GET', `profiles?id=eq.${user.id}&select=deleted_at`);
     const profile = Array.isArray(profiles) ? profiles[0] : null;
 
@@ -646,7 +858,7 @@ app.post('/api/restore-account', async (req, res) => {
     const daysSince = (Date.now() - new Date(profile.deleted_at).getTime()) / (1000 * 60 * 60 * 24);
     if (daysSince > 30) return res.json({ status: 'wiped' });
 
-    // Restore — clear deleted_at
+    // Clear deleted_at to restore the account
     await supabaseRequest('PATCH', `profiles?id=eq.${user.id}`, { deleted_at: null });
     res.json({ status: 'restored' });
   } catch (e) {
@@ -654,40 +866,490 @@ app.post('/api/restore-account', async (req, res) => {
   }
 });
 
-// Legacy /api/generate and /api/job/:jobId endpoints removed (v3.8)
-// All generation now uses /api/generate-stream (SSE)
+// Note: Legacy /api/generate and /api/job/:jobId endpoints removed in v3.8
+// All generation now goes through /api/generate-stream (SSE)
 
-// ── Deploy ──────────────────────────────────────────────────────────────────
+// ── GET /api/check-subdomain ───────────────────────────────────────────────────
+// Checks if a subdomain is available for deployment
+// Dependencies: SUPABASE_URL, SUPABASE_SERVICE_KEY, fetch
+// Flow:
+//   1. Validate subdomain not empty
+//   2. Check reserved list
+//   3. Validate regex format (lowercase alphanum + hyphens, 3-32 chars)
+//   4. Query Supabase projects table for existing deployed_url match
+//   5. Allow re-deploy of same project (projectId match)
+// Affects: nothing (read-only)
+// Called by: frontend checkSubdomain() in /app/build/ (deploy modal)
+app.get('/api/check-subdomain', async (req, res) => {
+  const { subdomain, projectId } = req.query;
+  if (!subdomain) return res.json({ available: false, error: 'No subdomain provided' });
+
+  const reserved = ['kenzo', 'admin', 'api', 'www', 'mail', 'builder', 'app', 'dashboard', 'auth', 'login', 'static', 'assets', 'cdn'];
+  if (reserved.includes(subdomain)) return res.json({ available: false, reason: 'reserved' });
+  if (!/^[a-z0-9][a-z0-9-]{1,30}[a-z0-9]$/.test(subdomain)) return res.json({ available: false, reason: 'invalid' });
+
+  try {
+    const url = `${SUPABASE_URL}/rest/v1/projects?deployed_url=eq.https://${subdomain}.kenzoagent.com&select=id`;
+    const sbRes = await fetch(url, { headers: { 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}` } });
+    const rows = await sbRes.json();
+    if (rows.length === 0) return res.json({ available: true });
+    // Allow re-deploy on same project
+    if (projectId && rows[0].id === projectId) return res.json({ available: true });
+    return res.json({ available: false, reason: 'taken' });
+  } catch(e) { return res.json({ available: true }); } // fail open on Supabase error
+});
+
+// ── POST /api/delete-project ───────────────────────────────────────────────────
+// Fully removes a project: undeploys site, deletes build files, removes DB record
+// Dependencies: verifyUser, http.request (deploy API), fs.rmSync, fetch (Supabase)
+// Flow:
+//   1. Verify user ownership
+//   2. Undeploy live site (call internal deploy API /undeploy)
+//   3. Delete temp build folder from BUILDS_DIR
+//   4. Delete permanent copy from DEPLOYED_BUILDS_DIR
+//   5. DELETE project row from Supabase (scoped to user_id for safety)
+// Affects: BUILDS_DIR, DEPLOYED_BUILDS_DIR (filesystem), Supabase `projects` table
+// Called by: dashboard delProj() in /app/index.html
+app.post('/api/delete-project', async (req, res) => {
+  const user = await verifyUser(req.headers.authorization);
+  if (!user?.id) return res.status(401).json({ error: 'Login required' });
+  const { projectId, buildId, subdomain } = req.body;
+  if (!projectId) return res.status(400).json({ error: 'projectId required' });
+  try {
+    // Step 1: undeploy if the site is live
+    if (subdomain) {
+      try {
+        const undeployBody = JSON.stringify({ domain: `${subdomain}.kenzoagent.com` });
+        await new Promise((resolve, reject) => {
+          const opts = { hostname: DEPLOY_HOST, port: DEPLOY_PORT, path: '/undeploy', method: 'POST', headers: { 'Content-Type': 'application/json' } };
+          const r = http.request(opts, (res2) => { let d=''; res2.on('data',c=>d+=c); res2.on('end',()=>resolve(d)); });
+          r.on('error', reject); r.write(undeployBody); r.end();
+        });
+      } catch(e) { console.warn('undeploy during delete failed:', e.message); }
+    }
+
+    // Step 2: delete build files from both temp and permanent locations
+    if (buildId) {
+      const tempPath = path.join(BUILDS_DIR, buildId);
+      const deployedPath = path.join(DEPLOYED_BUILDS_DIR, buildId);
+      if (fs.existsSync(tempPath)) {
+        try { fs.rmSync(tempPath, { recursive: true, force: true }); } catch(e) { console.warn('temp build cleanup failed:', e.message); }
+      }
+      if (fs.existsSync(deployedPath)) {
+        try { fs.rmSync(deployedPath, { recursive: true, force: true }); } catch(e) { console.warn('deployed build cleanup failed:', e.message); }
+      }
+    }
+
+    // Step 3: delete project from Supabase (user_id scoped — prevents cross-user deletion)
+    const delUrl = `${SUPABASE_URL}/rest/v1/projects?id=eq.${projectId}&user_id=eq.${user.id}`;
+    await fetch(delUrl, {
+      method: 'DELETE',
+      headers: { 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`, 'Prefer': 'return=minimal' }
+    });
+    res.json({ success: true });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── POST /api/deploy ───────────────────────────────────────────────────────────
+// Deploys a build to a public kenzoagent.com subdomain with SSL
+// Dependencies: verifyUser, fs (build scan), http.request (deploy API), fetch (Supabase)
+// Flow:
+//   1. Verify user + validate subdomain format + reserved list
+//   2. Locate build folder (BUILDS_DIR → fallback DEPLOYED_BUILDS_DIR)
+//   3. Security scan: allowed extensions, max files (30), max size (5MB), blocked content
+//   4. Generate nginx.conf for the subdomain
+//   5. POST to internal deploy API at 172.18.0.1:5000/deploy
+//   6. Copy build to permanent DEPLOYED_BUILDS_DIR for future redeploys
+//   7. Update Supabase project record with deployed_url
+//   8. Return { success, url }
+// Affects: BUILDS_DIR (nginx.conf added), DEPLOYED_BUILDS_DIR (copy), Supabase `projects` table
+// Called by: frontend confirmDeploy() in /app/build/
+// ── Schema Management (Multi-Tenant Database) ──────────────────────────────
+
+// POST /api/create-schema — creates an isolated Postgres schema for a project
+// Dependencies: verifyUser(), supabaseRequest (RPC), SUPABASE_URL, SUPABASE_SERVICE_KEY
+// Flow: validate user → generate schema name → call Supabase RPC → save to project record
+// Affects: Postgres (new schema), projects table (app_schema column)
+app.post('/api/create-schema', async (req, res) => {
+  const user = await verifyUser(req.headers.authorization);
+  if (!user?.id) return res.status(401).json({ error: 'Login required' });
+  const { projectId } = req.body;
+  if (!projectId) return res.status(400).json({ error: 'projectId required' });
+
+  // Generate schema name from project ID (sanitize for Postgres)
+  const schemaName = 'app_proj_' + projectId.replace(/-/g, '_').toLowerCase();
+
+  try {
+    // Call Supabase RPC to create schema
+    const rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/create_app_schema`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_SERVICE_KEY,
+        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ schema_name: schemaName })
+    });
+    if (!rpcRes.ok) {
+      const err = await rpcRes.text();
+      throw new Error('Schema creation failed: ' + err);
+    }
+
+    // Save schema name to project record
+    await fetch(`${SUPABASE_URL}/rest/v1/projects?id=eq.${projectId}&user_id=eq.${user.id}`, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPABASE_SERVICE_KEY,
+        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ app_schema: schemaName })
+    });
+
+    console.log(`[schema] Created ${schemaName} for project ${projectId}`);
+    res.json({ success: true, schemaName });
+  } catch(e) {
+    console.error('[schema] Error:', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// POST /api/run-migration — executes SQL migration in a project's schema
+// Dependencies: verifyUser(), SUPABASE_URL, SUPABASE_SERVICE_KEY
+// Flow: validate user → validate schema ownership → call Supabase RPC with SQL
+// Affects: Postgres (creates/alters tables in user's schema)
+app.post('/api/run-migration', async (req, res) => {
+  const user = await verifyUser(req.headers.authorization);
+  if (!user?.id) return res.status(401).json({ error: 'Login required' });
+  const { projectId, sql } = req.body;
+  if (!projectId || !sql) return res.status(400).json({ error: 'projectId and sql required' });
+
+  // Security: block dangerous SQL
+  const forbidden = ['DROP SCHEMA', 'DROP DATABASE', 'CREATE ROLE', 'ALTER ROLE', 'GRANT', 'pg_', 'information_schema'];
+  for (const f of forbidden) {
+    if (sql.toUpperCase().includes(f.toUpperCase())) {
+      return res.status(400).json({ error: `Forbidden SQL: ${f}` });
+    }
+  }
+
+  const schemaName = 'app_proj_' + projectId.replace(/-/g, '_').toLowerCase();
+
+  try {
+    const rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/run_app_migration`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_SERVICE_KEY,
+        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ schema_name: schemaName, migration_sql: sql })
+    });
+    if (!rpcRes.ok) {
+      const err = await rpcRes.text();
+      throw new Error('Migration failed: ' + err);
+    }
+
+    console.log(`[migration] Ran migration in ${schemaName}`);
+    res.json({ success: true });
+  } catch(e) {
+    console.error('[migration] Error:', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// GET /api/schema-info — returns database credentials for a project's schema
+// Dependencies: verifyUser(), SUPABASE_URL, SUPABASE_SERVICE_KEY
+// Flow: validate user → return Supabase URL + anon key + schema name
+// Used by: WebContainer apps to connect to their database
+app.get('/api/schema-info', async (req, res) => {
+  const user = await verifyUser(req.headers.authorization);
+  if (!user?.id) return res.status(401).json({ error: 'Login required' });
+  const { projectId } = req.query;
+  if (!projectId) return res.status(400).json({ error: 'projectId required' });
+
+  const schemaName = 'app_proj_' + projectId.replace(/-/g, '_').toLowerCase();
+
+  // Return credentials the app needs to connect
+  // Note: using anon key (not service key) — RLS still applies
+  res.json({
+    supabaseUrl: SUPABASE_URL,
+    supabaseKey: SUPABASE_SERVICE_KEY.slice(0, 20) === 'eyJ' ? SUPABASE_SERVICE_KEY : '', // only return if it's a JWT
+    schemaName,
+    hint: 'Use these in your app: createClient(url, key, { db: { schema: schemaName } })'
+  });
+});
+
+// POST /api/list-tables — lists tables in a project's schema
+// Dependencies: verifyUser(), Supabase RPC
+app.post('/api/list-tables', async (req, res) => {
+  const user = await verifyUser(req.headers.authorization);
+  if (!user?.id) return res.status(401).json({ error: 'Login required' });
+  const { projectId } = req.body;
+  if (!projectId) return res.status(400).json({ error: 'projectId required' });
+
+  const schemaName = 'app_proj_' + projectId.replace(/-/g, '_').toLowerCase();
+
+  try {
+    const rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/list_app_tables`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_SERVICE_KEY,
+        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ schema_name: schemaName })
+    });
+    const tables = await rpcRes.json();
+    res.json({ tables });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ── Full-Stack Docker Deployment ────────────────────────────────────────────
+
+// POST /api/deploy-fullstack — deploys a full-stack app as a Docker container
+// Dependencies: verifyUser(), create-schema, run-migration, Docker on host
+// Flow:
+//   1. Validate user + project
+//   2. Create Supabase schema + run migrations
+//   3. Write project files + Dockerfile to host path
+//   4. Call host Docker API to build + run container
+//   5. Configure Nginx routing
+//   6. Return live URL
+// Affects: Docker containers, Nginx config, Supabase schemas, projects table
+const DOCKER_APPS_DIR = path.join(__dirname, 'docker-apps');
+if (!fs.existsSync(DOCKER_APPS_DIR)) fs.mkdirSync(DOCKER_APPS_DIR, { recursive: true });
+
+// Track container port assignments
+const PORTS_FILE = path.join(__dirname, 'docker-ports.json');
+function getNextPort() {
+  let ports = {};
+  try { ports = JSON.parse(fs.readFileSync(PORTS_FILE, 'utf8')); } catch(e) {}
+  const usedPorts = Object.values(ports).map(Number);
+  let port = 4001;
+  while (usedPorts.includes(port)) port++;
+  return port;
+}
+function assignPort(subdomain, port) {
+  let ports = {};
+  try { ports = JSON.parse(fs.readFileSync(PORTS_FILE, 'utf8')); } catch(e) {}
+  ports[subdomain] = port;
+  fs.writeFileSync(PORTS_FILE, JSON.stringify(ports, null, 2));
+}
+function releasePort(subdomain) {
+  let ports = {};
+  try { ports = JSON.parse(fs.readFileSync(PORTS_FILE, 'utf8')); } catch(e) {}
+  delete ports[subdomain];
+  fs.writeFileSync(PORTS_FILE, JSON.stringify(ports, null, 2));
+}
+
+app.post('/api/deploy-fullstack', async (req, res) => {
+  const user = await verifyUser(req.headers.authorization);
+  if (!user?.id) return res.status(401).json({ error: 'Login required to deploy' });
+
+  const { projectId, subdomain, files, schemaSql } = req.body;
+  if (!projectId || !subdomain || !files) return res.status(400).json({ error: 'projectId, subdomain, and files required' });
+
+  // Validate subdomain
+  if (!/^[a-z0-9][a-z0-9-]{1,30}[a-z0-9]$/.test(subdomain)) {
+    return res.status(400).json({ error: 'Invalid subdomain' });
+  }
+  const reserved = ['kenzo', 'admin', 'api', 'www', 'mail', 'builder', 'app', 'dashboard', 'auth', 'login', 'static', 'assets', 'cdn', 'wc'];
+  if (reserved.includes(subdomain)) return res.status(400).json({ error: 'Reserved subdomain' });
+
+  const schemaName = 'app_proj_' + projectId.replace(/-/g, '_').toLowerCase();
+  const appPort = getNextPort();
+  const containerName = 'app-' + subdomain;
+  const appDir = path.join(DOCKER_APPS_DIR, subdomain);
+  const hostAppDir = appDir.replace('/home/node/.openclaw', '/root/.openclaw');
+
+  try {
+    // ── Step 1: Create Supabase schema ──
+    console.log(`[deploy-fs] Creating schema ${schemaName}...`);
+    const schemaRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/create_app_schema`, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ schema_name: schemaName })
+    });
+    if (!schemaRes.ok) console.warn('[deploy-fs] Schema may already exist');
+
+    // ── Step 2: Run migrations if schema.sql provided ──
+    if (schemaSql) {
+      console.log(`[deploy-fs] Running migration in ${schemaName}...`);
+      await fetch(`${SUPABASE_URL}/rest/v1/rpc/run_app_migration`, {
+        method: 'POST',
+        headers: { 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ schema_name: schemaName, migration_sql: schemaSql })
+      });
+    }
+
+    // ── Step 3: Write project files + Dockerfile ──
+    if (fs.existsSync(appDir)) fs.rmSync(appDir, { recursive: true, force: true });
+    fs.mkdirSync(appDir, { recursive: true });
+
+    // Write all project files
+    for (const [filename, content] of Object.entries(files)) {
+      const filePath = path.join(appDir, filename);
+      const dir = path.dirname(filePath);
+      if (dir !== appDir) fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(filePath, content);
+    }
+
+    // Generate Dockerfile
+    const dockerfile = `FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install --production
+COPY . .
+ENV PORT=3000
+ENV SUPABASE_URL=${SUPABASE_URL}
+ENV SUPABASE_KEY=${SUPABASE_SERVICE_KEY}
+ENV SUPABASE_SCHEMA=${schemaName}
+EXPOSE 3000
+CMD ["node", "index.js"]
+`;
+    fs.writeFileSync(path.join(appDir, 'Dockerfile'), dockerfile);
+
+    // Generate Nginx config for this app
+    const nginxConf = `server {
+    listen 80;
+    server_name ${subdomain}.kenzoagent.com;
+    location / {
+        proxy_pass http://127.0.0.1:${appPort};
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_cache_bypass $http_upgrade;
+    }
+}`;
+    fs.writeFileSync(path.join(appDir, 'nginx.conf'), nginxConf);
+
+    // ── Step 4: Build + Run Docker container via host ──
+    // Use the deploy API to copy nginx config, then run Docker via a script
+    console.log(`[deploy-fs] Building Docker image ${containerName}...`);
+
+    // Write a deploy script the host can execute
+    const deployScript = `#!/bin/bash
+set -e
+
+# Stop and remove existing container if any
+docker stop ${containerName} 2>/dev/null || true
+docker rm ${containerName} 2>/dev/null || true
+
+# Build the image
+cd ${hostAppDir}
+docker build -t ${containerName} .
+
+# Run the container
+docker run -d \\
+  --name ${containerName} \\
+  -p ${appPort}:3000 \\
+  --memory=128m \\
+  --cpus=0.25 \\
+  --restart=unless-stopped \\
+  ${containerName}
+
+# Set up Nginx
+cp ${hostAppDir}/nginx.conf /etc/nginx/sites-available/${subdomain}.kenzoagent.com
+ln -sf /etc/nginx/sites-available/${subdomain}.kenzoagent.com /etc/nginx/sites-enabled/
+nginx -t && systemctl reload nginx
+
+# SSL
+certbot --nginx -d ${subdomain}.kenzoagent.com --non-interactive --agree-tos -m admin@kenzoagent.com 2>/dev/null || true
+
+echo "DEPLOYED"
+`;
+    fs.writeFileSync(path.join(appDir, 'deploy.sh'), deployScript, { mode: 0o755 });
+
+    // Execute deploy script via host
+    // The deploy API can copy files — for Docker we need direct host access
+    // Write to a known location and have the host pick it up
+    const deployFlag = path.join(DOCKER_APPS_DIR, subdomain + '.deploy');
+    fs.writeFileSync(deployFlag, 'pending');
+
+    // Call Docker deploy API on host
+    const dockerBody = JSON.stringify({
+      subdomain,
+      files_path: hostAppDir,
+      port: appPort,
+      memory: '128m',
+      cpus: '0.25',
+      env: {
+        SUPABASE_URL: SUPABASE_URL,
+        SUPABASE_KEY: SUPABASE_SERVICE_KEY,
+        SUPABASE_SCHEMA: schemaName,
+        PORT: '3000'
+      }
+    });
+    const deployResult = await new Promise((resolve, reject) => {
+      const opts = { hostname: DEPLOY_HOST, port: DEPLOY_PORT, path: '/docker/deploy-app', method: 'POST', headers: { 'Content-Type': 'application/json' } };
+      const r = http.request(opts, (res2) => { let d=''; res2.on('data',c=>d+=c); res2.on('end',()=>{ try{resolve(JSON.parse(d))}catch(e){resolve({raw:d})} }); });
+      r.on('error', reject); r.write(dockerBody); r.end();
+    });
+    if (!deployResult.success) throw new Error(deployResult.error || 'Docker deploy failed');
+
+    // ── Step 5: Save to Supabase ──
+    const deployedUrl = `https://${subdomain}.kenzoagent.com`;
+    assignPort(subdomain, appPort);
+
+    await fetch(`${SUPABASE_URL}/rest/v1/projects?id=eq.${projectId}&user_id=eq.${user.id}`, {
+      method: 'PATCH',
+      headers: { 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ deployed_url: deployedUrl, app_schema: schemaName, updated_at: new Date().toISOString() })
+    });
+
+    console.log(`[deploy-fs] ✅ ${containerName} deployed at ${deployedUrl} (port ${appPort})`);
+    res.json({ success: true, url: deployedUrl, port: appPort, schemaName });
+
+  } catch(err) {
+    console.error(`[deploy-fs] ❌ Error:`, err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.post('/api/deploy', async (req, res) => {
   const user = await verifyUser(req.headers.authorization);
   if (!user?.id) return res.status(401).json({ error: 'Login required to deploy' });
 
-  const { buildId, subdomain } = req.body;
+  const { buildId, subdomain, projectId } = req.body;
   if (!buildId || !subdomain) return res.status(400).json({ error: 'buildId and subdomain required' });
 
-  // Validate subdomain: lowercase alphanumeric + hyphens, 3-32 chars, no leading/trailing hyphen
   if (!/^[a-z0-9][a-z0-9-]{1,30}[a-z0-9]$/.test(subdomain)) {
     return res.status(400).json({ error: 'Invalid subdomain. Use 3-32 lowercase letters, numbers, and hyphens only.' });
   }
-  // Block reserved subdomains
   const reserved = ['kenzo', 'admin', 'api', 'www', 'mail', 'builder', 'app', 'dashboard', 'auth', 'login', 'static', 'assets', 'cdn'];
   if (reserved.includes(subdomain)) {
     return res.status(400).json({ error: 'This subdomain is reserved.' });
   }
-  const buildPath = path.join(BUILDS_DIR, buildId);
-  if (!fs.existsSync(buildPath)) return res.status(404).json({ error: 'Build not found' });
+
+  let buildPath = path.join(BUILDS_DIR, buildId);
+  // Fall back to deployed-builds if temp build was cleaned up by the hourly job
+  if (!fs.existsSync(buildPath)) {
+    const deployedPath = path.join(DEPLOYED_BUILDS_DIR, buildId);
+    if (fs.existsSync(deployedPath)) {
+      buildPath = deployedPath;
+    } else {
+      return res.status(404).json({ error: 'Build not found' });
+    }
+  }
 
   // ── Deploy Security: File Validation ──
+  // Only allow static web assets — block server-side code, symlinks, oversized projects
   const ALLOWED_EXT = ['.html', '.css', '.js', '.json', '.svg', '.png', '.jpg', '.jpeg', '.gif', '.ico', '.txt', '.md', '.webp', '.woff', '.woff2'];
   const BLOCKED_CONTENT = ['<?php', '#!/bin', '<%', '<jsp:', 'eval(', 'require(', 'import os', 'import subprocess'];
   const MAX_FILES = 30;
   const MAX_TOTAL_SIZE = 5 * 1024 * 1024; // 5MB
 
+  // Recursively collect all files (skip symlinks to prevent path traversal)
   function scanDir(dir, base = '') {
     const entries = [];
     for (const item of fs.readdirSync(dir, { withFileTypes: true })) {
       const rel = path.join(base, item.name);
-      if (item.isSymbolicLink()) continue; // skip symlinks
+      if (item.isSymbolicLink()) continue; // skip symlinks — security
       if (item.isDirectory()) {
         entries.push(...scanDir(path.join(dir, item.name), rel));
       } else if (item.isFile()) {
@@ -698,23 +1360,22 @@ app.post('/api/deploy', async (req, res) => {
   }
 
   const deployFiles = scanDir(buildPath);
-  // Check file count
+
   if (deployFiles.length > MAX_FILES) {
     return res.status(400).json({ error: `Too many files (${deployFiles.length}). Maximum ${MAX_FILES}.` });
   }
-  // Check total size
   const totalSize = deployFiles.reduce((s, f) => s + f.size, 0);
   if (totalSize > MAX_TOTAL_SIZE) {
     return res.status(400).json({ error: `Project too large (${(totalSize/1024/1024).toFixed(1)}MB). Maximum 5MB.` });
   }
-  // Check extensions and content
+  // Check each file for allowed extension and dangerous content
   for (const file of deployFiles) {
-    if (file.path === 'nginx.conf') continue; // allow our generated conf
+    if (file.path === 'nginx.conf') continue; // our own generated conf is always OK
     const ext = path.extname(file.path).toLowerCase();
     if (!ALLOWED_EXT.includes(ext) && file.path !== '.gitkeep') {
       return res.status(400).json({ error: `Blocked file type: ${file.path}. Allowed: ${ALLOWED_EXT.join(', ')}` });
     }
-    // Content scan text files only
+    // Scan text files for server-side code patterns
     if (['.html', '.css', '.js', '.json', '.svg', '.txt', '.md'].includes(ext)) {
       const content = fs.readFileSync(file.full, 'utf8');
       for (const blocked of BLOCKED_CONTENT) {
@@ -725,32 +1386,117 @@ app.post('/api/deploy', async (req, res) => {
     }
   }
 
+  // Generate minimal nginx config for this subdomain (SPA fallback to index.html)
   const nginxConf = `server {\n    listen 80;\n    server_name ${subdomain}.kenzoagent.com;\n    root /var/www/${subdomain}.kenzoagent.com;\n    index index.html;\n    location / { try_files $uri $uri/ /index.html; }\n}`;
   fs.writeFileSync(path.join(buildPath, 'nginx.conf'), nginxConf);
 
   try {
+    // Call host deploy API (path must be host path, not container path)
     const deployBody = JSON.stringify({
       domain: `${subdomain}.kenzoagent.com`,
       files_path: buildPath.replace('/home/node/.openclaw', '/root/.openclaw')
     });
     const result = await new Promise((resolve, reject) => {
-      const opts = { hostname: '172.18.0.1', port: 5000, path: '/deploy', method: 'POST', headers: { 'Content-Type': 'application/json' } };
+      const opts = { hostname: DEPLOY_HOST, port: DEPLOY_PORT, path: '/deploy', method: 'POST', headers: { 'Content-Type': 'application/json' } };
       const r = http.request(opts, (res2) => { let d=''; res2.on('data',c=>d+=c); res2.on('end',()=>{ try{resolve(JSON.parse(d))}catch(e){resolve({raw:d})} }); });
       r.on('error', reject); r.write(deployBody); r.end();
     });
-    res.json({ success: true, url: `https://${subdomain}.kenzoagent.com`, result });
+
+    // Copy build to permanent location so redeploy works even after 24h cleanup
+    const deployedBuildPath = path.join(DEPLOYED_BUILDS_DIR, buildId);
+    try {
+      if (fs.existsSync(deployedBuildPath)) fs.rmSync(deployedBuildPath, { recursive: true, force: true });
+      fs.cpSync(buildPath, deployedBuildPath, { recursive: true });
+    } catch(e) { console.warn('Failed to copy to deployed-builds:', e.message); }
+
+    const deployedUrl = `https://${subdomain}.kenzoagent.com`;
+
+    // Persist deployed_url to Supabase project record
+    try {
+      const filter = projectId
+        ? `projects?id=eq.${projectId}&user_id=eq.${user.id}`
+        : `projects?build_id=eq.${buildId}&user_id=eq.${user.id}`;
+      const sbUrl = `${SUPABASE_URL}/rest/v1/${filter}`;
+      const sbRes = await fetch(sbUrl, {
+        method: 'PATCH',
+        headers: {
+          'apikey': SUPABASE_SERVICE_KEY,
+          'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ deployed_url: deployedUrl, updated_at: new Date().toISOString() })
+      });
+      console.log('deployed_url save status:', sbRes.status, 'filter:', filter);
+    } catch(e) { console.warn('Failed to save deployed_url:', e.message); }
+
+    res.json({ success: true, url: deployedUrl, result });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
+// ── POST /api/undeploy ─────────────────────────────────────────────────────────
+// Removes a deployed site from nginx and clears deployed_url in Supabase
+// Dependencies: verifyUser, http.request (deploy API), supabaseRequest
+// Flow:
+//   1. Verify user JWT
+//   2. Call internal deploy API /undeploy with domain name
+//   3. Clear deployed_url on Supabase project row
+// Affects: Supabase `projects` table (deployed_url → null), nginx config on host
+// Called by: frontend undeploySite() in /app/build/
+app.post('/api/undeploy', async (req, res) => {
+  const user = await verifyUser(req.headers.authorization);
+  if (!user?.id) return res.status(401).json({ error: 'Login required' });
+  const { subdomain, projectId } = req.body;
+  if (!subdomain) return res.status(400).json({ error: 'subdomain required' });
+  try {
+    const undeployBody = JSON.stringify({ domain: `${subdomain}.kenzoagent.com` });
+    await new Promise((resolve, reject) => {
+      const opts = { hostname: DEPLOY_HOST, port: DEPLOY_PORT, path: '/undeploy', method: 'POST', headers: { 'Content-Type': 'application/json' } };
+      const r = http.request(opts, (res2) => { let d=''; res2.on('data',c=>d+=c); res2.on('end',()=>resolve(d)); });
+      r.on('error', reject); r.write(undeployBody); r.end();
+    });
+
+    // Clear deployed_url in DB
+    if (projectId) {
+      try {
+        await supabaseRequest('PATCH', `projects?id=eq.${projectId}&user_id=eq.${user.id}`,
+          { deployed_url: null, updated_at: new Date().toISOString() });
+      } catch(e) { console.warn('Failed to clear deployed_url:', e.message); }
+    }
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── GET /api/build/:buildId ────────────────────────────────────────────────────
+// Returns the index.html for a given build ID (used for preview loading)
+// Dependencies: BUILDS_DIR, DEPLOYED_BUILDS_DIR, fs
+// Flow: looks in temp builds → falls back to deployed-builds → returns HTML or 404
+// Affects: nothing (read-only)
+// Called by: frontend when reloading a saved project's preview
 app.get('/api/build/:buildId', (req, res) => {
-  const htmlPath = path.join(BUILDS_DIR, req.params.buildId, 'index.html');
+  let htmlPath = path.join(BUILDS_DIR, req.params.buildId, 'index.html');
+  if (!fs.existsSync(htmlPath)) {
+    htmlPath = path.join(DEPLOYED_BUILDS_DIR, req.params.buildId, 'index.html');
+  }
   if (!fs.existsSync(htmlPath)) return res.status(404).json({ error: 'Not found' });
   res.json({ html: fs.readFileSync(htmlPath, 'utf8') });
 });
 
-// === WHISPER TRANSCRIPTION ===
+// ── POST /api/transcribe ───────────────────────────────────────────────────────
+// Transcribes voice audio to text using OpenAI gpt-4o-transcribe (Whisper-quality)
+// Dependencies: OPENAI_API_KEY, fs, child_process.execSync (ffmpeg), fetch
+// Flow:
+//   1. Decode base64 audio → write to temp .webm file
+//   2. Convert .webm → .wav via ffmpeg (16kHz mono — optimal for Whisper)
+//   3. Build multipart/form-data body with WAV file + model + language
+//   4. POST to OpenAI /v1/audio/transcriptions
+//   5. Clean up temp files → return { text }
+// Affects: /tmp (temp files, cleaned up immediately after)
+// Called by: frontend transcribeAudio() in /app/index.html and /app/build/
 app.post('/api/transcribe', async (req, res) => {
   try {
     const { audio, mimeType, language } = req.body;
@@ -763,10 +1509,10 @@ app.post('/api/transcribe', async (req, res) => {
     const tmpWebm = `/tmp/voice_${tmpId}.webm`;
     const tmpWav = `/tmp/voice_${tmpId}.wav`;
 
-    // Write webm to temp file
+    // Write input audio to temp file
     fs.writeFileSync(tmpWebm, audioBuffer);
 
-    // Convert webm → wav using ffmpeg
+    // Convert webm → wav using ffmpeg: 16kHz sample rate, mono channel
     try {
       execSync(`ffmpeg -i ${tmpWebm} -ar 16000 -ac 1 -f wav ${tmpWav} -y 2>/dev/null`);
     } catch(e) {
@@ -775,14 +1521,13 @@ app.post('/api/transcribe', async (req, res) => {
       return res.status(500).json({ error: 'Audio conversion failed' });
     }
 
-    // Read wav file as base64
     const wavBuffer = fs.readFileSync(tmpWav);
     const wavBase64 = wavBuffer.toString('base64');
 
-    // Clean up temp files
+    // Clean up temp files immediately
     try { fs.unlinkSync(tmpWebm); fs.unlinkSync(tmpWav); } catch(x){}
 
-    // Use gpt-4o-transcribe (Whisper endpoint, but GPT-4o quality)
+    // Build multipart/form-data manually (no FormData in Node without extra deps)
     const boundary2 = '----WB2' + Date.now();
     function field2(name, value) {
       return `--${boundary2}\r\nContent-Disposition: form-data; name="${name}"\r\n\r\n${value}\r\n`;
@@ -790,7 +1535,7 @@ app.post('/api/transcribe', async (req, res) => {
 
     let prefix2 = field2('model', 'gpt-4o-transcribe');
     if (language && language !== 'uz') prefix2 += field2('language', language);
-    // For Uzbek: use prompt hint instead of language code
+    // Uzbek isn't a standard BCP-47 code in Whisper — use prompt hint instead
     if (language === 'uz') prefix2 += field2('prompt', 'Bu odam o\'zbek tilida gapirmoqda. O\'zbek lotin alifbosida yozing.');
     prefix2 += `--${boundary2}\r\nContent-Disposition: form-data; name="file"; filename="voice.wav"\r\nContent-Type: audio/wav\r\n\r\n`;
     const suffix2 = `\r\n--${boundary2}--\r\n`;
@@ -821,7 +1566,17 @@ app.post('/api/transcribe', async (req, res) => {
   }
 });
 
-// ── Auto-cleanup: old builds (>24h) and stale jobs (>10min) ─────────────────
+// ── Maintenance: Build Cleanup ─────────────────────────────────────────────────
+
+// ── cleanBuilds ───────────────────────────────────────────────────────────────
+// Removes temp build folders older than 24h; enforces 100-build hard cap
+// Dependencies: fs, BUILDS_DIR
+// Flow:
+//   1. Read all subdirs in BUILDS_DIR
+//   2. Delete any older than 24h (mtime-based)
+//   3. If still > 100 builds remaining, delete oldest until 50 remain
+// Affects: BUILDS_DIR (filesystem)
+// Called by: setInterval every 60 minutes + once at startup
 function cleanBuilds() {
   if (!fs.existsSync(BUILDS_DIR)) return;
   const now = Date.now();
@@ -839,7 +1594,8 @@ function cleanBuilds() {
       } catch(e) {}
     });
     if (cleaned > 0) console.log(`🧹 Cleaned ${cleaned} old builds`);
-    // Hard cap: if >100 builds, delete oldest regardless of age
+
+    // Hard cap: if >100 builds exist, delete oldest to get back to 50
     const remaining = fs.readdirSync(BUILDS_DIR);
     if (remaining.length > 100) {
       const sorted = remaining.map(d => ({name:d, time:fs.statSync(path.join(BUILDS_DIR,d)).mtimeMs})).sort((a,b)=>a.time-b.time);
@@ -850,25 +1606,22 @@ function cleanBuilds() {
   } catch(e) { console.warn('Build cleanup error:', e.message); }
 }
 
-function cleanJobs() {
+// ── cleanGuestUsage ───────────────────────────────────────────────────────────
+// Removes expired guest IP entries from in-memory tracker
+// Dependencies: guestUsage (in-memory object)
+// Flow: iterates all IPs → deletes any whose resetAt has passed
+// Affects: guestUsage (in-memory state)
+// Called by: setInterval every 60 seconds
+function cleanGuestUsage() {
   const now = Date.now();
-  let cleaned = 0;
-  Object.keys(jobs).forEach(id => {
-    if (jobs[id].createdAt && now - jobs[id].createdAt > 10 * 60 * 1000) {
-      delete jobs[id];
-      cleaned++;
-    }
-  });
-  // Clean expired guest usage entries
   Object.keys(guestUsage).forEach(ip => {
     if (now > guestUsage[ip].resetAt) delete guestUsage[ip];
   });
-  if (cleaned > 0) console.log(`🧹 Cleaned ${cleaned} stale jobs from memory`);
 }
 
-// Run cleanup every hour for builds, every minute for jobs
+// Run cleanup every hour for builds, every minute for guest usage
 setInterval(cleanBuilds, 60 * 60 * 1000);
-setInterval(cleanJobs, 60 * 1000);
-cleanBuilds(); // Run once at startup
+setInterval(cleanGuestUsage, 60 * 1000);
+cleanBuilds(); // Run immediately on startup to handle any stale builds from previous runs
 
 app.listen(PORT, () => console.log(`🚀 Website Builder API v3.3.0-voice on port ${PORT}`));

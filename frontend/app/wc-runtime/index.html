@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WebContainer Runtime</title>
+  <!--
+    ============================================================
+    WebContainer Runtime — Isolated Sandbox Page
+    ============================================================
+    Purpose:
+      This page boots a WebContainer (in-browser Node.js runtime)
+      and exposes it to the parent builder page via postMessage.
+
+    Why isolated:
+      WebContainers require SharedArrayBuffer, which requires
+      COEP (Cross-Origin-Embedder-Policy: credentialless) and
+      COOP (Cross-Origin-Opener-Policy: same-origin) headers.
+      These headers break Supabase auth and CDN resources, so
+      the WebContainer runs in a SEPARATE isolated iframe served
+      from /app/wc-runtime/ (which has the headers) while the
+      main builder page does NOT have them.
+
+    Communication protocol (postMessage):
+      Parent → Runtime: { type, id, payload }
+      Runtime → Parent: { type, id, [data/exitCode/error] }
+
+    Supported message types:
+      boot      — boots the WebContainer instance
+      mount     — mounts file system (object of { file: {contents} })
+      spawn     — runs a command (waits for exit)
+      spawn-bg  — runs a command without waiting (e.g. npm start)
+      server-ready — emitted by wc.on('server-ready'), forwarded to parent
+      runtime-ready — emitted once boot() succeeds, tells parent we're live
+
+    Security:
+      - Only accepts messages from window.location.origin
+      - Re-tries boot up to 3 times if a stale instance error occurs
+      - 120s timeout on all wc operations (enforced by wcSend on parent side)
+    ============================================================
+  -->
+  <script type="module">
+    import { WebContainer } from 'https://esm.sh/@webcontainer/api';
+
+    // Singleton WebContainer instance — shared across all operations
+    let wc = null;
+
+    // How many times we've retried boot (stale instance recovery)
+    let bootAttempts = 0;
+
+    // ── boot ──────────────────────────────────────────────────────────────────
+    // Boots the WebContainer singleton (idempotent — returns existing instance)
+    // Dependencies: WebContainer.boot from @webcontainer/api
+    // Flow:
+    //   1. Return existing wc if already booted
+    //   2. Call WebContainer.boot({ coep: 'credentialless' })
+    //   3. On "more instances" error: wait 2s and retry up to 3 times
+    //      (stale GC issue — browser keeps old instance briefly after reload)
+    // Affects: `wc` module-level singleton
+    // Called by: all message handlers + auto-boot at bottom of script
+    async function boot() {
+      if (wc) return wc;
+      try {
+        wc = await WebContainer.boot({ coep: 'credentialless' });
+        return wc;
+      } catch(e) {
+        // "more instances" error: previous instance not yet garbage-collected
+        if (e.message && e.message.includes('more instances') && bootAttempts < 3) {
+          bootAttempts++;
+          // Wait for stale instance to be garbage collected
+          await new Promise(r => setTimeout(r, 2000));
+          return boot();
+        }
+        throw e;
+      }
+    }
+
+    // ── message listener ──────────────────────────────────────────────────────
+    // Central command handler — receives postMessage from parent builder page
+    // Dependencies: boot(), wc.mount(), wc.spawn()
+    // Flow: validates origin → dispatches on type → posts result back to parent
+    // Affects: wc filesystem and running processes
+    // Called by: parent page wcSend() (builder /app/build/index.html)
+    window.addEventListener('message', async (e) => {
+      // Security: only accept messages from the same origin (builder page)
+      if (e.origin !== window.location.origin) return;
+
+      const { type, id, payload } = e.data;
+      if (!type) return;
+
+      try {
+
+        // ── boot command ─────────────────────────────────────────────────────
+        // Boots the WebContainer and signals readiness to parent
+        // Called by: parent before any other operations
+        if (type === 'boot') {
+          await boot();
+          parent.postMessage({ type: 'boot-ready', id }, '*');
+        }
+
+        // ── mount command ────────────────────────────────────────────────────
+        // Mounts a virtual file system into the WebContainer
+        // payload.files: WebContainer FS object { path: { file: { contents } } }
+        // Called by: parent runInWebContainer() after generating project files
+        if (type === 'mount') {
+          await boot();
+          await wc.mount(payload.files);
+          parent.postMessage({ type: 'mount-done', id }, '*');
+        }
+
+        // ── spawn command ────────────────────────────────────────────────────
+        // Spawns a process and WAITS for it to exit (e.g. npm install)
+        // payload.cmd: command string, payload.args: string[]
+        // Streams stdout/stderr back as 'output' events during execution
+        // Called by: parent runInWebContainer() for npm install step
+        if (type === 'spawn') {
+          await boot();
+          const proc = await wc.spawn(payload.cmd, payload.args || []);
+          // Stream stdout/stderr to parent terminal in real-time
+          proc.output.pipeTo(new WritableStream({
+            write(data) {
+              parent.postMessage({ type: 'output', id, data: data }, '*');
+            }
+          }));
+          const exitCode = await proc.exit; // wait for process to finish
+          parent.postMessage({ type: 'exit', id, exitCode }, '*');
+        }
+
+        // ── spawn-bg command ─────────────────────────────────────────────────
+        // Spawns a process WITHOUT waiting for exit (e.g. npm start)
+        // Parent receives 'spawned' immediately; server-ready fires when port opens
+        // Called by: parent runInWebContainer() for npm start step
+        if (type === 'spawn-bg') {
+          await boot();
+          const proc = await wc.spawn(payload.cmd, payload.args || []);
+          // Continue streaming output even though we don't wait for exit
+          proc.output.pipeTo(new WritableStream({
+            write(data) {
+              parent.postMessage({ type: 'output', id, data: data }, '*');
+            }
+          }));
+          parent.postMessage({ type: 'spawned', id }, '*');
+        }
+
+      } catch (err) {
+        // Report any error back to the parent with the matching message id
+        parent.postMessage({ type: 'error', id, error: err.message }, '*');
+      }
+    });
+
+    // ── Auto-boot & server-ready forwarding ──────────────────────────────────
+    // Boots immediately on page load and subscribes to server-ready events
+    // Dependencies: boot(), wc.on('server-ready')
+    // Flow:
+    //   1. Boot WebContainer on load
+    //   2. Register server-ready listener — fires when Express/Node starts listening
+    //   3. Forward server-ready to parent (includes port + internal URL)
+    //   4. Tell parent runtime is ready ('runtime-ready')
+    // Called by: automatically on iframe load
+    (async function() {
+      await boot();
+
+      // Forward server-ready (port, url) to parent so it can display the preview
+      wc.on('server-ready', (port, url) => {
+        parent.postMessage({ type: 'server-ready', port, url }, '*');
+      });
+
+      // Signal to parent that runtime is booted and accepting commands
+      parent.postMessage({ type: 'runtime-ready' }, '*');
+    })();
+  </script>
+</head>
+<body></body>
+</html>
