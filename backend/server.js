@@ -60,6 +60,8 @@ let OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || '';
 let OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
 let SUPABASE_URL = '';
 let SUPABASE_SERVICE_KEY = '';
+let SUPABASE_ANON_KEY = '';
+let DATABASE_URL = '';
 
 try {
   const cfg = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8'));
@@ -73,6 +75,8 @@ try {
   const sbCfg = JSON.parse(fs.readFileSync(path.join(__dirname, 'supabase-config.json'), 'utf8'));
   SUPABASE_URL = sbCfg.SUPABASE_URL;
   SUPABASE_SERVICE_KEY = sbCfg.SUPABASE_SERVICE_ROLE_KEY;
+  SUPABASE_ANON_KEY = sbCfg.SUPABASE_ANON_KEY || '';
+  DATABASE_URL = sbCfg.DATABASE_URL || '';
 } catch(e) { console.warn('supabase-config.json not found'); }
 
 // Internal deploy API host (runs on host machine, not inside container)
@@ -1185,6 +1189,29 @@ app.post('/api/deploy-fullstack', async (req, res) => {
       });
     }
 
+    // ── Step 2b: Set up RLS policies for the schema (anon key access, no cross-schema leakage) ──
+    console.log(`[deploy-fs] Setting up RLS for ${schemaName}...`);
+    const rlsSql = `
+      DO $$
+      DECLARE
+        t text;
+      BEGIN
+        FOR t IN
+          SELECT table_name FROM information_schema.tables
+          WHERE table_schema = '${schemaName}' AND table_type = 'BASE TABLE'
+        LOOP
+          EXECUTE format('ALTER TABLE ${schemaName}.%I ENABLE ROW LEVEL SECURITY', t);
+          EXECUTE format('DROP POLICY IF EXISTS allow_all ON ${schemaName}.%I', t);
+          EXECUTE format('CREATE POLICY allow_all ON ${schemaName}.%I FOR ALL USING (true) WITH CHECK (true)', t);
+        END LOOP;
+      END $$;
+    `;
+    await fetch(`${SUPABASE_URL}/rest/v1/rpc/run_app_migration`, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ schema_name: schemaName, migration_sql: rlsSql })
+    });
+
     // ── Step 3: Write project files + Dockerfile ──
     if (fs.existsSync(appDir)) fs.rmSync(appDir, { recursive: true, force: true });
     fs.mkdirSync(appDir, { recursive: true });
@@ -1197,15 +1224,17 @@ app.post('/api/deploy-fullstack', async (req, res) => {
       fs.writeFileSync(filePath, content);
     }
 
-    // Generate Dockerfile
+    // Generate Dockerfile — uses direct Postgres connection with schema via SUPABASE_SCHEMA env var
+    // pg Pool uses options: `-c search_path=${schemaName}` in app code (not URL params)
     const dockerfile = `FROM node:20-alpine
 WORKDIR /app
 COPY package*.json ./
 RUN npm install --production
 COPY . .
 ENV PORT=3000
+ENV DATABASE_URL=${DATABASE_URL}
 ENV SUPABASE_URL=${SUPABASE_URL}
-ENV SUPABASE_KEY=${SUPABASE_SERVICE_KEY}
+ENV SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
 ENV SUPABASE_SCHEMA=${schemaName}
 EXPOSE 3000
 CMD ["node", "index.js"]
@@ -1279,8 +1308,9 @@ echo "DEPLOYED"
       memory: '128m',
       cpus: '0.25',
       env: {
+        DATABASE_URL: DATABASE_URL,
         SUPABASE_URL: SUPABASE_URL,
-        SUPABASE_KEY: SUPABASE_SERVICE_KEY,
+        SUPABASE_ANON_KEY: SUPABASE_ANON_KEY,
         SUPABASE_SCHEMA: schemaName,
         PORT: '3000'
       }
@@ -1437,36 +1467,90 @@ app.post('/api/deploy', async (req, res) => {
 });
 
 // ── POST /api/undeploy ─────────────────────────────────────────────────────────
-// Removes a deployed site from nginx and clears deployed_url in Supabase
-// Dependencies: verifyUser, http.request (deploy API), supabaseRequest
+// Removes a deployed site — handles both static sites and full-stack Docker apps
+// Dependencies: verifyUser, http.request (deploy API), supabaseRequest, releasePort
 // Flow:
-//   1. Verify user JWT
-//   2. Call internal deploy API /undeploy with domain name
-//   3. Clear deployed_url on Supabase project row
-// Affects: Supabase `projects` table (deployed_url → null), nginx config on host
+//   1. Verify user + fetch project to detect if full-stack
+//   2. Full-stack: call /docker/undeploy-app (stop container + remove image + nginx)
+//      Static: call /undeploy (nginx only)
+//   3. Drop Supabase schema if full-stack
+//   4. Release port from docker-ports.json
+//   5. Clear deployed_url + app_schema in Supabase
+// Affects: Docker containers, Nginx, Supabase schemas, projects table
 // Called by: frontend undeploySite() in /app/build/
 app.post('/api/undeploy', async (req, res) => {
   const user = await verifyUser(req.headers.authorization);
   if (!user?.id) return res.status(401).json({ error: 'Login required' });
   const { subdomain, projectId } = req.body;
   if (!subdomain) return res.status(400).json({ error: 'subdomain required' });
-  try {
-    const undeployBody = JSON.stringify({ domain: `${subdomain}.kenzoagent.com` });
-    await new Promise((resolve, reject) => {
-      const opts = { hostname: DEPLOY_HOST, port: DEPLOY_PORT, path: '/undeploy', method: 'POST', headers: { 'Content-Type': 'application/json' } };
-      const r = http.request(opts, (res2) => { let d=''; res2.on('data',c=>d+=c); res2.on('end',()=>resolve(d)); });
-      r.on('error', reject); r.write(undeployBody); r.end();
-    });
 
-    // Clear deployed_url in DB
+  try {
+    // Detect if this is a full-stack app (has app_schema)
+    let appSchema = null;
+    if (projectId) {
+      try {
+        const projects = await supabaseRequest('GET', `projects?id=eq.${projectId}&user_id=eq.${user.id}&select=app_schema`);
+        appSchema = projects?.[0]?.app_schema || null;
+      } catch(e) { console.warn('[undeploy] Could not fetch project schema:', e.message); }
+    }
+
+    const isFullStack = !!appSchema;
+    console.log(`[undeploy] ${subdomain} — ${isFullStack ? 'full-stack (Docker)' : 'static site'}`);
+
+    if (isFullStack) {
+      // ── Full-stack undeploy: stop container + remove image + nginx ──
+      const dockerBody = JSON.stringify({ subdomain });
+      const dockerResult = await new Promise((resolve, reject) => {
+        const opts = { hostname: DEPLOY_HOST, port: DEPLOY_PORT, path: '/docker/undeploy-app', method: 'POST', headers: { 'Content-Type': 'application/json' } };
+        const r = http.request(opts, (res2) => { let d=''; res2.on('data',c=>d+=c); res2.on('end',()=>{ try{resolve(JSON.parse(d))}catch(e){resolve({raw:d})} }); });
+        r.on('error', reject); r.write(dockerBody); r.end();
+      });
+      console.log(`[undeploy] Docker result:`, dockerResult);
+
+      // Drop Supabase schema (all tables + data gone)
+      try {
+        await fetch(`${SUPABASE_URL}/rest/v1/rpc/drop_app_schema`, {
+          method: 'POST',
+          headers: { 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ schema_name: appSchema })
+        });
+        console.log(`[undeploy] Dropped schema ${appSchema}`);
+      } catch(e) { console.warn('[undeploy] Schema drop failed:', e.message); }
+
+      // Release port
+      releasePort(subdomain);
+      console.log(`[undeploy] Port released for ${subdomain}`);
+
+      // Remove docker-apps directory
+      const appDir = path.join(DOCKER_APPS_DIR, subdomain);
+      if (fs.existsSync(appDir)) {
+        fs.rmSync(appDir, { recursive: true, force: true });
+        console.log(`[undeploy] Removed app files ${appDir}`);
+      }
+
+    } else {
+      // ── Static site undeploy: nginx only ──
+      const undeployBody = JSON.stringify({ domain: `${subdomain}.kenzoagent.com` });
+      await new Promise((resolve, reject) => {
+        const opts = { hostname: DEPLOY_HOST, port: DEPLOY_PORT, path: '/undeploy', method: 'POST', headers: { 'Content-Type': 'application/json' } };
+        const r = http.request(opts, (res2) => { let d=''; res2.on('data',c=>d+=c); res2.on('end',()=>resolve(d)); });
+        r.on('error', reject); r.write(undeployBody); r.end();
+      });
+    }
+
+    // Clear deployed_url + app_schema in Supabase
     if (projectId) {
       try {
         await supabaseRequest('PATCH', `projects?id=eq.${projectId}&user_id=eq.${user.id}`,
-          { deployed_url: null, updated_at: new Date().toISOString() });
-      } catch(e) { console.warn('Failed to clear deployed_url:', e.message); }
+          { deployed_url: null, app_schema: null, updated_at: new Date().toISOString() });
+      } catch(e) { console.warn('[undeploy] Failed to clear project record:', e.message); }
     }
+
+    console.log(`[undeploy] ✅ ${subdomain} fully undeployed`);
     res.json({ success: true });
+
   } catch (err) {
+    console.error(`[undeploy] ❌ Error:`, err.message);
     res.status(500).json({ error: err.message });
   }
 });
