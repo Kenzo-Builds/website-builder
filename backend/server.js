@@ -24,6 +24,24 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
+const { Pool: PgPool } = require('pg');
+
+// Direct Postgres connection for admin operations (CREATE USER, GRANT, etc.)
+// Only used server-side for deploy/undeploy — never exposed to user apps
+let adminPool = null;
+try {
+  const sbCfg = JSON.parse(require('fs').readFileSync(require('path').join(__dirname, 'supabase-config.json'), 'utf8'));
+  if (sbCfg.DATABASE_URL) {
+    adminPool = new PgPool({
+      connectionString: sbCfg.DATABASE_URL,
+      ssl: { rejectUnauthorized: false },
+      max: 3 // small pool — only used for deploy/undeploy admin ops
+    });
+    adminPool.on('error', (err) => console.warn('Admin pool error:', err.message));
+    console.log('✅ Admin Postgres pool ready');
+  }
+} catch(e) { console.warn('Admin pool not initialized:', e.message); }
+
 const app = express();
 // Trust the first nginx reverse proxy for accurate IP extraction
 app.set('trust proxy', 1);
@@ -267,6 +285,12 @@ app.post('/api/auth/signup', signupLimiter, async (req, res) => {
 app.get('/api/usage', async (req, res) => {
   const user = await verifyUser(req.headers.authorization);
   if (!user) return res.json({ plan: 'guest', used: 0, limit: PLAN_LIMITS.guest });
+
+  // Admin bypass — unlimited builds, no counter shown
+  if (ADMIN_USERS.includes(user.id)) {
+    const used = await getMonthlyUsage(user.id);
+    return res.json({ plan: 'admin', used, limit: 'unlimited', remaining: 'unlimited' });
+  }
 
   const plan = await getUserPlan(user.id);
   const used = await getMonthlyUsage(user.id);
@@ -939,6 +963,8 @@ app.post('/api/delete-project', async (req, res) => {
             r.on('error', reject); r.write(dockerBody); r.end();
           });
           // Drop Supabase schema
+          // Drop per-app DB user
+          try { await dropAppDbUser(appSchema); } catch(e) { console.warn('[delete] DB user drop failed:', e.message); }
           try {
             await fetch(`${SUPABASE_URL}/rest/v1/rpc/drop_app_schema`, {
               method: 'POST',
@@ -1144,6 +1170,67 @@ app.post('/api/list-tables', async (req, res) => {
 
 // ── Full-Stack Docker Deployment ────────────────────────────────────────────
 
+// ── createAppDbUser ────────────────────────────────────────────────────────────
+// Creates an isolated Postgres user for a deployed app with access ONLY to its schema
+// Dependencies: adminPool (direct Postgres connection with master credentials)
+// Flow: CREATE USER → GRANT USAGE ON SCHEMA → GRANT ALL ON TABLES → ALTER DEFAULT PRIVILEGES
+// Returns: { username, password } or throws on failure
+async function createAppDbUser(schemaName) {
+  if (!adminPool) throw new Error('Admin Postgres pool not available');
+  
+  const username = schemaName; // e.g. app_proj_abc123
+  const password = require('crypto').randomBytes(24).toString('base64url'); // strong random password
+  
+  const client = await adminPool.connect();
+  try {
+    // Drop existing user if any (idempotent redeploy)
+    await client.query(`DO $$ BEGIN
+      IF EXISTS (SELECT FROM pg_roles WHERE rolname = '${username}') THEN
+        EXECUTE format('REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA %I FROM %I', '${schemaName}', '${username}');
+        EXECUTE format('REVOKE USAGE ON SCHEMA %I FROM %I', '${schemaName}', '${username}');
+        EXECUTE format('DROP USER %I', '${username}');
+      END IF;
+    END $$;`);
+    
+    // Create user with login
+    await client.query(`CREATE USER "${username}" WITH LOGIN PASSWORD '${password}'`);
+    
+    // Grant schema access (only this schema, nothing else)
+    await client.query(`GRANT USAGE ON SCHEMA "${schemaName}" TO "${username}"`);
+    await client.query(`GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA "${schemaName}" TO "${username}"`);
+    await client.query(`GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA "${schemaName}" TO "${username}"`);
+    await client.query(`ALTER DEFAULT PRIVILEGES IN SCHEMA "${schemaName}" GRANT ALL ON TABLES TO "${username}"`);
+    await client.query(`ALTER DEFAULT PRIVILEGES IN SCHEMA "${schemaName}" GRANT ALL ON SEQUENCES TO "${username}"`);
+    
+    console.log(`[deploy-fs] Created DB user ${username} with schema-scoped access`);
+    return { username, password };
+  } finally {
+    client.release();
+  }
+}
+
+// ── dropAppDbUser ────────────────────────────────────────────────────────────
+// Removes the per-app Postgres user during undeploy
+async function dropAppDbUser(schemaName) {
+  if (!adminPool) return;
+  const username = schemaName;
+  const client = await adminPool.connect();
+  try {
+    await client.query(`DO $$ BEGIN
+      IF EXISTS (SELECT FROM pg_roles WHERE rolname = '${username}') THEN
+        EXECUTE format('REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA %I FROM %I', '${schemaName}', '${username}');
+        EXECUTE format('REVOKE USAGE ON SCHEMA %I FROM %I', '${schemaName}', '${username}');
+        EXECUTE format('DROP USER %I', '${username}');
+      END IF;
+    END $$;`);
+    console.log(`[undeploy] Dropped DB user ${username}`);
+  } catch(e) {
+    console.warn(`[undeploy] Failed to drop DB user ${username}:`, e.message);
+  } finally {
+    client.release();
+  }
+}
+
 // POST /api/deploy-fullstack — deploys a full-stack app as a Docker container
 // Dependencies: verifyUser(), create-schema, run-migration, Docker on host
 // Flow:
@@ -1243,6 +1330,23 @@ app.post('/api/deploy-fullstack', async (req, res) => {
       body: JSON.stringify({ schema_name: schemaName, migration_sql: rlsSql })
     });
 
+    // ── Step 2c: Create per-app Postgres user with schema-scoped access ──
+    let appDbUser = null;
+    try {
+      appDbUser = await createAppDbUser(schemaName);
+      console.log(`[deploy-fs] Per-app DB user created: ${schemaName}`);
+    } catch(e) {
+      console.warn(`[deploy-fs] Per-app DB user failed (falling back to master):`, e.message);
+    }
+
+    // Build per-app DATABASE_URL (uses per-app credentials if available, master as fallback)
+    let appDatabaseUrl = DATABASE_URL;
+    if (appDbUser) {
+      // Extract host/port/db from master DATABASE_URL and build with per-app credentials
+      const dbUrlParts = new URL(DATABASE_URL);
+      appDatabaseUrl = `postgresql://${encodeURIComponent(appDbUser.username)}:${encodeURIComponent(appDbUser.password)}@${dbUrlParts.host}${dbUrlParts.pathname}`;
+    }
+
     // ── Step 3: Write project files + Dockerfile ──
     if (fs.existsSync(appDir)) fs.rmSync(appDir, { recursive: true, force: true });
     fs.mkdirSync(appDir, { recursive: true });
@@ -1263,7 +1367,7 @@ COPY package*.json ./
 RUN npm install --production
 COPY . .
 ENV PORT=3000
-ENV DATABASE_URL=${DATABASE_URL}
+ENV DATABASE_URL=${appDatabaseUrl}
 ENV SUPABASE_URL=${SUPABASE_URL}
 ENV SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
 ENV SUPABASE_SCHEMA=${schemaName}
@@ -1339,7 +1443,7 @@ echo "DEPLOYED"
       memory: '128m',
       cpus: '0.25',
       env: {
-        DATABASE_URL: DATABASE_URL,
+        DATABASE_URL: appDatabaseUrl,
         SUPABASE_URL: SUPABASE_URL,
         SUPABASE_ANON_KEY: SUPABASE_ANON_KEY,
         SUPABASE_SCHEMA: schemaName,
@@ -1357,10 +1461,15 @@ echo "DEPLOYED"
     const deployedUrl = `https://${subdomain}.kenzoagent.com`;
     assignPort(subdomain, appPort);
 
+    const projectUpdate = { deployed_url: deployedUrl, app_schema: schemaName, updated_at: new Date().toISOString() };
+    if (appDbUser) {
+      projectUpdate.db_user = appDbUser.username;
+      projectUpdate.db_password = appDbUser.password;
+    }
     await fetch(`${SUPABASE_URL}/rest/v1/projects?id=eq.${projectId}&user_id=eq.${user.id}`, {
       method: 'PATCH',
       headers: { 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ deployed_url: deployedUrl, app_schema: schemaName, updated_at: new Date().toISOString() })
+      body: JSON.stringify(projectUpdate)
     });
 
     console.log(`[deploy-fs] ✅ ${containerName} deployed at ${deployedUrl} (port ${appPort})`);
@@ -1539,6 +1648,11 @@ app.post('/api/undeploy', async (req, res) => {
       console.log(`[undeploy] Docker result:`, dockerResult);
 
       // Drop Supabase schema (all tables + data gone)
+      // Drop per-app DB user first (before dropping schema)
+      try {
+        await dropAppDbUser(appSchema);
+      } catch(e) { console.warn('[undeploy] DB user drop failed:', e.message); }
+
       try {
         await fetch(`${SUPABASE_URL}/rest/v1/rpc/drop_app_schema`, {
           method: 'POST',
