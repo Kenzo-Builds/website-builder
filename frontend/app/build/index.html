@@ -513,7 +513,7 @@
       padding: 12px; transition: padding 0.3s ease;
     }
     #preview-container.device-tablet,
-    #preview-container.device-phone { padding: 24px; background: var(--bg); }
+    #preview-container.device-phone { padding: 24px; background: var(--bg); display: flex; align-items: flex-start; justify-content: center; }
 
     #device-frame {
       width: 100%; height: 100%; position: relative;
@@ -868,11 +868,11 @@
               <i data-lucide="paperclip" style="width:16px;height:16px;stroke-width:1.75"></i>
             </div>
             <input type="file" id="attach-file" aria-label="Attach image" accept="image/jpeg,image/png,image/gif,image/webp,image/heic,image/heif" style="display:none" onchange="handleAttach(this)">
-            <textarea id="prompt-input" aria-label="Describe your website" placeholder="Describe your website..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();generate()}" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+            <textarea id="prompt-input" aria-label="Describe your website" placeholder="Describe your website..." rows="1"></textarea>
             <div class="input-icon-btn" id="mic-btn" onclick="toggleVoice()" title="Voice input">
               <i data-lucide="mic" style="width:16px;height:16px;stroke-width:1.75"></i>
             </div>
-            <div id="send-btn" onclick="generate()" title="Send">
+            <div id="send-btn" title="Send">
               <i data-lucide="send" style="width:13px;height:13px;stroke-width:2.5"></i>
             </div>
           </div>
@@ -898,11 +898,11 @@
               </div>
             </div>
             <select id="model-select" aria-label="Select AI model">
-              <option value="openai/gpt-5.3-codex" selected>GPT-5.3 Codex</option>
-              <option value="anthropic/claude-sonnet-4.6">Sonnet 4.6</option>
-              <option value="anthropic/claude-opus-4.6">Opus 4.6</option>
+              <option value="anthropic/claude-sonnet-4.6" selected>Claude Sonnet 4.6</option>
+              <option value="anthropic/claude-opus-4.6">Claude Opus 4.6</option>
               <option value="google/gemini-3.1-pro-preview">Gemini 3.1 Pro</option>
               <option value="google/gemini-3-flash-preview">Gemini 3 Flash</option>
+              <option value="openai/gpt-5.3-codex">GPT-5.3 Codex</option>
               <option value="openai/gpt-5.4">GPT-5.4</option>
             </select>
           </div>
@@ -1783,7 +1783,7 @@
       return _wcInstance;
     }
 
-    const FULLSTACK_SYSTEM_PROMPT = `You are an expert full-stack developer building Node.js web applications with Supabase database.
+    const FULLSTACK_SYSTEM_PROMPT = `You are an expert full-stack developer building Node.js web applications with PostgreSQL (direct connection via pg library).
 
 ## OUTPUT FORMAT
 Return a multi-file project using this EXACT format. Each file starts with "--- FILE: filename ---" on its own line:
@@ -1804,7 +1804,7 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
 
 ### Server & Routing
 - Always create: package.json, index.js (Express server), public/ HTML files, public/styles.css, schema.sql
-- Use Express.js for the server (npm install express @supabase/supabase-js)
+- Use Express.js + pg library for the server (npm install express pg)
 - Server listens on process.env.PORT || 3000
 - CRITICAL: Each page MUST have its own Express route AND its own HTML file
 - Navigation links use href="/products" (server routes, not hash/JS routing)
@@ -1813,43 +1813,27 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
 - Make it beautiful with a consistent shared navigation on every page
 - package.json must have "start": "node index.js" script
 
-### Database (Supabase)
+### Database (Direct PostgreSQL via pg)
 - Generate a schema.sql file with CREATE TABLE statements for ALL data the app needs
-- In index.js, set up Supabase client:
-  const { createClient } = require('@supabase/supabase-js');
-  const supabase = createClient(
-    process.env.SUPABASE_URL || 'http://localhost',
-    process.env.SUPABASE_KEY || 'placeholder',
-    { db: { schema: process.env.SUPABASE_SCHEMA || 'public' } }
-  );
-- ALL API routes MUST use Supabase for data:
-  // GET all items
-  app.get('/api/items', async (req, res) => {
-    const { data, error } = await supabase.from('items').select('*');
-    if (error) return res.status(500).json({ error: error.message });
-    res.json(data);
-  });
-  // CREATE item
-  app.post('/api/items', async (req, res) => {
-    const { data, error } = await supabase.from('items').insert(req.body).select();
-    if (error) return res.status(500).json({ error: error.message });
-    res.json(data[0]);
-  });
-  // UPDATE item
-  app.put('/api/items/:id', async (req, res) => {
-    const { data, error } = await supabase.from('items').update(req.body).eq('id', req.params.id).select();
-    if (error) return res.status(500).json({ error: error.message });
-    res.json(data[0]);
-  });
-  // DELETE item
-  app.delete('/api/items/:id', async (req, res) => {
-    const { error } = await supabase.from('items').delete().eq('id', req.params.id);
-    if (error) return res.status(500).json({ error: error.message });
-    res.json({ success: true });
-  });
-- ALSO include in-memory fallback so the app works without database (for WebContainer preview):
-  let useDB = !!process.env.SUPABASE_URL && process.env.SUPABASE_URL !== 'http://localhost';
-  // In each route, check useDB — if false, use in-memory arrays as fallback
+- In index.js, set up database connection like this:
+  const dns = require('dns');
+  dns.setDefaultResultOrder('ipv4first'); // force IPv4 — Docker containers lack IPv6
+  const { Pool } = require('pg');
+  const useDB = !!process.env.DATABASE_URL;
+  const dbSchema = process.env.SUPABASE_SCHEMA || 'public';
+  const pool = useDB ? new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
+  }) : null;
+  // Set search_path on every new connection (options param unreliable with PgBouncer)
+  if (pool) { pool.on('connect', (client) => { client.query('SET search_path TO ' + dbSchema); }); }
+- For each API route, use pool.query() with parameterized SQL ($1, $2, etc.)
+- GET routes: pool.query('SELECT * FROM table ORDER BY created_at DESC')
+- POST routes: pool.query('INSERT INTO table (col1,col2) VALUES ($1,$2) RETURNING *', [val1, val2])
+- PUT routes: pool.query('UPDATE table SET col=$1 WHERE id=$2 RETURNING *', [val, id])
+- DELETE routes: pool.query('DELETE FROM table WHERE id=$1', [id])
+- ALWAYS include in-memory arrays as fallback when useDB is false (for WebContainer preview)
+- Check useDB at the start of each route handler: if (!useDB) use in-memory fallback
 - NEVER hardcode data — always use API calls from frontend with fetch()
 
 ### Schema.sql Rules
@@ -1858,6 +1842,8 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
 - Use appropriate types: TEXT, INTEGER, BOOLEAN, TIMESTAMP, NUMERIC
 - Add meaningful column constraints (NOT NULL where required)
 - Include sample INSERT statements (3-5 rows of realistic data)
+- Do NOT include search_path or schema prefix — the DATABASE_URL already sets the schema
+- SUPABASE_URL and SUPABASE_ANON_KEY env vars are also available if you need Supabase Auth
 
 ### Frontend
 - HTML files in public/ with fetch() calls to /api/ endpoints
@@ -2529,10 +2515,16 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
       const attachSnapshot = _attachData ? { ..._attachData } : null;
       if (_attachData) removeAttach();
 
-      // Route to full-stack app builder (direct build)
-      if (appMode === 'fullstack' && _readyToBuild) {
-        _readyToBuild = false;
-        return generateFullStack(prompt);
+      // Route to full-stack app builder
+      if (appMode === 'fullstack') {
+        if (_readyToBuild) {
+          // Build directly (either "Build directly" mode or brainstorm complete)
+          _readyToBuild = false;
+          return generateFullStack(prompt);
+        } else {
+          // Brainstorm first — discovery conversation, then builds when __BUILD_READY__
+          return brainstorm(prompt, attachSnapshot);
+        }
       }
 
       // Route to landing page builder (direct build)
@@ -3260,6 +3252,11 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
         return;
       }
 
+      if (usageData.plan === 'admin') {
+        badge.style.display = 'none'; // Admins don't see a counter
+        return;
+      }
+
       if (usageData.limit === 'unlimited') {
         badge.textContent = `${usageData.used} builds`;
         badge.style.display = 'inline';
@@ -3705,6 +3702,12 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
     (async function checkDashboardContext() {
       const prompt = sessionStorage.getItem('builder_prompt');
       const mode = sessionStorage.getItem('builder_mode');
+      const savedModel = sessionStorage.getItem('builder_model');
+      if (savedModel) {
+        const sel = document.getElementById('model-select');
+        if (sel) { sel.value = savedModel; }
+      }
+      sessionStorage.removeItem('builder_model');
       // URL param takes priority (tab-safe, survives refresh)
       const urlParams = new URLSearchParams(window.location.search);
       const urlProjectId = urlParams.get('project');
