@@ -920,16 +920,47 @@ app.post('/api/delete-project', async (req, res) => {
   const { projectId, buildId, subdomain } = req.body;
   if (!projectId) return res.status(400).json({ error: 'projectId required' });
   try {
-    // Step 1: undeploy if the site is live
+    // Step 1: full undeploy if the site is live (handles both static + full-stack Docker apps)
     if (subdomain) {
       try {
-        const undeployBody = JSON.stringify({ domain: `${subdomain}.kenzoagent.com` });
-        await new Promise((resolve, reject) => {
-          const opts = { hostname: DEPLOY_HOST, port: DEPLOY_PORT, path: '/undeploy', method: 'POST', headers: { 'Content-Type': 'application/json' } };
-          const r = http.request(opts, (res2) => { let d=''; res2.on('data',c=>d+=c); res2.on('end',()=>resolve(d)); });
-          r.on('error', reject); r.write(undeployBody); r.end();
-        });
-      } catch(e) { console.warn('undeploy during delete failed:', e.message); }
+        // Fetch app_schema to determine if full-stack
+        let appSchema = null;
+        try {
+          const projects = await supabaseRequest('GET', `projects?id=eq.${projectId}&user_id=eq.${user.id}&select=app_schema`);
+          appSchema = projects?.[0]?.app_schema || null;
+        } catch(e) { console.warn('[delete] Could not fetch app_schema:', e.message); }
+
+        if (appSchema) {
+          // Full-stack: stop Docker container + remove image + nginx + drop schema + release port
+          const dockerBody = JSON.stringify({ subdomain });
+          await new Promise((resolve, reject) => {
+            const opts = { hostname: DEPLOY_HOST, port: DEPLOY_PORT, path: '/docker/undeploy-app', method: 'POST', headers: { 'Content-Type': 'application/json' } };
+            const r = http.request(opts, (res2) => { let d=''; res2.on('data',c=>d+=c); res2.on('end',()=>resolve(d)); });
+            r.on('error', reject); r.write(dockerBody); r.end();
+          });
+          // Drop Supabase schema
+          try {
+            await fetch(`${SUPABASE_URL}/rest/v1/rpc/drop_app_schema`, {
+              method: 'POST',
+              headers: { 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ schema_name: appSchema })
+            });
+          } catch(e) { console.warn('[delete] Schema drop failed:', e.message); }
+          // Release port + remove app files
+          releasePort(subdomain);
+          const appDir = path.join(DOCKER_APPS_DIR, subdomain);
+          if (fs.existsSync(appDir)) fs.rmSync(appDir, { recursive: true, force: true });
+          console.log(`[delete] Full-stack undeploy complete for ${subdomain}`);
+        } else {
+          // Static site: nginx only
+          const undeployBody = JSON.stringify({ domain: `${subdomain}.kenzoagent.com` });
+          await new Promise((resolve, reject) => {
+            const opts = { hostname: DEPLOY_HOST, port: DEPLOY_PORT, path: '/undeploy', method: 'POST', headers: { 'Content-Type': 'application/json' } };
+            const r = http.request(opts, (res2) => { let d=''; res2.on('data',c=>d+=c); res2.on('end',()=>resolve(d)); });
+            r.on('error', reject); r.write(undeployBody); r.end();
+          });
+        }
+      } catch(e) { console.warn('[delete] undeploy during delete failed:', e.message); }
     }
 
     // Step 2: delete build files from both temp and permanent locations
