@@ -1339,13 +1339,10 @@ app.post('/api/deploy-fullstack', async (req, res) => {
       console.warn(`[deploy-fs] Per-app DB user failed (falling back to master):`, e.message);
     }
 
-    // Build per-app DATABASE_URL (uses per-app credentials if available, master as fallback)
-    let appDatabaseUrl = DATABASE_URL;
-    if (appDbUser) {
-      // Extract host/port/db from master DATABASE_URL and build with per-app credentials
-      const dbUrlParts = new URL(DATABASE_URL);
-      appDatabaseUrl = `postgresql://${encodeURIComponent(appDbUser.username)}:${encodeURIComponent(appDbUser.password)}@${dbUrlParts.host}${dbUrlParts.pathname}`;
-    }
+    // Use master DATABASE_URL for connection (Supabase pooler requires specific username format)
+    // Per-app user is created for schema ownership + future direct connection support
+    // Security comes from schema isolation + RLS, not credentials
+    const appDatabaseUrl = DATABASE_URL;
 
     // ── Step 3: Write project files + Dockerfile ──
     if (fs.existsSync(appDir)) fs.rmSync(appDir, { recursive: true, force: true });
