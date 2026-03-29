@@ -1739,4 +1739,148 @@ setInterval(cleanBuilds, 60 * 60 * 1000);
 setInterval(cleanGuestUsage, 60 * 1000);
 cleanBuilds(); // Run immediately on startup to handle any stale builds from previous runs
 
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ADMIN ENDPOINTS — requires is_admin = true on profiles table
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── verifyAdmin ───────────────────────────────────────────────────────────────
+async function verifyAdmin(authHeader) {
+  const user = await verifyUser(authHeader);
+  if (!user?.id) return null;
+  try {
+    const profiles = await supabaseRequest('GET', `profiles?id=eq.${user.id}&select=is_admin`);
+    if (profiles?.[0]?.is_admin !== true) return null;
+    return user;
+  } catch(e) { return null; }
+}
+
+// ── GET /api/admin/stats ──────────────────────────────────────────────────────
+app.get('/api/admin/stats', async (req, res) => {
+  const admin = await verifyAdmin(req.headers.authorization);
+  if (!admin) return res.status(403).json({ error: 'Admin access required' });
+  try {
+    const [profiles, projects, generations, containers] = await Promise.all([
+      supabaseRequest('GET', 'profiles?select=id,plan,created_at'),
+      supabaseRequest('GET', 'projects?select=id,deployed_url,app_schema,created_at'),
+      supabaseRequest('GET', 'generations?select=id,created_at&order=created_at.desc&limit=1000'),
+      new Promise((resolve) => {
+        const opts = { hostname: DEPLOY_HOST, port: DEPLOY_PORT, path: '/docker/list', method: 'GET' };
+        const r = http.request(opts, (res2) => { let d=''; res2.on('data',c=>d+=c); res2.on('end',()=>{ try{resolve(JSON.parse(d))}catch(e){resolve({containers:[]})} }); });
+        r.on('error', () => resolve({ containers: [] })); r.end();
+      })
+    ]);
+
+    const now = new Date();
+    const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const thisWeek = new Date(now - 7 * 24 * 60 * 60 * 1000);
+
+    res.json({
+      users: {
+        total: profiles.length,
+        free: profiles.filter(p => !p.plan || p.plan === 'free').length,
+        paid: profiles.filter(p => p.plan && p.plan !== 'free').length,
+        newThisWeek: profiles.filter(p => new Date(p.created_at) > thisWeek).length
+      },
+      projects: {
+        total: projects.length,
+        deployed: projects.filter(p => p.deployed_url).length,
+        fullstack: projects.filter(p => p.app_schema).length
+      },
+      generations: {
+        total: generations.length,
+        thisMonth: generations.filter(g => new Date(g.created_at) > thisMonth).length
+      },
+      containers: {
+        running: containers.containers?.length || 0,
+        list: containers.containers || []
+      }
+    });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── GET /api/admin/users ──────────────────────────────────────────────────────
+app.get('/api/admin/users', async (req, res) => {
+  const admin = await verifyAdmin(req.headers.authorization);
+  if (!admin) return res.status(403).json({ error: 'Admin access required' });
+  try {
+    const profiles = await supabaseRequest('GET', 'profiles?select=id,email,plan,is_admin,created_at,deleted_at&order=created_at.desc');
+    // Get project counts per user
+    const projects = await supabaseRequest('GET', 'projects?select=id,user_id,deployed_url');
+    const projectsByUser = {};
+    for (const p of projects) {
+      if (!projectsByUser[p.user_id]) projectsByUser[p.user_id] = { total: 0, deployed: 0 };
+      projectsByUser[p.user_id].total++;
+      if (p.deployed_url) projectsByUser[p.user_id].deployed++;
+    }
+    const users = profiles.map(p => ({
+      ...p,
+      projects: projectsByUser[p.id]?.total || 0,
+      deployedApps: projectsByUser[p.id]?.deployed || 0
+    }));
+    res.json({ users });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── PATCH /api/admin/users/:id/plan ──────────────────────────────────────────
+app.patch('/api/admin/users/:id/plan', async (req, res) => {
+  const admin = await verifyAdmin(req.headers.authorization);
+  if (!admin) return res.status(403).json({ error: 'Admin access required' });
+  const { plan } = req.body;
+  const validPlans = ['free', 'starter', 'pro', 'expert'];
+  if (!validPlans.includes(plan)) return res.status(400).json({ error: 'Invalid plan' });
+  try {
+    await supabaseRequest('PATCH', `profiles?id=eq.${req.params.id}`, { plan, updated_at: new Date().toISOString() });
+    res.json({ success: true });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── GET /api/admin/containers ─────────────────────────────────────────────────
+app.get('/api/admin/containers', async (req, res) => {
+  const admin = await verifyAdmin(req.headers.authorization);
+  if (!admin) return res.status(403).json({ error: 'Admin access required' });
+  try {
+    const result = await new Promise((resolve) => {
+      const opts = { hostname: DEPLOY_HOST, port: DEPLOY_PORT, path: '/docker/list', method: 'GET' };
+      const r = http.request(opts, (res2) => { let d=''; res2.on('data',c=>d+=c); res2.on('end',()=>{ try{resolve(JSON.parse(d))}catch(e){resolve({containers:[]})} }); });
+      r.on('error', () => resolve({ containers: [] })); r.end();
+    });
+    res.json(result);
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── POST /api/admin/containers/:name/restart ──────────────────────────────────
+app.post('/api/admin/containers/:name/restart', async (req, res) => {
+  const admin = await verifyAdmin(req.headers.authorization);
+  if (!admin) return res.status(403).json({ error: 'Admin access required' });
+  const name = req.params.name;
+  if (!name.startsWith('app-')) return res.status(400).json({ error: 'Invalid container name' });
+  try {
+    const body = JSON.stringify({ container: name });
+    const result = await new Promise((resolve, reject) => {
+      const opts = { hostname: DEPLOY_HOST, port: DEPLOY_PORT, path: '/docker/restart', method: 'POST', headers: { 'Content-Type': 'application/json' } };
+      const r = http.request(opts, (res2) => { let d=''; res2.on('data',c=>d+=c); res2.on('end',()=>{ try{resolve(JSON.parse(d))}catch(e){resolve({raw:d})} }); });
+      r.on('error', reject); r.write(body); r.end();
+    });
+    res.json(result);
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── POST /api/admin/containers/:name/stop ─────────────────────────────────────
+app.post('/api/admin/containers/:name/stop', async (req, res) => {
+  const admin = await verifyAdmin(req.headers.authorization);
+  if (!admin) return res.status(403).json({ error: 'Admin access required' });
+  const name = req.params.name;
+  if (!name.startsWith('app-')) return res.status(400).json({ error: 'Invalid container name' });
+  try {
+    const body = JSON.stringify({ container: name });
+    const result = await new Promise((resolve, reject) => {
+      const opts = { hostname: DEPLOY_HOST, port: DEPLOY_PORT, path: '/docker/stop', method: 'POST', headers: { 'Content-Type': 'application/json' } };
+      const r = http.request(opts, (res2) => { let d=''; res2.on('data',c=>d+=c); res2.on('end',()=>{ try{resolve(JSON.parse(d))}catch(e){resolve({raw:d})} }); });
+      r.on('error', reject); r.write(body); r.end();
+    });
+    res.json(result);
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
 app.listen(PORT, () => console.log(`🚀 Website Builder API v3.3.0-voice on port ${PORT}`));
