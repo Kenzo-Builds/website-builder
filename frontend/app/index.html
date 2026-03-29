@@ -801,77 +801,7 @@
     </div>
 
     <!-- TEMPLATES -->
-    <div class="page" id="page-admin" style="padding:0">
-      <div style="display:flex;height:100vh;overflow:hidden">
-        <!-- Admin sub-sidebar -->
-        <div style="width:180px;flex-shrink:0;background:#0a0a0f;border-right:1px solid rgba(255,255,255,0.06);padding:20px 12px;display:flex;flex-direction:column;gap:4px">
-          <div style="font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.08em;padding:0 8px;margin-bottom:8px">Admin Panel</div>
-          <button class="sb-item active" id="atab-overview" onclick="switchAdminTab('overview')"><i data-lucide="layout-dashboard" style="width:16px;height:16px"></i><span>Overview</span></button>
-          <button class="sb-item" id="atab-containers" onclick="switchAdminTab('containers')"><i data-lucide="box" style="width:16px;height:16px"></i><span>Containers</span></button>
-          <button class="sb-item" id="atab-users" onclick="switchAdminTab('users')"><i data-lucide="users" style="width:16px;height:16px"></i><span>Users</span></button>
-        </div>
-        <!-- Admin content -->
-        <div style="flex:1;overflow-y:auto;padding:32px">
-
-          <!-- Overview tab -->
-          <div id="admin-overview">
-            <h2 style="font-size:20px;font-weight:600;color:#F4F4F5;margin:0 0 24px">Overview</h2>
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-bottom:32px" id="admin-kpi-grid">
-              <div style="background:#111;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px">
-                <div style="font-size:12px;color:#6B7280;margin-bottom:8px">Total Users</div>
-                <div style="font-size:28px;font-weight:700;color:#fff" id="akpi-users">—</div>
-              </div>
-              <div style="background:#111;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px">
-                <div style="font-size:12px;color:#6B7280;margin-bottom:8px">Paid Users</div>
-                <div style="font-size:28px;font-weight:700;color:#22C55E" id="akpi-paid">—</div>
-              </div>
-              <div style="background:#111;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px">
-                <div style="font-size:12px;color:#6B7280;margin-bottom:8px">New This Week</div>
-                <div style="font-size:28px;font-weight:700;color:#60A5FA" id="akpi-newusers">—</div>
-              </div>
-              <div style="background:#111;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px">
-                <div style="font-size:12px;color:#6B7280;margin-bottom:8px">Total Projects</div>
-                <div style="font-size:28px;font-weight:700;color:#fff" id="akpi-projects">—</div>
-              </div>
-              <div style="background:#111;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px">
-                <div style="font-size:12px;color:#6B7280;margin-bottom:8px">Live Apps</div>
-                <div style="font-size:28px;font-weight:700;color:#A78BFA" id="akpi-deployed">—</div>
-              </div>
-              <div style="background:#111;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px">
-                <div style="font-size:12px;color:#6B7280;margin-bottom:8px">Running Containers</div>
-                <div style="font-size:28px;font-weight:700;color:#F59E0B" id="akpi-containers">—</div>
-              </div>
-              <div style="background:#111;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px">
-                <div style="font-size:12px;color:#6B7280;margin-bottom:8px">Generations (month)</div>
-                <div style="font-size:28px;font-weight:700;color:#fff" id="akpi-gens">—</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Containers tab -->
-          <div id="admin-containers" style="display:none">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
-              <h2 style="font-size:20px;font-weight:600;color:#F4F4F5;margin:0">Running Containers</h2>
-              <button onclick="loadAdminContainers()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:#D1D5DB;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit">↻ Refresh</button>
-            </div>
-            <div id="admin-containers-list" style="display:flex;flex-direction:column;gap:8px">
-              <div style="color:#6B7280;font-size:14px">Loading...</div>
-            </div>
-          </div>
-
-          <!-- Users tab -->
-          <div id="admin-users" style="display:none">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
-              <h2 style="font-size:20px;font-weight:600;color:#F4F4F5;margin:0">All Users</h2>
-              <button onclick="loadAdminUsers()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:#D1D5DB;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit">↻ Refresh</button>
-            </div>
-            <div id="admin-users-list" style="display:flex;flex-direction:column;gap:8px">
-              <div style="color:#6B7280;font-size:14px">Loading...</div>
-            </div>
-          </div>
-
-        </div>
-      </div>
+    <div class="page" id="page-admin" style="padding:0;display:none">
     </div>
 
     <div class="page" id="page-templates">
@@ -1524,7 +1454,7 @@ function setupNav(){
 function switchPage(name){
   // If navigating to appearance/support, redirect to settings subpage
   if(name==='appearance'){switchPage('settings');switchSP('appearance');return;}
-  if(name==='admin'){document.querySelectorAll('[data-v]').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-v')==='admin');});document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});var ap=document.getElementById('page-admin');if(ap)ap.classList.add('active');loadAdminStats();return;}
+  if(name==='admin'){openAdminView();return;}
   if(name==='support'){switchPage('settings');switchSP('help');return;}
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   document.getElementById('page-'+name).classList.add('active');
@@ -2915,12 +2845,146 @@ applyDashLang();
 
 var isAdmin = false;
 
+// ── Admin overlay — replaces full layout (sidebar + content) ─────────────────
+function buildAdminOverlay() {
+  var overlay = document.createElement('div');
+  overlay.id = 'admin-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:500;display:flex;background:#09090B';
+
+  // Admin sidebar
+  var sidebar = document.createElement('div');
+  sidebar.style.cssText = 'width:220px;flex-shrink:0;background:#09090B;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;height:100vh';
+
+  // Logo — matches main dashboard brand styling (no divider)
+  var logo = document.createElement('div');
+  logo.style.cssText = 'display:flex;align-items:center;padding:10px 16px;gap:10px';
+  logo.innerHTML = '<span style="font-family:Montserrat,sans-serif;font-weight:200;font-size:15px;letter-spacing:3px;text-transform:uppercase;color:#fff">AI Builder</span>';
+  sidebar.appendChild(logo);
+
+  // Back button
+  var backWrap = document.createElement('div');
+  backWrap.style.cssText = 'padding:12px';
+  var backBtn = document.createElement('button');
+  backBtn.className = 'sb-item';
+  backBtn.id = 'admin-back-btn';
+  backBtn.style.justifyContent = 'flex-start';
+  backBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg><span>Back</span>';
+  backWrap.appendChild(backBtn);
+  sidebar.appendChild(backWrap);
+
+  // Label
+  var label = document.createElement('div');
+  label.style.cssText = 'padding:0 20px;margin:4px 0 8px;font-size:10px;font-weight:600;color:#4B5563;text-transform:uppercase;letter-spacing:.1em';
+  label.textContent = 'Admin Panel';
+  sidebar.appendChild(label);
+
+  // Nav
+  var nav = document.createElement('div');
+  nav.style.cssText = 'padding:0 12px;display:flex;flex-direction:column;gap:2px';
+  var tabs = [
+    {id:'atab-overview', tab:'overview', icon:'layout-dashboard', label:'Overview'},
+    {id:'atab-containers', tab:'containers', icon:'box', label:'Containers'},
+    {id:'atab-users', tab:'users', icon:'users', label:'Users'}
+  ];
+  tabs.forEach(function(t, i) {
+    var btn = document.createElement('button');
+    btn.className = 'sb-item' + (i === 0 ? ' active' : '');
+    btn.id = t.id;
+    btn.setAttribute('data-admintab', t.tab);
+    btn.innerHTML = '<i data-lucide="' + t.icon + '" style="width:18px;height:18px;flex-shrink:0"></i><span>' + t.label + '</span>';
+    nav.appendChild(btn);
+  });
+  sidebar.appendChild(nav);
+
+  // Content area
+  var content_area = document.createElement('div');
+  content_area.style.cssText = 'flex:1;overflow-y:auto;padding:32px 36px';
+
+  // Overview tab
+  var overviewDiv = document.createElement('div');
+  overviewDiv.id = 'admin-overview';
+  var kpis = [
+    {id:'akpi-users', label:'Total Users', color:'#fff'},
+    {id:'akpi-paid', label:'Paid Users', color:'#22C55E'},
+    {id:'akpi-newusers', label:'New This Week', color:'#60A5FA'},
+    {id:'akpi-projects', label:'Total Projects', color:'#fff'},
+    {id:'akpi-deployed', label:'Live Apps', color:'#A78BFA'},
+    {id:'akpi-containers', label:'Containers Running', color:'#F59E0B'},
+    {id:'akpi-gens', label:'Generations (month)', color:'#fff'}
+  ];
+  overviewDiv.innerHTML = '<h2 style="font-size:20px;font-weight:600;color:#F4F4F5;margin:0 0 24px">Overview</h2>' +
+    '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px">' +
+    kpis.map(function(k) {
+      return '<div style="background:#111;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px"><div style="font-size:12px;color:#6B7280;margin-bottom:8px">' + k.label + '</div><div style="font-size:28px;font-weight:700;color:' + k.color + '" id="' + k.id + '">—</div></div>';
+    }).join('') + '</div>';
+  content_area.appendChild(overviewDiv);
+
+  // Containers tab
+  var containersDiv = document.createElement('div');
+  containersDiv.id = 'admin-containers';
+  containersDiv.style.display = 'none';
+  containersDiv.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px"><h2 style="font-size:20px;font-weight:600;color:#F4F4F5;margin:0">Running Containers</h2><button id="admin-refresh-containers" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:#D1D5DB;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit">Refresh</button></div><div id="admin-containers-list" style="display:flex;flex-direction:column;gap:8px"><div style="color:#6B7280;font-size:14px">Loading...</div></div>';
+  content_area.appendChild(containersDiv);
+
+  // Users tab
+  var usersDiv = document.createElement('div');
+  usersDiv.id = 'admin-users';
+  usersDiv.style.display = 'none';
+  usersDiv.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px"><h2 style="font-size:20px;font-weight:600;color:#F4F4F5;margin:0">All Users</h2><button id="admin-refresh-users" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:#D1D5DB;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit">Refresh</button></div><div id="admin-users-list" style="display:flex;flex-direction:column;gap:8px"><div style="color:#6B7280;font-size:14px">Loading...</div></div>';
+  content_area.appendChild(usersDiv);
+
+  overlay.appendChild(sidebar);
+  overlay.appendChild(content_area);
+  document.body.appendChild(overlay);
+
+  // Wire events with addEventListener (no inline onclick)
+  backBtn.addEventListener('click', closeAdminView);
+  nav.querySelectorAll('[data-admintab]').forEach(function(btn) {
+    btn.addEventListener('click', function() { switchAdminTab(this.getAttribute('data-admintab')); });
+  });
+  var rc = document.getElementById('admin-refresh-containers');
+  if (rc) rc.addEventListener('click', loadAdminContainers);
+  var ru = document.getElementById('admin-refresh-users');
+  if (ru) ru.addEventListener('click', loadAdminUsers);
+
+  if (window.lucide) lucide.createIcons();
+}
+
+function openAdminView() {
+  var overlay = document.getElementById('admin-overlay');
+  if (!overlay) {
+    buildAdminOverlay();
+  } else {
+    overlay.style.display = 'flex';
+  }
+  switchAdminTab('overview');
+  loadAdminStats();
+}
+
+function closeAdminView() {
+  var overlay = document.getElementById('admin-overlay');
+  if (overlay) overlay.style.display = 'none';
+  document.querySelectorAll('[data-v]').forEach(function(b) {
+    b.classList.toggle('active', b.getAttribute('data-v') === 'home');
+  });
+}
+
+
 async function checkAdminStatus() {
   if (!user) return;
+  // Hardcoded admin user IDs (instant check, no API call needed)
+  var ADMIN_IDS = ['69ef123f-b5de-4d16-999d-aa1fef63001e'];
+  if (ADMIN_IDS.indexOf(user.id) !== -1) {
+    isAdmin = true;
+    var btn = document.getElementById('admin-nav-btn');
+    if (btn) btn.style.display = '';
+    return;
+  }
+  // Also check via API for future admins
   try {
     var session = (await sb.auth.getSession()).data.session;
     if (!session) return;
-    var res = await fetch(API + '/api/admin/stats', {
+    var res = await fetch('/api/admin/stats', {
       headers: { 'Authorization': 'Bearer ' + session.access_token }
     });
     if (res.ok) {
@@ -2950,7 +3014,7 @@ async function getAdminToken() {
 async function loadAdminStats() {
   try {
     var token = await getAdminToken();
-    var res = await fetch(API + '/api/admin/stats', { headers: { 'Authorization': 'Bearer ' + token } });
+    var res = await fetch('/api/admin/stats', { headers: { 'Authorization': 'Bearer ' + token } });
     if (!res.ok) return;
     var d = await res.json();
     document.getElementById('akpi-users').textContent = d.users.total;
@@ -2968,7 +3032,7 @@ async function loadAdminContainers() {
   el.innerHTML = '<div style="color:#6B7280;font-size:14px">Loading...</div>';
   try {
     var token = await getAdminToken();
-    var res = await fetch(API + '/api/admin/containers', { headers: { 'Authorization': 'Bearer ' + token } });
+    var res = await fetch('/api/admin/containers', { headers: { 'Authorization': 'Bearer ' + token } });
     var d = await res.json();
     if (!d.containers || d.containers.length === 0) {
       el.innerHTML = '<div style="color:#6B7280;font-size:14px;padding:24px;text-align:center">No containers running</div>';
@@ -2984,11 +3048,17 @@ async function loadAdminContainers() {
           '<div style="font-size:12px;color:#6B7280;margin-top:2px">' + c.status + ' &middot; <a href="' + url + '" target="_blank" style="color:#60A5FA">' + url + '</a></div>' +
         '</div>' +
         '<div style="display:flex;gap:8px">' +
-          '<button onclick="adminRestartContainer('' + c.name + '')" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:#D1D5DB;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit">&#8635; Restart</button>' +
-          '<button onclick="adminStopContainer('' + c.name + '')" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#F87171;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit">&#9632; Stop</button>' +
+          '<button data-cname="' + c.name + '" class="admin-restart-btn" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:#D1D5DB;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit">Restart</button>' +
+          '<button data-cname="' + c.name + '" class="admin-stop-btn" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#F87171;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit">Stop</button>' +
         '</div>' +
       '</div>';
     }).join('');
+    el.querySelectorAll('.admin-restart-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() { adminRestartContainer(this.getAttribute('data-cname')); });
+    });
+    el.querySelectorAll('.admin-stop-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() { adminStopContainer(this.getAttribute('data-cname')); });
+    });
   } catch(e) {
     el.innerHTML = '<div style="color:#F87171;font-size:14px">Error: ' + e.message + '</div>';
   }
@@ -2999,7 +3069,7 @@ async function loadAdminUsers() {
   el.innerHTML = '<div style="color:#6B7280;font-size:14px">Loading...</div>';
   try {
     var token = await getAdminToken();
-    var res = await fetch(API + '/api/admin/users', { headers: { 'Authorization': 'Bearer ' + token } });
+    var res = await fetch('/api/admin/users', { headers: { 'Authorization': 'Bearer ' + token } });
     var d = await res.json();
     if (!d.users || d.users.length === 0) {
       el.innerHTML = '<div style="color:#6B7280;font-size:14px;padding:24px;text-align:center">No users found</div>';
@@ -3018,10 +3088,13 @@ async function loadAdminUsers() {
         '</div>' +
         '<div style="display:flex;align-items:center;gap:8px">' +
           '<span style="font-size:12px;color:' + planColor + ';font-weight:600">' + (u.plan||'free').toUpperCase() + '</span>' +
-          '<select onchange="adminChangePlan('' + u.id + '',this.value)" style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.1);color:#D1D5DB;padding:4px 8px;border-radius:6px;font-size:12px;cursor:pointer;font-family:inherit">' + planOpts + '</select>' +
+          '<select data-uid="' + u.id + '" class="admin-plan-select" style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.1);color:#D1D5DB;padding:4px 8px;border-radius:6px;font-size:12px;cursor:pointer;font-family:inherit">' + planOpts + '</select>' +
         '</div>' +
       '</div>';
     }).join('');
+    el.querySelectorAll('.admin-plan-select').forEach(function(sel) {
+      sel.addEventListener('change', function() { adminChangePlan(this.getAttribute('data-uid'), this.value); });
+    });
   } catch(e) {
     el.innerHTML = '<div style="color:#F87171;font-size:14px">Error: ' + e.message + '</div>';
   }
@@ -3030,7 +3103,7 @@ async function loadAdminUsers() {
 async function adminRestartContainer(name) {
   if (!confirm('Restart ' + name + '?')) return;
   var token = await getAdminToken();
-  var res = await fetch(API + '/api/admin/containers/' + encodeURIComponent(name) + '/restart', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
+  var res = await fetch('/api/admin/containers/' + encodeURIComponent(name) + '/restart', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
   var d = await res.json();
   if (d.success) { loadAdminContainers(); } else { alert('Error: ' + d.error); }
 }
@@ -3038,14 +3111,14 @@ async function adminRestartContainer(name) {
 async function adminStopContainer(name) {
   if (!confirm('Stop ' + name + '? The app will go offline.')) return;
   var token = await getAdminToken();
-  var res = await fetch(API + '/api/admin/containers/' + encodeURIComponent(name) + '/stop', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
+  var res = await fetch('/api/admin/containers/' + encodeURIComponent(name) + '/stop', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
   var d = await res.json();
   if (d.success) { loadAdminContainers(); } else { alert('Error: ' + d.error); }
 }
 
 async function adminChangePlan(userId, plan) {
   var token = await getAdminToken();
-  var res = await fetch(API + '/api/admin/users/' + userId + '/plan', {
+  var res = await fetch('/api/admin/users/' + userId + '/plan', {
     method: 'PATCH',
     headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
     body: JSON.stringify({ plan: plan })
