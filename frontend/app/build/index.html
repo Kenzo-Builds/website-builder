@@ -2256,7 +2256,7 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
       const files = {};
       let match;
       while ((match = filePattern.exec(response)) !== null) {
-        const filename = match[1].trim().toLowerCase();
+        const filename = match[1].trim(); // preserve case — React uses PascalCase (App.jsx, Dashboard.jsx)
         const content = match[2].trim();
         if (filename && content) files[filename] = content;
       }

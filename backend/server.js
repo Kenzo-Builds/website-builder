@@ -383,7 +383,7 @@ function extractMultiFile(response) {
   const files = {};
   let match;
   while ((match = filePattern.exec(response)) !== null) {
-    const filename = match[1].trim().toLowerCase();
+    const filename = match[1].trim(); // preserve case for React (App.jsx, Dashboard.jsx, etc.)
     const content = match[2].trim();
     if (filename && content) files[filename] = content;
   }
