@@ -4525,122 +4525,7 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
           }
         }, 500);
       }
-    })();
-    })();
-  </script>
-  <div class="url-bar-dropdown" id="url-dropdown"></div>
 
-  <!-- Builder Confirm Modal -->
-  <div class="cm-overlay" id="builder-confirm-overlay" onclick="if(event.target===this)closeBuilderConfirm()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
-    <div style="background:#0F0F12;border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:24px;width:340px;max-width:90vw;box-shadow:0 16px 48px rgba(0,0,0,0.6);animation:scaleIn .2s ease">
-      <div style="font-size:16px;font-weight:600;color:#F4F4F5;text-align:center;margin-bottom:6px" id="bc-title">Confirm</div>
-      <div style="font-size:13px;color:#71717A;text-align:center;margin-bottom:20px" id="bc-sub">Are you sure?</div>
-      <div style="display:flex;gap:10px">
-        <button onclick="closeBuilderConfirm()" style="flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:rgba(255,255,255,0.08);color:#D1D5DB">Cancel</button>
-        <button id="bc-confirm" onclick="doBuilderConfirm()" style="flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#EF4444;color:#fff">Confirm</button>
-      </div>
-    </div>
-  </div>
-  <style>#builder-confirm-overlay.show{display:flex!important}</style>
-
-  <!-- Builder Prompt Modal -->
-  <div class="cm-overlay" id="builder-prompt-overlay" onclick="if(event.target===this)closeBuilderPrompt()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
-    <div style="background:#0F0F12;border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:24px;width:340px;max-width:90vw;box-shadow:0 16px 48px rgba(0,0,0,0.6);animation:scaleIn .2s ease">
-      <div style="font-size:16px;font-weight:600;color:#F4F4F5;text-align:center;margin-bottom:14px" id="bp-title">Input</div>
-      <input id="bp-input" aria-label="Input value" style="width:100%;background:#09090B;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#F4F4F5;font-size:14px;outline:none;margin-bottom:16px;font-family:inherit" onkeydown="if(event.key==='Enter')doBuilderPrompt()">
-      <div style="display:flex;gap:10px">
-        <button onclick="closeBuilderPrompt()" style="flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:rgba(255,255,255,0.08);color:#D1D5DB">Cancel</button>
-        <button id="bp-confirm" onclick="doBuilderPrompt()" style="flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#fff;color:#0D0D0D">OK</button>
-      </div>
-    </div>
-  </div>
-  <style>#builder-prompt-overlay.show{display:flex!important}</style>
-
-  <script>
-    // ===== MATRIX RAIN =====
-    (function(){
-      var canvas=document.getElementById('matrix-canvas');
-      if(!canvas) return;
-      var ctx=canvas.getContext('2d');
-      var chars='01</>{}();:.#ABCDEFabcdef';
-      var drops=[];
-      var fontSize=20;
-      var cols;
-      var running=true;
-
-      function resize(){
-        canvas.width=canvas.parentElement.offsetWidth;
-        canvas.height=canvas.parentElement.offsetHeight;
-        cols=Math.floor(canvas.width/fontSize);
-        drops=[];
-        for(var i=0;i<cols;i++) drops[i]=Math.random()*-100;
-      }
-      resize();
-      window.addEventListener('resize',resize);
-
-      function draw(){
-        if(!running) return;
-        ctx.fillStyle='rgba(13,13,13,0.08)';
-        ctx.fillRect(0,0,canvas.width,canvas.height);
-        ctx.fillStyle='rgba(0,229,255,0.35)';
-        ctx.font=fontSize+'px monospace';
-        for(var i=0;i<cols;i++){
-          var ch=chars[Math.floor(Math.random()*chars.length)];
-          var x=i*fontSize;
-          var y=drops[i]*fontSize;
-          ctx.fillText(ch,x,y);
-          if(y>canvas.height && Math.random()>0.99) drops[i]=0;
-          drops[i]+=0.11+Math.random()*0.06;
-        }
-        requestAnimationFrame(draw);
-      }
-      draw();
-
-      // Pause when hidden
-      var es=document.getElementById('empty-state');
-      var obs=new MutationObserver(function(){
-        if(es.style.display==='none'){running=false;}
-        else{running=true;requestAnimationFrame(draw);}
-      });
-      obs.observe(es,{attributes:true,attributeFilter:['style']});
-
-      // Expose stop for cleanup
-      window._matrixStop=function(){running=false;};
-    })();
-
-    // ===== CAROUSEL AUTO-PLAY =====
-    var _esSlide=0;
-    var _esTimer;
-    function esGoSlide(n){
-      _esSlide=n;
-      var slides=document.querySelectorAll('.es-slide');
-      var dots=document.querySelectorAll('.es-dot');
-      slides.forEach(function(s,i){s.classList.toggle('active',i===n);});
-      dots.forEach(function(d,i){d.classList.toggle('active',i===n);});
-    }
-    function esNext(){_esSlide=(_esSlide+1)%3;esGoSlide(_esSlide);if(_esSlide===1)startLineCounter();}
-    _esTimer=setInterval(esNext,5000);
-
-    // Line counter animation for slide 2
-    var _lcInterval;
-    function startLineCounter(){
-      var el=document.getElementById('es-line-counter');if(!el)return;
-      var count=0;clearInterval(_lcInterval);
-      _lcInterval=setInterval(function(){
-        count+=Math.floor(800+Math.random()*1200);
-        if(count>32000){count=32000;clearInterval(_lcInterval);}
-        el.textContent=count.toLocaleString()+' lines';
-      },120);
-    }
-    // Pause on hover
-    var esCar=document.querySelector('.es-carousel');
-    if(esCar){
-      esCar.addEventListener('mouseenter',function(){clearInterval(_esTimer);});
-      esCar.addEventListener('mouseleave',function(){_esTimer=setInterval(esNext,5000);});
-    }
-
-    // Initialize Lucide icons
-    if(window.lucide) lucide.createIcons();
 
     // ═══════════════════════════════════════════════════════════════════════
     // LEFT SIDEBAR — Canva-style panel (hover=float, click=dock)
@@ -4927,6 +4812,97 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
         body.innerHTML = '<div style="font-size:12px;color:var(--red,#EF4444);padding:20px">Error loading projects</div>';
       }
     }
+
+
+    })();
+    })();
+  </script>
+  <script>
+    // ===== MATRIX RAIN =====
+    (function(){
+      var canvas=document.getElementById('matrix-canvas');
+      if(!canvas) return;
+      var ctx=canvas.getContext('2d');
+      var chars='01</>{}();:.#ABCDEFabcdef';
+      var drops=[];
+      var fontSize=20;
+      var cols;
+      var running=true;
+
+      function resize(){
+        canvas.width=canvas.parentElement.offsetWidth;
+        canvas.height=canvas.parentElement.offsetHeight;
+        cols=Math.floor(canvas.width/fontSize);
+        drops=[];
+        for(var i=0;i<cols;i++) drops[i]=Math.random()*-100;
+      }
+      resize();
+      window.addEventListener('resize',resize);
+
+      function draw(){
+        if(!running) return;
+        ctx.fillStyle='rgba(13,13,13,0.08)';
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.fillStyle='rgba(0,229,255,0.35)';
+        ctx.font=fontSize+'px monospace';
+        for(var i=0;i<cols;i++){
+          var ch=chars[Math.floor(Math.random()*chars.length)];
+          var x=i*fontSize;
+          var y=drops[i]*fontSize;
+          ctx.fillText(ch,x,y);
+          if(y>canvas.height && Math.random()>0.99) drops[i]=0;
+          drops[i]+=0.11+Math.random()*0.06;
+        }
+        requestAnimationFrame(draw);
+      }
+      draw();
+
+      // Pause when hidden
+      var es=document.getElementById('empty-state');
+      var obs=new MutationObserver(function(){
+        if(es.style.display==='none'){running=false;}
+        else{running=true;requestAnimationFrame(draw);}
+      });
+      obs.observe(es,{attributes:true,attributeFilter:['style']});
+
+      // Expose stop for cleanup
+      window._matrixStop=function(){running=false;};
+    })();
+
+    // ===== CAROUSEL AUTO-PLAY =====
+    var _esSlide=0;
+    var _esTimer;
+    function esGoSlide(n){
+      _esSlide=n;
+      var slides=document.querySelectorAll('.es-slide');
+      var dots=document.querySelectorAll('.es-dot');
+      slides.forEach(function(s,i){s.classList.toggle('active',i===n);});
+      dots.forEach(function(d,i){d.classList.toggle('active',i===n);});
+    }
+    function esNext(){_esSlide=(_esSlide+1)%3;esGoSlide(_esSlide);if(_esSlide===1)startLineCounter();}
+    _esTimer=setInterval(esNext,5000);
+
+    // Line counter animation for slide 2
+    var _lcInterval;
+    function startLineCounter(){
+      var el=document.getElementById('es-line-counter');if(!el)return;
+      var count=0;clearInterval(_lcInterval);
+      _lcInterval=setInterval(function(){
+        count+=Math.floor(800+Math.random()*1200);
+        if(count>32000){count=32000;clearInterval(_lcInterval);}
+        el.textContent=count.toLocaleString()+' lines';
+      },120);
+    }
+    // Pause on hover
+    var esCar=document.querySelector('.es-carousel');
+    if(esCar){
+      esCar.addEventListener('mouseenter',function(){clearInterval(_esTimer);});
+      esCar.addEventListener('mouseleave',function(){_esTimer=setInterval(esNext,5000);});
+    }
+
+    // Initialize Lucide icons
+    if(window.lucide) lucide.createIcons();
+
   </script>
 </body>
 </html>
