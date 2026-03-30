@@ -300,8 +300,8 @@ app.get('/api/usage', async (req, res) => {
 });
 
 // ── Filesystem Setup ──────────────────────────────────────────────────────────
-const BUILDS_DIR = path.join(__dirname, 'builds');           // temp builds (24h TTL)
-const DEPLOYED_BUILDS_DIR = path.join(__dirname, 'deployed-builds'); // permanent deployed copies
+const BUILDS_DIR = process.env.BUILDS_DIR || path.join(__dirname, 'builds');           // temp builds (24h TTL)
+const DEPLOYED_BUILDS_DIR = process.env.DEPLOYED_BUILDS_DIR || path.join(__dirname, 'deployed-builds'); // permanent deployed copies
 const PORT = process.env.PORT || 3500;
 
 if (!fs.existsSync(BUILDS_DIR)) fs.mkdirSync(BUILDS_DIR, { recursive: true });
