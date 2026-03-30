@@ -3032,8 +3032,9 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
       }
 
       // Route to landing page builder
-      if (appMode === 'build' && _readyToBuild) {
+      if ((appMode === 'build' || appMode === 'wizard') && _readyToBuild) {
         _readyToBuild = false;
+        appMode = 'build'; // switch from wizard to build for generation
         // Fall through to the existing generate-stream code below
       } else if (appMode === 'wizard' || (appMode === 'build' && !_readyToBuild && wizardStage === 0)) {
         // Start wizard flow for new conversations
