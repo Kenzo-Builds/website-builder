@@ -472,6 +472,7 @@ function callAIStream(messages, model, onChunk, onDone, onError) {
   const req = https.request(options, (res) => {
     let buffer = '';
     let fullContent = '';
+    let doneFired = false; // guard against double-fire from [DONE] + res.on('end')
     res.on('data', (chunk) => {
       buffer += chunk.toString();
       const lines = buffer.split('\n');
@@ -479,7 +480,10 @@ function callAIStream(messages, model, onChunk, onDone, onError) {
       for (const line of lines) {
         if (!line.startsWith('data: ')) continue;
         const data = line.slice(6).trim();
-        if (data === '[DONE]') { onDone(fullContent); return; }
+        if (data === '[DONE]') {
+          if (!doneFired) { doneFired = true; onDone(fullContent); }
+          return;
+        }
         try {
           const parsed = JSON.parse(data);
           const delta = parsed.choices?.[0]?.delta?.content;
@@ -502,7 +506,8 @@ function callAIStream(messages, model, onChunk, onDone, onError) {
           } catch(e) {}
         }
       }
-      onDone(fullContent);
+      // Only fire onDone if [DONE] wasn't received (some models skip it)
+      if (!doneFired) { doneFired = true; onDone(fullContent); }
     });
   });
   req.setTimeout(600000, () => { req.destroy(); onError(new Error('AI stream timed out')); });
@@ -683,7 +688,31 @@ ${isMultiFile ? 'Return ALL files using the --- FILE: filename --- format.' : 'R
 
       // Guard against writing to a closed connection (client disconnected during long generation)
       if (res.writableEnded || res.destroyed) {
-        console.log(`[stream] client disconnected before done event — skipping write`);
+        console.log(`[stream] client disconnected before done event — saving project server-side`);
+        // Server-side save: persist project to Supabase so user doesn't lose work
+        if (userId && SUPABASE_URL && SUPABASE_SERVICE_KEY) {
+          const projectData = {
+            user_id: userId,
+            title: prompt.slice(0, 80).replace(/[^a-zA-Z0-9 ]/g, '').trim() || 'Untitled App',
+            prompt,
+            html: html || '',
+            model,
+            build_id: buildId,
+            files: files,
+            updated_at: new Date().toISOString()
+          };
+          fetch(`${SUPABASE_URL}/rest/v1/projects`, {
+            method: 'POST',
+            headers: {
+              'apikey': SUPABASE_SERVICE_KEY,
+              'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
+              'Content-Type': 'application/json',
+              'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify(projectData)
+          }).then(() => console.log(`[stream] server-side project save complete for user=${userId.slice(0,8)}`))
+            .catch(e => console.warn(`[stream] server-side save failed:`, e.message));
+        }
         return;
       }
       try {
@@ -701,8 +730,14 @@ ${isMultiFile ? 'Return ALL files using the --- FILE: filename --- format.' : 'R
     }
   );
 
-  // Handle client disconnect gracefully (no further writes after close)
-  req.on('close', () => { /* client disconnected — stream will fail naturally */ });
+  // Handle client disconnect — save project server-side if user was logged in
+  req.on('close', () => {
+    if (!res.writableEnded) {
+      // Client disconnected mid-stream — generation may still be running
+      // saveProject will be called server-side when generation completes (see onDone)
+      console.log(`[stream] client disconnected mid-stream for user=${userId?.slice(0,8)||'guest'}`);
+    }
+  });
 });
 
 // ── Brainstorm System Prompt ──────────────────────────────────────────────────
@@ -2247,6 +2282,105 @@ app.get('/api/react-template', (req, res) => {
     res.json({ files, count: Object.keys(files).length });
   } catch(e) {
     res.status(500).json({ error: e.message });
+  }
+});
+
+// ── POST /api/deploy-react ─────────────────────────────────────────────────────
+// Deploys a React/Vite project: builds it server-side then deploys dist/ as static site
+// Dependencies: verifyUser, http.request (deploy API), fetch (Supabase)
+// Flow:
+//   1. Verify user + validate subdomain
+//   2. Write all project files to a temp directory
+//   3. Run npm install + npm run build via child_process
+//   4. Deploy the dist/ folder as static site via deploy API
+//   5. Update Supabase project record with deployed_url
+app.post('/api/deploy-react', async (req, res) => {
+  const user = await verifyUser(req.headers.authorization);
+  if (!user?.id) return res.status(401).json({ error: 'Login required to deploy' });
+
+  const { buildId, subdomain, projectId, files: clientFiles } = req.body;
+  if (!subdomain) return res.status(400).json({ error: 'subdomain required' });
+
+  if (!/^[a-z0-9][a-z0-9-]{1,30}[a-z0-9]$/.test(subdomain)) {
+    return res.status(400).json({ error: 'Invalid subdomain format' });
+  }
+  const reserved = ['kenzo', 'admin', 'api', 'www', 'mail', 'builder', 'app', 'dashboard', 'auth', 'login', 'static', 'assets', 'cdn'];
+  if (reserved.includes(subdomain)) return res.status(400).json({ error: 'Reserved subdomain' });
+
+  try {
+    // Get project files — from request body or from disk
+    let files = clientFiles;
+    if (!files && buildId) {
+      let buildPath = path.join(BUILDS_DIR, buildId);
+      if (!fs.existsSync(buildPath)) buildPath = path.join(DEPLOYED_BUILDS_DIR, buildId);
+      if (fs.existsSync(buildPath)) {
+        files = {};
+        function readDir(dir, base = '') {
+          for (const item of fs.readdirSync(dir, { withFileTypes: true })) {
+            const rel = base ? `${base}/${item.name}` : item.name;
+            if (item.isDirectory()) readDir(path.join(dir, item.name), rel);
+            else files[rel] = fs.readFileSync(path.join(dir, item.name), 'utf8');
+          }
+        }
+        readDir(buildPath);
+      }
+    }
+    if (!files || !Object.keys(files).length) return res.status(400).json({ error: 'No project files found' });
+
+    // Write project files to temp build directory
+    const buildDir = path.join(BUILDS_DIR, `react-build-${Date.now()}`);
+    fs.mkdirSync(buildDir, { recursive: true });
+    for (const [filename, content] of Object.entries(files)) {
+      const filePath = path.join(buildDir, filename);
+      fs.mkdirSync(path.dirname(filePath), { recursive: true });
+      fs.writeFileSync(filePath, typeof content === 'string' ? content : JSON.stringify(content));
+    }
+
+    // Run npm install + vite build
+    const { execSync } = require('child_process');
+    console.log(`[deploy-react] Running npm install in ${buildDir}...`);
+    execSync('npm install --production=false 2>&1', { cwd: buildDir, timeout: 120000 });
+    console.log(`[deploy-react] Running npm run build...`);
+    execSync('npm run build 2>&1', { cwd: buildDir, timeout: 120000 });
+
+    const distDir = path.join(buildDir, 'dist');
+    if (!fs.existsSync(distDir)) return res.status(500).json({ error: 'Build failed: no dist directory' });
+
+    // Generate nginx config for static site
+    const nginxConf = `server {\n    listen 80;\n    server_name ${subdomain}.kenzoagent.com;\n    root /var/www/${subdomain}.kenzoagent.com;\n    index index.html;\n    location / { try_files $uri $uri/ /index.html; }\n}`;
+    fs.writeFileSync(path.join(distDir, 'nginx.conf'), nginxConf);
+
+    // Deploy dist/ as static site
+    const deployBody = JSON.stringify({
+      domain: `${subdomain}.kenzoagent.com`,
+      files_path: distDir.replace('/home/node/.openclaw', '/root/.openclaw')
+    });
+    const result = await new Promise((resolve, reject) => {
+      const opts = { hostname: DEPLOY_HOST, port: DEPLOY_PORT, path: '/deploy', method: 'POST', headers: { 'Content-Type': 'application/json' } };
+      const r = http.request(opts, (res2) => { let d=''; res2.on('data',c=>d+=c); res2.on('end',()=>{ try{resolve(JSON.parse(d))}catch(e){resolve({raw:d})} }); });
+      r.on('error', reject); r.write(deployBody); r.end();
+    });
+
+    // Cleanup temp build dir
+    try { fs.rmSync(buildDir, { recursive: true, force: true }); } catch(e) {}
+
+    const deployedUrl = `https://${subdomain}.kenzoagent.com`;
+
+    // Update Supabase project record
+    if (projectId) {
+      await fetch(`${SUPABASE_URL}/rest/v1/projects?id=eq.${projectId}&user_id=eq.${user.id}`, {
+        method: 'PATCH',
+        headers: { 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ deployed_url: deployedUrl, updated_at: new Date().toISOString() })
+      });
+    }
+
+    console.log(`[deploy-react] ✅ Deployed to ${deployedUrl}`);
+    res.json({ success: true, url: deployedUrl });
+
+  } catch(err) {
+    console.error(`[deploy-react] ❌ Error:`, err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 

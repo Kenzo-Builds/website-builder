@@ -776,7 +776,7 @@
     .sb-icon:hover { color:rgba(255,255,255,0.7); background:rgba(255,255,255,0.05); }
     .sb-icon.active { color:var(--blue); background:rgba(59,130,246,0.12); }
     .sb-icon.docked { color:var(--blue); background:rgba(59,130,246,0.12); }
-    .sidebar-float { position:absolute; left:48px; top:0; bottom:0; width:260px; background:#0C0C0F; border-right:1px solid rgba(255,255,255,0.06); display:flex; flex-direction:column; z-index:25; box-shadow:4px 0 16px rgba(0,0,0,0.3); overflow:hidden; }
+    .sidebar-float { position:fixed; left:48px; top:0; bottom:0; width:260px; background:#0C0C0F; border-right:1px solid rgba(255,255,255,0.06); display:flex; flex-direction:column; z-index:25; box-shadow:4px 0 16px rgba(0,0,0,0.3); overflow:hidden; max-height:100vh; }
     .sidebar-panel { width:260px; background:#0C0C0F; border-right:1px solid rgba(255,255,255,0.06); display:flex; flex-direction:column; z-index:19; flex-shrink:0; overflow:hidden; }
     .sb-panel-header { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid rgba(255,255,255,0.06); }
     .sb-panel-title { font-size:14px; font-weight:600; color:var(--text-1); }
@@ -2160,7 +2160,12 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
     async function generateFullStack(prompt) {
       setStatus('generating');
       document.getElementById('send-btn').classList.add('disabled');
-      startBuildStatusMessages();
+      // Override build steps with React-specific messages
+      const reactSteps = getBuildSteps(true);
+      _buildMsgEl = addMessage(reactSteps[0].text + ' <span style="font-size:10px;color:var(--text-4)">(Sonnet 4.6)</span>', 'ai');
+      reactSteps.slice(1).forEach(step => {
+        setTimeout(() => { if (_buildMsgEl) _buildMsgEl.innerHTML = step.text; }, step.delay);
+      });
 
       try {
         // Load React base template in parallel with AI generation
@@ -2371,13 +2376,25 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
 
     // ── Chat build status messages ──
     let _buildMsgEl = null;
-    const _buildSteps = [
-      { text: '🧠 Analyzing your requirements...', delay: 0 },
-      { text: '📁 Generating project structure...', delay: 1200 },
-      { text: '⚡ Writing server & API routes...', delay: 2800 },
-      { text: '🎨 Building frontend interface...', delay: 4500 },
-      { text: '📦 Preparing dependencies...', delay: 6500 },
-    ];
+    // Build status steps — different messages for React vs regular fullstack
+    function getBuildSteps(isReact) {
+      if (isReact) return [
+        { text: '🧠 Generating React + Shadcn/UI app...', delay: 0 },
+        { text: '⚛️ Writing React components & pages...', delay: 3000 },
+        { text: '🎨 Applying Tailwind styles & layout...', delay: 8000 },
+        { text: '🔌 Building Express API backend...', delay: 15000 },
+        { text: '📦 Merging with component library...', delay: 25000 },
+        { text: '⚡ Booting Vite dev server... (this takes ~60s)', delay: 40000 },
+      ];
+      return [
+        { text: '🧠 Analyzing your requirements...', delay: 0 },
+        { text: '📁 Generating project structure...', delay: 1200 },
+        { text: '⚡ Writing server & API routes...', delay: 2800 },
+        { text: '🎨 Building frontend interface...', delay: 4500 },
+        { text: '📦 Preparing dependencies...', delay: 6500 },
+      ];
+    }
+    const _buildSteps = getBuildSteps(false); // will be replaced at runtime
 
     function startBuildStatusMessages() {
       _buildMsgEl = addMessage('🧠 Analyzing your requirements...', 'ai');
@@ -4340,12 +4357,22 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
         const session = await sb.auth.getSession();
         const token = session.data.session?.access_token;
 
-        // Full-stack apps use Docker deployment
-        var isFS = appMode === 'fullstack' || (projectFiles && (projectFiles['index.js'] || projectFiles['package.json']));
-        var endpoint = isFS ? `${API}/api/deploy-fullstack` : `${API}/api/deploy`;
-        var body = isFS
-          ? { projectId: currentProjectId, subdomain: sub, files: projectFiles, schemaSql: projectFiles['schema.sql'] || null }
-          : { buildId: currentBuildId, subdomain: sub, projectId: currentProjectId };
+        // React apps (have src/App.jsx) use Vite build + static deploy
+        // Legacy fullstack (index.js + no src/) use Docker deployment
+        // Static sites use direct file deploy
+        var isReact = projectFiles && (projectFiles['src/App.jsx'] || projectFiles['src/app.jsx']);
+        var isLegacyFS = !isReact && (projectFiles && (projectFiles['index.js'] || projectFiles['server.js']));
+        var endpoint, body;
+        if (isReact) {
+          endpoint = `${API}/api/deploy-react`;
+          body = { buildId: currentBuildId, subdomain: sub, projectId: currentProjectId, files: projectFiles };
+        } else if (isLegacyFS) {
+          endpoint = `${API}/api/deploy-fullstack`;
+          body = { projectId: currentProjectId, subdomain: sub, files: projectFiles, schemaSql: projectFiles['schema.sql'] || null };
+        } else {
+          endpoint = `${API}/api/deploy`;
+          body = { buildId: currentBuildId, subdomain: sub, projectId: currentProjectId };
+        }
 
         const res = await fetch(endpoint, {
           method: 'POST',
@@ -4518,12 +4545,13 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
         else setMode('build');
 
         // Check if user chose "Build directly" from dashboard
+        // Full Stack mode always defaults to direct build (no wizard)
         var buildMode = sessionStorage.getItem('builder_buildmode') || 'wizard';
         sessionStorage.removeItem('builder_buildmode');
-        if (buildMode === 'direct') {
+        if (buildMode === 'direct' || mode === 'fullstack') {
           _readyToBuild = true; // skip discovery, generate immediately
-        } else if (buildMode === 'wizard' && mode !== 'fullstack') {
-          appMode = 'wizard'; // only set wizard for non-fullstack modes
+        } else if (buildMode === 'wizard') {
+          appMode = 'wizard'; // wizard mode for landing pages only
         }
 
         setTimeout(() => {
