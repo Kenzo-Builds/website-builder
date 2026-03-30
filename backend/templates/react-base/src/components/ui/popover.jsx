@@ -1,24 +1,34 @@
 import * as React from "react"
-import * as PopoverPrimitive from "@radix-ui/react-popover"
 import { cn } from "@/lib/utils"
 
-const Popover = PopoverPrimitive.Root
-const PopoverTrigger = PopoverPrimitive.Trigger
+const PopoverContext = React.createContext({ open: false, setOpen: () => {} })
 
-const PopoverContent = React.forwardRef(({ className, align = "center", sideOffset = 4, ...props }, ref) => (
-  <PopoverPrimitive.Portal>
-    <PopoverPrimitive.Content
-      ref={ref}
-      align={align}
-      sideOffset={sideOffset}
-      className={cn(
-        "z-50 w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-        className
-      )}
-      {...props}
-    />
-  </PopoverPrimitive.Portal>
-))
-PopoverContent.displayName = PopoverPrimitive.Content.displayName
+function Popover({ children }) {
+  const [open, setOpen] = React.useState(false)
+  React.useEffect(() => {
+    if (!open) return
+    const handler = () => setOpen(false)
+    setTimeout(() => document.addEventListener('click', handler), 0)
+    return () => document.removeEventListener('click', handler)
+  }, [open])
+  return <PopoverContext.Provider value={{ open, setOpen }}><div className="relative inline-block">{children}</div></PopoverContext.Provider>
+}
+
+function PopoverTrigger({ children, asChild }) {
+  const { setOpen } = React.useContext(PopoverContext)
+  const el = asChild ? React.Children.only(children) : <button>{children}</button>
+  return React.cloneElement(el, { onClick: (e) => { e.stopPropagation(); setOpen(v => !v) } })
+}
+
+const PopoverContent = React.forwardRef(({ className, align = "center", sideOffset = 4, children, ...props }, ref) => {
+  const { open } = React.useContext(PopoverContext)
+  if (!open) return null
+  return (
+    <div ref={ref} className={cn("absolute z-50 w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none top-full mt-1", align === "end" ? "right-0" : align === "center" ? "left-1/2 -translate-x-1/2" : "left-0", className)} onClick={e => e.stopPropagation()} {...props}>
+      {children}
+    </div>
+  )
+})
+PopoverContent.displayName = "PopoverContent"
 
 export { Popover, PopoverTrigger, PopoverContent }

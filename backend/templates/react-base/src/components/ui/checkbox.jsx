@@ -1,24 +1,27 @@
 import * as React from "react"
-import * as CheckboxPrimitive from "@radix-ui/react-checkbox"
-import { Check } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Check } from "lucide-react"
 
-const Checkbox = React.forwardRef(({ className, ...props }, ref) => (
-  <CheckboxPrimitive.Root
-    ref={ref}
-    className={cn(
-      "peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground",
-      className
-    )}
-    {...props}
-  >
-    <CheckboxPrimitive.Indicator
-      className={cn("flex items-center justify-center text-current")}
+const Checkbox = React.forwardRef(({ className, checked, defaultChecked, onCheckedChange, ...props }, ref) => {
+  const [internalChecked, setInternalChecked] = React.useState(defaultChecked || false)
+  const isChecked = checked !== undefined ? checked : internalChecked
+  const toggle = () => { const next = !isChecked; if (checked === undefined) setInternalChecked(next); onCheckedChange?.(next) }
+  return (
+    <button
+      ref={ref}
+      type="button"
+      role="checkbox"
+      aria-checked={isChecked}
+      onClick={toggle}
+      className={cn("peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+        isChecked ? "bg-primary text-primary-foreground" : "bg-background",
+        className)}
+      {...props}
     >
-      <Check className="h-4 w-4" />
-    </CheckboxPrimitive.Indicator>
-  </CheckboxPrimitive.Root>
-))
-Checkbox.displayName = CheckboxPrimitive.Root.displayName
+      {isChecked && <Check className="h-3 w-3 m-auto" />}
+    </button>
+  )
+})
+Checkbox.displayName = "Checkbox"
 
 export { Checkbox }

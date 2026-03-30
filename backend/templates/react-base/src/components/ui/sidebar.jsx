@@ -1,181 +1,102 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { ChevronLeft, ChevronRight } from "lucide-react"
 
-const SidebarContext = React.createContext({
-  collapsed: false,
-  setCollapsed: () => {},
-})
+const SidebarContext = React.createContext({ open: true, setOpen: () => {} })
 
-function useSidebar() {
-  return React.useContext(SidebarContext)
+function SidebarProvider({ children, defaultOpen = true }) {
+  const [open, setOpen] = React.useState(defaultOpen)
+  return <SidebarContext.Provider value={{ open, setOpen }}><div className="flex h-screen w-full">{children}</div></SidebarContext.Provider>
 }
-
-const SidebarProvider = ({ children, defaultCollapsed = false }) => {
-  const [collapsed, setCollapsed] = React.useState(defaultCollapsed)
-
-  return (
-    <SidebarContext.Provider value={{ collapsed, setCollapsed }}>
-      <div className="flex h-full w-full">
-        {children}
-      </div>
-    </SidebarContext.Provider>
-  )
-}
-SidebarProvider.displayName = "SidebarProvider"
 
 const Sidebar = React.forwardRef(({ className, children, ...props }, ref) => {
-  const { collapsed } = useSidebar()
-
+  const { open } = React.useContext(SidebarContext)
   return (
-    <aside
-      ref={ref}
-      className={cn(
-        "flex flex-col border-r bg-sidebar text-sidebar-foreground transition-all duration-300",
-        collapsed ? "w-[60px]" : "w-[240px]",
-        className
-      )}
-      {...props}
-    >
+    <aside ref={ref} className={cn("flex flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-300", open ? "w-64" : "w-14", className)} {...props}>
       {children}
     </aside>
   )
 })
 Sidebar.displayName = "Sidebar"
 
+const SidebarInset = React.forwardRef(({ className, ...props }, ref) => (
+  <main ref={ref} className={cn("flex flex-1 flex-col overflow-auto", className)} {...props} />
+))
+SidebarInset.displayName = "SidebarInset"
+
+function SidebarTrigger({ className, ...props }) {
+  const { open, setOpen } = React.useContext(SidebarContext)
+  return (
+    <button onClick={() => setOpen(!open)} className={cn("inline-flex h-7 w-7 items-center justify-center rounded-md text-sidebar-foreground hover:bg-sidebar-accent", className)} {...props}>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      </svg>
+    </button>
+  )
+}
+
 const SidebarHeader = React.forwardRef(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("flex h-14 items-center border-b px-4", className)}
-    {...props}
-  />
+  <div ref={ref} className={cn("flex h-16 items-center border-b border-sidebar-border px-4", className)} {...props} />
 ))
 SidebarHeader.displayName = "SidebarHeader"
 
-const SidebarContent = React.forwardRef(({ className, ...props }, ref) => (
-  <ScrollArea className="flex-1">
-    <div
-      ref={ref}
-      className={cn("flex flex-col gap-1 p-2", className)}
-      {...props}
-    />
-  </ScrollArea>
-))
-SidebarContent.displayName = "SidebarContent"
-
 const SidebarFooter = React.forwardRef(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("flex items-center border-t p-4", className)}
-    {...props}
-  />
+  <div ref={ref} className={cn("flex items-center border-t border-sidebar-border p-4 mt-auto", className)} {...props} />
 ))
 SidebarFooter.displayName = "SidebarFooter"
 
+const SidebarContent = React.forwardRef(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn("flex flex-1 flex-col overflow-y-auto py-2", className)} {...props} />
+))
+SidebarContent.displayName = "SidebarContent"
+
 const SidebarGroup = React.forwardRef(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("flex flex-col gap-1", className)}
-    {...props}
-  />
+  <div ref={ref} className={cn("flex flex-col gap-1 px-2 py-1", className)} {...props} />
 ))
 SidebarGroup.displayName = "SidebarGroup"
 
 const SidebarGroupLabel = React.forwardRef(({ className, ...props }, ref) => {
-  const { collapsed } = useSidebar()
-  if (collapsed) return null
-
-  return (
-    <div
-      ref={ref}
-      className={cn("px-2 py-1.5 text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider", className)}
-      {...props}
-    />
-  )
+  const { open } = React.useContext(SidebarContext)
+  if (!open) return null
+  return <div ref={ref} className={cn("px-2 py-1 text-xs font-semibold text-sidebar-foreground/50 uppercase tracking-wider", className)} {...props} />
 })
 SidebarGroupLabel.displayName = "SidebarGroupLabel"
 
 const SidebarGroupContent = React.forwardRef(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("flex flex-col gap-0.5", className)}
-    {...props}
-  />
+  <div ref={ref} className={cn("flex flex-col gap-0.5", className)} {...props} />
 ))
 SidebarGroupContent.displayName = "SidebarGroupContent"
 
+const SidebarMenu = React.forwardRef(({ className, ...props }, ref) => (
+  <ul ref={ref} className={cn("flex flex-col gap-0.5 list-none m-0 p-0", className)} {...props} />
+))
+SidebarMenu.displayName = "SidebarMenu"
+
 const SidebarMenuItem = React.forwardRef(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("", className)}
-    {...props}
-  />
+  <li ref={ref} className={cn("", className)} {...props} />
 ))
 SidebarMenuItem.displayName = "SidebarMenuItem"
 
-const SidebarMenuButton = React.forwardRef(({ className, isActive, icon, children, ...props }, ref) => {
-  const { collapsed } = useSidebar()
-
+const SidebarMenuButton = React.forwardRef(({ className, asChild, isActive, children, ...props }, ref) => {
+  const { open } = React.useContext(SidebarContext)
+  const Comp = asChild ? "span" : "button"
+  const inner = asChild ? React.Children.only(children) : null
+  if (asChild && inner) {
+    return React.cloneElement(inner, {
+      ref,
+      className: cn("flex items-center gap-2 rounded-md px-2 py-2 text-sm transition-colors w-full", isActive ? "bg-sidebar-primary text-sidebar-primary-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground", !open && "justify-center", className, inner.props.className),
+    })
+  }
   return (
-    <button
-      ref={ref}
-      className={cn(
-        "flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-        isActive && "bg-sidebar-accent text-sidebar-accent-foreground",
-        collapsed && "justify-center",
-        className
-      )}
-      {...props}
-    >
-      {icon && <span className="flex-shrink-0">{icon}</span>}
-      {!collapsed && <span>{children}</span>}
-    </button>
+    <Comp ref={ref} className={cn("flex items-center gap-2 rounded-md px-2 py-2 text-sm transition-colors w-full", isActive ? "bg-sidebar-primary text-sidebar-primary-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground", !open && "justify-center", className)} {...props}>
+      {children}
+    </Comp>
   )
 })
 SidebarMenuButton.displayName = "SidebarMenuButton"
 
-const SidebarTrigger = React.forwardRef(({ className, ...props }, ref) => {
-  const { collapsed, setCollapsed } = useSidebar()
-
-  return (
-    <Button
-      ref={ref}
-      variant="ghost"
-      size="icon"
-      className={cn("h-8 w-8", className)}
-      onClick={() => setCollapsed(!collapsed)}
-      {...props}
-    >
-      {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-      <span className="sr-only">Toggle sidebar</span>
-    </Button>
-  )
-})
-SidebarTrigger.displayName = "SidebarTrigger"
-
-const SidebarInset = React.forwardRef(({ className, ...props }, ref) => (
-  <main
-    ref={ref}
-    className={cn("flex flex-1 flex-col overflow-auto", className)}
-    {...props}
-  />
-))
-SidebarInset.displayName = "SidebarInset"
-
 export {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarInset,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarProvider,
-  SidebarTrigger,
-  useSidebar,
+  SidebarProvider, Sidebar, SidebarInset, SidebarTrigger,
+  SidebarHeader, SidebarFooter, SidebarContent,
+  SidebarGroup, SidebarGroupLabel, SidebarGroupContent,
+  SidebarMenu, SidebarMenuItem, SidebarMenuButton
 }
