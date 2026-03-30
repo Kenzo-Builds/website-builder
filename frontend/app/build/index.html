@@ -2610,9 +2610,20 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
     // Dependencies: setMode, generateFromPlan
     // Called by: .build-it-btn onclick injected by brainstorm()
     function buildFromPlan() {
-      // Compile the full conversation into a build prompt
-      const lastAssistantMsg = brainstormHistory.filter(m => m.role === 'assistant').pop();
-      const buildPrompt = lastAssistantMsg ? lastAssistantMsg.content : brainstormHistory.map(m => m.content).join('\n');
+      // For fullstack: use original user prompt + brief summary to keep generation focused
+      // For landing pages: use full AI plan for best layout guidance
+      let buildPrompt;
+      if (appMode === 'fullstack') {
+        // Use first user message + last assistant summary to keep prompt lean
+        const firstUserMsg = brainstormHistory.find(m => m.role === 'user');
+        const lastAssistantMsg = brainstormHistory.filter(m => m.role === 'assistant').pop();
+        const userText = typeof firstUserMsg?.content === 'string' ? firstUserMsg.content : lastPrompt;
+        const summaryText = typeof lastAssistantMsg?.content === 'string' ? lastAssistantMsg.content.substring(0, 500) : '';
+        buildPrompt = userText + (summaryText ? '\n\nKey requirements summary:\n' + summaryText : '');
+      } else {
+        const lastAssistantMsg = brainstormHistory.filter(m => m.role === 'assistant').pop();
+        buildPrompt = lastAssistantMsg ? lastAssistantMsg.content : brainstormHistory.map(m => m.content).join('\n');
+      }
 
       addMessage('🚀 Generating your ' + (appMode === 'fullstack' ? 'app' : 'website') + ' from the plan...', 'ai');
 
