@@ -706,11 +706,11 @@
 
                 <div class="dd-trigger" id="dd-mode" style="min-width:auto">
                   <span id="md-ico"><i data-lucide="sparkles" style="width:14px;height:14px;stroke-width:1.75"></i></span>
-                  <span id="md-lbl">Brainstorm</span>
+                  <span id="md-lbl">Wizard</span>
                   <span class="chev">▾</span>
                   <div class="dd-menu" id="menu-mode">
-                    <div class="dd-opt active" data-mode="brainstorm" data-l="Brainstorm"><i data-lucide="sparkles" style="width:14px;height:14px;stroke-width:1.75;vertical-align:-2px"></i> Brainstorm first</div>
-                    <div class="dd-opt" data-mode="direct" data-l="Build directly"><i data-lucide="zap" style="width:14px;height:14px;stroke-width:1.75;vertical-align:-2px"></i> Build directly</div>
+                    <div class="dd-opt active" data-mode="wizard" data-l="Wizard"><i data-lucide="sparkles" style="width:14px;height:14px;stroke-width:1.75;vertical-align:-2px"></i> 🧠 Wizard first</div>
+                    <div class="dd-opt" data-mode="direct" data-l="Build directly"><i data-lucide="zap" style="width:14px;height:14px;stroke-width:1.75;vertical-align:-2px"></i> ⚡ Build directly</div>
                   </div>
                 </div>
               </div>
@@ -1209,7 +1209,7 @@
                 <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Can I use my own domain?<span class="faq-chevron">›</span></div><div class="faq-a">Custom domains are available on the Pro plan. Free and Starter plans deploy to *.kenzoagent.com subdomains.</div></div>
                 <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Can I download my code?<span class="faq-chevron">›</span></div><div class="faq-a">Yes! All plans can copy code. Starter and above can download full project files.</div></div>
                 <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">How do I delete my account?<span class="faq-chevron">›</span></div><div class="faq-a">Go to Account Settings → Danger Zone → Delete Account. This permanently removes all your data.</div></div>
-                <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">What is Brainstorm mode?<span class="faq-chevron">›</span></div><div class="faq-a">Brainstorm mode lets you plan your website with AI before building. The AI asks questions and creates a strategy, then you hit "Build it" to generate the site.</div></div>
+                <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">What is Wizard mode?<span class="faq-chevron">›</span></div><div class="faq-a">Wizard mode guides you step-by-step through selecting your app type, structure, brand strategy, and visual identity — then builds your site with all that context baked in.</div></div>
               </div>
             </div>
           </div>
@@ -1251,7 +1251,7 @@ var SUPA_URL='https://ljfkpkytcahmugwphrqo.supabase.co';
 var SUPA_KEY='sb_publishable_7eIDQqzdu6zy7-tLpLVpXw_ciCm1doM';
 var sb;try{sb=window.supabase.createClient(SUPA_URL,SUPA_KEY)}catch(e){}
 // Global state
-var user=null,curModel='anthropic/claude-sonnet-4.6',curBuildMode='brainstorm',attachB64=null;
+var user=null,curModel='anthropic/claude-sonnet-4.6',curBuildMode='wizard',attachB64=null;
 
 var TPLS=[
   // ── New templates (most recent first) ──

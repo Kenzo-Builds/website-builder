@@ -728,6 +728,46 @@
       .tab-actions-header { display: none; }
       .chat-header { display: none; }
     }
+
+    /* ═══ WIZARD UI ═══ */
+    .wizard-progress { display:flex; align-items:center; gap:6px; padding:8px 16px; border-bottom:1px solid rgba(255,255,255,0.06); }
+    .wizard-step { display:flex; align-items:center; gap:4px; font-size:11px; color:var(--text-4); }
+    .wizard-step.active { color:var(--blue); font-weight:600; }
+    .wizard-step.done { color:var(--green); }
+    .wizard-step-dot { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,0.1); }
+    .wizard-step.active .wizard-step-dot { background:var(--blue); }
+    .wizard-step.done .wizard-step-dot { background:var(--green); }
+    .wizard-step-line { width:20px; height:1px; background:rgba(255,255,255,0.1); }
+    .wizard-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:8px; margin:10px 0; }
+    .wizard-card { padding:12px; border:1px solid rgba(255,255,255,0.08); border-radius:10px; cursor:pointer; transition:all .15s; text-align:center; background:rgba(255,255,255,0.02); }
+    .wizard-card:hover { border-color:var(--blue); background:rgba(59,130,246,0.06); }
+    .wizard-card.selected { border-color:var(--blue); background:rgba(59,130,246,0.1); }
+    .wizard-card-emoji { font-size:24px; margin-bottom:4px; }
+    .wizard-card-label { font-size:12px; font-weight:600; color:var(--text-1); }
+    .wizard-card-desc { font-size:10px; color:var(--text-4); margin-top:2px; }
+    .wizard-checks { display:flex; flex-direction:column; gap:6px; margin:10px 0; }
+    .wizard-check { display:flex; align-items:center; gap:8px; padding:8px 12px; border:1px solid rgba(255,255,255,0.06); border-radius:8px; cursor:pointer; transition:all .15s; }
+    .wizard-check:hover { border-color:rgba(255,255,255,0.15); }
+    .wizard-check input[type=checkbox] { accent-color:var(--blue); width:16px; height:16px; }
+    .wizard-check-label { font-size:13px; color:var(--text-2); }
+    .wizard-options { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0; }
+    .wizard-opt { padding:8px 14px; border:1px solid rgba(255,255,255,0.08); border-radius:20px; cursor:pointer; font-size:12px; color:var(--text-3); transition:all .15s; }
+    .wizard-opt:hover { border-color:var(--blue); color:var(--text-1); }
+    .wizard-opt.selected { border-color:var(--blue); background:rgba(59,130,246,0.1); color:var(--text-1); }
+    .wizard-colors { display:flex; gap:10px; margin:10px 0; flex-wrap:wrap; }
+    .wizard-color-opt { display:flex; flex-direction:column; align-items:center; gap:4px; padding:10px; border:1px solid rgba(255,255,255,0.06); border-radius:10px; cursor:pointer; transition:all .15s; min-width:90px; }
+    .wizard-color-opt:hover { border-color:var(--blue); }
+    .wizard-color-opt.selected { border-color:var(--blue); background:rgba(59,130,246,0.06); }
+    .wizard-color-swatches { display:flex; gap:3px; }
+    .wizard-swatch { width:20px; height:20px; border-radius:4px; }
+    .wizard-color-name { font-size:10px; color:var(--text-4); }
+    .wizard-btn { padding:10px 20px; border:none; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; transition:all .15s; }
+    .wizard-btn-primary { background:var(--blue); color:#fff; }
+    .wizard-btn-primary:hover { filter:brightness(1.1); }
+    .wizard-btn-skip { background:transparent; color:var(--text-4); border:1px solid rgba(255,255,255,0.06); }
+    .wizard-btn-skip:hover { color:var(--text-2); border-color:rgba(255,255,255,0.15); }
+    .wizard-actions { display:flex; gap:8px; margin-top:12px; justify-content:flex-end; }
+    .wizard-skip-msg { font-size:11px; color:var(--text-4); margin-bottom:8px; font-style:italic; }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
@@ -844,6 +884,17 @@
             <i data-lucide="panel-left-close" style="width:14px;height:14px;stroke-width:1.75"></i>
           </button>
         </div>
+      </div>
+      <div class="wizard-progress" id="wizard-progress" style="display:none">
+        <div class="wizard-step active" id="ws-1"><span class="wizard-step-dot"></span> App Type</div>
+        <div class="wizard-step-line"></div>
+        <div class="wizard-step" id="ws-2"><span class="wizard-step-dot"></span> Structure</div>
+        <div class="wizard-step-line"></div>
+        <div class="wizard-step" id="ws-3"><span class="wizard-step-dot"></span> Brand</div>
+        <div class="wizard-step-line"></div>
+        <div class="wizard-step" id="ws-4"><span class="wizard-step-dot"></span> Identity</div>
+        <div class="wizard-step-line"></div>
+        <div class="wizard-step" id="ws-5"><span class="wizard-step-dot"></span> Build</div>
       </div>
       <div id="chat-history">
         <div class="msg">
@@ -1181,9 +1232,21 @@
     let isGuest = false;         // true if user chose "Continue without account"
     let authMode = 'signup';     // auth modal mode: 'signup' | 'login'
     let currentDevice = 'desktop'; // preview device frame: 'desktop' | 'tablet' | 'phone'
-    let appMode = 'build';  // chat mode: 'build' (landing page) | 'fullstack'
+    let appMode = 'build';  // chat mode: 'build' (landing page) | 'fullstack' | 'wizard'
     let _readyToBuild = false;  // set to true when AI confirms brief is complete
     let brainstormHistory = [];  // conversation history array for /api/brainstorm
+
+    // ═══ WIZARD STATE ═══
+    let wizardStage = 0; // 0=not started, 1=app_type, 2=structure, 3=brand_strategy, 4=brand_identity, 5=building
+    let wizardContext = {
+      app_type: null,
+      app_label: null,
+      pages: [],
+      brand: {},
+      language: 'en',
+      industry_context: null
+    };
+    let wizardAppTypes = []; // cached from /api/wizard/start
     let currentProjectId = null; // Supabase projects.id for current project
     let currentProjectName = ''; // auto-generated from first prompt
     let currentDeployedUrl = null; // live URL after deploy (e.g. https://mysite.kenzoagent.com)
@@ -2313,6 +2376,378 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
       // Restore mode if needed
     }
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // WIZARD FLOW — 3-stage structured onboarding
+    // ═══════════════════════════════════════════════════════════════════════
+
+    function updateWizardProgress(stage) {
+      wizardStage = stage;
+      var bar = document.getElementById('wizard-progress');
+      if (!bar) return;
+      bar.style.display = stage > 0 ? 'flex' : 'none';
+      for (var i = 1; i <= 5; i++) {
+        var el = document.getElementById('ws-' + i);
+        if (!el) continue;
+        el.className = 'wizard-step' + (i < stage ? ' done' : i === stage ? ' active' : '');
+      }
+    }
+
+    async function startWizard(prompt) {
+      updateWizardProgress(1);
+      var typingEl = addMessage('<div class="typing-dots"><span></span><span></span><span></span></div>', 'ai');
+
+      try {
+        var res = await fetch(API + '/api/wizard/start', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: prompt })
+        });
+        var data = await res.json();
+        wizardAppTypes = data.appTypes || [];
+        wizardContext.language = data.userLanguage || 'en';
+
+        if (data.hasHistory && data.pastBrandContext) {
+          wizardContext.brand = { ...wizardContext.brand, ...data.pastBrandContext };
+        }
+
+        var msg = '🧠 <strong>Wizard</strong> — Let\'s build your app step by step.\n\nWhat type of app do you need?';
+        if (data.detectedType) {
+          msg = '🧠 <strong>Wizard</strong> — I detected you want a <strong>' + (wizardAppTypes.find(a => a.key === data.detectedType)?.label || data.detectedType) + '</strong>. Is that right? Pick your app type:';
+        }
+
+        var cardsHtml = '<div class="wizard-cards">';
+        wizardAppTypes.forEach(function(app) {
+          var sel = app.key === data.detectedType ? ' selected' : '';
+          cardsHtml += '<div class="wizard-card' + sel + '" onclick="wizardSelectAppType(\'' + app.key + '\')">' +
+            '<div class="wizard-card-emoji">' + app.emoji + '</div>' +
+            '<div class="wizard-card-label">' + app.label + '</div>' +
+            '<div class="wizard-card-desc">' + app.description + '</div>' +
+          '</div>';
+        });
+        cardsHtml += '</div>';
+        cardsHtml += '<div style="margin-top:8px"><input type="text" id="wizard-custom-type" placeholder="Or describe a custom app..." style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 12px;color:var(--text-2);font-size:12px;font-family:inherit;outline:none" onkeydown="if(event.key===\'Enter\')wizardSelectAppType(\'custom\')"></div>';
+
+        typingEl.innerHTML = msg.replace(/\n/g, '<br>') + cardsHtml;
+      } catch(e) {
+        typingEl.innerHTML = '<span style="color:var(--red)">Wizard error: ' + e.message + '</span>';
+      }
+    }
+
+    async function wizardSelectAppType(type) {
+      if (type === 'custom') {
+        var input = document.getElementById('wizard-custom-type');
+        var customDesc = input ? input.value.trim() : '';
+        if (!customDesc) return;
+        wizardContext.app_type = 'custom';
+        wizardContext.app_label = customDesc;
+        addMessage('Custom app: ' + customDesc, 'user');
+        wizardShowCustomPages();
+        return;
+      }
+
+      var app = wizardAppTypes.find(function(a) { return a.key === type; });
+      wizardContext.app_type = type;
+      wizardContext.app_label = app ? app.label : type;
+      addMessage(app ? app.emoji + ' ' + app.label : type, 'user');
+
+      document.querySelectorAll('.wizard-card').forEach(function(c) { c.onclick = null; c.style.opacity = '0.5'; });
+      var selected = document.querySelector('.wizard-card.selected');
+      if (selected) { selected.classList.remove('selected'); }
+      document.querySelectorAll('.wizard-card').forEach(function(c) {
+        if (c.querySelector('.wizard-card-label')?.textContent === (app?.label || type)) {
+          c.classList.add('selected');
+          c.style.opacity = '1';
+        }
+      });
+
+      updateWizardProgress(2);
+      var typingEl = addMessage('<div class="typing-dots"><span></span><span></span><span></span></div>', 'ai');
+
+      try {
+        var res = await fetch(API + '/api/wizard/structure', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ appType: type })
+        });
+        var data = await res.json();
+
+        var checksHtml = '<div class="wizard-checks" id="wizard-pages">';
+        (data.pages || []).forEach(function(p) {
+          checksHtml += '<label class="wizard-check"><input type="checkbox" value="' + p.name + '"' + (p.checked ? ' checked' : '') + '><span class="wizard-check-label">' + p.name + '</span></label>';
+        });
+        checksHtml += '</div>';
+        checksHtml += '<div style="margin-top:6px"><input type="text" id="wizard-extra-page" placeholder="+ Add custom page..." style="width:200px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px 10px;color:var(--text-2);font-size:12px;font-family:inherit;outline:none" onkeydown="if(event.key===\'Enter\')wizardAddPage()"></div>';
+        checksHtml += '<div class="wizard-actions"><button class="wizard-btn wizard-btn-primary" onclick="wizardConfirmPages()">Confirm Pages &#8594;</button></div>';
+
+        var features = (data.keyFeatures || []).map(function(f) { return '• ' + f; }).join('<br>');
+        typingEl.innerHTML = '📋 <strong>Recommended pages for ' + data.label + ':</strong><br>All are pre-selected — uncheck any you don\'t need.<br>' + checksHtml + (features ? '<div style="margin-top:10px;font-size:11px;color:var(--text-4)">Key features: ' + features + '</div>' : '');
+      } catch(e) {
+        typingEl.innerHTML = '<span style="color:var(--red)">Error loading structure: ' + e.message + '</span>';
+      }
+    }
+
+    function wizardShowCustomPages() {
+      updateWizardProgress(2);
+      var html = '📋 <strong>What pages should your app have?</strong><br>Type page names separated by commas:<br>';
+      html += '<div style="margin:10px 0"><input type="text" id="wizard-custom-pages" placeholder="Dashboard, Products, Reports..." style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 12px;color:var(--text-2);font-size:13px;font-family:inherit;outline:none"></div>';
+      html += '<div class="wizard-actions"><button class="wizard-btn wizard-btn-primary" onclick="wizardConfirmCustomPages()">Confirm &#8594;</button></div>';
+      addMessage(html, 'ai');
+    }
+
+    function wizardConfirmCustomPages() {
+      var input = document.getElementById('wizard-custom-pages');
+      var pages = (input ? input.value : '').split(',').map(function(p) { return p.trim(); }).filter(Boolean);
+      if (pages.length < 2) { alert('Add at least 2 pages'); return; }
+      wizardContext.pages = pages;
+      addMessage('Pages: ' + pages.join(', '), 'user');
+      wizardGoToBrandStrategy();
+    }
+
+    function wizardAddPage() {
+      var input = document.getElementById('wizard-extra-page');
+      if (!input || !input.value.trim()) return;
+      var container = document.getElementById('wizard-pages');
+      if (!container) return;
+      var label = document.createElement('label');
+      label.className = 'wizard-check';
+      label.innerHTML = '<input type="checkbox" value="' + input.value.trim() + '" checked><span class="wizard-check-label">' + input.value.trim() + '</span>';
+      container.appendChild(label);
+      input.value = '';
+    }
+
+    function wizardConfirmPages() {
+      var checks = document.querySelectorAll('#wizard-pages input[type=checkbox]');
+      var pages = [];
+      checks.forEach(function(c) { if (c.checked) pages.push(c.value); });
+      if (pages.length < 2) { alert('Select at least 2 pages'); return; }
+      wizardContext.pages = pages;
+      addMessage('✓ Pages: ' + pages.join(', '), 'user');
+      wizardGoToBrandStrategy();
+    }
+
+    async function wizardGoToBrandStrategy() {
+      updateWizardProgress(3);
+      var typingEl = addMessage('<div class="typing-dots"><span></span><span></span><span></span></div>', 'ai');
+
+      try {
+        var res = await fetch(API + '/api/wizard/brand-strategy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ appType: wizardContext.app_type, pages: wizardContext.pages, userLanguage: wizardContext.language })
+        });
+        var data = await res.json();
+        var bs = data.brandStrategy || {};
+
+        var html = '🎨 <strong>Brand Strategy</strong> (optional)<br>';
+        html += '<div class="wizard-skip-msg">You can skip this — but it helps AI build a more consistent app.</div>';
+
+        html += '<div style="margin:8px 0"><strong style="font-size:12px;color:var(--text-3)">Mission:</strong><br>';
+        html += '<div class="wizard-options" id="wizard-mission">';
+        var missions = [bs.mission].concat(bs.mission_alternatives || []).filter(Boolean);
+        missions.forEach(function(m, i) {
+          html += '<div class="wizard-opt' + (i === 0 ? ' selected' : '') + '" onclick="wizardToggleOpt(this,\'wizard-mission\')" data-value="' + m.replace(/"/g, '&quot;') + '">' + m + '</div>';
+        });
+        html += '</div></div>';
+
+        html += '<div style="margin:8px 0"><strong style="font-size:12px;color:var(--text-3)">Brand Personality:</strong><br>';
+        html += '<div class="wizard-options" id="wizard-personality">';
+        (bs.personality_options || ['Professional & Trustworthy', 'Friendly & Approachable', 'Bold & Modern']).forEach(function(p, i) {
+          html += '<div class="wizard-opt' + (p === bs.personality ? ' selected' : '') + '" onclick="wizardToggleOpt(this,\'wizard-personality\')" data-value="' + p + '">' + p + '</div>';
+        });
+        html += '</div></div>';
+
+        html += '<div style="margin:8px 0"><strong style="font-size:12px;color:var(--text-3)">Brand Tone:</strong><br>';
+        html += '<div class="wizard-options" id="wizard-tone">';
+        (bs.tone_options || ['Formal & Professional', 'Friendly & Simple', 'Modern & Minimal']).forEach(function(t, i) {
+          html += '<div class="wizard-opt' + (t === bs.tone ? ' selected' : '') + '" onclick="wizardToggleOpt(this,\'wizard-tone\')" data-value="' + t + '">' + t + '</div>';
+        });
+        html += '</div></div>';
+
+        html += '<div class="wizard-actions">';
+        html += '<button class="wizard-btn wizard-btn-skip" onclick="wizardSkipBrand()">Skip &#8594;</button>';
+        html += '<button class="wizard-btn wizard-btn-primary" onclick="wizardConfirmBrand()">Confirm &amp; Continue &#8594;</button>';
+        html += '</div>';
+
+        typingEl.innerHTML = html;
+
+        wizardContext.brand.mission = bs.mission;
+        wizardContext.brand.personality = bs.personality;
+        wizardContext.brand.tone = bs.tone;
+        wizardContext.brand.values = bs.values;
+        wizardContext.brand.messaging_pillars = bs.messaging_pillars;
+
+      } catch(e) {
+        typingEl.innerHTML = '<span style="color:var(--red)">Error: ' + e.message + '</span>';
+      }
+    }
+
+    function wizardToggleOpt(el, groupId) {
+      document.querySelectorAll('#' + groupId + ' .wizard-opt').forEach(function(o) { o.classList.remove('selected'); });
+      el.classList.add('selected');
+    }
+
+    function wizardSkipBrand() {
+      addMessage('⏭ Skipped brand strategy', 'user');
+      wizardGoToIdentity();
+    }
+
+    function wizardConfirmBrand() {
+      var missionEl = document.querySelector('#wizard-mission .wizard-opt.selected');
+      var personalityEl = document.querySelector('#wizard-personality .wizard-opt.selected');
+      var toneEl = document.querySelector('#wizard-tone .wizard-opt.selected');
+
+      if (missionEl) wizardContext.brand.mission = missionEl.getAttribute('data-value');
+      if (personalityEl) wizardContext.brand.personality = personalityEl.getAttribute('data-value');
+      if (toneEl) wizardContext.brand.tone = toneEl.getAttribute('data-value');
+
+      addMessage('✓ Brand: ' + (wizardContext.brand.personality || 'Professional') + ' / ' + (wizardContext.brand.tone || 'Direct'), 'user');
+      wizardGoToIdentity();
+    }
+
+    async function wizardGoToIdentity() {
+      updateWizardProgress(4);
+      var typingEl = addMessage('<div class="typing-dots"><span></span><span></span><span></span></div>', 'ai');
+
+      try {
+        var res = await fetch(API + '/api/wizard/brand-identity', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ appType: wizardContext.app_type, brandStrategy: wizardContext.brand })
+        });
+        var data = await res.json();
+
+        var html = '🎭 <strong>Brand Identity</strong> (optional)<br>';
+        html += '<div class="wizard-skip-msg">Choose your app\'s visual style. Skip to use defaults.</div>';
+
+        html += '<div style="margin:10px 0"><strong style="font-size:12px;color:var(--text-3)">Color Palette:</strong><br>';
+        html += '<div class="wizard-colors" id="wizard-colors">';
+        (data.colorPalettes || []).forEach(function(p, i) {
+          html += '<div class="wizard-color-opt' + (i === 0 ? ' selected' : '') + '" onclick="wizardSelectColor(this,' + i + ')" data-idx="' + i + '">' +
+            '<div class="wizard-color-swatches">' +
+            '<div class="wizard-swatch" style="background:' + p.primary + '"></div>' +
+            '<div class="wizard-swatch" style="background:' + p.secondary + '"></div>' +
+            '<div class="wizard-swatch" style="background:' + p.accent + '"></div>' +
+            '</div>' +
+            '<div class="wizard-color-name">' + p.name + '</div>' +
+          '</div>';
+        });
+        html += '</div></div>';
+
+        html += '<div style="margin:10px 0"><strong style="font-size:12px;color:var(--text-3)">Typography:</strong><br>';
+        html += '<div class="wizard-options" id="wizard-fonts">';
+        (data.fontPairings || []).forEach(function(f, i) {
+          html += '<div class="wizard-opt' + (i === 0 ? ' selected' : '') + '" onclick="wizardToggleOpt(this,\'wizard-fonts\')" data-heading="' + f.heading + '" data-body="' + f.body + '">' + f.name + ' (' + f.heading + ')</div>';
+        });
+        html += '</div></div>';
+
+        html += '<div style="margin:10px 0"><strong style="font-size:12px;color:var(--text-3)">Visual Style:</strong><br>';
+        html += '<div class="wizard-options" id="wizard-style">';
+        (data.styles || []).forEach(function(s, i) {
+          html += '<div class="wizard-opt' + (i === 0 ? ' selected' : '') + '" onclick="wizardToggleOpt(this,\'wizard-style\')" data-value="' + s.key + '">' + s.label + '</div>';
+        });
+        html += '</div></div>';
+
+        if (data.taglines && data.taglines.length) {
+          html += '<div style="margin:10px 0"><strong style="font-size:12px;color:var(--text-3)">Tagline:</strong><br>';
+          html += '<div class="wizard-options" id="wizard-tagline">';
+          data.taglines.forEach(function(t, i) {
+            html += '<div class="wizard-opt' + (i === 0 ? ' selected' : '') + '" onclick="wizardToggleOpt(this,\'wizard-tagline\')" data-value="' + t.replace(/"/g, '&quot;') + '">"' + t + '"</div>';
+          });
+          html += '</div></div>';
+        }
+
+        html += '<div class="wizard-actions">';
+        html += '<button class="wizard-btn wizard-btn-skip" onclick="wizardSkipIdentity()">Skip &#8594;</button>';
+        html += '<button class="wizard-btn wizard-btn-primary" onclick="wizardConfirmIdentity()">🚀 Build it &#8594;</button>';
+        html += '</div>';
+
+        typingEl.innerHTML = html;
+
+        window._wizardColorPalettes = data.colorPalettes || [];
+        if (data.colorPalettes && data.colorPalettes[0]) {
+          wizardContext.brand.colors = data.colorPalettes[0];
+        }
+        if (data.fontPairings && data.fontPairings[0]) {
+          wizardContext.brand.typography = { heading: data.fontPairings[0].heading, body: data.fontPairings[0].body };
+        }
+        if (data.styles && data.styles[0]) {
+          wizardContext.brand.style = data.styles[0].key;
+        }
+        if (data.taglines && data.taglines[0]) {
+          wizardContext.brand.tagline = data.taglines[0];
+        }
+
+      } catch(e) {
+        typingEl.innerHTML = '<span style="color:var(--red)">Error: ' + e.message + '</span>';
+      }
+    }
+
+    function wizardSelectColor(el, idx) {
+      document.querySelectorAll('#wizard-colors .wizard-color-opt').forEach(function(c) { c.classList.remove('selected'); });
+      el.classList.add('selected');
+      if (window._wizardColorPalettes && window._wizardColorPalettes[idx]) {
+        wizardContext.brand.colors = window._wizardColorPalettes[idx];
+      }
+    }
+
+    function wizardSkipIdentity() {
+      addMessage('⏭ Skipped brand identity — using defaults', 'user');
+      wizardBuild();
+    }
+
+    function wizardConfirmIdentity() {
+      var colorEl = document.querySelector('#wizard-colors .wizard-color-opt.selected');
+      if (colorEl) {
+        var idx = parseInt(colorEl.getAttribute('data-idx'));
+        if (window._wizardColorPalettes && window._wizardColorPalettes[idx]) {
+          wizardContext.brand.colors = window._wizardColorPalettes[idx];
+        }
+      }
+
+      var fontEl = document.querySelector('#wizard-fonts .wizard-opt.selected');
+      if (fontEl) {
+        wizardContext.brand.typography = { heading: fontEl.getAttribute('data-heading'), body: fontEl.getAttribute('data-body') };
+      }
+
+      var styleEl = document.querySelector('#wizard-style .wizard-opt.selected');
+      if (styleEl) wizardContext.brand.style = styleEl.getAttribute('data-value');
+
+      var tagEl = document.querySelector('#wizard-tagline .wizard-opt.selected');
+      if (tagEl) wizardContext.brand.tagline = tagEl.getAttribute('data-value');
+
+      var summary = (wizardContext.brand.colors?.name || 'Default') + ' / ' + (wizardContext.brand.typography?.heading || 'Inter') + ' / ' + (wizardContext.brand.style || 'clean');
+      addMessage('✓ Identity: ' + summary, 'user');
+      wizardBuild();
+    }
+
+    function wizardBuild() {
+      updateWizardProgress(5);
+
+      var prompt = 'Build a ' + (wizardContext.app_label || wizardContext.app_type) + ' application.\n';
+      prompt += 'Pages: ' + wizardContext.pages.join(', ') + '.\n';
+      if (wizardContext.brand.personality) prompt += 'Brand personality: ' + wizardContext.brand.personality + '.\n';
+      if (wizardContext.brand.tone) prompt += 'Brand tone: ' + wizardContext.brand.tone + '.\n';
+      if (wizardContext.brand.mission) prompt += 'Mission: ' + wizardContext.brand.mission + '.\n';
+      if (wizardContext.brand.tagline) prompt += 'Tagline: ' + wizardContext.brand.tagline + '.\n';
+      if (wizardContext.brand.colors) {
+        prompt += 'Colors: primary=' + wizardContext.brand.colors.primary + ', secondary=' + wizardContext.brand.colors.secondary + ', accent=' + wizardContext.brand.colors.accent + '.\n';
+      }
+      if (wizardContext.brand.typography) {
+        prompt += 'Fonts: heading=' + wizardContext.brand.typography.heading + ', body=' + wizardContext.brand.typography.body + '.\n';
+      }
+      if (wizardContext.brand.style) prompt += 'Style: ' + wizardContext.brand.style + '.\n';
+
+      addMessage('🚀 Building your ' + (wizardContext.app_label || 'app') + ' from the wizard plan...', 'ai');
+
+      var input = document.getElementById('prompt-input');
+      input.value = prompt;
+      _readyToBuild = true;
+
+      window._activeWizardContext = wizardContext;
+
+      generate();
+    }
+
     // ===== CORE GENERATION =====
 
     // ── handleKey — legacy key handler (now also bound via addEventListener)
@@ -2343,14 +2778,14 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
 
       const avatarDiv = document.createElement('div');
       avatarDiv.className = `msg-avatar ${role}`;
-      avatarDiv.textContent = role === 'ai' ? '✦' : (currentUser?.user_metadata?.full_name?.[0]?.toUpperCase() || '→');
+      avatarDiv.textContent = role === 'ai' ? (wizardStage > 0 ? '🧠' : '✦') : (currentUser?.user_metadata?.full_name?.[0]?.toUpperCase() || '→');
 
       const bodyDiv = document.createElement('div');
       bodyDiv.className = 'msg-body';
 
       const nameDiv = document.createElement('div');
       nameDiv.className = 'msg-name';
-      nameDiv.textContent = role === 'ai' ? 'AI Builder' : 'You';
+      nameDiv.textContent = role === 'ai' ? (wizardStage > 0 ? 'Wizard' : 'AI Builder') : 'You';
 
       const textDiv = document.createElement('div');
       textDiv.className = 'msg-text';
@@ -2375,8 +2810,14 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
       const h = document.getElementById('chat-history');
       h.innerHTML = '';
       brainstormHistory = [];
+      wizardStage = 0;
+      wizardContext = { app_type: null, app_label: null, pages: [], brand: {}, language: 'en', industry_context: null };
+      wizardAppTypes = [];
+      window._activeWizardContext = null;
+      window._wizardColorPalettes = null;
+      updateWizardProgress(0);
       setMode('brainstorm');
-      addMessage('Chat cleared. Tell me what you want to build — let\'s plan it first 🧠', 'ai');
+      addMessage('Chat cleared. What do you want to build? 🧠', 'ai');
       currentHtml = '';
       currentBuildId = '';
       projectFiles = {};
@@ -2527,12 +2968,14 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
         }
       }
 
-      // Route to landing page builder (direct build)
+      // Route to landing page builder
       if (appMode === 'build' && _readyToBuild) {
         _readyToBuild = false;
         // Fall through to the existing generate-stream code below
-      } else {
-        // Smart discovery conversation — AI asks questions first
+      } else if (appMode === 'wizard' || (appMode === 'build' && !_readyToBuild && wizardStage === 0)) {
+        // Start wizard flow for new conversations
+        return startWizard(prompt);
+      } else if (appMode === 'build' && !_readyToBuild) {
         return brainstorm(prompt, attachSnapshot);
       }
 
@@ -2564,6 +3007,10 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
           existingCode = currentHtml || null;
         }
         const genBody = { prompt, model, existingCode };
+        if (window._activeWizardContext) {
+          genBody.wizardContext = window._activeWizardContext;
+          window._activeWizardContext = null; // clear after use
+        }
         if (attachSnapshot) {
           genBody.image = attachSnapshot.base64;
           genBody.imageMimeType = attachSnapshot.mimeType;
@@ -3799,10 +4246,12 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
         else setMode('build');
 
         // Check if user chose "Build directly" from dashboard
-        var buildMode = sessionStorage.getItem('builder_buildmode') || 'brainstorm';
+        var buildMode = sessionStorage.getItem('builder_buildmode') || 'wizard';
         sessionStorage.removeItem('builder_buildmode');
         if (buildMode === 'direct') {
           _readyToBuild = true; // skip discovery, generate immediately
+        } else if (buildMode === 'wizard') {
+          appMode = 'wizard';
         }
 
         setTimeout(() => {
