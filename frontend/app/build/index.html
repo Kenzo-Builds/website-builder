@@ -1920,6 +1920,144 @@
       return _wcInstance;
     }
 
+    const REACT_SYSTEM_PROMPT = `You are an expert React developer building full-stack web applications using React + Vite + Shadcn/UI + Tailwind CSS + Express.js backend.
+
+## STACK (pre-installed, just import)
+- React 18 + React Router v6 (react-router-dom)
+- Shadcn/UI components at @/components/ui/*
+- Tailwind CSS (use Tailwind classes for all styling — no custom CSS files)
+- Recharts for charts (import from 'recharts')
+- Lucide React for icons (import from 'lucide-react')
+- Express.js backend (server.js) with pg for PostgreSQL
+
+## OUTPUT FORMAT
+Return ONLY these files using "--- FILE: filename ---" format:
+
+--- FILE: src/App.jsx ---
+...
+--- FILE: src/pages/Dashboard.jsx ---
+...
+--- FILE: src/components/AppSidebar.jsx ---
+...
+--- FILE: server.js ---
+...
+--- FILE: schema.sql ---
+...
+
+## RULES
+
+### React Frontend
+- src/App.jsx — BrowserRouter + Routes to all pages. Always include a layout wrapper with sidebar and nav.
+- src/pages/*.jsx — One file per page/route. Use Shadcn/UI components for everything.
+- src/components/AppSidebar.jsx — App navigation sidebar using Shadcn SidebarProvider/Sidebar from @/components/ui/sidebar
+- Import UI components: \`import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"\`
+- Import available: button, card, input, label, badge, table, dialog, dropdown-menu, tabs, select, checkbox, progress, separator, tooltip, avatar, switch, scroll-area, textarea, skeleton, alert, accordion, popover, sheet, toast, toaster, chart, sidebar
+- Use useState + useEffect + fetch() for data loading from /api/* endpoints
+- ALL data from backend API — no hardcoded arrays in components
+- Use Recharts for charts: BarChart, LineChart, PieChart from 'recharts'
+- Use Lucide icons: import { Users, DollarSign, TrendingUp } from 'lucide-react'
+- Apply dark mode classes where appropriate (dark:bg-gray-900, etc.)
+- Responsive with Tailwind grid/flex — works on mobile
+
+### Sidebar Pattern (always use this):
+\`\`\`jsx
+// src/components/AppSidebar.jsx
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter } from "@/components/ui/sidebar"
+import { Link, useLocation } from "react-router-dom"
+import { LayoutDashboard, Users, Settings } from "lucide-react"
+
+const items = [
+  { title: "Dashboard", url: "/", icon: LayoutDashboard },
+  { title: "Contacts", url: "/contacts", icon: Users },
+]
+
+export function AppSidebar() {
+  const location = useLocation()
+  return (
+    <Sidebar>
+      <SidebarHeader><div className="p-4 font-bold text-lg">AppName</div></SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {items.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild isActive={location.pathname === item.url}>
+                    <Link to={item.url}><item.icon /><span>{item.title}</span></Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+    </Sidebar>
+  )
+}
+\`\`\`
+
+### Dashboard Stats Pattern (always use for dashboards):
+\`\`\`jsx
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+  <Card>
+    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <CardTitle className="text-sm font-medium">Total Contacts</CardTitle>
+      <Users className="h-4 w-4 text-muted-foreground" />
+    </CardHeader>
+    <CardContent>
+      <div className="text-2xl font-bold">{stats?.total || 0}</div>
+      <p className="text-xs text-muted-foreground">+12% from last month</p>
+    </CardContent>
+  </Card>
+</div>
+\`\`\`
+
+### App.jsx Layout Pattern:
+\`\`\`jsx
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
+import { AppSidebar } from "./components/AppSidebar"
+import Dashboard from "./pages/Dashboard"
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset>
+          <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+            <SidebarTrigger className="-ml-1" />
+            <h1 className="font-semibold">App Name</h1>
+          </header>
+          <main className="flex-1 p-6">
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+            </Routes>
+          </main>
+        </SidebarInset>
+      </SidebarProvider>
+    </BrowserRouter>
+  )
+}
+\`\`\`
+
+### Express Backend (server.js)
+- Express + pg + cors. Listen on process.env.PORT || 3000
+- Serve Vite build: \`app.use(express.static('dist'))\` + \`app.get('*', (req,res) => res.sendFile(path.join(__dirname,'dist','index.html')))\`
+- Setup DNS + pg pool same as before (useDB pattern with in-memory fallback for WebContainer)
+- All API routes under /api/ prefix
+- CORS enabled for development
+
+### schema.sql
+- Same rules as before: CREATE TABLE with SERIAL PRIMARY KEY, timestamps, sample data
+- No schema prefix
+
+### DO NOT generate:
+- tailwind.config.js, postcss.config.js, vite.config.js, package.json (already in template)
+- src/index.css, src/main.jsx, src/lib/utils.js, src/hooks/use-toast.js (already in template)
+- Any file in src/components/ui/ (already in template)
+- Only generate: src/App.jsx, src/pages/*.jsx, src/components/AppSidebar.jsx (and any custom app components), server.js, schema.sql`;
+
     const FULLSTACK_SYSTEM_PROMPT = `You are an expert full-stack developer building Node.js web applications with PostgreSQL (direct connection via pg library).
 
 ## OUTPUT FORMAT
@@ -1989,15 +2127,32 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
 - Display data from GET endpoints in tables or cards
 - Include edit and delete functionality with PUT and DELETE calls`;
 
+    // ── _reactTemplateCache ───────────────────────────────────────────────────
+    // Cached React base template files (loaded once, reused for all React builds)
+    var _reactTemplateCache = null;
+
+    async function loadReactTemplate() {
+      if (_reactTemplateCache) return _reactTemplateCache;
+      try {
+        const res = await fetch(`${API}/api/react-template`);
+        if (!res.ok) throw new Error('Template not available');
+        const data = await res.json();
+        _reactTemplateCache = data.files;
+        console.log(`[react-template] Loaded ${data.count} base files`);
+        return _reactTemplateCache;
+      } catch(e) {
+        console.warn('[react-template] Failed to load:', e.message);
+        return null;
+      }
+    }
+
     // ── generateFullStack ─────────────────────────────────────────────────────
-    // Generates a Node.js Express app with AI then boots it in WebContainers
-    // Dependencies: /api/generate-stream (FULLSTACK_SYSTEM_PROMPT), runInWebContainer,
-    //               extractMultiFileClient, renderFileTree, renderEditorTabs, saveProject
+    // Generates a React + Shadcn/UI app with AI then boots it in WebContainers
     // Flow:
-    //   1. Stream AI response using FULLSTACK_SYSTEM_PROMPT
-    //   2. Parse multi-file output (package.json, index.js, public/*)
-    //   3. Load files into Monaco + file tree
-    //   4. Boot WebContainer → npm install → npm start → server-ready → show preview
+    //   1. Load React base template (package.json, Shadcn components, etc.)
+    //   2. Stream AI response using REACT_SYSTEM_PROMPT (generates only app-specific files)
+    //   3. Merge: base template + AI files (AI files override base where same name)
+    //   4. Mount in WebContainer → npm install → npm run dev (Vite) → preview
     // Affects: projectFiles, currentHtml, monacoEditor, WebContainer runtime
     // Called by: generate() when appMode === 'fullstack'
     async function generateFullStack(prompt) {
@@ -2006,12 +2161,26 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
       startBuildStatusMessages();
 
       try {
-        // Generate multi-file app with AI
+        // Load React base template in parallel with AI generation
+        const templatePromise = loadReactTemplate();
+
+        // Generate app-specific files with AI
         const model = document.getElementById('model-select').value;
+        const wizardCtx = window._activeWizardContext;
+        window._activeWizardContext = null;
+
+        // Inject wizard context into prompt if available
+        let fullPrompt = prompt + '\n\nBuild this as a React + Vite + Shadcn/UI app.';
+        if (wizardCtx) {
+          fullPrompt += `\n\nApp context:\n- Type: ${wizardCtx.app_type || 'web app'}\n- Pages: ${(wizardCtx.pages||[]).join(', ')}`;
+          if (wizardCtx.brand?.colors) fullPrompt += `\n- Primary color: ${wizardCtx.brand.colors.primary}\n- Accent: ${wizardCtx.brand.colors.accent}`;
+          if (wizardCtx.brand?.personality) fullPrompt += `\n- Brand personality: ${wizardCtx.brand.personality}`;
+        }
+
         const res = await fetch(`${API}/api/generate-stream`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', ...(await getAuthHeader()) },
-          body: JSON.stringify({ prompt: prompt + '\n\nBuild this as a Node.js Express app.', model, _systemOverride: FULLSTACK_SYSTEM_PROMPT })
+          body: JSON.stringify({ prompt: fullPrompt, model, _systemOverride: REACT_SYSTEM_PROMPT })
         });
 
         if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Generation failed'); }
@@ -2040,22 +2209,29 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
           }
         }
 
-        // Parse files from AI output
-        const files = extractMultiFileClient(fullContent);
+        // Parse AI-generated files
+        const aiFiles = extractMultiFileClient(fullContent);
         clearBuildStatusMessages();
-        if (_buildMsgEl) _buildMsgEl.innerHTML = '✓ App generated — booting Node.js in your browser...';
+        if (_buildMsgEl) _buildMsgEl.innerHTML = '✓ App generated — loading React template...';
+
+        // Merge: base template + AI files (AI overrides base for same filenames)
+        const baseTemplate = await templatePromise;
+        const files = baseTemplate ? { ...baseTemplate, ...aiFiles } : aiFiles;
+        console.log(`[react] Merged ${Object.keys(baseTemplate||{}).length} template + ${Object.keys(aiFiles).length} AI files = ${Object.keys(files).length} total`);
+
+        if (_buildMsgEl) _buildMsgEl.innerHTML = '✓ React app ready — booting Vite in your browser...';
 
         // Load files into Monaco editor + file tree
-        currentHtml = files['index.html'] || files['public/index.html'] || '';
+        currentHtml = files['index.html'] || '';
         projectFiles = files;
-        activeFile = 'index.js';
-        openTabs = Object.keys(files).slice(0, 5);
+        activeFile = 'src/App.jsx';
+        openTabs = ['src/App.jsx', 'src/components/AppSidebar.jsx', 'server.js'].filter(f => files[f]);
         if (typeof renderFileTree === 'function') renderFileTree();
         if (typeof renderEditorTabs === 'function') renderEditorTabs();
-        if (typeof updateEditor === 'function') updateEditor(files['index.js'] || files['index.html'] || '');
+        if (typeof updateEditor === 'function') updateEditor(files['src/App.jsx'] || files['src/pages/Dashboard.jsx'] || '');
 
-        // Boot WebContainer and run the app
-        await runInWebContainer(files, _buildMsgEl);
+        // Boot WebContainer and run the React app
+        await runInWebContainer(files, _buildMsgEl, true); // true = react mode (npm run dev)
         saveProject(prompt, fullContent, model, buildId);
         incrementGuestCount();
         fetchUsage();
@@ -2253,7 +2429,7 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
       }
     }
 
-    async function runInWebContainer(files, statusEl) {
+    async function runInWebContainer(files, statusEl, reactMode) {
       try {
         // Hide empty state
         var es = document.getElementById('empty-state');
@@ -2299,7 +2475,8 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
           <span style="color:#F59E0B">⚡</span> Starting server...
         </div>`;
 
-        const server = await wc.spawn('npm', ['start']);
+        const startCmd = reactMode ? ['run', 'dev', '--', '--host'] : ['start'];
+        const server = await wc.spawn('npm', startCmd);
         server.output.pipeTo(new WritableStream({ write(d) { termLog(d.trim(), '#22C55E'); } }));
 
         wc.on('server-ready', (port, url) => {

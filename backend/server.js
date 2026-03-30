@@ -2210,4 +2210,35 @@ async function runPostBuildReview(fullContent, wizardContext, buildId) {
   } catch(e) { console.warn('[wizard-review] error:', e.message); }
 }
 
+// ── GET /api/react-template ────────────────────────────────────────────────────
+// Returns the React + Shadcn/UI base template as a flat filename→content map
+// Used by generateFullStack() to pre-populate the WebContainer with the base template
+// before mounting AI-generated files on top
+app.get('/api/react-template', (req, res) => {
+  const templateDir = path.join(__dirname, 'templates', 'react-base');
+  if (!fs.existsSync(templateDir)) {
+    return res.status(404).json({ error: 'React template not found' });
+  }
+  
+  function readDirRecursive(dir, base = '') {
+    const files = {};
+    for (const item of fs.readdirSync(dir, { withFileTypes: true })) {
+      const rel = base ? `${base}/${item.name}` : item.name;
+      if (item.isDirectory()) {
+        Object.assign(files, readDirRecursive(path.join(dir, item.name), rel));
+      } else {
+        files[rel] = fs.readFileSync(path.join(dir, item.name), 'utf8');
+      }
+    }
+    return files;
+  }
+  
+  try {
+    const files = readDirRecursive(templateDir);
+    res.json({ files, count: Object.keys(files).length });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 app.listen(PORT, () => console.log(`🚀 Website Builder API v3.3.0-voice on port ${PORT}`));
