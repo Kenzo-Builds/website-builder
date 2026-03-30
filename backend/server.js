@@ -438,7 +438,7 @@ function callAI(messages, model) {
         }
       });
     });
-    req.setTimeout(240000, () => { req.destroy(); reject(new Error('AI timed out')); });
+    req.setTimeout(600000, () => { req.destroy(); reject(new Error('AI timed out')); });
     req.on('error', reject);
     req.write(body);
     req.end();
@@ -505,7 +505,7 @@ function callAIStream(messages, model, onChunk, onDone, onError) {
       onDone(fullContent);
     });
   });
-  req.setTimeout(240000, () => { req.destroy(); onError(new Error('AI stream timed out')); });
+  req.setTimeout(600000, () => { req.destroy(); onError(new Error('AI stream timed out')); });
   req.on('error', onError);
   req.write(body);
   req.end();
@@ -681,8 +681,17 @@ ${isMultiFile ? 'Return ALL files using the --- FILE: filename --- format.' : 'R
       const fileCount = Object.keys(files).length;
       console.log(`[stream] done ${fileCount} files, ${html.length} chars index.html in ${duration}ms`);
 
-      res.write(`data: ${JSON.stringify({ type: 'done', html, files, buildId, duration })}\n\n`);
-      res.end();
+      // Guard against writing to a closed connection (client disconnected during long generation)
+      if (res.writableEnded || res.destroyed) {
+        console.log(`[stream] client disconnected before done event — skipping write`);
+        return;
+      }
+      try {
+        res.write(`data: ${JSON.stringify({ type: 'done', html, files, buildId, duration })}\n\n`);
+        res.end();
+      } catch(e) {
+        console.warn(`[stream] write error on done:`, e.message);
+      }
     },
     // onError — send error event and close SSE connection
     (err) => {
