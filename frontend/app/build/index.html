@@ -4314,8 +4314,8 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
         sessionStorage.removeItem('builder_buildmode');
         if (buildMode === 'direct') {
           _readyToBuild = true; // skip discovery, generate immediately
-        } else if (buildMode === 'wizard') {
-          appMode = 'wizard';
+        } else if (buildMode === 'wizard' && mode !== 'fullstack') {
+          appMode = 'wizard'; // only set wizard for non-fullstack modes
         }
 
         setTimeout(() => {
