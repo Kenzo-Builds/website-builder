@@ -1,0 +1,120 @@
+{
+  "crm": {
+    "label": "CRM",
+    "emoji": "👥",
+    "description": "Manage clients, deals, and follow-ups",
+    "pages": ["Dashboard", "Contacts", "Deals", "Tasks", "Reports"],
+    "schema": ["contacts", "deals", "tasks"],
+    "key_features": ["Pipeline view", "Contact timeline", "Task reminders"],
+    "uzbek_context": {
+      "extra_fields": ["telegram_username", "nasiya_credit_limit"],
+      "payment_methods": ["payme", "click", "cash"],
+      "notes": "Include nasiya (credit) tracking column in contacts"
+    }
+  },
+  "pos": {
+    "label": "POS System",
+    "emoji": "🏪",
+    "description": "Point of sale for retail stores",
+    "pages": ["Sales Terminal", "Products", "Receipts", "Reports", "Settings"],
+    "schema": ["products", "sales", "sale_items"],
+    "key_features": ["Quick sale entry", "Cash reconciliation", "Receipt printing"],
+    "uzbek_context": {
+      "currency": "UZS",
+      "extra_features": ["multi_branch", "barcode_scan"],
+      "notes": "Format currency as UZS with thousand separators"
+    }
+  },
+  "inventory": {
+    "label": "Inventory Management",
+    "emoji": "📦",
+    "description": "Track stock, suppliers, and movements",
+    "pages": ["Dashboard", "Products", "Stock Movements", "Suppliers", "Alerts"],
+    "schema": ["products", "stock_movements", "suppliers"],
+    "key_features": ["Low stock alerts", "Reorder tracking", "Movement history"],
+    "uzbek_context": {
+      "notes": "Include UZS pricing, multi-warehouse support"
+    }
+  },
+  "invoice": {
+    "label": "Invoice / Billing",
+    "emoji": "🧾",
+    "description": "Create invoices and track payments",
+    "pages": ["Invoices", "Clients", "Products", "Reports", "Settings"],
+    "schema": ["invoices", "invoice_items", "clients"],
+    "key_features": ["Auto-calculate totals", "PDF export", "Payment tracking"],
+    "uzbek_context": {
+      "currency": "UZS",
+      "payment_methods": ["payme", "click", "bank_transfer"],
+      "notes": "Support UZS and USD invoices"
+    }
+  },
+  "booking": {
+    "label": "Appointment Booking",
+    "emoji": "📅",
+    "description": "Schedule appointments and manage staff",
+    "pages": ["Calendar", "Appointments", "Services", "Clients", "Staff"],
+    "schema": ["appointments", "services", "staff", "clients"],
+    "key_features": ["Time slot conflict check", "SMS reminders", "Staff schedules"],
+    "uzbek_context": {
+      "notes": "Add Telegram notification option alongside SMS"
+    }
+  },
+  "restaurant": {
+    "label": "Restaurant Management",
+    "emoji": "🍽️",
+    "description": "Manage orders, tables, and menu",
+    "pages": ["Orders", "Menu", "Tables", "Kitchen View", "Reports"],
+    "schema": ["menu_items", "orders", "order_items", "tables"],
+    "key_features": ["Live order status", "Kitchen display", "Table management"],
+    "uzbek_context": {
+      "extra_features": ["telegram_ordering", "delivery_zones"],
+      "notes": "Add Telegram bot ordering integration placeholder"
+    }
+  },
+  "task_manager": {
+    "label": "Task Manager",
+    "emoji": "✅",
+    "description": "Organize tasks and projects",
+    "pages": ["Dashboard", "Tasks", "Projects", "Team", "Reports"],
+    "schema": ["tasks", "projects", "labels", "team_members"],
+    "key_features": ["Kanban board", "Due dates", "Priority levels"],
+    "uzbek_context": {
+      "notes": "Standard task manager works well for Uzbek market"
+    }
+  },
+  "expense": {
+    "label": "Expense Tracker",
+    "emoji": "💸",
+    "description": "Track business expenses and budgets",
+    "pages": ["Dashboard", "Expenses", "Categories", "Reports", "Budget"],
+    "schema": ["expenses", "categories", "budgets"],
+    "key_features": ["Category tracking", "Monthly summary", "Budget alerts"],
+    "uzbek_context": {
+      "currency": "UZS",
+      "notes": "Support multi-currency: UZS and USD"
+    }
+  },
+  "hr": {
+    "label": "HR / Employee",
+    "emoji": "👔",
+    "description": "Manage employees, attendance, and payroll",
+    "pages": ["Employees", "Attendance", "Leave Requests", "Payroll", "Reports"],
+    "schema": ["employees", "attendance", "leave_requests", "payroll"],
+    "key_features": ["Attendance tracking", "Leave management", "Payroll calculation"],
+    "uzbek_context": {
+      "notes": "Include Telegram HR bot integration placeholder"
+    }
+  },
+  "sales_dashboard": {
+    "label": "Sales Dashboard",
+    "emoji": "📊",
+    "description": "Track leads, pipeline, and sales performance",
+    "pages": ["Overview", "Leads", "Pipeline", "Activities", "Reports"],
+    "schema": ["leads", "opportunities", "activities", "team_members"],
+    "key_features": ["Conversion funnel", "Revenue forecast", "Activity log"],
+    "uzbek_context": {
+      "notes": "Add WhatsApp/Telegram lead source tracking"
+    }
+  }
+}

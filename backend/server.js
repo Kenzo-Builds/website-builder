@@ -602,7 +602,25 @@ app.post('/api/generate-stream', async (req, res) => {
 ## OUTPUT FORMAT
 ${isMultiFile ? 'Return ALL files using the --- FILE: filename --- format.' : 'Return a single complete HTML file. No file markers, no markdown fences. Just the complete HTML from <!DOCTYPE html> to </html>.'}`;
 
-  const systemPrompt = _systemOverride || (isModifying ? MODIFY_PROMPT : SYSTEM_PROMPT);
+  let wizardContextStr = '';
+  if (req.body.wizardContext) {
+    const wc = req.body.wizardContext;
+    wizardContextStr = `\n\n## PROJECT CONTEXT (from Wizard)\nApp Type: ${wc.app_type || 'custom'}\nPages to build: ${(wc.pages || []).join(', ')}\n`;
+    if (wc.brand) {
+      const b = wc.brand;
+      if (b.colors) wizardContextStr += `Brand Colors: primary=${b.colors.primary}, secondary=${b.colors.secondary}, accent=${b.colors.accent}, bg=${b.colors.bg||'#ffffff'}\n`;
+      if (b.typography) wizardContextStr += `Typography: heading=${b.typography.heading}, body=${b.typography.body}\n`;
+      if (b.style) wizardContextStr += `Style: ${b.style}\n`;
+      if (b.personality) wizardContextStr += `Brand Personality: ${b.personality}\n`;
+      if (b.tone) wizardContextStr += `Brand Tone: ${b.tone}\n`;
+      if (b.mission) wizardContextStr += `Mission: ${b.mission}\n`;
+      if (b.tagline) wizardContextStr += `Tagline: ${b.tagline}\n`;
+    }
+    if (wc.language) wizardContextStr += `User language: ${wc.language}\n`;
+    wizardContextStr += '\nApply ALL brand context consistently across every page and component.';
+  }
+  const baseSystemPrompt = _systemOverride || (isModifying ? MODIFY_PROMPT : SYSTEM_PROMPT);
+  const systemPrompt = wizardContextStr ? baseSystemPrompt + wizardContextStr : baseSystemPrompt;
   const messages = [{ role: 'system', content: systemPrompt }];
 
   // Build user message — multimodal if image was attached
@@ -652,6 +670,12 @@ ${isMultiFile ? 'Return ALL files using the --- FILE: filename --- format.' : 'R
 
       // Log generation event for usage tracking
       if (userId) logGeneration(userId, model, prompt);
+
+      // Wizard post-build review
+      const wizardCtx = req.body.wizardContext;
+      if (wizardCtx && fullContent.length > 1000) {
+        runPostBuildReview(fullContent, wizardCtx, buildId).catch(e => console.warn('[wizard-review]', e.message));
+      }
 
       const duration = Date.now() - startTime;
       const fileCount = Object.keys(files).length;
@@ -1993,5 +2017,197 @@ app.post('/api/admin/containers/:name/stop', async (req, res) => {
     res.json(result);
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
+
+// ═══════════════════════════════════════════════════════════════════════
+// WIZARD ENDPOINTS — Phase 1 Backend Foundation
+// ═══════════════════════════════════════════════════════════════════════
+
+const ARCHITECTURES = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'architectures.json'), 'utf8'));
+
+app.post('/api/wizard/start', async (req, res) => {
+  const user = await verifyUser(req.headers.authorization);
+  const { prompt, language } = req.body;
+
+  let detectedLang = language || 'en';
+  if (!language && prompt) {
+    if (/[а-яёА-ЯЁ]/.test(prompt)) detectedLang = 'ru';
+    else if (/[oʻgʻ]|oʼ|gʼ/.test(prompt)) detectedLang = 'uz';
+  }
+
+  let detectedType = null;
+  const lower = (prompt || '').toLowerCase();
+  const intentMap = {
+    'crm': ['crm', 'client', 'customer', 'contact', 'lead', 'deal', 'mijoz', 'nasiya'],
+    'pos': ['pos', 'sale', 'shop', 'store', 'cash register', "do'kon", 'savdo'],
+    'inventory': ['inventory', 'stock', 'warehouse', 'ombor'],
+    'invoice': ['invoice', 'billing', 'hisob', 'bill'],
+    'booking': ['booking', 'appointment', 'schedule', 'bron'],
+    'restaurant': ['restaurant', 'cafe', 'food', 'menu', 'restoran'],
+    'task_manager': ['task', 'todo', 'kanban', 'vazifa'],
+    'expense': ['expense', 'budget', 'xarajat'],
+    'hr': ['employee', 'staff', 'attendance', 'hr', 'xodim'],
+    'sales_dashboard': ['sales dashboard', 'pipeline', 'revenue']
+  };
+  for (const [type, kws] of Object.entries(intentMap)) {
+    if (kws.some(kw => lower.includes(kw))) { detectedType = type; break; }
+  }
+
+  let pastBrandContext = null;
+  if (user?.id) {
+    try {
+      const past = await fetch(`${SUPABASE_URL}/rest/v1/projects?user_id=eq.${user.id}&context=not.is.null&select=context&order=created_at.desc&limit=1`, {
+        headers: { 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}` }
+      });
+      const pastData = await past.json();
+      if (pastData?.[0]?.context?.brand) {
+        pastBrandContext = { colors: pastData[0].context.brand.colors, typography: pastData[0].context.brand.typography, style: pastData[0].context.brand.style };
+      }
+    } catch(e) {}
+  }
+
+  res.json({
+    appTypes: Object.entries(ARCHITECTURES).map(([key, val]) => ({ key, label: val.label, emoji: val.emoji, description: val.description })),
+    detectedType,
+    userLanguage: detectedLang,
+    pastBrandContext,
+    hasHistory: !!pastBrandContext
+  });
+});
+
+app.post('/api/wizard/structure', async (req, res) => {
+  const { appType } = req.body;
+  if (!appType || !ARCHITECTURES[appType]) return res.status(400).json({ error: 'Invalid app type' });
+  const arch = ARCHITECTURES[appType];
+  res.json({
+    appType, label: arch.label,
+    pages: arch.pages.map(p => ({ name: p, checked: true })),
+    schema: arch.schema, keyFeatures: arch.key_features,
+    uzbekContext: arch.uzbek_context,
+    message: `Here are the recommended pages for your ${arch.label}. All are pre-selected — uncheck any you don't need.`
+  });
+});
+
+app.post('/api/wizard/brand-strategy', async (req, res) => {
+  const { appType, pages, userLanguage = 'en', additionalContext = '' } = req.body;
+  if (!appType || !ARCHITECTURES[appType]) return res.status(400).json({ error: 'Invalid app type' });
+  const arch = ARCHITECTURES[appType];
+  const lang = userLanguage === 'uz' ? 'Uzbek (Latin script)' : userLanguage === 'ru' ? 'Russian' : 'English';
+  const prompt = `Generate brand strategy for a ${arch.label} app for small businesses in Uzbekistan. Context: ${additionalContext || 'none'}. Respond in ${lang}. Return ONLY JSON: {"mission":"...","mission_alternatives":["...","..."],"values":["...","...","..."],"values_alternatives":["...","...","..."],"personality":"...","personality_options":["Professional & Trustworthy","Friendly & Approachable","Bold & Modern"],"tone":"...","tone_options":["Formal & Professional","Friendly & Simple","Modern & Minimal"],"messaging_pillars":["...","...","..."]}`;
+  try {
+    const content = await callAI([{ role: 'system', content: 'Return only valid JSON.' }, { role: 'user', content: prompt }], 'anthropic/claude-haiku-4-5');
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('No JSON');
+    res.json({ success: true, brandStrategy: JSON.parse(jsonMatch[0]) });
+  } catch(e) {
+    res.json({ success: true, brandStrategy: { mission: `Help your business manage ${arch.label.toLowerCase()} efficiently`, mission_alternatives: [`Simplify ${arch.label.toLowerCase()}`, `Grow with smart ${arch.label.toLowerCase()}`], values: ['Reliability', 'Simplicity', 'Efficiency'], values_alternatives: ['Trust', 'Speed', 'Clarity'], personality: 'Professional & Trustworthy', personality_options: ['Professional & Trustworthy', 'Friendly & Approachable', 'Bold & Modern'], tone: 'Direct and clear', tone_options: ['Formal & Professional', 'Friendly & Simple', 'Modern & Minimal'], messaging_pillars: ['Save time', 'Stay organized', 'Grow faster'] } });
+  }
+});
+
+app.post('/api/wizard/brand-identity', async (req, res) => {
+  const { appType, brandStrategy } = req.body;
+  const personality = brandStrategy?.personality || 'Professional & Trustworthy';
+  const palettesMap = {
+    'Professional & Trustworthy': [
+      { name: 'Corporate Blue', primary: '#1E40AF', secondary: '#3B82F6', accent: '#FBBF24', bg: '#F8FAFC' },
+      { name: 'Deep Navy', primary: '#1E3A5F', secondary: '#2563EB', accent: '#10B981', bg: '#F0F4F8' },
+      { name: 'Slate Pro', primary: '#334155', secondary: '#475569', accent: '#3B82F6', bg: '#F8FAFC' }
+    ],
+    'Friendly & Approachable': [
+      { name: 'Warm Orange', primary: '#EA580C', secondary: '#FB923C', accent: '#3B82F6', bg: '#FFF7ED' },
+      { name: 'Fresh Green', primary: '#16A34A', secondary: '#22C55E', accent: '#F59E0B', bg: '#F0FDF4' },
+      { name: 'Sky Blue', primary: '#0284C7', secondary: '#38BDF8', accent: '#F59E0B', bg: '#F0F9FF' }
+    ],
+    'Bold & Modern': [
+      { name: 'Dark Modern', primary: '#111827', secondary: '#374151', accent: '#6366F1', bg: '#0F172A' },
+      { name: 'Purple Power', primary: '#7C3AED', secondary: '#8B5CF6', accent: '#EC4899', bg: '#1E1B4B' },
+      { name: 'Teal Tech', primary: '#0F766E', secondary: '#14B8A6', accent: '#F59E0B', bg: '#F0FDFA' }
+    ]
+  };
+  const fontPairings = [
+    { name: 'Clean & Modern', heading: 'Inter', body: 'Inter' },
+    { name: 'Professional', heading: 'Poppins', body: 'Open Sans' },
+    { name: 'Technical', heading: 'IBM Plex Sans', body: 'IBM Plex Mono' }
+  ];
+  const styles = [
+    { key: 'clean_minimal', label: 'Clean & Minimal', description: 'Whitespace, simple typography, subtle shadows' },
+    { key: 'bold_modern', label: 'Bold & Modern', description: 'Strong typography, high contrast, geometric shapes' },
+    { key: 'professional', label: 'Professional & Corporate', description: 'Structured layout, muted colors, trustworthy feel' }
+  ];
+  const palettes = palettesMap[personality] || palettesMap['Professional & Trustworthy'];
+  let taglines = [];
+  try {
+    const arch = ARCHITECTURES[appType] || { label: 'App' };
+    const content = await callAI([{ role: 'user', content: `Generate 3 taglines (max 6 words) for a ${arch.label} app. Return only JSON array of strings.` }], 'anthropic/claude-haiku-4-5');
+    const m = content.match(/\[[\s\S]*?\]/);
+    if (m) taglines = JSON.parse(m[0]);
+  } catch(e) {}
+  if (!taglines.length) {
+    const arch = ARCHITECTURES[appType] || { label: 'App' };
+    taglines = [`Your ${arch.label}, simplified`, 'Work smarter, grow faster', 'Built for your business'];
+  }
+  res.json({ colorPalettes: palettes, fontPairings, styles, taglines });
+});
+
+app.post('/api/wizard/validate', async (req, res) => {
+  const { appType, pages } = req.body;
+  if (!appType || !pages) return res.status(400).json({ error: 'appType and pages required' });
+  const issues = [], warnings = [], suggestions = [];
+  if (pages.length < 2) issues.push('Too few pages. At least 2 recommended.');
+  if (pages.length > 15) warnings.push('More than 15 pages may result in a complex app. Consider starting smaller.');
+  if (!pages.includes('Dashboard') && !pages.includes('Overview') && appType !== 'invoice') {
+    suggestions.push('Consider adding a Dashboard for an overview.');
+  }
+  res.json({ valid: issues.length === 0, issues, warnings, suggestions });
+});
+
+app.post('/api/wizard/save-context', async (req, res) => {
+  const user = await verifyUser(req.headers.authorization);
+  if (!user?.id) return res.status(401).json({ error: 'Login required' });
+  const { projectId, context } = req.body;
+  if (!projectId || !context) return res.status(400).json({ error: 'projectId and context required' });
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/projects?id=eq.${projectId}&user_id=eq.${user.id}`, {
+      method: 'PATCH',
+      headers: { 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ context, updated_at: new Date().toISOString() })
+    });
+    res.json({ success: true });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/wizard/load-context', async (req, res) => {
+  const user = await verifyUser(req.headers.authorization);
+  if (!user?.id) return res.status(401).json({ error: 'Login required' });
+  const { projectId } = req.query;
+  if (!projectId) return res.status(400).json({ error: 'projectId required' });
+  try {
+    const result = await fetch(`${SUPABASE_URL}/rest/v1/projects?id=eq.${projectId}&user_id=eq.${user.id}&select=context`, {
+      headers: { 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}` }
+    });
+    const data = await result.json();
+    res.json({ context: data?.[0]?.context || null });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── Wizard Post-Build Review ──────────────────────────────────────────────────
+async function runPostBuildReview(fullContent, wizardContext, buildId) {
+  const buildPath = path.join(BUILDS_DIR, buildId);
+  if (!fs.existsSync(buildPath)) return;
+  const files = extractMultiFile(fullContent);
+  const fileList = Object.keys(files).join(', ');
+  const indexHtml = files['index.html'] || '';
+  const cssKey = Object.keys(files).find(f => f.endsWith('.css'));
+  const cssSnippet = cssKey ? files[cssKey].substring(0, 500) : '';
+  const reviewPrompt = `Review this ${wizardContext.app_type || 'web'} app. Expected pages: ${(wizardContext.pages || []).join(', ')}. Files: ${fileList}. Index snippet: ${indexHtml.substring(0,400)}. CSS: ${cssSnippet}. Return JSON only: {"all_pages_present":bool,"has_navigation":bool,"colors_applied":bool,"missing_pages":[],"notes":""}`;
+  try {
+    const review = await callAI([{ role: 'system', content: 'Code reviewer. Return only JSON.' }, { role: 'user', content: reviewPrompt }], 'anthropic/claude-haiku-4-5');
+    const jsonMatch = review.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      const result = JSON.parse(jsonMatch[0]);
+      if (result.missing_pages?.length > 0) console.log(`[wizard-review] Missing pages for build ${buildId}:`, result.missing_pages);
+      fs.writeFileSync(path.join(buildPath, '.wizard-review.json'), JSON.stringify(result, null, 2));
+    }
+  } catch(e) { console.warn('[wizard-review] error:', e.message); }
+}
 
 app.listen(PORT, () => console.log(`🚀 Website Builder API v3.3.0-voice on port ${PORT}`));
