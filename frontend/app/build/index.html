@@ -771,10 +771,12 @@
     .wizard-skip-msg { font-size:11px; color:var(--text-4); margin-bottom:8px; font-style:italic; }
 
     /* ═══ LEFT SIDEBAR ═══ */
-    .sidebar-strip { width:48px; background:#0A0A0C; border-right:1px solid rgba(255,255,255,0.06); display:flex; flex-direction:column; align-items:center; padding:12px 0; gap:4px; z-index:20; flex-shrink:0; }
-    .sb-icon { width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:8px; cursor:pointer; font-size:16px; transition:all .15s; opacity:0.5; }
-    .sb-icon:hover { opacity:0.8; background:rgba(255,255,255,0.05); }
-    .sb-icon.active { opacity:1; background:rgba(59,130,246,0.12); }
+    .sidebar-strip { width:48px; background:#0A0A0C; border-right:1px solid rgba(255,255,255,0.06); display:flex; flex-direction:column; align-items:center; padding:12px 0; gap:4px; z-index:20; flex-shrink:0; position:relative; }
+    .sb-icon { width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:8px; cursor:pointer; transition:all .15s; color:rgba(255,255,255,0.35); }
+    .sb-icon:hover { color:rgba(255,255,255,0.7); background:rgba(255,255,255,0.05); }
+    .sb-icon.active { color:var(--blue); background:rgba(59,130,246,0.12); }
+    .sb-icon.docked { color:var(--blue); background:rgba(59,130,246,0.12); }
+    .sidebar-float { position:absolute; left:48px; top:0; bottom:0; width:260px; background:#0C0C0F; border-right:1px solid rgba(255,255,255,0.06); display:flex; flex-direction:column; z-index:25; box-shadow:4px 0 16px rgba(0,0,0,0.3); overflow:hidden; }
     .sidebar-panel { width:260px; background:#0C0C0F; border-right:1px solid rgba(255,255,255,0.06); display:flex; flex-direction:column; z-index:19; flex-shrink:0; overflow:hidden; }
     .sb-panel-header { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid rgba(255,255,255,0.06); }
     .sb-panel-title { font-size:14px; font-weight:600; color:var(--text-1); }
@@ -813,7 +815,8 @@
     .sb-palette.active { border-color:var(--blue); background:rgba(59,130,246,0.06); }
     .sb-palette-swatch { width:24px; height:24px; border-radius:6px; }
     .sb-palette-name { font-size:11px; color:var(--text-3); margin-left:4px; }
-    @media(max-width:768px) { .sidebar-strip { display:none; } .sidebar-panel { display:none!important; } }
+    .sidebar-strip:hover + .sidebar-float { pointer-events:auto; }
+    @media(max-width:768px) { .sidebar-strip { display:none; } .sidebar-panel { display:none!important; } .sidebar-float { display:none!important; } }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
@@ -921,12 +924,20 @@
 
     <!-- CANVA-STYLE LEFT SIDEBAR -->
     <div class="sidebar-strip" id="sidebar-strip">
-      <div class="sb-icon" data-tab="brand" onclick="toggleSidebar('brand')" title="Brand">🎨</div>
-      <div class="sb-icon" data-tab="templates" onclick="toggleSidebar('templates')" title="Templates">📄</div>
-      <div class="sb-icon" data-tab="texts" onclick="toggleSidebar('texts')" title="Typography">🔤</div>
-      <div class="sb-icon" data-tab="colors" onclick="toggleSidebar('colors')" title="Colors">🟣</div>
-      <div class="sb-icon" data-tab="projects" onclick="toggleSidebar('projects')" title="Projects">📁</div>
+      <div class="sb-icon" data-tab="brand" onmouseenter="hoverSidebar('brand')" onclick="clickSidebar('brand')" title="Brand"><i data-lucide="palette" style="width:18px;height:18px;stroke-width:1.5"></i></div>
+      <div class="sb-icon" data-tab="templates" onmouseenter="hoverSidebar('templates')" onclick="clickSidebar('templates')" title="Templates"><i data-lucide="layout-template" style="width:18px;height:18px;stroke-width:1.5"></i></div>
+      <div class="sb-icon" data-tab="texts" onmouseenter="hoverSidebar('texts')" onclick="clickSidebar('texts')" title="Typography"><i data-lucide="type" style="width:18px;height:18px;stroke-width:1.5"></i></div>
+      <div class="sb-icon" data-tab="colors" onmouseenter="hoverSidebar('colors')" onclick="clickSidebar('colors')" title="Colors"><i data-lucide="paintbrush" style="width:18px;height:18px;stroke-width:1.5"></i></div>
+      <div class="sb-icon" data-tab="projects" onmouseenter="hoverSidebar('projects')" onclick="clickSidebar('projects')" title="Projects"><i data-lucide="folder-open" style="width:18px;height:18px;stroke-width:1.5"></i></div>
     </div>
+    <!-- Floating panel (hover mode — overlays chat) -->
+    <div class="sidebar-float" id="sidebar-float" style="display:none" onmouseleave="closeFloatSidebar()">
+      <div class="sb-panel-header">
+        <span class="sb-panel-title" id="sb-float-title">Brand</span>
+      </div>
+      <div class="sb-panel-body" id="sb-float-body"></div>
+    </div>
+    <!-- Docked panel (click mode — replaces chat) -->
     <div class="sidebar-panel" id="sidebar-panel" style="display:none">
       <div class="sb-panel-header">
         <span class="sb-panel-title" id="sb-panel-title">Brand</span>
@@ -4444,37 +4455,105 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
     if(window.lucide) lucide.createIcons();
 
     // ═══════════════════════════════════════════════════════════════════════
-    // LEFT SIDEBAR — Canva-style panel
+    // LEFT SIDEBAR — Canva-style panel (hover=float, click=dock)
     // ═══════════════════════════════════════════════════════════════════════
 
-    let sidebarOpen = false;
+    let sidebarMode = null; // null | 'float' | 'docked'
     let sidebarTab = null;
+    var _sbTitles = { brand: 'Brand', templates: 'Templates', texts: 'Typography', colors: 'Colors', projects: 'Projects' };
 
-    function toggleSidebar(tab) {
-      if (sidebarOpen && sidebarTab === tab) {
+    // HOVER: open floating panel (overlays chat, closes on mouseleave)
+    function hoverSidebar(tab) {
+      if (sidebarMode === 'docked') return; // don't float if docked
+      sidebarTab = tab;
+      sidebarMode = 'float';
+      document.querySelectorAll('.sb-icon').forEach(function(i) { i.classList.toggle('active', i.getAttribute('data-tab') === tab); });
+      var floatPanel = document.getElementById('sidebar-float');
+      floatPanel.style.display = 'flex';
+      document.getElementById('sb-float-title').textContent = _sbTitles[tab] || tab;
+      var body = document.getElementById('sb-float-body');
+      _renderSidebarTab(tab, body);
+    }
+
+    function closeFloatSidebar() {
+      if (sidebarMode !== 'float') return;
+      sidebarMode = null;
+      sidebarTab = null;
+      document.getElementById('sidebar-float').style.display = 'none';
+      document.querySelectorAll('.sb-icon').forEach(function(i) { i.classList.remove('active'); });
+    }
+
+    // CLICK: dock panel (replaces chat panel, stays until X)
+    function clickSidebar(tab) {
+      if (sidebarMode === 'docked' && sidebarTab === tab) {
         closeSidebar();
         return;
       }
+      // Close float if open
+      document.getElementById('sidebar-float').style.display = 'none';
       sidebarTab = tab;
-      sidebarOpen = true;
-      document.querySelectorAll('.sb-icon').forEach(function(i) { i.classList.toggle('active', i.getAttribute('data-tab') === tab); });
+      sidebarMode = 'docked';
+      document.querySelectorAll('.sb-icon').forEach(function(i) {
+        i.classList.remove('active');
+        i.classList.toggle('docked', i.getAttribute('data-tab') === tab);
+      });
+      // Hide chat panel, show docked panel
+      var chatPanel = document.getElementById('chat-panel');
+      if (chatPanel) chatPanel.style.display = 'none';
       var panel = document.getElementById('sidebar-panel');
       panel.style.display = 'flex';
-      var titles = { brand: 'Brand', templates: 'Templates', texts: 'Typography', colors: 'Colors', projects: 'Projects' };
-      document.getElementById('sb-panel-title').textContent = titles[tab] || tab;
+      document.getElementById('sb-panel-title').textContent = _sbTitles[tab] || tab;
       var body = document.getElementById('sb-panel-body');
+      _renderSidebarTab(tab, body);
+    }
+
+    function closeSidebar() {
+      sidebarMode = null;
+      sidebarTab = null;
+      document.getElementById('sidebar-panel').style.display = 'none';
+      document.getElementById('sidebar-float').style.display = 'none';
+      // Restore chat panel
+      var chatPanel = document.getElementById('chat-panel');
+      if (chatPanel) chatPanel.style.display = '';
+      document.querySelectorAll('.sb-icon').forEach(function(i) { i.classList.remove('active'); i.classList.remove('docked'); });
+    }
+
+    function _renderSidebarTab(tab, body) {
       if (tab === 'brand') renderSidebarBrand(body);
       else if (tab === 'templates') renderSidebarTemplates(body);
       else if (tab === 'texts') renderSidebarTexts(body);
       else if (tab === 'colors') renderSidebarColors(body);
       else if (tab === 'projects') renderSidebarProjects(body);
+      if (window.lucide) lucide.createIcons();
     }
 
-    function closeSidebar() {
-      sidebarOpen = false;
-      sidebarTab = null;
-      document.getElementById('sidebar-panel').style.display = 'none';
-      document.querySelectorAll('.sb-icon').forEach(function(i) { i.classList.remove('active'); });
+    // ── Preview CSS injection (testing only) ──────────────────────────────
+    function injectPreviewCSS(colors, fonts) {
+      var frame = document.getElementById('preview-frame');
+      if (!frame || !frame.contentDocument) return;
+      try {
+        var doc = frame.contentDocument;
+        var existing = doc.getElementById('sidebar-preview-override');
+        if (existing) existing.remove();
+        var css = '';
+        if (colors) {
+          css += 'body, [style*="background"] { --sb-primary:' + colors.primary + '; --sb-secondary:' + colors.secondary + '; --sb-accent:' + colors.accent + '; }\n';
+          css += 'a, .text-primary, [style*="color:"][style*="blue"], [style*="color: #1"], [style*="color: #2"], [style*="color: #3"] { color:' + colors.primary + ' !important; }\n';
+          css += 'button, .btn, [style*="background-color:"][style*="blue"], input[type=submit] { background-color:' + colors.primary + ' !important; }\n';
+          css += 'nav, header { border-bottom-color:' + colors.primary + ' !important; }\n';
+        }
+        if (fonts) {
+          css += '@import url("https://fonts.googleapis.com/css2?family=' + encodeURIComponent(fonts.heading) + ':wght@400;600;700&family=' + encodeURIComponent(fonts.body) + ':wght@400;500&display=swap");\n';
+          css += 'h1,h2,h3,h4,h5,h6 { font-family:"' + fonts.heading + '",sans-serif !important; }\n';
+          css += 'body,p,span,div,td,li,a,input,button,textarea,select { font-family:"' + fonts.body + '",sans-serif !important; }\n';
+        }
+        if (css) {
+          var style = doc.createElement('style');
+          style.id = 'sidebar-preview-override';
+          style.textContent = css;
+          doc.head.appendChild(style);
+        }
+      } catch(e) { /* cross-origin iframe, can't inject */ }
     }
 
     function renderSidebarBrand(body) {
@@ -4569,7 +4648,9 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
       if (!wizardContext.brand.typography) wizardContext.brand.typography = {};
       wizardContext.brand.typography.heading = heading;
       wizardContext.brand.typography.body = bodyFont;
-      renderSidebarTexts(document.getElementById('sb-panel-body'));
+      var activeBody = document.getElementById(sidebarMode === 'docked' ? 'sb-panel-body' : 'sb-float-body');
+      renderSidebarTexts(activeBody);
+      injectPreviewCSS(null, { heading: heading, body: bodyFont });
     }
 
     function renderSidebarColors(body) {
@@ -4607,12 +4688,15 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
       if (!wizardContext.brand) wizardContext.brand = {};
       if (!wizardContext.brand.colors) wizardContext.brand.colors = {};
       wizardContext.brand.colors[key] = val;
+      injectPreviewCSS(wizardContext.brand.colors, null);
     }
 
     function sidebarSelectPalette(primary, secondary, accent, bg, name) {
       if (!wizardContext.brand) wizardContext.brand = {};
       wizardContext.brand.colors = { primary: primary, secondary: secondary, accent: accent, bg: bg, name: name };
-      renderSidebarColors(document.getElementById('sb-panel-body'));
+      var activeBody = document.getElementById(sidebarMode === 'docked' ? 'sb-panel-body' : 'sb-float-body');
+      renderSidebarColors(activeBody);
+      injectPreviewCSS(wizardContext.brand.colors, null);
     }
 
     async function renderSidebarProjects(body) {
