@@ -642,6 +642,7 @@
     .mode-gear-btn.open .mode-gear-icon{transform:rotate(90deg)}
     .mode-gear-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
     .mode-gear-dot.brainstorm{background:#67E8F9}
+    .mode-gear-dot.wizard{background:#67E8F9}
     .mode-gear-dot.build{background:var(--green)}
     .mode-gear-dot.fullstack{background:#F59E0B}
     .mode-gear-chev{font-size:9px;color:var(--text-4);margin-left:2px}
@@ -1825,14 +1826,14 @@
       // Update gear dropdown UI
       var label = document.getElementById('mode-gear-label');
       var dot = document.getElementById('mode-gear-dot');
-      var labels = {brainstorm:'Brainstorm', build:'Landing Page', fullstack:'Full Stack App'};
+      var labels = {brainstorm:'Brainstorm', wizard:'Wizard', build:'Landing Page', fullstack:'Full Stack App'};
       if(label) label.textContent = labels[mode] || mode;
       if(dot) { dot.className = 'mode-gear-dot ' + mode; }
       document.querySelectorAll('.mode-gear-item').forEach(function(el){ el.classList.toggle('active', el.getAttribute('data-mode') === mode); });
 
       const input = document.getElementById('prompt-input');
       var runBtn = document.getElementById('run-code-btn');
-      if (mode === 'brainstorm') {
+      if (mode === 'brainstorm' || mode === 'wizard') {
         input.placeholder = "What do you want to build? Let's plan it...";
         if (runBtn) runBtn.style.display = 'none';
       } else if (mode === 'fullstack') {
@@ -2878,7 +2879,7 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
       window._activeWizardContext = null;
       window._wizardColorPalettes = null;
       updateWizardProgress(0);
-      setMode('brainstorm');
+      setMode('wizard');
       addMessage('Chat cleared. What do you want to build? 🧠', 'ai');
       currentHtml = '';
       currentBuildId = '';
