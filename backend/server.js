@@ -1265,7 +1265,7 @@ async function dropAppDbUser(schemaName) {
 //   5. Configure Nginx routing
 //   6. Return live URL
 // Affects: Docker containers, Nginx config, Supabase schemas, projects table
-const DOCKER_APPS_DIR = path.join(__dirname, 'docker-apps');
+const DOCKER_APPS_DIR = process.env.DOCKER_APPS_DIR || path.join(__dirname, 'docker-apps');
 if (!fs.existsSync(DOCKER_APPS_DIR)) fs.mkdirSync(DOCKER_APPS_DIR, { recursive: true });
 
 // Track container port assignments
