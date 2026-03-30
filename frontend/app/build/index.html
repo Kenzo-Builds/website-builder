@@ -4707,12 +4707,18 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
     }
 
     function _renderSidebarTab(tab, body) {
-      if (tab === 'brand') renderSidebarBrand(body);
-      else if (tab === 'templates') renderSidebarTemplates(body);
-      else if (tab === 'texts') renderSidebarTexts(body);
-      else if (tab === 'colors') renderSidebarColors(body);
-      else if (tab === 'projects') renderSidebarProjects(body);
-      if (window.lucide) lucide.createIcons();
+      try {
+        if (tab === 'brand') renderSidebarBrand(body);
+        else if (tab === 'templates') renderSidebarTemplates(body);
+        else if (tab === 'texts') renderSidebarTexts(body);
+        else if (tab === 'colors') renderSidebarColors(body);
+        else if (tab === 'projects') renderSidebarProjects(body);
+        // Reinitialize lucide icons after content render
+        try { if (window.lucide) lucide.createIcons(); } catch(e) {}
+      } catch(err) {
+        console.error('[sidebar] render error:', err);
+        if (body) body.innerHTML = '<div style="font-size:12px;color:var(--text-4);padding:16px">Could not load panel. Try clicking instead of hovering.</div>';
+      }
     }
 
     // ── Preview CSS injection (testing only) ──────────────────────────────
@@ -4900,11 +4906,11 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
           body.innerHTML = '<div style="font-size:12px;color:var(--text-4);padding:20px;text-align:center">Log in to see your projects</div>';
           return;
         }
-        var res = await fetch(SUPABASE_URL + '/rest/v1/projects?user_id=eq.' + currentUser.id + '&select=id,title,updated_at,deployed_url&order=updated_at.desc&limit=20', {
+        var res = await fetch(SUPABASE_URL + '/rest/v1/projects?user_id=eq.' + currentUser.id + '&select=id,title,updated_at&order=updated_at.desc&limit=20', {
           headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + token }
         });
         var projects = await res.json();
-        if (!projects.length) {
+        if (!Array.isArray(projects) || !projects.length) {
           body.innerHTML = '<div style="font-size:12px;color:var(--text-4);padding:20px;text-align:center">No projects yet</div>';
           return;
         }
@@ -4913,7 +4919,7 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
           var date = new Date(p.updated_at).toLocaleDateString();
           html += '<div class="sb-project-item" onclick="window.location.href=\'?project=' + p.id + '\'">' +
             '<div class="sb-project-name">' + (p.title || 'Untitled') + '</div>' +
-            '<div class="sb-project-meta">' + date + (p.deployed_url ? ' • 🌐 Live' : '') + '</div>' +
+            '<div class="sb-project-meta">' + date + '</div>' +
             '</div>';
         });
         body.innerHTML = html;
