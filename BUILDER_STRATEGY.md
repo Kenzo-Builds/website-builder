@@ -257,3 +257,37 @@ Pull up this file, pick the top item from Priority 1, and build it. Don't plan, 
 5. Loading Progress Bar — stops users from thinking it's frozen
 
 After those 5 are done, we're at ~75-80% of Lovable. The remaining 20% is auth, payments, AI-in-apps — all separate features that can be added incrementally.
+
+---
+
+## 🔧 Job Queue Architecture — Implementation Plan
+
+**Why:** SSE dies when browser disconnects. Long prompts (5-8 min) always fail. Users lose work.
+
+**How Lovable does it:**
+1. User submits → gets `{jobId}` back immediately (<1s)
+2. Backend queues job, generates in background
+3. Frontend polls `/api/job/{id}` every 2-3s
+4. Job survives tab close/refresh/network drop
+5. User comes back 5 min later — app is ready
+
+**What to build:**
+
+Backend:
+- `POST /api/generate-job` — accepts prompt, returns `{jobId}` immediately, starts async generation
+- In-memory job store: `{ jobId: { status, progress, files, error, userId } }`
+- `GET /api/job/:id` — returns status + files when done
+- Job cleanup: delete jobs older than 24h
+
+Frontend:
+- `generateFullStack()` calls `/api/generate-job` → gets jobId
+- Polls `/api/job/:id` every 2s
+- Shows server-side progress messages ("Generating App.jsx... [3/8 files]")
+- On done: downloads all files, boots WebContainer
+
+**Bonus — file-by-file streaming to Monaco:**
+- As each file is generated, job store updates with partial files
+- Polling picks up new files → adds to Monaco file tree in real-time
+- User sees code appearing live (Lovable's "watching it build" effect)
+
+**Effort:** ~150 lines backend + ~50 lines frontend. ~3 hours total.
