@@ -2042,11 +2042,13 @@ export default function App() {
 \`\`\`
 
 ### Express Backend (server.js)
-- Express + pg + cors. Listen on process.env.PORT || 3000
+- Express + pg + cors. Listen on process.env.PORT || 3001 (Vite runs on 3000, API on 3001)
+- Use CommonJS require() syntax (NOT import/export) — the package.json does NOT have "type":"module"
 - Serve Vite build: \`app.use(express.static('dist'))\` + \`app.get('*', (req,res) => res.sendFile(path.join(__dirname,'dist','index.html')))\`
 - Setup DNS + pg pool same as before (useDB pattern with in-memory fallback for WebContainer)
 - All API routes under /api/ prefix
-- CORS enabled for development
+- CORS enabled for development: \`app.use(require('cors')())\`
+- Add 'cors' and 'express' and 'pg' to the dependencies in package.json when generating server.js
 
 ### schema.sql
 - Same rules as before: CREATE TABLE with SERIAL PRIMARY KEY, timestamps, sample data
@@ -2475,7 +2477,14 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
           <span style="color:#F59E0B">⚡</span> Starting server...
         </div>`;
 
-        const startCmd = reactMode ? ['run', 'dev', '--', '--host'] : ['start'];
+        if (reactMode && files['server.js']) {
+          // Start Express API backend first (port 3001)
+          termLog('$ Starting API server (port 3001)...', '#6B7280');
+          const apiServer = await wc.spawn('node', ['server.js']);
+          apiServer.output.pipeTo(new WritableStream({ write(d) { termLog(d.trim(), '#6B7280'); } }));
+          await new Promise(r => setTimeout(r, 500)); // brief pause for API to start
+        }
+        const startCmd = reactMode ? ['run', 'dev'] : ['start'];
         const server = await wc.spawn('npm', startCmd);
         server.output.pipeTo(new WritableStream({ write(d) { termLog(d.trim(), '#22C55E'); } }));
 
