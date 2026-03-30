@@ -242,3 +242,18 @@ These are things Lovable/Bolt will NEVER build. Our moat:
 - Per-app-type page templates
 - Project thumbnails
 - Auth in generated apps
+
+---
+
+## ⚡ Next Session — Start Here
+
+Pull up this file, pick the top item from Priority 1, and build it. Don't plan, just build.
+
+**Order to tackle:**
+1. Job Queue Architecture — unlocks long prompts (Learner V1, full apps)
+2. Per-App-Type Page Templates — biggest output quality jump
+3. React Modify Mode — makes iteration actually work
+4. Project Thumbnails — makes the dashboard look professional
+5. Loading Progress Bar — stops users from thinking it's frozen
+
+After those 5 are done, we're at ~75-80% of Lovable. The remaining 20% is auth, payments, AI-in-apps — all separate features that can be added incrementally.
