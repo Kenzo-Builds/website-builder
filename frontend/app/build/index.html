@@ -768,6 +768,51 @@
     .wizard-btn-skip:hover { color:var(--text-2); border-color:rgba(255,255,255,0.15); }
     .wizard-actions { display:flex; gap:8px; margin-top:12px; justify-content:flex-end; }
     .wizard-skip-msg { font-size:11px; color:var(--text-4); margin-bottom:8px; font-style:italic; }
+
+    /* ═══ LEFT SIDEBAR ═══ */
+    .sidebar-strip { width:48px; background:#0A0A0C; border-right:1px solid rgba(255,255,255,0.06); display:flex; flex-direction:column; align-items:center; padding:12px 0; gap:4px; z-index:20; flex-shrink:0; }
+    .sb-icon { width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:8px; cursor:pointer; font-size:16px; transition:all .15s; opacity:0.5; }
+    .sb-icon:hover { opacity:0.8; background:rgba(255,255,255,0.05); }
+    .sb-icon.active { opacity:1; background:rgba(59,130,246,0.12); }
+    .sidebar-panel { width:260px; background:#0C0C0F; border-right:1px solid rgba(255,255,255,0.06); display:flex; flex-direction:column; z-index:19; flex-shrink:0; overflow:hidden; }
+    .sb-panel-header { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid rgba(255,255,255,0.06); }
+    .sb-panel-title { font-size:14px; font-weight:600; color:var(--text-1); }
+    .sb-close { cursor:pointer; color:var(--text-4); font-size:16px; padding:4px; }
+    .sb-close:hover { color:var(--text-1); }
+    .sb-panel-body { flex:1; overflow-y:auto; padding:12px 16px; }
+    .sb-panel-body::-webkit-scrollbar { width:4px; }
+    .sb-panel-body::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:2px; }
+    .sb-section { margin-bottom:16px; }
+    .sb-section-title { font-size:11px; font-weight:600; color:var(--text-4); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
+    .sb-field { margin-bottom:10px; }
+    .sb-field label { display:block; font-size:11px; color:var(--text-4); margin-bottom:4px; }
+    .sb-field input, .sb-field select { width:100%; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:6px; padding:7px 10px; color:var(--text-2); font-size:12px; font-family:inherit; outline:none; }
+    .sb-field input:focus, .sb-field select:focus { border-color:var(--blue); }
+    .sb-field input[type=color] { width:36px; height:36px; padding:2px; cursor:pointer; border-radius:8px; }
+    .sb-color-row { display:flex; align-items:center; gap:8px; }
+    .sb-color-label { font-size:11px; color:var(--text-4); min-width:60px; }
+    .sb-project-item { padding:10px 12px; border:1px solid rgba(255,255,255,0.06); border-radius:8px; margin-bottom:6px; cursor:pointer; transition:all .15s; }
+    .sb-project-item:hover { border-color:rgba(255,255,255,0.15); background:rgba(255,255,255,0.02); }
+    .sb-project-name { font-size:13px; color:var(--text-1); font-weight:500; }
+    .sb-project-meta { font-size:10px; color:var(--text-4); margin-top:2px; }
+    .sb-tpl-card { padding:10px; border:1px solid rgba(255,255,255,0.06); border-radius:8px; margin-bottom:6px; cursor:pointer; transition:all .15s; display:flex; align-items:center; gap:10px; }
+    .sb-tpl-card:hover { border-color:var(--blue); background:rgba(59,130,246,0.04); }
+    .sb-tpl-card.active { border-color:var(--blue); background:rgba(59,130,246,0.08); }
+    .sb-tpl-emoji { font-size:20px; }
+    .sb-tpl-info { flex:1; }
+    .sb-tpl-name { font-size:12px; font-weight:600; color:var(--text-1); }
+    .sb-tpl-desc { font-size:10px; color:var(--text-4); }
+    .sb-font-opt { padding:8px 12px; border:1px solid rgba(255,255,255,0.06); border-radius:8px; margin-bottom:6px; cursor:pointer; transition:all .15s; }
+    .sb-font-opt:hover { border-color:rgba(255,255,255,0.15); }
+    .sb-font-opt.active { border-color:var(--blue); background:rgba(59,130,246,0.06); }
+    .sb-font-preview { font-size:14px; color:var(--text-1); }
+    .sb-font-name { font-size:10px; color:var(--text-4); margin-top:2px; }
+    .sb-palette { display:flex; align-items:center; gap:6px; padding:8px; border:1px solid rgba(255,255,255,0.06); border-radius:8px; margin-bottom:6px; cursor:pointer; transition:all .15s; }
+    .sb-palette:hover { border-color:rgba(255,255,255,0.15); }
+    .sb-palette.active { border-color:var(--blue); background:rgba(59,130,246,0.06); }
+    .sb-palette-swatch { width:24px; height:24px; border-radius:6px; }
+    .sb-palette-name { font-size:11px; color:var(--text-3); margin-left:4px; }
+    @media(max-width:768px) { .sidebar-strip { display:none; } .sidebar-panel { display:none!important; } }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
@@ -872,6 +917,23 @@
 
   <!-- App -->
   <div id="app" class="tab-chat">
+
+    <!-- CANVA-STYLE LEFT SIDEBAR -->
+    <div class="sidebar-strip" id="sidebar-strip">
+      <div class="sb-icon" data-tab="brand" onclick="toggleSidebar('brand')" title="Brand">🎨</div>
+      <div class="sb-icon" data-tab="templates" onclick="toggleSidebar('templates')" title="Templates">📄</div>
+      <div class="sb-icon" data-tab="texts" onclick="toggleSidebar('texts')" title="Typography">🔤</div>
+      <div class="sb-icon" data-tab="colors" onclick="toggleSidebar('colors')" title="Colors">🟣</div>
+      <div class="sb-icon" data-tab="projects" onclick="toggleSidebar('projects')" title="Projects">📁</div>
+    </div>
+    <div class="sidebar-panel" id="sidebar-panel" style="display:none">
+      <div class="sb-panel-header">
+        <span class="sb-panel-title" id="sb-panel-title">Brand</span>
+        <span class="sb-close" onclick="closeSidebar()">✕</span>
+      </div>
+      <div class="sb-panel-body" id="sb-panel-body"></div>
+    </div>
+
     <!-- Chat panel -->
     <div id="chat-panel">
       <div class="chat-header">
@@ -4378,6 +4440,213 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
 
     // Initialize Lucide icons
     if(window.lucide) lucide.createIcons();
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // LEFT SIDEBAR — Canva-style panel
+    // ═══════════════════════════════════════════════════════════════════════
+
+    let sidebarOpen = false;
+    let sidebarTab = null;
+
+    function toggleSidebar(tab) {
+      if (sidebarOpen && sidebarTab === tab) {
+        closeSidebar();
+        return;
+      }
+      sidebarTab = tab;
+      sidebarOpen = true;
+      document.querySelectorAll('.sb-icon').forEach(function(i) { i.classList.toggle('active', i.getAttribute('data-tab') === tab); });
+      var panel = document.getElementById('sidebar-panel');
+      panel.style.display = 'flex';
+      var titles = { brand: 'Brand', templates: 'Templates', texts: 'Typography', colors: 'Colors', projects: 'Projects' };
+      document.getElementById('sb-panel-title').textContent = titles[tab] || tab;
+      var body = document.getElementById('sb-panel-body');
+      if (tab === 'brand') renderSidebarBrand(body);
+      else if (tab === 'templates') renderSidebarTemplates(body);
+      else if (tab === 'texts') renderSidebarTexts(body);
+      else if (tab === 'colors') renderSidebarColors(body);
+      else if (tab === 'projects') renderSidebarProjects(body);
+    }
+
+    function closeSidebar() {
+      sidebarOpen = false;
+      sidebarTab = null;
+      document.getElementById('sidebar-panel').style.display = 'none';
+      document.querySelectorAll('.sb-icon').forEach(function(i) { i.classList.remove('active'); });
+    }
+
+    function renderSidebarBrand(body) {
+      var b = wizardContext.brand || {};
+      var html = '';
+      html += '<div class="sb-section"><div class="sb-section-title">Strategy</div>';
+      html += '<div class="sb-field"><label>Mission</label><input type="text" id="sb-mission" value="' + (b.mission || '').replace(/"/g, '&quot;') + '" onchange="wizardContext.brand.mission=this.value"></div>';
+      html += '<div class="sb-field"><label>Personality</label><select id="sb-personality" onchange="wizardContext.brand.personality=this.value"><option' + (b.personality === 'Professional & Trustworthy' ? ' selected' : '') + '>Professional & Trustworthy</option><option' + (b.personality === 'Friendly & Approachable' ? ' selected' : '') + '>Friendly & Approachable</option><option' + (b.personality === 'Bold & Modern' ? ' selected' : '') + '>Bold & Modern</option></select></div>';
+      html += '<div class="sb-field"><label>Tone</label><select id="sb-tone" onchange="wizardContext.brand.tone=this.value"><option' + (b.tone === 'Formal & Professional' ? ' selected' : '') + '>Formal & Professional</option><option' + (b.tone === 'Friendly & Simple' ? ' selected' : '') + '>Friendly & Simple</option><option' + (b.tone === 'Modern & Minimal' ? ' selected' : '') + '>Modern & Minimal</option></select></div>';
+      html += '</div>';
+      html += '<div class="sb-section"><div class="sb-section-title">Identity</div>';
+      if (b.colors) {
+        html += '<div class="sb-field"><label>Colors</label>';
+        html += '<div class="sb-color-row"><span class="sb-color-label">Primary</span><input type="color" value="' + (b.colors.primary || '#3B82F6') + '" onchange="wizardContext.brand.colors.primary=this.value"></div>';
+        html += '<div class="sb-color-row" style="margin-top:4px"><span class="sb-color-label">Secondary</span><input type="color" value="' + (b.colors.secondary || '#1E40AF') + '" onchange="wizardContext.brand.colors.secondary=this.value"></div>';
+        html += '<div class="sb-color-row" style="margin-top:4px"><span class="sb-color-label">Accent</span><input type="color" value="' + (b.colors.accent || '#FBBF24') + '" onchange="wizardContext.brand.colors.accent=this.value"></div>';
+        html += '</div>';
+      }
+      if (b.typography) {
+        html += '<div class="sb-field"><label>Heading Font</label><input type="text" value="' + (b.typography.heading || 'Inter') + '" onchange="wizardContext.brand.typography.heading=this.value"></div>';
+        html += '<div class="sb-field"><label>Body Font</label><input type="text" value="' + (b.typography.body || 'Inter') + '" onchange="wizardContext.brand.typography.body=this.value"></div>';
+      }
+      html += '<div class="sb-field"><label>Tagline</label><input type="text" value="' + (b.tagline || '').replace(/"/g, '&quot;') + '" onchange="wizardContext.brand.tagline=this.value"></div>';
+      html += '</div>';
+      body.innerHTML = html;
+    }
+
+    function renderSidebarTemplates(body) {
+      var types = wizardAppTypes && wizardAppTypes.length ? wizardAppTypes : [
+        {key:'crm',emoji:'👥',label:'CRM',description:'Manage clients and deals'},
+        {key:'pos',emoji:'🏪',label:'POS System',description:'Point of sale for retail'},
+        {key:'inventory',emoji:'📦',label:'Inventory',description:'Track stock and suppliers'},
+        {key:'invoice',emoji:'🧾',label:'Invoice',description:'Billing and payments'},
+        {key:'booking',emoji:'📅',label:'Booking',description:'Appointments and scheduling'},
+        {key:'restaurant',emoji:'🍽️',label:'Restaurant',description:'Orders and menu management'},
+        {key:'task_manager',emoji:'✅',label:'Task Manager',description:'Tasks and projects'},
+        {key:'expense',emoji:'💸',label:'Expense Tracker',description:'Track business expenses'},
+        {key:'hr',emoji:'👔',label:'HR / Employee',description:'Staff and attendance'},
+        {key:'sales_dashboard',emoji:'📊',label:'Sales Dashboard',description:'Leads and pipeline'}
+      ];
+      var html = '<div style="font-size:11px;color:var(--text-4);margin-bottom:10px">Click to load architecture into wizard context</div>';
+      types.forEach(function(t) {
+        var isActive = wizardContext.app_type === t.key;
+        html += '<div class="sb-tpl-card' + (isActive ? ' active' : '') + '" onclick="sidebarLoadTemplate(\'' + t.key + '\')">' +
+          '<div class="sb-tpl-emoji">' + t.emoji + '</div>' +
+          '<div class="sb-tpl-info"><div class="sb-tpl-name">' + t.label + '</div><div class="sb-tpl-desc">' + t.description + '</div></div>' +
+          '</div>';
+      });
+      body.innerHTML = html;
+    }
+
+    async function sidebarLoadTemplate(type) {
+      try {
+        var res = await fetch(API + '/api/wizard/structure', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ appType: type })
+        });
+        var data = await res.json();
+        wizardContext.app_type = type;
+        wizardContext.app_label = data.label;
+        wizardContext.pages = data.pages.filter(function(p) { return p.checked; }).map(function(p) { return p.name; });
+        if (data.uzbekContext) wizardContext.industry_context = data.uzbekContext;
+        addMessage('📄 Loaded ' + data.label + ' template: ' + wizardContext.pages.join(', '), 'ai');
+        renderSidebarTemplates(document.getElementById('sb-panel-body'));
+      } catch(e) { console.warn('Template load error:', e); }
+    }
+
+    function renderSidebarTexts(body) {
+      var fonts = [
+        { heading: 'Inter', body: 'Inter', preview: 'Clean & Modern' },
+        { heading: 'Poppins', body: 'Open Sans', preview: 'Professional' },
+        { heading: 'IBM Plex Sans', body: 'IBM Plex Mono', preview: 'Technical' },
+        { heading: 'Playfair Display', body: 'Source Sans Pro', preview: 'Elegant' },
+        { heading: 'Montserrat', body: 'Roboto', preview: 'Contemporary' },
+        { heading: 'DM Sans', body: 'DM Sans', preview: 'Geometric' }
+      ];
+      var current = (wizardContext.brand && wizardContext.brand.typography) ? wizardContext.brand.typography : { heading: 'Inter', body: 'Inter' };
+      var html = '<div style="font-size:11px;color:var(--text-4);margin-bottom:10px">Current: ' + current.heading + ' / ' + current.body + '</div>';
+      fonts.forEach(function(f) {
+        var isActive = current.heading === f.heading;
+        html += '<div class="sb-font-opt' + (isActive ? ' active' : '') + '" onclick="sidebarSelectFont(\'' + f.heading + '\',\'' + f.body + '\')">' +
+          '<div class="sb-font-preview" style="font-family:\'' + f.heading + '\',sans-serif">' + f.preview + '</div>' +
+          '<div class="sb-font-name">' + f.heading + ' + ' + f.body + '</div>' +
+          '</div>';
+      });
+      body.innerHTML = html;
+    }
+
+    function sidebarSelectFont(heading, bodyFont) {
+      if (!wizardContext.brand) wizardContext.brand = {};
+      if (!wizardContext.brand.typography) wizardContext.brand.typography = {};
+      wizardContext.brand.typography.heading = heading;
+      wizardContext.brand.typography.body = bodyFont;
+      renderSidebarTexts(document.getElementById('sb-panel-body'));
+    }
+
+    function renderSidebarColors(body) {
+      var allPalettes = [
+        { name: 'Corporate Blue', primary: '#1E40AF', secondary: '#3B82F6', accent: '#FBBF24', bg: '#F8FAFC' },
+        { name: 'Deep Navy', primary: '#1E3A5F', secondary: '#2563EB', accent: '#10B981', bg: '#F0F4F8' },
+        { name: 'Warm Orange', primary: '#EA580C', secondary: '#FB923C', accent: '#3B82F6', bg: '#FFF7ED' },
+        { name: 'Fresh Green', primary: '#16A34A', secondary: '#22C55E', accent: '#F59E0B', bg: '#F0FDF4' },
+        { name: 'Dark Modern', primary: '#111827', secondary: '#374151', accent: '#6366F1', bg: '#0F172A' },
+        { name: 'Purple Power', primary: '#7C3AED', secondary: '#8B5CF6', accent: '#EC4899', bg: '#1E1B4B' },
+        { name: 'Teal Tech', primary: '#0F766E', secondary: '#14B8A6', accent: '#F59E0B', bg: '#F0FDFA' }
+      ];
+      var current = (wizardContext.brand && wizardContext.brand.colors) ? wizardContext.brand.colors : {};
+      var html = '';
+      html += '<div class="sb-section"><div class="sb-section-title">Current Colors</div>';
+      html += '<div class="sb-color-row"><span class="sb-color-label">Primary</span><input type="color" value="' + (current.primary || '#3B82F6') + '" onchange="sidebarUpdateColor(\'primary\',this.value)"><span style="font-size:10px;color:var(--text-4);margin-left:4px">' + (current.primary || '#3B82F6') + '</span></div>';
+      html += '<div class="sb-color-row" style="margin-top:6px"><span class="sb-color-label">Secondary</span><input type="color" value="' + (current.secondary || '#1E40AF') + '" onchange="sidebarUpdateColor(\'secondary\',this.value)"><span style="font-size:10px;color:var(--text-4);margin-left:4px">' + (current.secondary || '#1E40AF') + '</span></div>';
+      html += '<div class="sb-color-row" style="margin-top:6px"><span class="sb-color-label">Accent</span><input type="color" value="' + (current.accent || '#FBBF24') + '" onchange="sidebarUpdateColor(\'accent\',this.value)"><span style="font-size:10px;color:var(--text-4);margin-left:4px">' + (current.accent || '#FBBF24') + '</span></div>';
+      html += '</div>';
+      html += '<div class="sb-section"><div class="sb-section-title">Presets</div>';
+      allPalettes.forEach(function(p) {
+        var isActive = current.primary === p.primary;
+        html += '<div class="sb-palette' + (isActive ? ' active' : '') + '" onclick="sidebarSelectPalette(\'' + p.primary + '\',\'' + p.secondary + '\',\'' + p.accent + '\',\'' + p.bg + '\',\'' + p.name + '\')">' +
+          '<div class="sb-palette-swatch" style="background:' + p.primary + '"></div>' +
+          '<div class="sb-palette-swatch" style="background:' + p.secondary + '"></div>' +
+          '<div class="sb-palette-swatch" style="background:' + p.accent + '"></div>' +
+          '<span class="sb-palette-name">' + p.name + '</span>' +
+          '</div>';
+      });
+      html += '</div>';
+      body.innerHTML = html;
+    }
+
+    function sidebarUpdateColor(key, val) {
+      if (!wizardContext.brand) wizardContext.brand = {};
+      if (!wizardContext.brand.colors) wizardContext.brand.colors = {};
+      wizardContext.brand.colors[key] = val;
+    }
+
+    function sidebarSelectPalette(primary, secondary, accent, bg, name) {
+      if (!wizardContext.brand) wizardContext.brand = {};
+      wizardContext.brand.colors = { primary: primary, secondary: secondary, accent: accent, bg: bg, name: name };
+      renderSidebarColors(document.getElementById('sb-panel-body'));
+    }
+
+    async function renderSidebarProjects(body) {
+      body.innerHTML = '<div style="text-align:center;padding:20px"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
+      try {
+        if (!sb || !currentUser) {
+          body.innerHTML = '<div style="font-size:12px;color:var(--text-4);padding:20px;text-align:center">Log in to see your projects</div>';
+          return;
+        }
+        var session = await sb.auth.getSession();
+        var token = session.data.session ? session.data.session.access_token : null;
+        if (!token) {
+          body.innerHTML = '<div style="font-size:12px;color:var(--text-4);padding:20px;text-align:center">Log in to see your projects</div>';
+          return;
+        }
+        var res = await fetch(SUPABASE_URL + '/rest/v1/projects?user_id=eq.' + currentUser.id + '&select=id,title,updated_at,deployed_url&order=updated_at.desc&limit=20', {
+          headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + token }
+        });
+        var projects = await res.json();
+        if (!projects.length) {
+          body.innerHTML = '<div style="font-size:12px;color:var(--text-4);padding:20px;text-align:center">No projects yet</div>';
+          return;
+        }
+        var html = '';
+        projects.forEach(function(p) {
+          var date = new Date(p.updated_at).toLocaleDateString();
+          html += '<div class="sb-project-item" onclick="window.location.href=\'?project=' + p.id + '\'">' +
+            '<div class="sb-project-name">' + (p.title || 'Untitled') + '</div>' +
+            '<div class="sb-project-meta">' + date + (p.deployed_url ? ' • 🌐 Live' : '') + '</div>' +
+            '</div>';
+        });
+        body.innerHTML = html;
+      } catch(e) {
+        body.innerHTML = '<div style="font-size:12px;color:var(--red,#EF4444);padding:20px">Error loading projects</div>';
+      }
+    }
   </script>
 </body>
 </html>
