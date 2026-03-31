@@ -291,3 +291,222 @@ Frontend:
 - User sees code appearing live (Lovable's "watching it build" effect)
 
 **Effort:** ~150 lines backend + ~50 lines frontend. ~3 hours total.
+
+---
+
+## 🏗️ DEFINITIVE ARCHITECTURE — Opus Analysis (2026-03-31)
+
+### Why This Specific Architecture
+
+#### Why Next.js 14 (not plain React, not Remix, not Vue)
+
+**Rejected: Plain React (CRA/Vite)**
+- No server-side rendering. Dashboard loads slow on mobile (Uzbek users often on 3G/4G).
+- No API routes — need separate Express server (what we have now = 2 processes to manage).
+- No file-based routing — everything in one file (what we have now = 5,000 line monolith).
+
+**Rejected: Remix (what Bolt uses)**
+- Bolt chose Remix because StackBlitz built it. They literally own the framework.
+- Remix is great but has smaller ecosystem than Next.js. Fewer tutorials, fewer components, fewer developers who know it.
+- For Uzbek developer market, Next.js is the most recognizable React framework.
+
+**Rejected: Vue/Nuxt**
+- Shadcn/UI doesn't exist for Vue (there's a port but it's not as polished).
+- AI models generate better React code than Vue — more training data.
+- Our generated apps are React — dogfooding means builder should be React too.
+
+**Chosen: Next.js 14 App Router**
+- Server components = dashboard loads instantly (SSR).
+- Client components = builder is fully interactive (CSR).
+- API routes = no separate Express server. One deployment.
+- File-based routing = `app/builder/page.tsx` instead of 5,000 lines in one file.
+- Vercel deployment = git push → live. Zero nginx config.
+- Largest React framework ecosystem. Most developers know it.
+
+#### Why Zustand (not Redux, not Context, not Jotai)
+
+**Rejected: Redux**
+- 200 lines of boilerplate for one store. Overkill for our use case.
+- Actions, reducers, middleware — complexity we don't need.
+
+**Rejected: React Context**
+- Re-renders entire tree when any value changes. Performance killer for editor + preview.
+- No devtools, no persistence, no middleware.
+
+**Rejected: Jotai/Recoil**
+- Atomic state = good for forms, bad for complex objects (project files, wizard context).
+- Less intuitive for a team to pick up.
+
+**Chosen: Zustand**
+- 2KB bundle. Zero boilerplate.
+- `const useProject = create((set) => ({ files: {}, setFiles: (f) => set({ files: f }) }))` — done.
+- Supports persistence (localStorage), devtools, middleware.
+- Doesn't cause unnecessary re-renders (selector-based).
+- 3 stores cover everything: `useProjectStore`, `useWizardStore`, `useAuthStore`.
+
+#### Why Hybrid Update (Full Rewrite + Diff) — not just one
+
+**Rejected: Full rewrite only (what Lovable does)**
+- Works for first generation. Terrible for edits.
+- "Change sidebar color" takes 60 seconds and regenerates 10 files.
+- User's manual code edits get overwritten.
+- Costs 10x more tokens per edit.
+
+**Rejected: Diff only (what Bolt does)**
+- Diffs can drift — after 5-6 edits, accumulated patches create inconsistencies.
+- AI has to understand the ENTIRE codebase to generate a correct diff.
+- If one diff is wrong, subsequent diffs compound the error.
+
+**Chosen: Hybrid**
+- First generation = full rewrite (like Lovable). Clean, consistent, no drift.
+- Follow-up edits = diff mode (like Bolt). Fast, cheap, preserves user's changes.
+- After 5+ diffs, offer "Clean rebuild" — full rewrite that incorporates all changes. Resets drift.
+- Best of both worlds. No competitor does this.
+
+#### Why Job Queue + Polling (not SSE, not WebSockets)
+
+**Rejected: SSE (Server-Sent Events) — what we had before**
+- Dies when browser tab closes. Long prompts (5+ min) always fail.
+- Browser has 6-connection limit per domain. SSE holds one permanently.
+- No way to resume a disconnected stream.
+
+**Rejected: WebSockets**
+- Overkill for one-way data (server → client).
+- Requires sticky sessions for load balancing.
+- More complex server code for no real benefit over polling.
+
+**Chosen: Job queue + 2-second polling**
+- Job starts → returns jobId in <100ms.
+- Frontend polls every 2s → gets status, progress, partial files.
+- Tab closes → job keeps running. Come back later → it's done.
+- Simple to implement, debug, and scale.
+- Works behind any proxy/CDN (no WebSocket upgrade needed).
+
+#### Why Claude Sonnet 4.6 (not GPT-5, not Gemini, not open source)
+
+**Rejected: GPT-5.3 Codex**
+- Doesn't follow structured React+Shadcn instructions reliably.
+- Often ignores "DO NOT generate these files" rules.
+- Wraps code in markdown fences even when told not to.
+
+**Rejected: Gemini 2.5 Pro**
+- Good for analysis, poor for code generation consistency.
+- Output format varies between calls — hard to parse reliably.
+
+**Rejected: Open source (Llama, DeepSeek, Qwen)**
+- Not good enough for React component generation at this quality level.
+- Would need fine-tuning on Shadcn patterns — months of work.
+
+**Chosen: Claude Sonnet 4.6**
+- Best code generation model for structured React output.
+- Follows system prompt instructions precisely.
+- Consistent output format across calls.
+- What Lovable and Bolt both use (they chose Claude too — for the same reasons).
+- Cost: ~$0.03 per generation. Acceptable for the quality.
+
+#### Why Per-App-Type Templates (the highest-leverage feature we haven't built)
+
+This is the single most important thing missing. Here's why:
+
+Without templates: AI receives "Build a CRM" → guesses what a CRM dashboard looks like → inconsistent results. Sometimes great, sometimes terrible.
+
+With templates: AI receives "Build a CRM" + pre-built Dashboard layout (4 KPI cards, pipeline chart, activity feed, with exact Shadcn component code) → fills in the data → consistent quality every time.
+
+This is what Lovable does internally. They have ~20 pre-built page layouts:
+1. Dashboard (KPI cards + charts)
+2. Data table (search + filter + CRUD)
+3. Kanban board (drag-drop columns)
+4. Form page (validation + submit)
+5. Detail page (tabs + info cards)
+6. Settings page (sections + toggles)
+7. Auth pages (login + register)
+8. Calendar view (events + slots)
+9. Chat/messaging layout
+10. Landing/marketing page
+
+Each template is ~100 lines of JSX that the AI fills with app-specific data. The template handles layout, spacing, responsiveness, animations. AI only decides what content goes where.
+
+This is our Phase 1 priority.
+
+#### Why Uzbek Market Features Are Our Moat
+
+Lovable will never build nasiya credit tracking. Bolt will never add Payme payment integration. No global competitor will optimize for UZS currency formatting or Telegram-first contact fields.
+
+These are small features (10 lines of code each) but they make the output feel native to Uzbek businesses. A POS that formats prices as "150,000 UZS" instead of "$150.00" instantly feels like a product built for them.
+
+The wizard's Uzbek context injection (already built) + per-app-type templates with Uzbek defaults = a product that global competitors cannot replicate without dedicating resources to a market they don't care about.
+
+### Competitor Architecture Summary
+
+| Aspect | Bolt.new | Lovable.dev | Kenzo (Target) |
+|---|---|---|---|
+| Frontend framework | Remix | React (custom) | Next.js 14 |
+| AI model | Claude 3.5 Sonnet | Claude | Claude Sonnet 4.6 |
+| Runtime | WebContainers (own tech) | Cloud sandboxes | WebContainers |
+| Update method | Diff/patch | Full rewrite | Hybrid (both) |
+| State management | Unknown (likely Zustand) | Unknown | Zustand |
+| Deploy target | Netlify/Vercel/Cloudflare | GitHub → Vercel | Docker → kenzoagent.com |
+| Database | User-provided | Supabase | Supabase |
+| Auth | None built-in | Supabase Auth | Supabase Auth |
+| Unique edge | Speed (diffs) | Design quality | Uzbek market + Wizard |
+
+### File Structure (Target)
+
+```
+kenzo-builder/
+├── app/
+│   ├── page.tsx                     # Dashboard
+│   ├── layout.tsx                   # Root layout + auth provider
+│   ├── builder/
+│   │   ├── page.tsx                 # Builder (main workspace)
+│   │   └── components/
+│   │       ├── ChatPanel.tsx        # AI chat interface
+│   │       ├── PreviewPanel.tsx     # Live preview iframe
+│   │       ├── EditorPanel.tsx      # Monaco code editor
+│   │       ├── FileTree.tsx         # Project file navigator
+│   │       ├── WizardFlow.tsx       # 3-stage wizard
+│   │       ├── LeftSidebar.tsx      # Brand/Templates/Colors/Fonts/Projects
+│   │       └── DeployModal.tsx      # Deploy dialog
+│   ├── admin/
+│   │   └── page.tsx                 # Admin dashboard
+│   ├── settings/
+│   │   └── page.tsx                 # User settings
+│   └── api/
+│       ├── generate-job/route.ts    # Async job creation
+│       ├── job/[id]/route.ts        # Job polling
+│       ├── wizard/
+│       │   ├── start/route.ts       # Intent detection
+│       │   ├── structure/route.ts   # App architecture
+│       │   ├── brand/route.ts       # Brand strategy
+│       │   └── identity/route.ts    # Brand identity
+│       ├── deploy/
+│       │   ├── react/route.ts       # React app deploy
+│       │   └── static/route.ts      # Static site deploy
+│       ├── brainstorm/route.ts      # Discovery chat
+│       └── auth/
+│           └── signup/route.ts      # Auto-confirm signup
+├── components/
+│   ├── ui/                          # Shadcn components (same as user template)
+│   └── shared/                      # Shared components (header, nav, etc.)
+├── stores/
+│   ├── project.ts                   # Current project state
+│   ├── wizard.ts                    # Wizard stages + context
+│   └── auth.ts                      # User + session
+├── lib/
+│   ├── supabase/
+│   │   ├── client.ts                # Browser client
+│   │   └── server.ts                # Server client (API routes)
+│   ├── ai/
+│   │   ├── generate.ts              # AI generation logic
+│   │   ├── diff.ts                  # Diff/patch engine
+│   │   └── prompts/                 # System prompts per app type
+│   ├── webcontainer.ts              # WebContainer bridge
+│   └── templates/
+│       ├── react-base/              # 37-file Shadcn template
+│       └── page-templates/          # Per-app-type page layouts
+├── public/
+│   └── templates/                   # Served to WebContainer
+└── middleware.ts                     # Auth middleware
+```
+
+This is the architecture. Don't build it now — ship features in the current builder, get users, then rebuild when revenue justifies it.
