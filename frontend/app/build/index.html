@@ -4483,20 +4483,26 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
             initProjectFiles(currentHtml);
           }
           // Delay preview to ensure DOM is ready
-          // Detect full-stack project (has index.js or package.json in files)
-          var isFullStack = project.files && (project.files['index.js'] || project.files['server.js'] || project.files['package.json']);
+          // Detect project type
+          var isReact = project.files && (project.files['src/App.jsx'] || project.files['src/app.jsx'] || project.files['vite.config.js']);
+          var isFullStack = !isReact && project.files && (project.files['index.js'] || project.files['server.js'] || project.files['package.json']);
 
-          if (isFullStack) {
+          if (isReact || isFullStack) {
             setMode('fullstack');
-            // Hide empty state immediately
             var es = document.getElementById('empty-state');
             if (es) { es.style.display = 'none'; es.style.opacity = '0'; }
             addMessage(`📁 Loaded project: <strong>${project.name}</strong>`, 'ai');
-            addMessage('⚡ Re-booting Node.js app in your browser...', 'ai');
-            // Show index.js in editor
-            updateEditor(project.files['index.js'] || project.files['server.js'] || currentHtml);
-            // Boot WebContainer with the saved files
-            runInWebContainer(project.files, null);
+            addMessage(isReact ? '⚛️ Re-booting React app in your browser...' : '⚡ Re-booting Node.js app in your browser...', 'ai');
+            updateEditor(project.files['src/App.jsx'] || project.files['src/app.jsx'] || project.files['index.js'] || project.files['server.js'] || currentHtml);
+            // For React projects: merge with base template before booting
+            if (isReact) {
+              loadReactTemplate().then(function(baseTemplate) {
+                var mergedFiles = baseTemplate ? Object.assign({}, baseTemplate, project.files) : project.files;
+                runInWebContainer(mergedFiles, null, true);
+              });
+            } else {
+              runInWebContainer(project.files, null, false);
+            }
           } else {
             setTimeout(function(){ updatePreview(currentHtml); }, 300);
             updateEditor(currentHtml);
@@ -4850,6 +4856,16 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
       }
     }
 
+
+    // Expose sidebar functions to global scope for inline HTML event handlers
+    window.hoverSidebar = hoverSidebar;
+    window.clickSidebar = clickSidebar;
+    window.closeSidebar = closeSidebar;
+    window.closeFloatSidebar = closeFloatSidebar;
+    window.sidebarLoadTemplate = sidebarLoadTemplate;
+    window.sidebarSelectFont = sidebarSelectFont;
+    window.sidebarUpdateColor = sidebarUpdateColor;
+    window.sidebarSelectPalette = sidebarSelectPalette;
 
     })();
     })();
