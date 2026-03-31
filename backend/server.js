@@ -1313,7 +1313,7 @@ const DOCKER_APPS_DIR = process.env.DOCKER_APPS_DIR || path.join(__dirname, 'doc
 if (!fs.existsSync(DOCKER_APPS_DIR)) fs.mkdirSync(DOCKER_APPS_DIR, { recursive: true });
 
 // Track container port assignments
-const PORTS_FILE = path.join(__dirname, 'docker-ports.json');
+const PORTS_FILE = process.env.PORTS_FILE || path.join(__dirname, 'docker-ports.json');
 function getNextPort() {
   let ports = {};
   try { ports = JSON.parse(fs.readFileSync(PORTS_FILE, 'utf8')); } catch(e) {}

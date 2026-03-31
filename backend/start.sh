@@ -16,9 +16,13 @@ sleep 1
 
 # Start server
 cd "$SCRIPT_DIR"
+# Ensure writable ports file exists
+[ -f /tmp/wb-docker-ports.json ] || echo '{}' > /tmp/wb-docker-ports.json
+
 BUILDS_DIR=/tmp/wb-builds \
 DEPLOYED_BUILDS_DIR=/tmp/wb-deployed \
 DOCKER_APPS_DIR=/tmp/wb-docker-apps \
+PORTS_FILE=/tmp/wb-docker-ports.json \
 nohup node server.js > /tmp/server.log 2>&1 &
 
 echo "✅ Website Builder API started (PID: $!)"
