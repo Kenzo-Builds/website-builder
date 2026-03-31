@@ -2643,11 +2643,18 @@ async function runGenerationJob(jobId, prompt, model, existingFiles, _systemOver
 
         // Save to Supabase
         if (userId && SUPABASE_URL && SUPABASE_SERVICE_KEY) {
+          const projectTitle = prompt.slice(0, 80).replace(/[^a-zA-Z0-9 ]/g, '').trim() || 'Untitled App';
+          console.log(`[job ${jobId}] saving to Supabase: "${projectTitle}" for user=${userId.slice(0,8)}`);
           fetch(`${SUPABASE_URL}/rest/v1/projects`, {
             method: 'POST',
-            headers: { 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-            body: JSON.stringify({ user_id: userId, title: prompt.slice(0, 80).replace(/[^a-zA-Z0-9 ]/g, '').trim() || 'Untitled App', prompt, html: html || '', model, build_id: buildId, files, updated_at: new Date().toISOString() })
+            headers: { 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+            body: JSON.stringify({ user_id: userId, title: projectTitle, prompt: prompt.slice(0, 5000), html: html?.slice(0, 50000) || '', model, build_id: buildId, files, updated_at: new Date().toISOString() })
+          }).then(async (r) => {
+            if (r.ok) console.log(`[job ${jobId}] ✅ saved to Supabase`);
+            else console.warn(`[job ${jobId}] Supabase save status ${r.status}:`, await r.text());
           }).catch(e => console.warn(`[job ${jobId}] supabase save failed:`, e.message));
+        } else {
+          console.warn(`[job ${jobId}] skipping save: userId=${!!userId} SUPABASE=${!!SUPABASE_URL}`);
         }
 
         // Mark job complete
