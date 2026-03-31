@@ -2469,4 +2469,233 @@ CMD ["node", "server.js"]
   }
 });
 
+// ═══════════════════════════════════════════════════════════════════════
+// JOB QUEUE — Async generation with polling (replaces SSE for fullstack)
+// Survives tab close, handles long prompts, enables file-by-file streaming
+// ═══════════════════════════════════════════════════════════════════════
+
+// In-memory job store — each job keyed by UUID
+// Structure: { id, status, progress, progressDetail, files, fullContent, buildId, error, userId, startTime }
+// status: 'queued' | 'generating' | 'done' | 'error'
+const jobStore = new Map();
+
+// Auto-cleanup jobs older than 2 hours
+setInterval(() => {
+  const twoHoursAgo = Date.now() - 2 * 60 * 60 * 1000;
+  for (const [id, job] of jobStore.entries()) {
+    if (job.startTime < twoHoursAgo) jobStore.delete(id);
+  }
+}, 30 * 60 * 1000); // run every 30 minutes
+
+// ── POST /api/generate-job ────────────────────────────────────────────────────
+// Starts async generation and returns a jobId immediately (<100ms response)
+// Frontend polls /api/job/:id to track progress and get files when done
+app.post('/api/generate-job', async (req, res) => {
+  const { prompt, model = 'anthropic/claude-sonnet-4-6', existingFiles, _systemOverride, wizardContext } = req.body;
+  if (!prompt) return res.status(400).json({ error: 'Prompt is required' });
+  if (prompt.length > 50000) return res.status(400).json({ error: 'Prompt too long. Maximum 50,000 characters.' });
+
+  // Auth + usage check
+  const user = await verifyUser(req.headers.authorization);
+  let userId = null;
+  if (user) {
+    userId = user.id;
+    if (!ADMIN_USERS.includes(userId)) {
+      const plan = await getUserPlan(userId);
+      const used = await getMonthlyUsage(userId);
+      const limit = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
+      if (used >= limit) {
+        return res.status(429).json({ error: 'limit_reached', message: `You've used all ${limit} generations this month.`, plan, used, limit });
+      }
+    }
+  } else {
+    // Guest rate limit
+    const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip;
+    if (!guestUsage[ip]) guestUsage[ip] = { count: 0, resetAt: Date.now() + 24 * 60 * 60 * 1000 };
+    if (Date.now() > guestUsage[ip].resetAt) guestUsage[ip] = { count: 0, resetAt: Date.now() + 24 * 60 * 60 * 1000 };
+    if (guestUsage[ip].count >= PLAN_LIMITS.guest) {
+      return res.status(429).json({ error: 'limit_reached', message: `Free limit reached (${PLAN_LIMITS.guest} builds). Sign up for more.`, plan: 'guest' });
+    }
+    guestUsage[ip].count++;
+  }
+
+  // Create job and return ID immediately
+  const jobId = crypto.randomUUID();
+  const job = { id: jobId, status: 'queued', progress: 0, progressDetail: 'Queued...', files: {}, fullContent: '', buildId: null, error: null, userId, startTime: Date.now() };
+  jobStore.set(jobId, job);
+  res.json({ jobId });
+
+  // Start generation asynchronously (don't await)
+  runGenerationJob(jobId, prompt, model, existingFiles, _systemOverride, wizardContext, userId).catch(err => {
+    const j = jobStore.get(jobId);
+    if (j) { j.status = 'error'; j.error = err.message; }
+    console.error(`[job ${jobId}] unhandled error:`, err.message);
+  });
+});
+
+// ── runGenerationJob ──────────────────────────────────────────────────────────
+// Runs AI generation for a job, updating job state in real-time
+async function runGenerationJob(jobId, prompt, model, existingFiles, _systemOverride, wizardContext, userId) {
+  const job = jobStore.get(jobId);
+  if (!job) return;
+
+  job.status = 'generating';
+  job.progressDetail = 'Generating your app...';
+  job.progress = 5;
+
+  // Build system prompt — same logic as generate-stream
+  let wizardContextStr = '';
+  if (wizardContext) {
+    const wc = wizardContext;
+    wizardContextStr = `\n\n## PROJECT CONTEXT (from Wizard)\nApp Type: ${wc.app_type || 'custom'}\nPages to build: ${(wc.pages || []).join(', ')}\n`;
+    if (wc.brand) {
+      const b = wc.brand;
+      if (b.colors) wizardContextStr += `Brand Colors: primary=${b.colors.primary}, secondary=${b.colors.secondary}, accent=${b.colors.accent}\n`;
+      if (b.typography) wizardContextStr += `Typography: heading=${b.typography.heading}, body=${b.typography.body}\n`;
+      if (b.style) wizardContextStr += `Style: ${b.style}\n`;
+      if (b.personality) wizardContextStr += `Brand Personality: ${b.personality}\n`;
+      if (b.tone) wizardContextStr += `Brand Tone: ${b.tone}\n`;
+      if (b.mission) wizardContextStr += `Mission: ${b.mission}\n`;
+    }
+    wizardContextStr += '\nApply ALL brand context consistently across every page and component.';
+  }
+
+  // Use React system prompt for fullstack jobs
+  const REACT_SP = require('fs').existsSync(require('path').join(__dirname, 'prompts', 'WIZARD_SYSTEM_PROMPT.md'))
+    ? null // use _systemOverride if provided
+    : null;
+
+  const basePrompt = _systemOverride || (existingFiles ? null : null); // caller passes _systemOverride
+  const systemPrompt = (basePrompt || '') + wizardContextStr;
+
+  const messages = [];
+  if (systemPrompt.trim()) messages.push({ role: 'system', content: systemPrompt });
+
+  // Build user message
+  let userContent = prompt;
+  if (existingFiles && Object.keys(existingFiles).length > 0) {
+    const filesStr = Object.entries(existingFiles).map(([f, c]) => `--- FILE: ${f} ---\n${c}`).join('\n\n');
+    userContent = `Current project files:\n${filesStr}\n\nUser request: ${prompt}\n\nReturn ALL files using --- FILE: filename --- format.`;
+  }
+  messages.push({ role: 'user', content: userContent });
+
+  const startTime = Date.now();
+  console.log(`[job ${jobId}] starting: model=${model} user=${userId?.slice(0,8)||'guest'} prompt="${prompt.slice(0,60)}"`);
+
+  return new Promise((resolve, reject) => {
+    let rawContent = '';
+    let lastFileCount = 0;
+
+    callAIStream(
+      messages,
+      model,
+      // onChunk — update raw content + extract files progressively
+      (delta, fullContent) => {
+        rawContent = fullContent;
+        job.fullContent = fullContent;
+        job.progress = Math.min(85, 5 + Math.floor(fullContent.length / 2000));
+
+        // Real-time file extraction — detect completed file blocks as they stream in
+        const filePattern = /---\s*FILE:\s*(.+?)\s*---\n([\s\S]*?)(?=---\s*FILE:|$)/gi;
+        const extractedFiles = {};
+        let match;
+        const contentSoFar = fullContent;
+        // Reset regex and extract all COMPLETE file blocks (not the last one — may be partial)
+        const allMatches = [...contentSoFar.matchAll(/---\s*FILE:\s*(.+?)\s*---\n([\s\S]*?)(?=---\s*FILE:|$)/gi)];
+        // All except possibly the last (partial) block
+        const completeMatches = allMatches.length > 1 ? allMatches.slice(0, -1) : allMatches;
+        for (const m of completeMatches) {
+          const filename = m[1].trim();
+          const content = m[2].trim();
+          if (filename && content.length > 10) extractedFiles[filename] = content;
+        }
+        if (Object.keys(extractedFiles).length > lastFileCount) {
+          job.files = extractedFiles;
+          lastFileCount = Object.keys(extractedFiles).length;
+          job.progressDetail = `Generated ${lastFileCount} file${lastFileCount !== 1 ? 's' : ''}...`;
+          console.log(`[job ${jobId}] ${lastFileCount} files extracted so far`);
+        }
+      },
+      // onDone — finalize files, save to disk
+      (fullContent) => {
+        const files = extractMultiFile(fullContent);
+        const html = files['index.html'] || extractCode(fullContent);
+        const buildId = crypto.randomUUID();
+        const buildPath = path.join(BUILDS_DIR, buildId);
+
+        try {
+          fs.mkdirSync(buildPath, { recursive: true });
+          for (const [filename, content] of Object.entries(files)) {
+            const filePath = path.join(buildPath, filename);
+            const dir = path.dirname(filePath);
+            if (dir !== buildPath) fs.mkdirSync(dir, { recursive: true });
+            fs.writeFileSync(filePath, content);
+          }
+        } catch(e) {
+          console.warn(`[job ${jobId}] disk save failed:`, e.message);
+        }
+
+        if (userId) logGeneration(userId, model, prompt);
+
+        const duration = Date.now() - startTime;
+        const fileCount = Object.keys(files).length;
+        console.log(`[job ${jobId}] done: ${fileCount} files in ${duration}ms`);
+
+        // Save to Supabase
+        if (userId && SUPABASE_URL && SUPABASE_SERVICE_KEY) {
+          fetch(`${SUPABASE_URL}/rest/v1/projects`, {
+            method: 'POST',
+            headers: { 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+            body: JSON.stringify({ user_id: userId, title: prompt.slice(0, 80).replace(/[^a-zA-Z0-9 ]/g, '').trim() || 'Untitled App', prompt, html: html || '', model, build_id: buildId, files, updated_at: new Date().toISOString() })
+          }).catch(e => console.warn(`[job ${jobId}] supabase save failed:`, e.message));
+        }
+
+        // Mark job complete
+        job.status = 'done';
+        job.files = files;
+        job.buildId = buildId;
+        job.html = html;
+        job.progress = 100;
+        job.progressDetail = `Done — ${fileCount} files`;
+        resolve();
+      },
+      // onError
+      (err) => {
+        job.status = 'error';
+        job.error = err.message;
+        job.progressDetail = 'Generation failed: ' + err.message;
+        console.error(`[job ${jobId}] error:`, err.message);
+        reject(err);
+      }
+    );
+  });
+}
+
+// ── GET /api/job/:id ──────────────────────────────────────────────────────────
+// Returns current job status — frontend polls this every 2 seconds
+// Returns: { status, progress, progressDetail, files (partial), buildId, error }
+app.get('/api/job/:id', async (req, res) => {
+  const job = jobStore.get(req.params.id);
+  if (!job) return res.status(404).json({ error: 'Job not found' });
+
+  // Auth check — only job owner can poll
+  const user = await verifyUser(req.headers.authorization);
+  if (job.userId && (!user || user.id !== job.userId)) {
+    return res.status(403).json({ error: 'Unauthorized' });
+  }
+
+  res.json({
+    status: job.status,
+    progress: job.progress,
+    progressDetail: job.progressDetail,
+    fileCount: Object.keys(job.files).length,
+    fileNames: Object.keys(job.files),
+    files: job.status === 'done' ? job.files : job.files, // always return partial files for streaming
+    buildId: job.buildId,
+    html: job.html,
+    error: job.error,
+    elapsed: Math.round((Date.now() - job.startTime) / 1000)
+  });
+});
+
 app.listen(PORT, () => console.log(`🚀 Website Builder API v3.3.0-voice on port ${PORT}`));

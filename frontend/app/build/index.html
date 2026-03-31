@@ -2149,34 +2149,27 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
     }
 
     // ── generateFullStack ─────────────────────────────────────────────────────
-    // Generates a React + Shadcn/UI app with AI then boots it in WebContainers
+    // Generates a React + Shadcn/UI app using job queue + polling
     // Flow:
-    //   1. Load React base template (package.json, Shadcn components, etc.)
-    //   2. Stream AI response using REACT_SYSTEM_PROMPT (generates only app-specific files)
-    //   3. Merge: base template + AI files (AI files override base where same name)
-    //   4. Mount in WebContainer → npm install → npm run dev (Vite) → preview
-    // Affects: projectFiles, currentHtml, monacoEditor, WebContainer runtime
-    // Called by: generate() when appMode === 'fullstack'
+    //   1. POST /api/generate-job → get jobId immediately
+    //   2. Load React base template in parallel
+    //   3. Poll /api/job/:id every 2s — update progress + stream files to Monaco
+    //   4. On done: merge template + AI files → boot WebContainer
+    // Survives tab close — job runs on server regardless of connection
     async function generateFullStack(prompt) {
       setStatus('generating');
       document.getElementById('send-btn').classList.add('disabled');
-      // Override build steps with React-specific messages
-      const reactSteps = getBuildSteps(true);
-      _buildMsgEl = addMessage(reactSteps[0].text + ' <span style="font-size:10px;color:var(--text-4)">(Sonnet 4.6)</span>', 'ai');
-      reactSteps.slice(1).forEach(step => {
-        setTimeout(() => { if (_buildMsgEl) _buildMsgEl.innerHTML = step.text; }, step.delay);
-      });
+
+      // Show React-specific build status
+      _buildMsgEl = addMessage('⚛️ Starting React build... <span style="font-size:10px;color:var(--text-4)">(Sonnet 4.6)</span>', 'ai');
 
       try {
-        // Load React base template in parallel with AI generation
+        // Load React base template in parallel with job start
         const templatePromise = loadReactTemplate();
 
-        // Generate app-specific files with AI
-        const model = document.getElementById('model-select').value;
+        // Build prompt with wizard context
         const wizardCtx = window._activeWizardContext;
         window._activeWizardContext = null;
-
-        // Inject wizard context into prompt if available
         let fullPrompt = prompt + '\n\nBuild this as a React + Vite + Shadcn/UI app.';
         if (wizardCtx) {
           fullPrompt += `\n\nApp context:\n- Type: ${wizardCtx.app_type || 'web app'}\n- Pages: ${(wizardCtx.pages||[]).join(', ')}`;
@@ -2184,51 +2177,68 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
           if (wizardCtx.brand?.personality) fullPrompt += `\n- Brand personality: ${wizardCtx.brand.personality}`;
         }
 
-        const res = await fetch(`${API}/api/generate-stream`, {
+        // Start job — returns immediately with jobId
+        const jobRes = await fetch(`${API}/api/generate-job`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', ...(await getAuthHeader()) },
-          body: JSON.stringify({ prompt: fullPrompt, model: 'anthropic/claude-sonnet-4-6', _systemOverride: REACT_SYSTEM_PROMPT })
+          body: JSON.stringify({ prompt: fullPrompt, model: 'anthropic/claude-sonnet-4-6', _systemOverride: REACT_SYSTEM_PROMPT, wizardContext: wizardCtx })
+        });
+        if (!jobRes.ok) { const d = await jobRes.json(); throw new Error(d.error || 'Failed to start job'); }
+        const { jobId } = await jobRes.json();
+        if (_buildMsgEl) _buildMsgEl.innerHTML = `⚛️ Building your React app... <span style="font-size:10px;color:var(--text-4)">Job ${jobId.slice(0,8)}</span>`;
+
+        // Poll job status every 2 seconds
+        let seenFiles = new Set();
+        let firstFileSeen = false;
+        const authHeader = await getAuthHeader();
+
+        const jobData = await new Promise((resolve, reject) => {
+          const interval = setInterval(async () => {
+            try {
+              const pollRes = await fetch(`${API}/api/job/${jobId}`, { headers: authHeader });
+              if (!pollRes.ok) { clearInterval(interval); return reject(new Error('Job poll failed')); }
+              const data = await pollRes.json();
+
+              // Update progress message
+              if (_buildMsgEl) {
+                const elapsed = data.elapsed ? ` (${data.elapsed}s)` : '';
+                _buildMsgEl.innerHTML = `⚛️ ${data.progressDetail || 'Building...'}${elapsed} <span style="font-size:10px;color:var(--text-4)">${data.fileCount || 0} files</span>`;
+              }
+
+              // Stream new files to Monaco as they appear (file-by-file)
+              const currentFiles = data.files || {};
+              for (const [filename, content] of Object.entries(currentFiles)) {
+                if (!seenFiles.has(filename)) {
+                  seenFiles.add(filename);
+                  projectFiles[filename] = content;
+                  if (!firstFileSeen) {
+                    firstFileSeen = true;
+                    activeFile = filename.includes('App.jsx') ? filename : (filename.includes('Dashboard') ? filename : filename);
+                    if (typeof renderFileTree === 'function') renderFileTree();
+                    if (typeof renderEditorTabs === 'function') renderEditorTabs();
+                  }
+                  if (typeof updateEditor === 'function' && (filename.includes('App.jsx') || filename.includes('Dashboard'))) {
+                    updateEditor(content);
+                  }
+                  if (typeof renderFileTree === 'function') renderFileTree();
+                }
+              }
+
+              if (data.status === 'done') { clearInterval(interval); resolve(data); }
+              else if (data.status === 'error') { clearInterval(interval); reject(new Error(data.error || 'Generation failed')); }
+            } catch(e) { clearInterval(interval); reject(e); }
+          }, 2000);
         });
 
-        if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Generation failed'); }
-
-        // Read SSE stream
-        const reader = res.body.getReader();
-        const decoder = new TextDecoder();
-        let buffer = '';
-        let fullContent = '';
-        let buildId = null;
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split('\n');
-          buffer = lines.pop() || '';
-          for (const line of lines) {
-            if (!line.startsWith('data: ')) continue;
-            try {
-              const event = JSON.parse(line.slice(6));
-              if (event.type === 'chunk') fullContent += event.delta;
-              if (event.type === 'done') { buildId = event.buildId; }
-              if (event.type === 'error') throw new Error(event.error);
-            } catch(e) { if (e.message && !e.message.includes('JSON')) throw e; }
-          }
-        }
-
-        // Parse AI-generated files
-        const aiFiles = extractMultiFileClient(fullContent);
-        clearBuildStatusMessages();
-        if (_buildMsgEl) _buildMsgEl.innerHTML = '✓ App generated — loading React template...';
-
-        // Merge: base template + AI files (AI overrides base for same filenames)
+        // Merge: base template + AI files
+        const aiFiles = jobData.files || {};
         const baseTemplate = await templatePromise;
         const files = baseTemplate ? { ...baseTemplate, ...aiFiles } : aiFiles;
         console.log(`[react] Merged ${Object.keys(baseTemplate||{}).length} template + ${Object.keys(aiFiles).length} AI files = ${Object.keys(files).length} total`);
 
-        if (_buildMsgEl) _buildMsgEl.innerHTML = '✓ React app ready — booting Vite in your browser...';
+        if (_buildMsgEl) _buildMsgEl.innerHTML = '✓ App generated — booting Vite in your browser...';
 
-        // Load files into Monaco editor + file tree
+        // Load all files into editor
         currentHtml = files['index.html'] || '';
         projectFiles = files;
         activeFile = 'src/App.jsx';
@@ -2237,9 +2247,9 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
         if (typeof renderEditorTabs === 'function') renderEditorTabs();
         if (typeof updateEditor === 'function') updateEditor(files['src/App.jsx'] || files['src/pages/Dashboard.jsx'] || '');
 
-        // Boot WebContainer and run the React app
-        await runInWebContainer(files, _buildMsgEl, true); // true = react mode (npm run dev)
-        saveProject(prompt, fullContent, model, buildId);
+        // Boot WebContainer — React uses Vite dev server
+        await runInWebContainer(files, _buildMsgEl, true);
+        saveProject(prompt, jobData.html || '', 'anthropic/claude-sonnet-4-6', jobData.buildId);
         incrementGuestCount();
         fetchUsage();
 
