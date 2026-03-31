@@ -2195,8 +2195,8 @@ Return a multi-file project using this EXACT format. Each file starts with "--- 
         const jobData = await new Promise((resolve, reject) => {
           const interval = setInterval(async () => {
             try {
-              const pollRes = await fetch(`${API}/api/job/${jobId}`, { headers: authHeader });
-              if (!pollRes.ok) { clearInterval(interval); return reject(new Error('Job poll failed')); }
+              const pollRes = await fetch(`${API}/api/job/${jobId}`);
+              if (!pollRes.ok) { clearInterval(interval); return reject(new Error('Job poll failed: HTTP ' + pollRes.status)); }
               const data = await pollRes.json();
 
               // Update progress message

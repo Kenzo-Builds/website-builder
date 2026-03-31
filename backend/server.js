@@ -693,7 +693,7 @@ ${isMultiFile ? 'Return ALL files using the --- FILE: filename --- format.' : 'R
         if (userId && SUPABASE_URL && SUPABASE_SERVICE_KEY) {
           const projectData = {
             user_id: userId,
-            title: prompt.slice(0, 80).replace(/[^a-zA-Z0-9 ]/g, '').trim() || 'Untitled App',
+            name: prompt.slice(0, 80).replace(/[^a-zA-Z0-9 ]/g, '').trim() || 'Untitled App',
             prompt,
             html: html || '',
             model,
@@ -2648,7 +2648,7 @@ async function runGenerationJob(jobId, prompt, model, existingFiles, _systemOver
           fetch(`${SUPABASE_URL}/rest/v1/projects`, {
             method: 'POST',
             headers: { 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
-            body: JSON.stringify({ user_id: userId, title: projectTitle, prompt: prompt.slice(0, 5000), html: html?.slice(0, 50000) || '', model, build_id: buildId, files, updated_at: new Date().toISOString() })
+            body: JSON.stringify({ user_id: userId, name: projectTitle, prompt: prompt.slice(0, 5000), html: html?.slice(0, 50000) || '', model, build_id: buildId, files, updated_at: new Date().toISOString() })
           }).then(async (r) => {
             if (r.ok) console.log(`[job ${jobId}] ✅ saved to Supabase`);
             else console.warn(`[job ${jobId}] Supabase save status ${r.status}:`, await r.text());
