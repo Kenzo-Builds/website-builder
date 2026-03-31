@@ -2327,8 +2327,8 @@ app.post('/api/deploy-react', async (req, res) => {
     }
     if (!files || !Object.keys(files).length) return res.status(400).json({ error: 'No project files found' });
 
-    // Write project files to temp build directory
-    const buildDir = path.join(BUILDS_DIR, `react-build-${Date.now()}`);
+    // Write project files to a workspace-relative dir (must be accessible from host for deploy API)
+    const buildDir = path.join(__dirname, '..', '..', '..', 'react-deploy-tmp', `${subdomain}-${Date.now()}`);
     fs.mkdirSync(buildDir, { recursive: true });
     for (const [filename, content] of Object.entries(files)) {
       const filePath = path.join(buildDir, filename);
@@ -2353,7 +2353,7 @@ app.post('/api/deploy-react', async (req, res) => {
     // Deploy dist/ as static site
     const deployBody = JSON.stringify({
       domain: `${subdomain}.kenzoagent.com`,
-      files_path: distDir.replace('/home/node/.openclaw', '/root/.openclaw')
+      files_path: distDir.replace('/home/node/.openclaw/workspace', '/root/.openclaw/workspace')
     });
     const result = await new Promise((resolve, reject) => {
       const opts = { hostname: DEPLOY_HOST, port: DEPLOY_PORT, path: '/deploy', method: 'POST', headers: { 'Content-Type': 'application/json' } };
@@ -2361,8 +2361,8 @@ app.post('/api/deploy-react', async (req, res) => {
       r.on('error', reject); r.write(deployBody); r.end();
     });
 
-    // Cleanup temp build dir
-    try { fs.rmSync(buildDir, { recursive: true, force: true }); } catch(e) {}
+    // Cleanup temp build dir (in workspace, so use trash-safe remove)
+    try { fs.rmSync(buildDir, { recursive: true, force: true }); } catch(e) { console.warn('Cleanup failed:', e.message); }
 
     const deployedUrl = `https://${subdomain}.kenzoagent.com`;
 
