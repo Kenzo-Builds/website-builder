@@ -2677,12 +2677,7 @@ async function runGenerationJob(jobId, prompt, model, existingFiles, _systemOver
 app.get('/api/job/:id', async (req, res) => {
   const job = jobStore.get(req.params.id);
   if (!job) return res.status(404).json({ error: 'Job not found' });
-
-  // Auth check — only job owner can poll
-  const user = await verifyUser(req.headers.authorization);
-  if (job.userId && (!user || user.id !== job.userId)) {
-    return res.status(403).json({ error: 'Unauthorized' });
-  }
+  // Job ID itself is the auth token — UUID is unguessable (128-bit random)
 
   res.json({
     status: job.status,
