@@ -2286,87 +2286,150 @@ app.get('/api/react-template', (req, res) => {
 });
 
 // ── POST /api/deploy-react ─────────────────────────────────────────────────────
-// Deploys a React/Vite project: builds it server-side then deploys dist/ as static site
-// Dependencies: verifyUser, http.request (deploy API), fetch (Supabase)
-// Flow:
-//   1. Verify user + validate subdomain
-//   2. Write all project files to a temp directory
-//   3. Run npm install + npm run build via child_process
-//   4. Deploy the dist/ folder as static site via deploy API
-//   5. Update Supabase project record with deployed_url
+// Deploys a React/Vite project as a full-stack app:
+//   - Builds React frontend with Vite → serves from Express static
+//   - Wraps everything in a single Express server (serves dist/ + /api/* routes)
+//   - Deploys as Docker container via host deploy API
+// This way /api/* calls work in production (no separate backend needed)
 app.post('/api/deploy-react', async (req, res) => {
   const user = await verifyUser(req.headers.authorization);
   if (!user?.id) return res.status(401).json({ error: 'Login required to deploy' });
 
   const { buildId, subdomain, projectId, files: clientFiles } = req.body;
   if (!subdomain) return res.status(400).json({ error: 'subdomain required' });
-
-  if (!/^[a-z0-9][a-z0-9-]{1,30}[a-z0-9]$/.test(subdomain)) {
-    return res.status(400).json({ error: 'Invalid subdomain format' });
-  }
+  if (!/^[a-z0-9][a-z0-9-]{1,30}[a-z0-9]$/.test(subdomain)) return res.status(400).json({ error: 'Invalid subdomain format' });
   const reserved = ['kenzo', 'admin', 'api', 'www', 'mail', 'builder', 'app', 'dashboard', 'auth', 'login', 'static', 'assets', 'cdn'];
   if (reserved.includes(subdomain)) return res.status(400).json({ error: 'Reserved subdomain' });
 
   try {
-    // Get project files — from request body or from disk
+    // Get project files
     let files = clientFiles;
     if (!files && buildId) {
       let buildPath = path.join(BUILDS_DIR, buildId);
       if (!fs.existsSync(buildPath)) buildPath = path.join(DEPLOYED_BUILDS_DIR, buildId);
       if (fs.existsSync(buildPath)) {
         files = {};
-        function readDir(dir, base = '') {
+        const readDirRec = (dir, base = '') => {
           for (const item of fs.readdirSync(dir, { withFileTypes: true })) {
             const rel = base ? `${base}/${item.name}` : item.name;
-            if (item.isDirectory()) readDir(path.join(dir, item.name), rel);
+            if (item.isDirectory()) readDirRec(path.join(dir, item.name), rel);
             else files[rel] = fs.readFileSync(path.join(dir, item.name), 'utf8');
           }
-        }
-        readDir(buildPath);
+        };
+        readDirRec(buildPath);
       }
     }
     if (!files || !Object.keys(files).length) return res.status(400).json({ error: 'No project files found' });
 
-    // Write project files to a workspace-relative dir (must be accessible from host for deploy API)
+    // Use workspace-relative dir (host-accessible for deploy API)
     const buildDir = path.join(__dirname, '..', '..', '..', 'react-deploy-tmp', `${subdomain}-${Date.now()}`);
     fs.mkdirSync(buildDir, { recursive: true });
+
+    // Write all project files
     for (const [filename, content] of Object.entries(files)) {
       const filePath = path.join(buildDir, filename);
       fs.mkdirSync(path.dirname(filePath), { recursive: true });
       fs.writeFileSync(filePath, typeof content === 'string' ? content : JSON.stringify(content));
     }
 
-    // Run npm install + vite build
+    // Patch vite.config.js to remove proxy (not needed in production)
+    const viteConfigPath = path.join(buildDir, 'vite.config.js');
+    if (fs.existsSync(viteConfigPath)) {
+      let viteConfig = fs.readFileSync(viteConfigPath, 'utf8');
+      // Remove proxy section — in production, Express serves both static + API
+      viteConfig = viteConfig.replace(/server:\s*\{[\s\S]*?proxy[\s\S]*?\},?/g, '');
+      fs.writeFileSync(viteConfigPath, viteConfig);
+    }
+
+    // Build React frontend with Vite
     const { execSync } = require('child_process');
-    console.log(`[deploy-react] Running npm install in ${buildDir}...`);
-    execSync('npm install --production=false 2>&1', { cwd: buildDir, timeout: 120000 });
-    console.log(`[deploy-react] Running npm run build...`);
+    console.log(`[deploy-react] npm install in ${buildDir}...`);
+    execSync('npm install --production=false 2>&1', { cwd: buildDir, timeout: 180000 });
+    console.log(`[deploy-react] npm run build...`);
     execSync('npm run build 2>&1', { cwd: buildDir, timeout: 120000 });
 
     const distDir = path.join(buildDir, 'dist');
-    if (!fs.existsSync(distDir)) return res.status(500).json({ error: 'Build failed: no dist directory' });
+    if (!fs.existsSync(distDir)) return res.status(500).json({ error: 'Vite build failed: no dist/ directory' });
 
-    // Generate nginx config for static site
-    const nginxConf = `server {\n    listen 80;\n    server_name ${subdomain}.kenzoagent.com;\n    root /var/www/${subdomain}.kenzoagent.com;\n    index index.html;\n    location / { try_files $uri $uri/ /index.html; }\n}`;
-    fs.writeFileSync(path.join(distDir, 'nginx.conf'), nginxConf);
+    // Patch server.js to serve built React frontend + keep API routes
+    const serverJsPath = path.join(buildDir, 'server.js');
+    if (fs.existsSync(serverJsPath)) {
+      let serverJs = fs.readFileSync(serverJsPath, 'utf8');
+      // Replace port to use PORT env var
+      serverJs = serverJs.replace(/const PORT = .*?;/, 'const PORT = process.env.PORT || 3000;');
+      // Add static serving of dist/ if not already there
+      if (!serverJs.includes("express.static('dist')") && !serverJs.includes('express.static("dist")')) {
+        serverJs = serverJs.replace(
+          /app\.listen/,
+          `app.use(require('express').static(require('path').join(__dirname, 'dist')));\napp.get('*', (req, res) => { if (!req.path.startsWith('/api')) res.sendFile(require('path').join(__dirname, 'dist', 'index.html')); });\napp.listen`
+        );
+      }
+      fs.writeFileSync(serverJsPath, serverJs);
+    }
 
-    // Deploy dist/ as static site
-    const deployBody = JSON.stringify({
-      domain: `${subdomain}.kenzoagent.com`,
-      files_path: distDir.replace('/home/node/.openclaw/workspace', '/root/.openclaw/workspace')
+    // Assign port for Docker container
+    const appPort = getNextPort();
+    const containerName = 'app-' + subdomain;
+
+    // Generate Dockerfile
+    const dockerfile = `FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install --production
+COPY . .
+ENV PORT=3000
+ENV DATABASE_URL=${DATABASE_URL || ''}
+ENV SUPABASE_URL=${SUPABASE_URL || ''}
+ENV SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY || ''}
+EXPOSE 3000
+CMD ["node", "server.js"]
+`;
+    fs.writeFileSync(path.join(buildDir, 'Dockerfile'), dockerfile);
+
+    // Generate nginx config (proxies all requests to Express which serves both static + /api/)
+    const nginxConf = `server {
+    listen 80;
+    server_name ${subdomain}.kenzoagent.com;
+    location / {
+        proxy_pass http://127.0.0.1:${appPort};
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_cache_bypass $http_upgrade;
+    }
+}`;
+    fs.writeFileSync(path.join(buildDir, 'nginx.conf'), nginxConf);
+
+    const hostBuildDir = buildDir.replace('/home/node/.openclaw/workspace', '/root/.openclaw/workspace');
+
+    // Deploy via Docker
+    const dockerBody = JSON.stringify({
+      subdomain,
+      files_path: hostBuildDir,
+      port: appPort,
+      memory: '256m',
+      cpus: '0.5',
+      env: { DATABASE_URL: DATABASE_URL || '', SUPABASE_URL: SUPABASE_URL || '', SUPABASE_ANON_KEY: SUPABASE_ANON_KEY || '', PORT: '3000' }
     });
-    const result = await new Promise((resolve, reject) => {
-      const opts = { hostname: DEPLOY_HOST, port: DEPLOY_PORT, path: '/deploy', method: 'POST', headers: { 'Content-Type': 'application/json' } };
+
+    const deployResult = await new Promise((resolve, reject) => {
+      const opts = { hostname: DEPLOY_HOST, port: DEPLOY_PORT, path: '/docker/deploy-app', method: 'POST', headers: { 'Content-Type': 'application/json' } };
       const r = http.request(opts, (res2) => { let d=''; res2.on('data',c=>d+=c); res2.on('end',()=>{ try{resolve(JSON.parse(d))}catch(e){resolve({raw:d})} }); });
-      r.on('error', reject); r.write(deployBody); r.end();
+      r.on('error', reject); r.write(dockerBody); r.end();
     });
 
-    // Cleanup temp build dir (in workspace, so use trash-safe remove)
-    try { fs.rmSync(buildDir, { recursive: true, force: true }); } catch(e) { console.warn('Cleanup failed:', e.message); }
+    if (!deployResult.success) throw new Error(deployResult.error || 'Docker deploy failed');
+
+    assignPort(subdomain, appPort);
+
+    // Cleanup temp build dir
+    try { fs.rmSync(buildDir, { recursive: true, force: true }); } catch(e) { console.warn('Cleanup:', e.message); }
 
     const deployedUrl = `https://${subdomain}.kenzoagent.com`;
 
-    // Update Supabase project record
+    // Update Supabase project
     if (projectId) {
       await fetch(`${SUPABASE_URL}/rest/v1/projects?id=eq.${projectId}&user_id=eq.${user.id}`, {
         method: 'PATCH',
@@ -2375,7 +2438,7 @@ app.post('/api/deploy-react', async (req, res) => {
       });
     }
 
-    console.log(`[deploy-react] ✅ Deployed to ${deployedUrl}`);
+    console.log(`[deploy-react] ✅ ${containerName} live at ${deployedUrl} (port ${appPort})`);
     res.json({ success: true, url: deployedUrl });
 
   } catch(err) {
