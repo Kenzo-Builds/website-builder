@@ -384,7 +384,9 @@ function extractMultiFile(response) {
   let match;
   while ((match = filePattern.exec(response)) !== null) {
     const filename = match[1].trim(); // preserve case for React (App.jsx, Dashboard.jsx, etc.)
-    const content = match[2].trim();
+    let content = match[2].trim();
+    // Strip markdown code fences if AI wrapped the content
+    content = content.replace(/^```[\w]*\n?/, '').replace(/\n?```\s*$/, '').trim();
     if (filename && content) files[filename] = content;
   }
   if (Object.keys(files).length > 0) return files;
