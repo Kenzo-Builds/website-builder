@@ -2332,21 +2332,43 @@ app.post('/api/deploy-react', async (req, res) => {
       fs.writeFileSync(filePath, typeof content === 'string' ? content : JSON.stringify(content));
     }
 
-    // Patch vite.config.js to remove proxy (not needed in production)
+    // Replace vite.config.js with clean production config (no dev proxy needed)
     const viteConfigPath = path.join(buildDir, 'vite.config.js');
-    if (fs.existsSync(viteConfigPath)) {
-      let viteConfig = fs.readFileSync(viteConfigPath, 'utf8');
-      // Remove proxy section — in production, Express serves both static + API
-      viteConfig = viteConfig.replace(/server:\s*\{[\s\S]*?proxy[\s\S]*?\},?/g, '');
-      fs.writeFileSync(viteConfigPath, viteConfig);
-    }
+    const cleanViteConfig = `import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import path from 'path'
+
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true,
+  }
+})
+`;
+    fs.writeFileSync(viteConfigPath, cleanViteConfig);
 
     // Build React frontend with Vite
     const { execSync } = require('child_process');
     console.log(`[deploy-react] npm install in ${buildDir}...`);
-    execSync('npm install --production=false 2>&1', { cwd: buildDir, timeout: 180000 });
+    try {
+      const installOut = execSync('npm install --production=false', { cwd: buildDir, timeout: 180000, stdio: 'pipe' });
+      console.log(`[deploy-react] npm install done`);
+    } catch(e) {
+      throw new Error('npm install failed: ' + (e.stderr?.toString() || e.message).slice(0,500));
+    }
     console.log(`[deploy-react] npm run build...`);
-    execSync('npm run build 2>&1', { cwd: buildDir, timeout: 120000 });
+    try {
+      const buildOut = execSync('npm run build', { cwd: buildDir, timeout: 120000, stdio: 'pipe' });
+      console.log(`[deploy-react] build output:`, buildOut?.toString().slice(0,300));
+    } catch(e) {
+      throw new Error('npm run build failed: ' + (e.stderr?.toString() || e.stdout?.toString() || e.message).slice(0,800));
+    }
 
     const distDir = path.join(buildDir, 'dist');
     if (!fs.existsSync(distDir)) return res.status(500).json({ error: 'Vite build failed: no dist/ directory' });
