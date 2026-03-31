@@ -56,7 +56,7 @@ app.use(express.json({ limit: '10mb' }));
 // General API rate limit — 30 req/min per IP
 const apiLimiter = rateLimit({
   windowMs: 60 * 1000,
-  max: 30,
+  max: 120, // increased for job polling (poll every 2s = 30/min + other API calls)
   message: { error: 'Too many requests. Please slow down.' },
   standardHeaders: true,
   legacyHeaders: false,
